@@ -1,35 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "NetComp.h"
 
+#include "Network/Marshaller.h"
+#include "Network/SocketManager.h"
 
-// Sets default values for this component's properties
-UNetComp::UNetComp()
+int32 UNetComp::sendInput(const FVector2D &input)
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
-}
-
-
-// Called when the game starts
-void UNetComp::BeginPlay()
-{
-	Super::BeginPlay();
-
-	// ...
-	
-}
-
-
-// Called every frame
-void UNetComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
+	TArray<uint8> bData = Marshaller::serializeData(input);
+	return USocketManager::getInstance()->send(bData.GetData(), bData.Num());
 }
 

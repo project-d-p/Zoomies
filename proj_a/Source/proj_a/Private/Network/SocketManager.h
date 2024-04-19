@@ -18,13 +18,16 @@ public:
 	
 	USocketManager();
 	bool connect(const FString& iP, int32 port);
-	int32 send(const uint8* data, int32 count) const;
-	int32 receive(uint8& outData, int32 bufferSize) const;
+
+	// XXX: sock 인자는 tcp, udp를 구분하여 입력. 
+	static int32 send(FSocket* &sock, const uint8* data, int32 count);
+	static int32 receive(FSocket* &sock, uint8& outData, int32 bufferSize);
 	void close() const;
 
 private:
-	static USocketManager* Instance;
-	FSocket* sock_;
+	static USocketManager* instance_;
+	FSocket* udpSock_;
+	FSocket* tcpSock_;
 	// FSocket* chatSock_;
 	ISocketSubsystem* socketSubSystem_;
 };

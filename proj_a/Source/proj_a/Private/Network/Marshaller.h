@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Serialization/MemoryWriter.h"
 #include "Serialization/BufferArchive.h"
 
 /**
@@ -13,14 +12,20 @@
 class Marshaller
 {
 public:
+	template<typename T, typename = void>
+struct is_range : std::false_type {};
+
+	template<typename T>
+	struct is_range<T, std::void_t<decltype(std::begin(std::declval<T>())), decltype(std::end(std::declval<T>()))>> : std::true_type {};
+	
 	template <typename T>
 	static TArray<uint8> serializeData(const T& data)
 	{
 		FBufferArchive archive;
 
-		for (auto d : data)
-			archive << d;
-		
+		// for (auto d : data)
+		// 	archive << d;
+
 		TArray<uint8> outData;
 		outData.Append(archive.GetData(), archive.Num());
 		archive.FlushCache();
@@ -35,8 +40,8 @@ public:
 		T data;
 		FMemoryReader Reader(inData);
 
-		for (auto d : data)
-			Reader << d;
+		// for (auto d : data)
+		// 	Reader << d;
 
 		Reader.FlushCache();
 		Reader.Close();
@@ -49,10 +54,10 @@ public:
 	{
 		std::string buffer;
 		data.SerializeToString(&buffer);
-		
+
 		TArray<uint8> OutData;
 		OutData.Append(reinterpret_cast<const uint8*>(buffer.data()), buffer.size());
-    
+
 		return OutData;
 	}
 

@@ -7,19 +7,22 @@
 #include "SocketSubsystem.h"
 #include "Interfaces/IPv4/IPv4Address.h"
 
+USocketManager* USocketManager::instance_ = nullptr;
+
 USocketManager* USocketManager::getInstance()
 {
-	if (Instance == nullptr)
+	if (instance_ == nullptr)
 	{
-		Instance = NewObject<USocketManager>();
-		Instance->AddToRoot();
+		instance_ = NewObject<USocketManager>();
+		instance_->AddToRoot();
 	}
-	return Instance;
+	return instance_;
 }
 
 USocketManager::USocketManager()
 {
-	sock_ = nullptr;
+	udpSock_ = nullptr;
+	tcpSock_ = nullptr;
 	socketSubSystem_ = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM);
 }
 
@@ -30,27 +33,33 @@ bool USocketManager::connect(const FString &sIp, int32 port)
 
 	TSharedRef<FInternetAddr> addr = socketSubSystem_->CreateInternetAddr();
 	addr->SetIp(ip.Value);
+	// XXX: 포트가 분리되어야하는지 확인 필요
 	addr->SetPort(port);
 
-	sock_ = socketSubSystem_->CreateSocket(NAME_Stream, TEXT("test"), false);
-
-	return sock_->Connect(*addr);
+	tcpSock_ = socketSubSystem_->CreateSocket(NAME_Stream, TEXT("InGame_TCP_Socket"), false);
+	udpSock_ = socketSubSystem_->CreateSocket(NAME_DGram, TEXT("InGame_UDP_Socket"), false);
+	
+	return tcpSock_->Connect(*addr);
 }
 
-int32 USocketManager::send(const uint8* data, int32 count) const
+// XXX: sock에 tcp, udp를 구분하여 입력.
+int32 USocketManager::send(FSocket* &sock, const uint8* data, int32 count)
 {
 	int32 sent = 0;
-	return sock_->Send(data, count, sent);
+	return sock->Send(data, count, sent);
 }
 
-int32 USocketManager::receive(uint8& outData, int32 bufferSize) const
+int32 USocketManager::receive(FSocket* &sock, uint8& outData, int32 bufferSize)
 {
 	int32 read = 0;
-	return sock_->Recv(&outData, bufferSize, read);
+	return sock->Recv(&outData, bufferSize, read);
 }
 
+// XXX: 게임 종료시 반드시 호출해야함.
 void USocketManager::close() const
 {
-	sock_->Close();
-	socketSubSystem_->DestroySocket(sock_);
+	udpSock_->Close();
+	tcpSock_->Close();
+	socketSubSystem_->DestroySocket(udpSock_);
+	socketSubSystem_->DestroySocket(tcpSock_);
 }
