@@ -42,6 +42,16 @@ bool USocketManager::connect(const FString &sIp, int32 port)
 	return tcpSock_->Connect(*addr);
 }
 
+FSocket* USocketManager::getUDPSocket() const
+{
+	return udpSock_;
+}
+
+FSocket* USocketManager::getTCPSocket() const
+{
+	return tcpSock_;
+}
+
 // XXX: sock에 tcp, udp를 구분하여 입력.
 int32 USocketManager::send(FSocket* &sock, const uint8* data, int32 count)
 {

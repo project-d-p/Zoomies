@@ -12,12 +12,6 @@
 class Marshaller
 {
 public:
-	template<typename T, typename = void>
-struct is_range : std::false_type {};
-
-	template<typename T>
-	struct is_range<T, std::void_t<decltype(std::begin(std::declval<T>())), decltype(std::end(std::declval<T>()))>> : std::true_type {};
-	
 	template <typename T>
 	static TArray<uint8> serializeData(const T& data)
 	{
