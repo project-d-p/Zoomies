@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "DPCharacter.h"
 #include "DPPlayerController.h"
+#include "DPCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
@@ -91,12 +91,12 @@ void ADPPlayerController::Jump(const FInputActionValue& value)
 
 void ADPPlayerController::Rotate(const FInputActionValue& value)
 {
-	// UE_LOG(LogTemp, Warning, TEXT("ia_rotate_x : %f"), value.Get<FVector2D>().X);
+	// UE_LOG(LogTemp, Warning, TEXT("ia_rotate_X : %f"), value.Get<FVector2D>().X);
 	// UE_LOG(LogTemp, Warning, TEXT("ia_rotate_y : %f"), value.Get<FVector2D>().Y);
 	
 	FVector2D actionValue = value.Get<FVector2D>();
 
-	// send rotate command ( id, actionValue )	// 시선은 안보내도 상관없엇나 ?
+	// send rotate command ( id, actionValue )
 	character->AddControllerYawInput(actionValue.X);
 	character->AddControllerPitchInput(actionValue.Y);
 }

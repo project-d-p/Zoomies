@@ -1,7 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "DPCharacter.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
 
 // Sets default values
@@ -27,6 +29,18 @@ ADPCharacter::ADPCharacter()
 	springArm->TargetArmLength = 700.0f;
 	//springArm->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
 	springArm->bUsePawnControlRotation = true;
+
+	// 움직이는 방향을 자동으로 보게
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	bUseControllerRotationYaw = false;
+
+	// 애니메이션 모드, 클래스 적용
+	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
+	(TEXT("/Game/blueprints/characterAnimation.characterAnimation_C"));
+	if (ANIM_CHARACTER.Succeeded()) {
+		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -40,7 +54,16 @@ void ADPCharacter::BeginPlay()
 void ADPCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	// 현재 속도 벡터 구하고 크기
+	if (GetCharacterMovement()) {
+		currentVelocity = GetCharacterMovement()->Velocity;
+		speed = currentVelocity.Size();
+	}
+	else
+		UE_LOG(LogTemp, Warning, TEXT("mmmmmmmmmmmmmmmmmmmmmmmm"));
 
+	UE_LOG(LogTemp, Warning, TEXT("speed : %f"), speed);
 }
 
 // Called to bind functionality to input
