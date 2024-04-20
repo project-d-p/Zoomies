@@ -21,12 +21,21 @@ public class proj_a : ModuleRules
 		
 		// XXX: 배포시에 컴파일 코드 삭제(혹은 주석 처리)
 		string protocPath = Path.Combine(protobufPath, "tools", "protobuf", "protoc.exe");
-		string protoFilesPath = Path.Combine(ModuleDirectory, "Protobuf");
-		string generatedProtoFilesPath = Path.Combine(ModuleDirectory, "pb_File");
+		string protoFilesPath = Path.Combine(ModuleDirectory, "Protobuf", "Proto_file");
+		string generatedProtoFilesPath = Path.Combine(ModuleDirectory, "Protobuf", "Pb_File");
 		
 		System.Console.WriteLine("Compiling .proto files...");
 		CompileProtoFiles(protocPath, protoFilesPath, generatedProtoFilesPath);
 		//
+		
+		PublicIncludePaths.AddRange(new string[] {
+			"proj_a/Actor/Controller/Public",
+			"proj_a/Actor/Character/Public",
+			"proj_a/Component/Public",
+			"proj_a/Network/Public",
+			"proj_a/Protobuf/Pb_File",
+			"proj_a/Core/Public",
+		});
 		
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 

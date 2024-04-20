@@ -2,8 +2,8 @@
 
 #include "NetComp.h"
 
-#include "Network/Marshaller.h"
-#include "Network/SocketManager.h"
+#include "Marshaller.h"
+#include "SocketManager.h"
 
 int32 UNetComp::sendTCP(const FVector2D &input)
 {
