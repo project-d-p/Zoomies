@@ -4,17 +4,41 @@
 
 #include "Marshaller.h"
 #include "SocketManager.h"
+#include "NetQueue.h"
 
-int32 UNetComp::sendTCP(const FVector2D &input)
+FNetworkTask* UNetComp::TCPtask = nullptr;
+FNetworkTask* UNetComp::UDPtask = nullptr;
+
+// TODO: end 추가
+
+int32 UNetComp::inputTCP(const FVector2D &input, const int32 &type)
 {
-	USocketManager *socketManager = USocketManager::getInstance();
-	FSocket *sock = socketManager->getTCPSocket();
+	if (!TCPtask)
+	{
+		TCPtask = new FNetworkTask(true);
+	}
+	if (!InputQueue.IsEmpty())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Input is not empty"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Input is empty"));
+	}
+	FInputData inputData;
+	inputData.InputVector = input;
+	inputData.Type = type;
+	InputQueue.Enqueue(inputData);
 	
-	TArray<uint8> bData = Marshaller::serializeData(input);
-	return socketManager->send(sock, bData.GetData(), bData.Num());
+	return 1;
+	// USocketManager *socketManager = USocketManager::getInstance();
+	// FSocket *sock = socketManager->getTCPSocket();
+	//
+	// TArray<uint8> bData = Marshaller::serializeData(input);
+	// return socketManager->send(sock, bData.GetData(), bData.Num());
 }
 
-int32 UNetComp::sendUDP(const FVector2D &input)
+int32 UNetComp::inputUDP(const FVector2D &input)
 {
 	USocketManager *socketManager = USocketManager::getInstance();
 	FSocket *sock = socketManager->getUDPSocket();

@@ -5,6 +5,9 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+#include "NetComp.h"
+#include "ProtobufUtility.h"
+#include "movement.pb.h"
 
 ADPPlayerController::ADPPlayerController()
 {
@@ -73,7 +76,8 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 
 	const FVector forwardVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
-	
+
+	UNetComp::inputTCP(actionValue, 0);
 	// send move command ( id, actionValue ) ( x = 1 forward, x = -1 backward, y = 1 right, y = -1 left )
 	character->AddMovementInput(forwardVector, actionValue.X);
 	character->AddMovementInput(rightVector, actionValue.Y);
@@ -96,9 +100,10 @@ void ADPPlayerController::Rotate(const FInputActionValue& value)
 	
 	FVector2D actionValue = value.Get<FVector2D>();
 
-	// send rotate command ( id, actionValue )	// 시선은 안보내도 상관없엇나 ?
+	// send rotate command ( id, actionValue )
 	character->AddControllerYawInput(actionValue.X);
 	character->AddControllerPitchInput(actionValue.Y);
+	ProtoData.set_allocated_orientation(ProtobufUtility::ConvertToFVecToVec3(character->GetControlRotation().Vector()));
 }
 
 void ADPPlayerController::UpdatePlayer(/*DataHub result*/)	// 한번에 받기 ?

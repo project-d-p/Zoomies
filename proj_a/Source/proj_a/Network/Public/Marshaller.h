@@ -46,12 +46,14 @@ public:
 	template <typename T>
 	static TArray<uint8> protoSerializeData(const T& data)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Somone called protoSerializeData"));
+
 		std::string buffer;
 		data.SerializeToString(&buffer);
-
+		
 		TArray<uint8> OutData;
 		OutData.Append(reinterpret_cast<const uint8*>(buffer.data()), buffer.size());
-
+		
 		return OutData;
 	}
 

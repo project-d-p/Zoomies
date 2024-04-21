@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Components/ActorComponent.h"
+#include "FNetworkTask.h"
 #include "NetComp.generated.h"
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -12,6 +13,9 @@ class PROJ_A_API UNetComp : public UActorComponent
 
 public:
 	// XXX: 사용성을 위해서 중복을 허용. 추후 다른 아이디어가 있다면 수정
-	static int32 sendTCP(const FVector2D &input);
-	static int32 sendUDP(const FVector2D &input);
+	static int32 inputTCP(const FVector2D &input, const int32 &type);
+	static int32 inputUDP(const FVector2D &input);
+private:
+	static FNetworkTask *TCPtask;
+	static FNetworkTask *UDPtask;
 };
