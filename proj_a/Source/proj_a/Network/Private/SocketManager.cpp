@@ -65,7 +65,7 @@ int32 USocketManager::receive(FSocket* &sock, uint8& outData, int32 bufferSize)
 	return sock->Recv(&outData, bufferSize, read);
 }
 
-// XXX: 게임 종료시 반드시 호출해야함.
+// XXX: 게임 종료시 반드시 호출해야한다.
 void USocketManager::close() const
 {
 	udpSock_->Close();

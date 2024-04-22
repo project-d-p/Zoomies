@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "message.pb.h"
 #include "Serialization/BufferArchive.h"
 
 /**
@@ -13,12 +14,9 @@ class Marshaller
 {
 public:
 	template <typename T>
-	static TArray<uint8> serializeData(const T& data)
+	static TArray<uint8> serializeData(const Movement& data)
 	{
 		FBufferArchive archive;
-
-		// for (auto d : data)
-		// 	archive << d;
 
 		TArray<uint8> outData;
 		outData.Append(archive.GetData(), archive.Num());
@@ -43,11 +41,23 @@ public:
 		return data;
 	}
 
+	static TArray<uint8> SerializeMovement(const Message& movement) {
+		// 데이터를 바이트 배열로 직렬화
+		uint32_t message_size = movement.ByteSizeLong();
+
+		TArray<uint8> buffer; // uint8의 TArray 생성
+		buffer.AddUninitialized(sizeof(message_size) + message_size);
+
+		memcpy(buffer.GetData(), &message_size, sizeof(message_size));
+		
+		movement.SerializeToArray(buffer.GetData() + sizeof(message_size), message_size);
+		
+		return buffer;
+	}
+	
 	template <typename T>
 	static TArray<uint8> protoSerializeData(const T& data)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Somone called protoSerializeData"));
-
 		std::string buffer;
 		data.SerializeToString(&buffer);
 		

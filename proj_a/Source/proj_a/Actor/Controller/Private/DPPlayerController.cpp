@@ -9,6 +9,8 @@
 #include "ProtobufUtility.h"
 #include "movement.pb.h"
 
+#include "SocketManager.h"
+
 ADPPlayerController::ADPPlayerController()
 {
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext>DEFAULT_CONTEXT
@@ -45,9 +47,25 @@ void ADPPlayerController::BeginPlay()
 		return;
 	}
 
+	// XXX: 수정
+	bool success = USocketManager::getInstance()->connect("10.19.225.124", 8080);
+	if (success) {
+		UE_LOG(LogTemp, Warning, TEXT("Connection established successfully."));
+	} else {
+		UE_LOG(LogTemp, Warning, TEXT("Failed to establish connection."));
+	}
+
 	// subsystem, IMC 연결
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 		SubSystem->AddMappingContext(defaultContext, 0);
+}
+
+void ADPPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	
+	// USocketManager::getInstance()->getTCPSocket()->Close();
+	// UNetComp::TCPtask->Stop();
 }
 
 void ADPPlayerController::SetupInputComponent()
@@ -103,6 +121,7 @@ void ADPPlayerController::Rotate(const FInputActionValue& value)
 	// send rotate command ( id, actionValue )
 	character->AddControllerYawInput(actionValue.X);
 	character->AddControllerPitchInput(actionValue.Y);
+	// XXX: 추후에 최적화 가능(필요)
 	ProtoData.set_allocated_orientation(ProtobufUtility::ConvertToFVecToVec3(character->GetControlRotation().Vector()));
 }
 

@@ -4,6 +4,7 @@
 #include "ProtobufUtility.h"
 #include "NetQueue.h"
 #include "Sockets.h"
+#include "message.pb.h"
 
 FNetworkTask::FNetworkTask(bool bUseTCP)
 {
@@ -37,8 +38,14 @@ uint32 FNetworkTask::Run()
 		}
 		Vec3* InputProgressData = ProtobufUtility::ConvertToFVecToVec3(FVector(TotalData, 0));
 		ProtoData.set_allocated_progess_vector(InputProgressData);
-
-		TArray<uint8> bData = Marshaller::serializeData(ProtoData);
+		ProtoData.set_player_id("1");
+		ProtoData.set_state(State::STATE_RUN);
+		ProtoData.set_timestamp("1");
+		
+		Message msg;
+		*msg.mutable_movement() = ProtoData;
+		
+		TArray<uint8> bData = Marshaller::SerializeMovement(msg);
 
 		int32 BytesSent = 0;
 		sock_->Send(bData.GetData(), bData.Num(), BytesSent);
