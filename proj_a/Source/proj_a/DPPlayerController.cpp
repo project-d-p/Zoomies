@@ -5,6 +5,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+#include "DPWeaponActorComponent.h"
 
 ADPPlayerController::ADPPlayerController()
 {
@@ -100,6 +101,8 @@ void ADPPlayerController::Rotate(const FInputActionValue& value)
 	character->AddControllerYawInput(actionValue.X);
 	character->AddControllerPitchInput(actionValue.Y);
 }
+
+//	character->weaponComponent->attack();
 
 void ADPPlayerController::UpdatePlayer(/*DataHub result*/)	// 한번에 받기 ?
 {

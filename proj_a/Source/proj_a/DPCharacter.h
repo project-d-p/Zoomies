@@ -31,9 +31,15 @@ public:
 	// FVector3f orientation;
 	// FString state;
 
-	// WeaponCompoment* weaponComponent;
-	// healthCompoment* healthComponent;
-	// StateComponent* stateComponent;
+public:	// component
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class UDPHpActorComponent* hpComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class UDPConstructionActorComponent* constructionComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class UDPWeaponActorComponent* weaponComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class UDPStateActorComponent* stateComponent;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
