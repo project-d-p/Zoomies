@@ -2,7 +2,7 @@
 
 #include "NetComp.h"
 
-#include "NetQueue.h"
+#include "FNetworkTask.h"
 
 // TODO: end 추가
 
@@ -11,7 +11,7 @@ int32 UNetComp::inputTCP(const FVector2D &input, const int32 &type)
 	FInputData inputData;
 	inputData.InputVector = input;
 	inputData.Type = type;
-	InputQueue.Enqueue(inputData);
+	FNetworkTask::InputQueue.Enqueue(inputData);
 	
 	return 1;
 }

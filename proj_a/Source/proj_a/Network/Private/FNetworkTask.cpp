@@ -2,9 +2,11 @@
 #include "SocketManager.h"
 #include "Marshaller.h"
 #include "ProtobufUtility.h"
-#include "NetQueue.h"
 #include "Sockets.h"
 #include "message.pb.h"
+
+Movement FNetworkTask::ProtoData;
+TQueue<FInputData, EQueueMode::Spsc> FNetworkTask::InputQueue;
 
 FNetworkTask::FNetworkTask(bool bUseTCP)
 {

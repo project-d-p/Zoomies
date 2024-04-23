@@ -38,6 +38,8 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* rotateAction;
 
+	virtual void Tick(float DeltaSeconds) override;
+	
 	void Move(const FInputActionValue& value);
 	void Jump(const FInputActionValue& value);
 	void Rotate(const FInputActionValue& value);
