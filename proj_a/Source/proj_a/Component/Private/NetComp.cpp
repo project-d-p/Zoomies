@@ -2,21 +2,12 @@
 
 #include "NetComp.h"
 
-#include "Marshaller.h"
-#include "SocketManager.h"
 #include "NetQueue.h"
-
-FNetworkTask* UNetComp::TCPtask = nullptr;
-FNetworkTask* UNetComp::UDPtask = nullptr;
 
 // TODO: end 추가
 
 int32 UNetComp::inputTCP(const FVector2D &input, const int32 &type)
 {
-	if (!TCPtask)
-	{
-		TCPtask = new FNetworkTask(true);
-	}
 	FInputData inputData;
 	inputData.InputVector = input;
 	inputData.Type = type;

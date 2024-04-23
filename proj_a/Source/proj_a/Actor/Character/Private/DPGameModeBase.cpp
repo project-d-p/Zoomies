@@ -4,9 +4,31 @@
 #include "DPGameModeBase.h"
 #include "DPCharacter.h"
 #include "DPPlayerController.h"
+#include "SocketManager.h"
 
 ADPGameModeBase::ADPGameModeBase()
 {
 	DefaultPawnClass = ADPCharacter::StaticClass();
 	PlayerControllerClass = ADPPlayerController::StaticClass();
+}
+
+void ADPGameModeBase::StartPlay()
+{
+	Super::StartPlay();
+
+	// 재시도 로직 추가 해야함.
+	bool success = USocketManager::getInstance()->connect("10.19.225.124", 8080);
+	if (success) {
+		UE_LOG(LogTemp, Warning, TEXT("Connection established successfully."));
+	} else {
+		UE_LOG(LogTemp, Warning, TEXT("Failed to establish connection."));
+	}
+	USocketManager::getInstance()->runTask();
+}
+
+void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	USocketManager::getInstance()->close();
 }

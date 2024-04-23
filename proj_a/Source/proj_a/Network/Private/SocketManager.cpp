@@ -6,6 +6,7 @@
 #include "Sockets.h"
 #include "SocketSubsystem.h"
 #include "Interfaces/IPv4/IPv4Address.h"
+#include "FNetworkTask.h"
 
 USocketManager* USocketManager::instance_ = nullptr;
 
@@ -33,13 +34,23 @@ bool USocketManager::connect(const FString &sIp, int32 port)
 
 	TSharedRef<FInternetAddr> addr = socketSubSystem_->CreateInternetAddr();
 	addr->SetIp(ip.Value);
-	// XXX: 포트가 분리되어야하는지 확인 필요
+	// XXX: 포트 분리
 	addr->SetPort(port);
 
 	tcpSock_ = socketSubSystem_->CreateSocket(NAME_Stream, TEXT("InGame_TCP_Socket"), false);
 	udpSock_ = socketSubSystem_->CreateSocket(NAME_DGram, TEXT("InGame_UDP_Socket"), false);
 	
 	return tcpSock_->Connect(*addr);
+}
+
+bool USocketManager::runTask()
+{
+	TCPtask = new FNetworkTask(true);
+	// UDP 추가, 실패 경우 추가
+
+	TCPReceiveTask = new FReceiveTask(true);
+	
+	return true;
 }
 
 FSocket* USocketManager::getUDPSocket() const
@@ -65,9 +76,12 @@ int32 USocketManager::receive(FSocket* &sock, uint8& outData, int32 bufferSize)
 	return sock->Recv(&outData, bufferSize, read);
 }
 
-// XXX: 게임 종료시 반드시 호출해야한다.
+// XXX: 게임 종료시 호출.
 void USocketManager::close() const
 {
+	TCPtask->Stop();
+	TCPReceiveTask->Stop();
+	
 	udpSock_->Close();
 	tcpSock_->Close();
 	socketSubSystem_->DestroySocket(udpSock_);

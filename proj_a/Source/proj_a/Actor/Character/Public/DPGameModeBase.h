@@ -16,4 +16,6 @@ class PROJ_A_API ADPGameModeBase : public AGameModeBase
 	
 public:
 	ADPGameModeBase();
+	virtual void StartPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 };

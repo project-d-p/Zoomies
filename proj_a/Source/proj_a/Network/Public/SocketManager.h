@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
+#include "FNetworkTask.h"
+#include "FReceiveTask.h"
 #include "SocketManager.generated.h"
 
 /**
@@ -18,6 +20,7 @@ public:
 	
 	USocketManager();
 	bool connect(const FString& iP, int32 port);
+	bool runTask();
 
 	FSocket* getUDPSocket() const;
 	FSocket* getTCPSocket() const;
@@ -27,10 +30,19 @@ public:
 	static int32 receive(FSocket* &sock, uint8& outData, int32 bufferSize);
 	void close() const;
 
+	/* TCP, UDP sender task */
+	FNetworkTask *TCPtask;
+	FNetworkTask *UDPtask;
+	//
+	/* TCP, UDP receiver task */
+	FReceiveTask *TCPReceiveTask;
+	FReceiveTask *UDPReceiveTask;
+	//
+	
 private:
 	static USocketManager* instance_;
-	FSocket* udpSock_;
-	FSocket* tcpSock_;
+	FSocket* udpSock_ = nullptr;
+	FSocket* tcpSock_ = nullptr;
 	// FSocket* chatSock_;
 	ISocketSubsystem* socketSubSystem_;
 };

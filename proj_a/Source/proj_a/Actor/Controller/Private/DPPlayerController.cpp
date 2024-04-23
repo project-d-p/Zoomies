@@ -9,8 +9,6 @@
 #include "ProtobufUtility.h"
 #include "movement.pb.h"
 
-#include "SocketManager.h"
-
 ADPPlayerController::ADPPlayerController()
 {
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext>DEFAULT_CONTEXT
@@ -47,14 +45,6 @@ void ADPPlayerController::BeginPlay()
 		return;
 	}
 
-	// XXX: 수정
-	bool success = USocketManager::getInstance()->connect("10.19.225.124", 8080);
-	if (success) {
-		UE_LOG(LogTemp, Warning, TEXT("Connection established successfully."));
-	} else {
-		UE_LOG(LogTemp, Warning, TEXT("Failed to establish connection."));
-	}
-
 	// subsystem, IMC 연결
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 		SubSystem->AddMappingContext(defaultContext, 0);
@@ -63,9 +53,6 @@ void ADPPlayerController::BeginPlay()
 void ADPPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-	
-	// USocketManager::getInstance()->getTCPSocket()->Close();
-	// UNetComp::TCPtask->Stop();
 }
 
 void ADPPlayerController::SetupInputComponent()
@@ -95,8 +82,8 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 	const FVector forwardVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
 
+	// XXX: 2번째 인자인 type은 나중에 사용, 0이 기본 이동 처리.
 	UNetComp::inputTCP(actionValue, 0);
-	// send move command ( id, actionValue ) ( x = 1 forward, x = -1 backward, y = 1 right, y = -1 left )
 	character->AddMovementInput(forwardVector, actionValue.X);
 	character->AddMovementInput(rightVector, actionValue.Y);
 }

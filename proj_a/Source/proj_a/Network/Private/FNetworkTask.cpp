@@ -45,7 +45,7 @@ uint32 FNetworkTask::Run()
 		Message msg;
 		*msg.mutable_movement() = ProtoData;
 		
-		TArray<uint8> bData = Marshaller::SerializeMovement(msg);
+		TArray<uint8> bData = Marshaller::SerializeMessage(msg);
 
 		int32 BytesSent = 0;
 		sock_->Send(bData.GetData(), bData.Num(), BytesSent);
