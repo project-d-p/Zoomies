@@ -23,6 +23,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	class ADPCharacter* character;
+
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	virtual void Attack();
 

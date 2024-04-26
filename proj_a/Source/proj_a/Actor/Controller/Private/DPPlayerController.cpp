@@ -165,6 +165,8 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 	UE_LOG(LogTemp, Warning, TEXT("Active"));
 
 	// if (state)
+	//character->PlayFireAnimation();
+
 	character->weaponComponent->Attack();
 }
 
@@ -178,6 +180,7 @@ void ADPPlayerController::AdditionalSetting(const FInputActionValue& value)
 void ADPPlayerController::Aim(const FInputActionValue& value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Aim"));
+	character->PlayAimAnimation();
 }
 
 void ADPPlayerController::AimReleased(const FInputActionValue& value)

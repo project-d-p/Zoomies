@@ -41,6 +41,13 @@ public:	// component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UDPStateActorComponent* stateComponent;
 
+	// 局聪皋捞记 根鸥林
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
+	UAnimMontage* characterMontage;
+
+	void PlayAimAnimation();
+	void PlayFireAnimation();
+
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* springArm;

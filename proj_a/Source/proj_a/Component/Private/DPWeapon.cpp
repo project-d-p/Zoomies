@@ -2,6 +2,7 @@
 
 
 #include "DPWeapon.h"
+//#include "DPCharacter.h"
 
 // Sets default values
 ADPWeapon::ADPWeapon()
@@ -16,7 +17,6 @@ ADPWeapon::ADPWeapon()
 void ADPWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame

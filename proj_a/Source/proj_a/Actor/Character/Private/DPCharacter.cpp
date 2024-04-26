@@ -14,7 +14,7 @@
 // Sets default values
 ADPCharacter::ADPCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	hpComponent = CreateDefaultSubobject<UDPHpActorComponent>(TEXT("HPComponent"));
@@ -24,7 +24,7 @@ ADPCharacter::ADPCharacter()
 
 	springArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SPRINGARM"));
 	camera = CreateDefaultSubobject<UCameraComponent>(TEXT("CAMERA"));
-	
+
 	springArm->SetupAttachment(RootComponent);
 	camera->SetupAttachment(springArm);
 
@@ -51,31 +51,40 @@ ADPCharacter::ADPCharacter()
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}
+
+	// 애니메이션 몽타주
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> CHARACTER_MONTAGE
+	(TEXT("/Game/blueprints/characterAnimMontage.characterAnimMontage"));
+	if (CHARACTER_MONTAGE.Succeeded()) {
+		characterMontage = CHARACTER_MONTAGE.Object;
+	}
 }
 
 // Called when the game starts or when spawned
 void ADPCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	// 기본 무기 추가 및 장착
 	TSubclassOf<ADPWeapon> rifleClass = ADPWeaponRifle::StaticClass();
-	weaponComponent->AddWeapons(rifleClass);
-	weaponComponent->Equip(rifleClass);
+	if (weaponComponent) {
+		weaponComponent->AddWeapons(rifleClass);
+		weaponComponent->Equip(rifleClass);
+	}
 }
 
 // Called every frame
 void ADPCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
 	// 현재 속도 벡터 구하고 크기
 	if (GetCharacterMovement()) {
 		currentVelocity = GetCharacterMovement()->Velocity;
 		speed = currentVelocity.Size();
 	}
 	else
-		UE_LOG(LogTemp, Warning, TEXT("mmmmmmmmmmmmmmmmmmmmmmmm"));
+		UE_LOG(LogTemp, Warning, TEXT("null GetCharacterMovement"));
 
 	//UE_LOG(LogTemp, Warning, TEXT("speed : %f"), speed);
 }
@@ -88,3 +97,16 @@ void ADPCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 }
 
+void ADPCharacter::PlayAimAnimation()
+{
+	if (characterMontage) {
+		PlayAnimMontage(characterMontage, 1.f, "aim");	UE_LOG(LogTemp, Warning, TEXT("PlayAimAnimation"));
+	}
+}
+
+void ADPCharacter::PlayFireAnimation()
+{
+	if (characterMontage) {
+		PlayAnimMontage(characterMontage, 1.f, "fire");	UE_LOG(LogTemp, Warning, TEXT("PlayFireAnimation"));
+	}
+}
