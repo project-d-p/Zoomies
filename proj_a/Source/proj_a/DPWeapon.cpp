@@ -26,8 +26,8 @@ void ADPWeapon::Tick(float DeltaTime)
 
 }
 
-void ADPWeapon::attack()
+void ADPWeapon::Attack()
 {
-	// 공격 로직
+	UE_LOG(LogTemp, Warning, TEXT("attack weapon"));
 }
 

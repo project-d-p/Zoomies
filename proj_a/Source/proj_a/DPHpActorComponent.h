@@ -31,7 +31,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	float Hp{};
 
-	//void increaseHp(float value);
-	//void decreaseHp(float value);
-	//bood isDead();
+	//void IncreaseHp(float value);
+	//void DecreaseHp(float value);
+	//bood IsDead();
 };

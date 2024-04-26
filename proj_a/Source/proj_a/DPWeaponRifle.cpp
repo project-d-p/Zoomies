@@ -8,7 +8,8 @@ ADPWeaponRifle::ADPWeaponRifle()
 	damage = 15.f;
 }
 
-void ADPWeaponRifle::attack()
+void ADPWeaponRifle::Attack()
 {
 	// ถ๓ภฬวร
+	UE_LOG(LogTemp, Warning, TEXT("attack weapon Rifle"));
 }

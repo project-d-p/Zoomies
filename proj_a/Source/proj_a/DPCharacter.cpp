@@ -6,6 +6,7 @@
 #include "DPConstructionActorComponent.h"
 #include "DPWeaponActorComponent.h"
 #include "DPStateActorComponent.h"
+#include "DPWeaponRifle.h"	// 무기
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -57,6 +58,10 @@ void ADPCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// 기본 무기 추가 및 장착
+	TSubclassOf<ADPWeapon> rifleClass = ADPWeaponRifle::StaticClass();
+	weaponComponent->AddWeapons(rifleClass);
+	weaponComponent->Equip(rifleClass);
 }
 
 // Called every frame
@@ -72,7 +77,7 @@ void ADPCharacter::Tick(float DeltaTime)
 	else
 		UE_LOG(LogTemp, Warning, TEXT("mmmmmmmmmmmmmmmmmmmmmmmm"));
 
-	UE_LOG(LogTemp, Warning, TEXT("speed : %f"), speed);
+	//UE_LOG(LogTemp, Warning, TEXT("speed : %f"), speed);
 }
 
 // Called to bind functionality to input

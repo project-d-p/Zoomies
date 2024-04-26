@@ -30,7 +30,7 @@ void UDPWeaponActorComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	// ...
 }
 
-void UDPWeaponActorComponent::addWeapons(TSubclassOf<ADPWeapon> weaponClass)
+void UDPWeaponActorComponent::AddWeapons(TSubclassOf<ADPWeapon> weaponClass)
 {
 	if (weaponClass) {
 		ADPWeapon* newWeapon = NewObject<ADPWeapon>(this, weaponClass);
@@ -39,7 +39,7 @@ void UDPWeaponActorComponent::addWeapons(TSubclassOf<ADPWeapon> weaponClass)
 	}
 }
 
-void UDPWeaponActorComponent::equip(TSubclassOf<ADPWeapon> weaponClass)
+void UDPWeaponActorComponent::Equip(TSubclassOf<ADPWeapon> weaponClass)
 {
 	for (ADPWeapon* weapon : weapons) {
 		if (weapon->IsA(weaponClass)) {
@@ -50,10 +50,10 @@ void UDPWeaponActorComponent::equip(TSubclassOf<ADPWeapon> weaponClass)
 	}
 }
 
-void UDPWeaponActorComponent::attack()
+void UDPWeaponActorComponent::Attack()
 {
 	if (currentWeapon)
-		currentWeapon->attack();	UE_LOG(LogTemp, Warning, TEXT("attack weapon"));
-
+		currentWeapon->Attack();	UE_LOG(LogTemp, Warning, TEXT("attack weaponActorComponent"));
+	UE_LOG(LogTemp, Warning, TEXT("current weapon : %s"), *currentWeapon->GetName());
 }
 

@@ -32,9 +32,9 @@ public:
 	ADPWeapon* currentWeapon;
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	void addWeapons(TSubclassOf<ADPWeapon> weaponClass);
+	void AddWeapons(TSubclassOf<ADPWeapon> weaponClass);
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	void equip(TSubclassOf<ADPWeapon> weaponClass);
+	void Equip(TSubclassOf<ADPWeapon> weaponClass);
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	void attack();
+	void Attack();
 };

@@ -31,7 +31,7 @@ void UDPConstructionActorComponent::TickComponent(float DeltaTime, ELevelTick Ti
 	// ...
 }
 
-void UDPConstructionActorComponent::makeWall(FVector pos, FRotator rotation)
+void UDPConstructionActorComponent::MakeWall(FVector pos, FRotator rotation)
 {
 	ADPCharacter* owner = Cast<ADPCharacter>(GetOwner());
 

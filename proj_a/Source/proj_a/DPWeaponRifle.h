@@ -17,5 +17,5 @@ class PROJ_A_API ADPWeaponRifle : public ADPWeapon
 public:
 	ADPWeaponRifle();
 
-	virtual void attack() override;
+	virtual void Attack() override;
 };

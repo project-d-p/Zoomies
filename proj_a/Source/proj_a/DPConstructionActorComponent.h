@@ -30,5 +30,5 @@ public:
 	int wallCount{};
 
 	UFUNCTION(BlueprintCallable, Category = "Construction")
-	void makeWall(FVector pos, FRotator rotation);
+	void MakeWall(FVector pos, FRotator rotation);
 };

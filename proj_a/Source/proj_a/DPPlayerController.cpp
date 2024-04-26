@@ -6,6 +6,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
 #include "DPWeaponActorComponent.h"
+#include "DPStateActorComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 ADPPlayerController::ADPPlayerController()
 {
@@ -28,6 +30,31 @@ ADPPlayerController::ADPPlayerController()
 	(TEXT("/Game/input/ia_rotate.ia_rotate"));
 	if (IA_ROTATE.Succeeded())
 		rotateAction = IA_ROTATE.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_ACTIVE
+	(TEXT("/Game/input/ia_active.ia_active"));
+	if (IA_ACTIVE.Succeeded())
+		activeAction = IA_ACTIVE.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_ADDITIONALSETTING
+	(TEXT("/Game/input/ia_additionalSetting.ia_additionalSetting"));
+	if (IA_ADDITIONALSETTING.Succeeded())
+		additionalSettingAction = IA_ADDITIONALSETTING.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_AIM
+	(TEXT("/Game/input/ia_aim.ia_aim"));
+	if (IA_AIM.Succeeded())
+		aimAction = IA_AIM.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_CANCEL
+	(TEXT("/Game/input/ia_cancel.ia_cancel"));
+	if (IA_CANCEL.Succeeded())
+		cancelAction = IA_CANCEL.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_CHAT
+	(TEXT("/Game/input/ia_chat.ia_chat"));
+	if (IA_CHAT.Succeeded())
+		chatAction = IA_CHAT.Object;
 }
 
 void ADPPlayerController::BeginPlay()
@@ -60,6 +87,17 @@ void ADPPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(jumpAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Jump);
 		// 시점 변환 ( 마우스 회전 )
 		EnhancedInputComponent->BindAction(rotateAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Rotate);
+		//	행동, 총 발사/벽 설치/터렛 설치 ( 마우스 좌클릭 )
+		EnhancedInputComponent->BindAction(activeAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Active);
+		//	변경, 무기 변경/벽 회전 ( 마우스 스크롤 )
+		EnhancedInputComponent->BindAction(additionalSettingAction, ETriggerEvent::Triggered, this, &ADPPlayerController::AdditionalSetting);
+		//	에임 ( 마우스 우클릭 )
+		EnhancedInputComponent->BindAction(aimAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Aim);	// 	key down
+		EnhancedInputComponent->BindAction(aimAction, ETriggerEvent::Completed, this, &ADPPlayerController::AimReleased);
+		//	취소, 채팅 끄기 ( esc - UE 에디터에서 기본 단축키 변경 필요 )
+		EnhancedInputComponent->BindAction(cancelAction, ETriggerEvent::Triggered, this, &ADPPlayerController::ActionCancel);
+		//	채팅 열기 ( enter )
+		EnhancedInputComponent->BindAction(chatAction, ETriggerEvent::Triggered, this, &ADPPlayerController::OpenChat);
 	}
 }
 
@@ -78,6 +116,26 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 	// send move command ( id, actionValue ) ( x = 1 forward, x = -1 backward, y = 1 right, y = -1 left )
 	character->AddMovementInput(forwardVector, actionValue.X);
 	character->AddMovementInput(rightVector, actionValue.Y);
+
+	//FVector preLoc = character->GetActorLocation();
+	//if (1 == actionValue.X)
+	//{
+	//	FVector nextLoc;
+	//	nextLoc.X = preLoc.X + 10.f;
+	//	nextLoc.Y = preLoc.Y;
+	//	nextLoc.Z = preLoc.Z;
+	//	character->SetActorLocation(nextLoc);
+
+	//	//character->currentVelocity = character->GetCharacterMovement()->Velocity;
+	//	//speed = currentVelocity.Size();
+	//	UE_LOG(LogTemp, Warning, TEXT("speed : %f"), character->speed);
+	//}
+	
+	/*
+	클라 w 키를 눌러 -> 속도, ( 어색하면 blend space에 범위로 )
+	서버 location ( )
+	*/
+
 }
 
 void ADPPlayerController::Jump(const FInputActionValue& value)
@@ -102,7 +160,41 @@ void ADPPlayerController::Rotate(const FInputActionValue& value)
 	character->AddControllerPitchInput(actionValue.Y);
 }
 
-//	character->weaponComponent->attack();
+void ADPPlayerController::Active(const FInputActionValue& value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Active"));
+
+	// if (state)
+	character->weaponComponent->Attack();
+}
+
+void ADPPlayerController::AdditionalSetting(const FInputActionValue& value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("AdditionalSetting"));
+	// Scroll Up : 1, Scroll Down : -1
+	UE_LOG(LogTemp, Warning, TEXT("->	ia_rotate_x : %f"), value.Get<FVector2D>().X);
+}
+
+void ADPPlayerController::Aim(const FInputActionValue& value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Aim"));
+}
+
+void ADPPlayerController::AimReleased(const FInputActionValue& value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("AimReleased"));
+}
+
+void ADPPlayerController::ActionCancel(const FInputActionValue& value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("ActionCancel"));
+}
+
+void ADPPlayerController::OpenChat(const FInputActionValue& value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("OpenChat"));
+}
+
 
 void ADPPlayerController::UpdatePlayer(/*DataHub result*/)	// 한번에 받기 ?
 {
