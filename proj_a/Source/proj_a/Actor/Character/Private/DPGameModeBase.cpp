@@ -17,7 +17,7 @@ void ADPGameModeBase::StartPlay()
 	Super::StartPlay();
 
 	// 재시도 로직 추가 해야함.
-	bool success = USocketManager::getInstance()->connect("10.19.225.124", 8080);
+	bool success = USocketManager::getInstance()->connect("10.19.225.124", 4242, "10.19.225.124", 5000);
 	if (success) {
 		UE_LOG(LogTemp, Warning, TEXT("Connection established successfully."));
 	} else {

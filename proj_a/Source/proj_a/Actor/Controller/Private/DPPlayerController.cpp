@@ -10,7 +10,8 @@
 #include "ProtobufUtility.h"
 #include "movement.pb.h"
 #include "FDataHub.h"
-#include "FNetworkTask.h"
+#include "FTcpSendTask.h"
+#include "FUdpSendTask.h"
 #include "MessageHandler.h"
 
 ADPPlayerController::ADPPlayerController()
@@ -97,7 +98,8 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 	const FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
 
 	// XXX: 2번째 인자인 type은 나중에 사용, 0이 기본 이동 처리.
-	UNetComp::inputTCP(actionValue, 0);
+	// UNetComp::inputTCP(actionValue, 0);
+	UNetComp::inputUDP(actionValue);
 	// character->AddMovementInput(forwardVector, actionValue.X);
 	// character->AddMovementInput(rightVector, actionValue.Y);
 }
@@ -123,7 +125,7 @@ void ADPPlayerController::Rotate(const FInputActionValue& value)
 	character->AddControllerYawInput(actionValue.X);
 	character->AddControllerPitchInput(actionValue.Y);
 	// XXX: 추후에 최적화 가능(필요)
-	FNetworkTask::ProtoData.set_allocated_orientation(ProtobufUtility::ConvertToFVecToVec3(character->GetControlRotation().Vector()));
+	FUdpSendTask::ProtoData.set_allocated_orientation(ProtobufUtility::ConvertToFVecToVec3(character->GetControlRotation().Vector()));
 }
 
 void ADPPlayerController::UpdatePlayer()

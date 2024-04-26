@@ -12,18 +12,21 @@ struct FInputData
 	int32 Type;
 };
 
-class FNetworkTask : public FRunnable
+class FBaseSendTask : public FRunnable
 {
-private:
+protected:
 	FSocket* sock_;
 	FRunnableThread* thread_;
 	FThreadSafeBool bShouldRun_;
-public:
-	FNetworkTask(bool bUseTCP);
-	virtual ~FNetworkTask();
-	virtual uint32 Run() override;
-	virtual void Stop() override;
 
+public:
+	FBaseSendTask() : sock_(nullptr), thread_(nullptr), bShouldRun_(true) {}
+	virtual ~FBaseSendTask() { Stop(); if (thread_) { thread_->Kill(true); } }
+
+	virtual uint32 Run() = 0;
+	virtual void Stop() { bShouldRun_ = false; }
+
+	// TCP, UDP의 행방 결정시 이동
 	static TQueue<FInputData, EQueueMode::Spsc> InputQueue;
 	static Movement ProtoData;
 };

@@ -6,7 +6,9 @@
 #include "Sockets.h"
 #include "SocketSubsystem.h"
 #include "Interfaces/IPv4/IPv4Address.h"
-#include "FNetworkTask.h"
+#include "FTcpSendTask.h"
+#include "FUdpSendTask.h"
+#include "Common/UdpSocketBuilder.h"
 
 USocketManager* USocketManager::instance_ = nullptr;
 
@@ -27,28 +29,36 @@ USocketManager::USocketManager()
 	socketSubSystem_ = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM);
 }
 
-bool USocketManager::connect(const FString &sIp, int32 port)
+bool USocketManager::connect(const FString& tIP, int32 tPort, const FString& uIP, int32 uPort)
 {
 	FIPv4Address ip;
-	FIPv4Address::Parse(sIp, ip);
-
 	TSharedRef<FInternetAddr> addr = socketSubSystem_->CreateInternetAddr();
-	addr->SetIp(ip.Value);
-	// XXX: 포트 분리
-	addr->SetPort(port);
-
-	tcpSock_ = socketSubSystem_->CreateSocket(NAME_Stream, TEXT("InGame_TCP_Socket"), false);
-	udpSock_ = socketSubSystem_->CreateSocket(NAME_DGram, TEXT("InGame_UDP_Socket"), false);
 	
-	return tcpSock_->Connect(*addr);
+	FIPv4Address::Parse(tIP, ip);
+	addr->SetIp(ip.Value);
+	addr->SetPort(tPort);
+	tcpSock_ = socketSubSystem_->CreateSocket(NAME_Stream, TEXT("InGame_TCP_Socket"), false);
+
+	if (tcpSock_->Connect(*addr))
+	{
+		udpSock_ = FUdpSocketBuilder(TEXT("UDPClientSocket"))
+			.AsNonBlocking()
+			.AsReusable()
+			.WithBroadcast();
+
+		return true;
+	}
+	return false;
 }
 
 bool USocketManager::runTask()
 {
-	TCPtask = new FNetworkTask(true);
+	TCPtask = new FTcpSendTask();
+	UDPtask = new FUdpSendTask();
 	// UDP 추가, 실패 경우 추가
 
-	TCPReceiveTask = new FReceiveTask(true);
+	// TCPReceiveTask = new FReceiveTask(true);
+	UDPReceiveTask = new FReceiveTask(false, getTCPSocket()->GetPortNo());
 	
 	return true;
 }
@@ -63,27 +73,11 @@ FSocket* USocketManager::getTCPSocket() const
 	return tcpSock_;
 }
 
-// XXX: sock에 tcp, udp를 구분하여 입력.
-int32 USocketManager::send(FSocket* &sock, const uint8* data, int32 count)
-{
-	int32 sent = 0;
-	return sock->Send(data, count, sent);
-}
-
-int32 USocketManager::receive(FSocket* &sock, uint8& outData, int32 bufferSize)
-{
-	int32 read = 0;
-	return sock->Recv(&outData, bufferSize, read);
-}
-
 // XXX: 게임 종료시 호출.
 void USocketManager::close() const
 {
-	TCPtask->Stop();
 	TCPReceiveTask->Stop();
 	
-	udpSock_->Close();
 	tcpSock_->Close();
-	socketSubSystem_->DestroySocket(udpSock_);
 	socketSubSystem_->DestroySocket(tcpSock_);
 }

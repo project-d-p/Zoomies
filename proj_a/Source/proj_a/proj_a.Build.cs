@@ -33,6 +33,7 @@ public class proj_a : ModuleRules
 			"proj_a/Actor/Character/Public",
 			"proj_a/Component/Public",
 			"proj_a/Network/Public",
+			"proj_a/Network/Tasks/Public",
 			"proj_a/Core/Public",
 			"proj_a/Utility/Public",
 			"proj_a/Protobuf/Pb_File",

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
-#include "FNetworkTask.h"
+#include "FBaseSendTask.h"
 #include "FReceiveTask.h"
 #include "SocketManager.generated.h"
 
@@ -19,30 +19,27 @@ public:
 	static USocketManager* getInstance();
 	
 	USocketManager();
-	bool connect(const FString& iP, int32 port);
+	bool connect(const FString& tIP, int32 tPort, const FString& uIP, int32 uPort);
 	bool runTask();
 
 	FSocket* getUDPSocket() const;
 	FSocket* getTCPSocket() const;
-
-	// XXX: sock 인자는 tcp, udp를 구분하여 입력. 
-	static int32 send(FSocket* &sock, const uint8* data, int32 count);
-	static int32 receive(FSocket* &sock, uint8& outData, int32 bufferSize);
+	
 	void close() const;
 
 	/* TCP, UDP sender task */
-	FNetworkTask *TCPtask;
-	FNetworkTask *UDPtask;
+	FBaseSendTask *TCPtask;
+	FBaseSendTask *UDPtask;
 	//
 	/* TCP, UDP receiver task */
 	FReceiveTask *TCPReceiveTask;
 	FReceiveTask *UDPReceiveTask;
 	//
+	ISocketSubsystem* socketSubSystem_;
 	
 private:
 	static USocketManager* instance_;
 	FSocket* udpSock_ = nullptr;
 	FSocket* tcpSock_ = nullptr;
 	// FSocket* chatSock_;
-	ISocketSubsystem* socketSubSystem_;
 };

@@ -3,13 +3,29 @@
 #include "Marshaller.h"
 #include "Sockets.h"
 #include "message.pb.h"
+#include "Interfaces/IPv4/IPv4Endpoint.h"
 
-FReceiveTask::FReceiveTask(bool bUseTCP)
+FReceiveTask::FReceiveTask(bool bUseTCP, int32 InPort)
 {
 	USocketManager* SocketManager = USocketManager::getInstance();
 	sock_ = bUseTCP ? SocketManager->getTCPSocket() : SocketManager->getUDPSocket();
+	if (!bUseTCP) {
+		EnsureUdpSocketBound(InPort);
+	}
 	bShouldRun_ = true;
 	thread_ = FRunnableThread::Create(this, TEXT("NetworkReceiverThread"), 0, TPri_BelowNormal);
+}
+
+void FReceiveTask::EnsureUdpSocketBound(int32 InPort)
+{
+	if (sock_ && sock_->GetSocketType() == SOCKTYPE_Datagram)
+	{
+		FIPv4Endpoint Endpoint(FIPv4Address::Any, InPort);
+		int32 BufferSize = 2 * 1024 * 1024;
+		sock_->SetReceiveBufferSize(BufferSize, BufferSize);
+		bool bIsBound = sock_->Bind(*Endpoint.ToInternetAddr());
+		check(bIsBound);
+	}
 }
 
 FReceiveTask::~FReceiveTask()
@@ -39,7 +55,7 @@ uint32 FReceiveTask::Run()
 				ReceivedData.SetNumZeroed(BufferSize);
 			}
 		}
-		FPlatformProcess::Sleep(0.1);
+		// FPlatformProcess::Sleep(0.01);
 	}
 	return 0;
 }
