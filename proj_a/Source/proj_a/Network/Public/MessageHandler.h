@@ -4,8 +4,6 @@
 #include "Message.pb.h"
 #include "Containers/Map.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogNetwork, Log, All);
-
 DECLARE_DELEGATE_OneParam(FMessageDelegate, const Message&);
 
 class FMessageHandler

@@ -2,27 +2,27 @@
 
 #include "Marshaller.h"
 
-TArray<uint8> Marshaller::SerializeMessage(const Message& msg)
+TArray<uint8> Marshaller::SerializeMessage(const Message& Msg)
 {
-	uint32_t message_size = msg.ByteSizeLong();
+	const uint32_t MSG_SIZE = Msg.ByteSizeLong();
 
 	TArray<uint8> buffer;
-	buffer.AddUninitialized(sizeof(message_size) + message_size);
+	buffer.AddUninitialized(sizeof(MSG_SIZE) + MSG_SIZE);
 
-	memcpy(buffer.GetData(), &message_size, sizeof(message_size));
+	memcpy(buffer.GetData(), &MSG_SIZE, sizeof(MSG_SIZE));
 
-	msg.SerializeToArray(buffer.GetData() + sizeof(message_size), message_size);
+	Msg.SerializeToArray(buffer.GetData() + sizeof(MSG_SIZE), MSG_SIZE);
 
 	return buffer;
 }
 
-Message Marshaller::DeserializeMessage(const TArray<uint8>& buffer)
+Message Marshaller::DeserializeMessage(const TArray<uint8>& Buffer)
 {
 	uint32_t message_size;
-	memcpy(&message_size, buffer.GetData(), sizeof(message_size));
+	memcpy(&message_size, Buffer.GetData(), sizeof(message_size));
 
 	Message msg;
-	msg.ParseFromArray(buffer.GetData() + sizeof(message_size), message_size);
+	msg.ParseFromArray(Buffer.GetData() + sizeof(message_size), message_size);
 
 	return msg;
 }

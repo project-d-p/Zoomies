@@ -12,6 +12,6 @@
 class Marshaller
 {
 public:
-	static TArray<uint8> SerializeMessage(const Message& msg);
-	static Message DeserializeMessage(const TArray<uint8>& buffer);
+	static TArray<uint8> SerializeMessage(const Message& Msg);
+	static Message DeserializeMessage(const TArray<uint8>& Buffer);
 };

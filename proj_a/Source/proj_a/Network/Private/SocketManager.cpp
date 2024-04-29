@@ -3,81 +3,76 @@
 
 #include "SocketManager.h"
 
+#include "FNetLogger.h"
 #include "Sockets.h"
 #include "SocketSubsystem.h"
 #include "Interfaces/IPv4/IPv4Address.h"
 #include "FTcpSendTask.h"
+#include "FUdpReceiveTask.h"
 #include "FUdpSendTask.h"
 #include "Common/UdpSocketBuilder.h"
 
-USocketManager* USocketManager::instance_ = nullptr;
+USocketManager* USocketManager::Instance = nullptr;
 
-USocketManager* USocketManager::getInstance()
+USocketManager* USocketManager::GetInstance()
 {
-	if (instance_ == nullptr)
+	if (Instance == nullptr)
 	{
-		instance_ = NewObject<USocketManager>();
-		instance_->AddToRoot();
+		Instance = NewObject<USocketManager>();
 	}
-	return instance_;
+	return Instance;
 }
 
 USocketManager::USocketManager()
 {
-	udpSock_ = nullptr;
-	tcpSock_ = nullptr;
-	socketSubSystem_ = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM);
+	SockSubSystem = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM);
 }
 
-bool USocketManager::connect(const FString& tIP, int32 tPort, const FString& uIP, int32 uPort)
+bool USocketManager::Connect(const FString& tIP, int32 tPort)
 {
 	FIPv4Address ip;
-	TSharedRef<FInternetAddr> addr = socketSubSystem_->CreateInternetAddr();
-	
+	TSharedRef<FInternetAddr> addr = SockSubSystem->CreateInternetAddr();
+
 	FIPv4Address::Parse(tIP, ip);
 	addr->SetIp(ip.Value);
 	addr->SetPort(tPort);
-	tcpSock_ = socketSubSystem_->CreateSocket(NAME_Stream, TEXT("InGame_TCP_Socket"), false);
+	TcpSock = SockSubSystem->CreateSocket(NAME_Stream, TEXT("InGame_TCP_Socket"), false);
 
-	if (tcpSock_->Connect(*addr))
+	if (TcpSock->Connect(*addr))
 	{
-		udpSock_ = FUdpSocketBuilder(TEXT("UDPClientSocket"))
-			.AsNonBlocking()
-			.AsReusable()
-			.WithBroadcast();
-
+		UdpSock = FUdpSocketBuilder(TEXT("UdpClientSocket"));
 		return true;
 	}
+	FNetLogger::GetInstance().LogError(TEXT("Failed to connect to server.(TCP)"));
 	return false;
 }
 
-bool USocketManager::runTask()
+bool USocketManager::RunTask()
 {
-	TCPtask = new FTcpSendTask();
-	UDPtask = new FUdpSendTask();
-	// UDP 추가, 실패 경우 추가
+	TcpSendTask = new FTcpSendTask();
+	if (TcpSendTask->isRun())
+		UdpSendTask = new FUdpSendTask();
 
 	// TCPReceiveTask = new FReceiveTask(true);
-	UDPReceiveTask = new FReceiveTask(false, getTCPSocket()->GetPortNo());
-	
+	TSharedRef<FInternetAddr> Addr = SockSubSystem->CreateInternetAddr();
+	GetTCPSocket()->GetAddress(*Addr);
+	FSocket* UdpSocket = GetUDPSocket();
+	if (UdpSocket == nullptr)
+	{
+		FNetLogger::GetInstance().LogError(TEXT("UDP Socket is null!"));
+		return false;
+	}
+	UdpReceiveTask = new FUdpReceiveTask(Addr->ToString(false), Addr->GetPort());
+
 	return true;
 }
 
-FSocket* USocketManager::getUDPSocket() const
+FSocket* USocketManager::GetUDPSocket() const
 {
-	return udpSock_;
+	return UdpSock;
 }
 
-FSocket* USocketManager::getTCPSocket() const
+FSocket* USocketManager::GetTCPSocket() const
 {
-	return tcpSock_;
-}
-
-// XXX: 게임 종료시 호출.
-void USocketManager::close() const
-{
-	TCPReceiveTask->Stop();
-	
-	tcpSock_->Close();
-	socketSubSystem_->DestroySocket(tcpSock_);
+	return TcpSock;
 }

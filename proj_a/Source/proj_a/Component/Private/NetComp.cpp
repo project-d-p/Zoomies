@@ -5,24 +5,19 @@
 #include "FTcpSendTask.h"
 #include "FUdpSendTask.h"
 
-// TODO: end 추가
-
-int32 UNetComp::inputTCP(const FVector2D &input, const int32 &type)
+// Type은 입력 데이터가 나눠질 수 있겠다는 생각에 추가한 변수
+void UNetComp::InputTCP(const FVector2D& Input, const int32& Type)
 {
-	FInputData inputData;
-	inputData.InputVector = input;
-	inputData.Type = type;
-	FTcpSendTask::InputQueue.Enqueue(inputData);
-	
-	return 1;
+	FInputData InputData;
+	InputData.InputVector = Input;
+	InputData.Type = Type;
+	FTcpSendTask::InputQueue.Enqueue(InputData);
 }
 
-int32 UNetComp::inputUDP(const FVector2D &input)
+void UNetComp::InputUDP(const FVector2D& Input)
 {
-	FInputData inputData;
-	inputData.InputVector = input;
-	inputData.Type = 0;
-	FUdpSendTask::InputQueue.Enqueue(inputData);
-	
-	return 1;
+	FInputData InputData;
+	InputData.InputVector = Input;
+	InputData.Type = 0;
+	FUdpSendTask::InputQueue.Enqueue(InputData);
 }

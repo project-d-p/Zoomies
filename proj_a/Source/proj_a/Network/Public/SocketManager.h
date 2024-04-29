@@ -5,41 +5,40 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "FBaseSendTask.h"
-#include "FReceiveTask.h"
+#include "FTcpReceiveTask.h"
+#include "FUdpReceiveTask.h"
+#include "SocketSubsystem.h"
 #include "SocketManager.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class PROJ_A_API USocketManager : public UObject
 {
 	GENERATED_BODY()
 public:
-	static USocketManager* getInstance();
+	static USocketManager* GetInstance();
 	
 	USocketManager();
-	bool connect(const FString& tIP, int32 tPort, const FString& uIP, int32 uPort);
-	bool runTask();
+	bool Connect(const FString& tIP, int32 tPort);
+	bool RunTask();
 
-	FSocket* getUDPSocket() const;
-	FSocket* getTCPSocket() const;
+	FSocket* GetUDPSocket() const;
+	FSocket* GetTCPSocket() const;
 	
-	void close() const;
+	void Close() const;
 
 	/* TCP, UDP sender task */
-	FBaseSendTask *TCPtask;
-	FBaseSendTask *UDPtask;
+	FBaseSendTask* TcpSendTask = nullptr;
+	FBaseSendTask* UdpSendTask = nullptr;
 	//
 	/* TCP, UDP receiver task */
-	FReceiveTask *TCPReceiveTask;
-	FReceiveTask *UDPReceiveTask;
+	FTcpReceiveTask* TcpReceiveTask = nullptr;
+	FUdpReceiveTask* UdpReceiveTask	= nullptr;
 	//
-	ISocketSubsystem* socketSubSystem_;
-	
+	ISocketSubsystem* SockSubSystem = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM);
 private:
-	static USocketManager* instance_;
-	FSocket* udpSock_ = nullptr;
-	FSocket* tcpSock_ = nullptr;
+	static USocketManager* Instance;
+	//
+	FSocket* UdpSock = nullptr;
+	FSocket* TcpSock = nullptr;
 	// FSocket* chatSock_;
 };

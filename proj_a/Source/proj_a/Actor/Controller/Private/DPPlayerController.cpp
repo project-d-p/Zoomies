@@ -10,9 +10,10 @@
 #include "ProtobufUtility.h"
 #include "movement.pb.h"
 #include "FDataHub.h"
-#include "FTcpSendTask.h"
+#include "FNetLogger.h"
 #include "FUdpSendTask.h"
-#include "MessageHandler.h"
+
+DEFINE_LOG_CATEGORY(LogNetwork);
 
 ADPPlayerController::ADPPlayerController()
 {
@@ -41,17 +42,17 @@ void ADPPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ADPCharacter·Î Ä³½ºÆÃ, ÇöÀç PawnÀ» character º¯¼ö¿¡ ÇÒ´ç
+	// ADPCharacterë¡œ ìºìŠ¤íŒ…, í˜„ì¬ Pawnì„ character ë³€ìˆ˜ì— í• ë‹¹
 	character = Cast<ADPCharacter>(GetPawn());
 
-	// character°¡ À¯È¿ÇÑÁö È®ÀÎ
+	// characterê°€ ìœ íš¨í•œì§€ í™•ì¸
 	if (!character)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("character null"));
 		return;
 	}
 
-	// subsystem, IMC ¿¬°á
+	// subsystem, IMC ì—°ê²°
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
 		GetLocalPlayer()))
 		SubSystem->AddMappingContext(defaultContext, 0);
@@ -73,14 +74,14 @@ void ADPPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	// enhanced input component Ä³½ºÆÃÇÏ°í ¹ÙÀÎµù
+	// enhanced input component ìºìŠ¤íŒ…í•˜ê³  ë°”ì¸ë”©
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
 	{
-		// ÇÃ·¹ÀÌ¾î ÀÌµ¿ ( w, a, d, s )
+		// í”Œë ˆì´ì–´ ì´ë™ ( w, a, d, s )
 		EnhancedInputComponent->BindAction(moveAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Move);
-		// ÇÃ·¹ÀÌ¾î Á¡ÇÁ ( space )
+		// í”Œë ˆì´ì–´ ì í”„ ( space )
 		EnhancedInputComponent->BindAction(jumpAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Jump);
-		// ½ÃÁ¡ º¯È¯ ( ¸¶¿ì½º È¸Àü )
+		// ì‹œì  ë³€í™˜ ( ë§ˆìš°ìŠ¤ íšŒì „ )
 		EnhancedInputComponent->BindAction(rotateAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Rotate);
 	}
 }
@@ -97,9 +98,9 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 	const FVector forwardVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
 
-	// XXX: 2¹øÂ° ÀÎÀÚÀÎ typeÀº ³ªÁß¿¡ »ç¿ë, 0ÀÌ ±âº» ÀÌµ¿ Ã³¸®.
+	// XXX: 2ë²ˆì§¸ ì¸ìì¸ typeì€ ë‚˜ì¤‘ì— ì‚¬ìš©, 0ì´ ê¸°ë³¸ ì´ë™ ì²˜ë¦¬.
 	// UNetComp::inputTCP(actionValue, 0);
-	UNetComp::inputUDP(actionValue);
+	UNetComp::InputUDP(actionValue);
 	// character->AddMovementInput(forwardVector, actionValue.X);
 	// character->AddMovementInput(rightVector, actionValue.Y);
 }
@@ -124,7 +125,7 @@ void ADPPlayerController::Rotate(const FInputActionValue& value)
 	// send rotate command ( id, actionValue )
 	character->AddControllerYawInput(actionValue.X);
 	character->AddControllerPitchInput(actionValue.Y);
-	// XXX: ÃßÈÄ¿¡ ÃÖÀûÈ­ °¡´É(ÇÊ¿ä)
+	// XXX: ì¶”í›„ì— ìµœì í™” ê°€ëŠ¥(í•„ìš”)
 	FUdpSendTask::ProtoData.set_allocated_orientation(ProtobufUtility::ConvertToFVecToVec3(character->GetControlRotation().Vector()));
 }
 
@@ -132,15 +133,15 @@ void ADPPlayerController::UpdatePlayer()
 {
 	Movement movement;
 	if (!FDataHub::EchoData.Contains("1")) {
-		UE_LOG(LogNetwork, Warning, TEXT("No movement data"));
+		// UE_LOG(LogNetwork, Warning, TEXT("Player 1 data not found"));
 		return;
 	}
 	movement = FDataHub::EchoData["1"];
 	if (!movement.has_progess_vector())
 	{
-		UE_LOG(LogNetwork, Warning, TEXT("No movement data"));
+		// UE_LOG(LogNetwork, Warning, TEXT("progress vector not found"));
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Progress: %f %f %f"), movement.progess_vector().x(), movement.progess_vector().y(), movement.progess_vector().z());
+	// UE_LOG(LogTemp, Warning, TEXT("Progress: %f %f %f"), movement.progess_vector().x(), movement.progess_vector().y(), movement.progess_vector().z());
 	if (movement.has_progess_vector())
 	{
 		FVector rightVector = character->GetActorRightVector();
@@ -151,7 +152,7 @@ void ADPPlayerController::UpdatePlayer()
 		character->AddMovementInput(rightVector, actionValue.Y);
 	}
 	
-	// class ¼Ó¼ºÀ¸·Î Ãß°¡ °í·Á.
+	// class ì†ì„±ìœ¼ë¡œ ì¶”ê°€ ê³ ë ¤.
 	// PlayerPosition result = FDataHub::PlayerPositions["1"];
 	// if (result.has_position())
 	// 	character->SetActorLocation(FVector(result.position().x(), result.position().y(), result.position().z()));

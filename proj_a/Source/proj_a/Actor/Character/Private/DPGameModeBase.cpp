@@ -17,18 +17,28 @@ void ADPGameModeBase::StartPlay()
 	Super::StartPlay();
 
 	// 재시도 로직 추가 해야함.
-	bool success = USocketManager::getInstance()->connect("10.19.225.124", 4242, "10.19.225.124", 5000);
+	USocketManager* SocketManager = USocketManager::GetInstance();
+	
+	bool success = SocketManager->Connect("10.19.225.124", 4242);
 	if (success) {
 		UE_LOG(LogTemp, Warning, TEXT("Connection established successfully."));
 	} else {
 		UE_LOG(LogTemp, Warning, TEXT("Failed to establish connection."));
 	}
-	USocketManager::getInstance()->runTask();
+	USocketManager::GetInstance()->RunTask();
 }
 
 void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	USocketManager::getInstance()->close();
+	USocketManager *sockManger = USocketManager::GetInstance();
+	// if (sockManger->UdpReceiveTask->isRun())
+	// 	USocketManager::GetInstance()->UdpReceiveTask->Stop();
+	// if (sockManger->TcpReceiveTask->isRun())
+	// 	USocketManager::GetInstance()->TcpReceiveTask->Stop();
+	// if (sockManger->UdpSendTask->isRun())
+	// 	USocketManager::GetInstance()->UdpSendTask->Stop();
+	// if (sockManger->TcpSendTask->isRun())
+	// 	USocketManager::GetInstance()->TcpSendTask->Stop();
 }
