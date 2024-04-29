@@ -46,7 +46,12 @@ public:	// component
 	UAnimMontage* characterMontage;
 
 	void PlayAimAnimation();
+	void StopAimAnimation();
 	void PlayFireAnimation();
+	void ChangeAnimation();
+	void PlaceConstructionAnimation();
+	void DestroyConstructionAnimation();
+	void DyingAnimation();
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -59,4 +64,5 @@ public:
 	FVector currentVelocity{ 0.f, 0.f, 0.f };
 	UPROPERTY(BlueprintReadWrite)
 	float speed{ 0.f };
+	bool isAim{ false };
 };

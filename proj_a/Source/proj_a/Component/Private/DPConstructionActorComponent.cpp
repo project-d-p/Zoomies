@@ -36,6 +36,7 @@ void UDPConstructionActorComponent::MakeWall(FVector pos, FRotator rotation)
 	ADPCharacter* owner = Cast<ADPCharacter>(GetOwner());
 
 	if (owner)
-		owner->SetActorLocationAndRotation(pos, rotation);
+	//	owner->SetActorLocationAndRotation(pos, rotation);
+		UE_LOG(LogTemp, Warning, TEXT("makeWall"));
 }
 

@@ -27,11 +27,12 @@ public:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float maxHP{};
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	float Hp{};
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
+	bool IsDead{ false };
 
-	//void IncreaseHp(float value);
-	//void DecreaseHp(float value);
-	//bood IsDead();
+
+	void IncreaseHp(float value);
+	void DecreaseHp(float value);
 };

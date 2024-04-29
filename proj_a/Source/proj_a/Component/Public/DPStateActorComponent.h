@@ -26,5 +26,12 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
-	FString state;
+	FString characterState;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	FString equipmentState;
+	int currentCharacterState{ 0 };
+	int currentEquipmentState{ 0 };
+
+	void ChangeCharacterState(int value);
+	void ChangeEquipmentState(int value);
 };

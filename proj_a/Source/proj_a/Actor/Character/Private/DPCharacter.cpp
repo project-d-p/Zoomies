@@ -65,6 +65,12 @@ void ADPCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	stateComponent->currentEquipmentState = 0;
+	hpComponent->Hp = 100.f;
+	hpComponent->IsDead = false;
+	constructionComponent->placeWall = false;
+	constructionComponent->placeturret = false;
+
 	// 기본 무기 추가 및 장착
 	TSubclassOf<ADPWeapon> rifleClass = ADPWeaponRifle::StaticClass();
 	if (weaponComponent) {
@@ -99,8 +105,17 @@ void ADPCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 void ADPCharacter::PlayAimAnimation()
 {
-	if (characterMontage) {
+	if (characterMontage && !isAim ) {
+		isAim = true;
 		PlayAnimMontage(characterMontage, 1.f, "aim");	UE_LOG(LogTemp, Warning, TEXT("PlayAimAnimation"));
+	}
+}
+
+void ADPCharacter::StopAimAnimation()
+{
+	if (characterMontage) {
+		isAim = false;
+		StopAnimMontage(characterMontage); UE_LOG(LogTemp, Warning, TEXT("StopAimAnimation"));
 	}
 }
 
@@ -109,4 +124,26 @@ void ADPCharacter::PlayFireAnimation()
 	if (characterMontage) {
 		PlayAnimMontage(characterMontage, 1.f, "fire");	UE_LOG(LogTemp, Warning, TEXT("PlayFireAnimation"));
 	}
+}
+
+void ADPCharacter::ChangeAnimation()
+{
+	if (characterMontage) {
+		PlayAnimMontage(characterMontage, 1.f, "changeWeapon");	UE_LOG(LogTemp, Warning, TEXT("ChangeAnimation"));
+	}
+}
+
+void ADPCharacter::PlaceConstructionAnimation()
+{
+	// 행동 막고 애니메이션 재생
+}
+
+void ADPCharacter::DestroyConstructionAnimation()
+{
+	// 행동 막고 애니메이션 재생
+}
+
+void ADPCharacter::DyingAnimation()
+{
+	// 행동 막고 애니메이션 재생
 }

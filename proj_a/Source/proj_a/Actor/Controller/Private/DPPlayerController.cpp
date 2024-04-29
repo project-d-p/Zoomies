@@ -6,6 +6,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
 #include "DPWeaponActorComponent.h"
+#include "DPConstructionActorComponent.h"
 #include "DPStateActorComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -69,6 +70,10 @@ void ADPPlayerController::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("character null"));
 		return;
 	}
+	else {
+		state = Cast<UDPStateActorComponent>(character->GetComponentByClass(UDPStateActorComponent::StaticClass()));
+		construction = Cast<UDPConstructionActorComponent>(character->GetComponentByClass(UDPConstructionActorComponent::StaticClass()));
+	}
 
 	// subsystem, IMC 연결
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
@@ -112,36 +117,16 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 
 	const FVector forwardVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
-	
+
 	// send move command ( id, actionValue ) ( x = 1 forward, x = -1 backward, y = 1 right, y = -1 left )
 	character->AddMovementInput(forwardVector, actionValue.X);
 	character->AddMovementInput(rightVector, actionValue.Y);
-
-	//FVector preLoc = character->GetActorLocation();
-	//if (1 == actionValue.X)
-	//{
-	//	FVector nextLoc;
-	//	nextLoc.X = preLoc.X + 10.f;
-	//	nextLoc.Y = preLoc.Y;
-	//	nextLoc.Z = preLoc.Z;
-	//	character->SetActorLocation(nextLoc);
-
-	//	//character->currentVelocity = character->GetCharacterMovement()->Velocity;
-	//	//speed = currentVelocity.Size();
-	//	UE_LOG(LogTemp, Warning, TEXT("speed : %f"), character->speed);
-	//}
-	
-	/*
-	클라 w 키를 눌러 -> 속도, ( 어색하면 blend space에 범위로 )
-	서버 location ( )
-	*/
-
 }
 
 void ADPPlayerController::Jump(const FInputActionValue& value)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("ia_jump : %d"), value.Get<bool>());
-	
+
 	bool actionValue = value.Get<bool>();
 	if (actionValue)
 		// send jump command ( id, actionValue ) ( true = jump )
@@ -152,7 +137,7 @@ void ADPPlayerController::Rotate(const FInputActionValue& value)
 {
 	// UE_LOG(LogTemp, Warning, TEXT("ia_rotate_X : %f"), value.Get<FVector2D>().X);
 	// UE_LOG(LogTemp, Warning, TEXT("ia_rotate_y : %f"), value.Get<FVector2D>().Y);
-	
+
 	FVector2D actionValue = value.Get<FVector2D>();
 
 	// send rotate command ( id, actionValue )
@@ -164,28 +149,103 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Active"));
 
-	// if (state)
-	//character->PlayFireAnimation();
+	if ("NONE" == state->equipmentState) {
 
-	character->weaponComponent->Attack();
+	}
+	if ("RIFLE" == state->equipmentState) {
+		if (character->isAim) {
+			character->PlayFireAnimation();
+			character->weaponComponent->Attack();
+		}
+	}
+	if ("WALL" == state->equipmentState) {
+		//if (character->isAim) {
+			character->GetCharacterMovement()->DisableMovement();
+			construction->MakeWall({ 0, 0, 0 }, { 0, 0, 0 });
+			character->constructionComponent->placeWall = true;
+			// 다음 틱에 false로 바꿈
+			auto resetPlaceWall = [this]() {
+				character->constructionComponent->placeWall = false;
+			};
+			GetWorld()->GetTimerManager().SetTimerForNextTick(resetPlaceWall);
+
+			FTimerHandle waitTimer;
+			GetWorld()->GetTimerManager().SetTimer(waitTimer, FTimerDelegate::CreateLambda([&]() {
+				UE_LOG(LogTemp, Warning, TEXT("wall delay 1.63"));
+				character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);	// movement disable -> enable
+				GetWorldTimerManager().ClearTimer(waitTimer);
+			}), 1.63f, false);
+		//}
+	}
+	if ("TURRET" == state->equipmentState) {
+		if (character->isAim) {
+			character->GetCharacterMovement()->DisableMovement();
+			character->constructionComponent->placeturret = true;
+
+			auto resetPlaceTurret = [this]() {
+				character->constructionComponent->placeturret = false;
+			};
+			GetWorld()->GetTimerManager().SetTimerForNextTick(resetPlaceTurret);
+
+			FTimerHandle waitTimer;
+			GetWorld()->GetTimerManager().SetTimer(waitTimer, FTimerDelegate::CreateLambda([&]() {
+				UE_LOG(LogTemp, Warning, TEXT("turret delay 1.63"));
+				character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+				GetWorldTimerManager().ClearTimer(waitTimer);
+			}), 1.63f, false);
+		}
+	}
 }
 
 void ADPPlayerController::AdditionalSetting(const FInputActionValue& value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("AdditionalSetting"));
 	// Scroll Up : 1, Scroll Down : -1
-	UE_LOG(LogTemp, Warning, TEXT("->	ia_rotate_x : %f"), value.Get<FVector2D>().X);
+	// UE_LOG(LogTemp, Warning, TEXT("->	ia_rotate_x : %f"), value.Get<FVector2D>().X);
+
+	int stateValue = static_cast<int>(value.Get<FVector2D>().X);
+	character->ChangeAnimation();
+	character->stateComponent->ChangeEquipmentState(stateValue);
 }
 
 void ADPPlayerController::Aim(const FInputActionValue& value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Aim"));
-	character->PlayAimAnimation();
+
+	if ("NONE" == state->equipmentState) {
+		
+	}
+	if ("RIFLE" == state->equipmentState) {
+		character->PlayAimAnimation();
+	}
+	if ("WALL" == state->equipmentState) {
+		character->isAim = true;
+		// 바라보는 방향 청사진 -> 이때 scroll시 wall회전되게	// idAim = true -> active 되면 설치
+	}
+	if ("TURRET" == state->equipmentState) {
+		character->isAim = true;
+		// 바라보는 방향 청사진
+	}
 }
 
 void ADPPlayerController::AimReleased(const FInputActionValue& value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("AimReleased"));
+
+	if ("NONE" == state->equipmentState) {
+
+	}
+	if ("RIFLE" == state->equipmentState) {
+		character->StopAimAnimation();
+	}
+	if ("WALL" == state->equipmentState) {
+		character->isAim = false;
+		// 청사진 제거
+	}
+	if ("TURRET" == state->equipmentState) {
+		character->isAim = false;
+		// 청사진 제거
+	}
 }
 
 void ADPPlayerController::ActionCancel(const FInputActionValue& value)

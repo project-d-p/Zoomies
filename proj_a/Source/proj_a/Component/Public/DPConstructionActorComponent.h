@@ -28,6 +28,10 @@ public:
 	int maxWall{};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Construction")
 	int wallCount{};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Construction")
+	bool placeWall{ false };
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Construction")
+	bool placeturret{ false };
 
 	UFUNCTION(BlueprintCallable, Category = "Construction")
 	void MakeWall(FVector pos, FRotator rotation);

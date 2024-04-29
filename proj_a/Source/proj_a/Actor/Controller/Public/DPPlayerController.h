@@ -25,6 +25,7 @@ protected:
 private:
 	class ADPCharacter* character;
 	class UDPStateActorComponent* state;
+	class UDPConstructionActorComponent* construction;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Input)
