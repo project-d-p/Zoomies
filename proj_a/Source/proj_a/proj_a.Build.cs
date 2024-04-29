@@ -12,21 +12,12 @@ public class proj_a : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
-        PublicIncludePaths.AddRange(new string[] {
-            "proj_a/Actor/Controller/Public",
-            "proj_a/Actor/Character/Public",
-            "proj_a/Component/Public",
-            "proj_a/Network/Public",
-            "proj_a/Protobuf/Pb_File",
-            "proj_a/Core/Public",
-        });
+		// Uncomment if you are using Slate UI
+		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
+		
+		// Uncomment if you are using online features
+		// PrivateDependencyModuleNames.Add("OnlineSubsystem");
 
-        // Uncomment if you are using Slate UI
-        // PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
-
-        // Uncomment if you are using online features
-        // PrivateDependencyModuleNames.Add("OnlineSubsystem");
-
-        // To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
-    }
+		// To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
+	}
 }
