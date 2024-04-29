@@ -75,7 +75,7 @@ void UDPStateActorComponent::ChangeEquipmentState(int value)
 		equipmentState = "NONE";
 	}
 	if (1 == currentEquipmentState) {
-		equipmentState = "RIFLE";
+		equipmentState = "GUN";
 	}
 	if (2 == currentEquipmentState) {
 		equipmentState = "WALL";

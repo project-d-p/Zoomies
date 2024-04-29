@@ -152,7 +152,7 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 	if ("NONE" == state->equipmentState) {
 
 	}
-	if ("RIFLE" == state->equipmentState) {
+	if ("GUN" == state->equipmentState) {
 		if (character->isAim) {
 			character->PlayFireAnimation();
 			character->weaponComponent->Attack();
@@ -215,7 +215,7 @@ void ADPPlayerController::Aim(const FInputActionValue& value)
 	if ("NONE" == state->equipmentState) {
 		
 	}
-	if ("RIFLE" == state->equipmentState) {
+	if ("GUN" == state->equipmentState) {
 		character->PlayAimAnimation();
 	}
 	if ("WALL" == state->equipmentState) {
@@ -235,7 +235,7 @@ void ADPPlayerController::AimReleased(const FInputActionValue& value)
 	if ("NONE" == state->equipmentState) {
 
 	}
-	if ("RIFLE" == state->equipmentState) {
+	if ("GUN" == state->equipmentState) {
 		character->StopAimAnimation();
 	}
 	if ("WALL" == state->equipmentState) {

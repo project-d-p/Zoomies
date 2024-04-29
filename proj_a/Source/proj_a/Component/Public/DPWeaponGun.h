@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "DPWeapon.h"
-#include "DPWeaponRifle.generated.h"
+#include "DPWeaponGun.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJ_A_API ADPWeaponRifle : public ADPWeapon
+class PROJ_A_API ADPWeaponGun : public ADPWeapon
 {
 	GENERATED_BODY()
 
 public:
-	ADPWeaponRifle();
+	ADPWeaponGun();
 
 	virtual void Attack() override;
 };

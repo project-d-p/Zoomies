@@ -6,7 +6,7 @@
 #include "DPConstructionActorComponent.h"
 #include "DPWeaponActorComponent.h"
 #include "DPStateActorComponent.h"
-#include "DPWeaponRifle.h"	// 무기
+#include "DPWeaponGun.h"	// 무기
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -72,10 +72,10 @@ void ADPCharacter::BeginPlay()
 	constructionComponent->placeturret = false;
 
 	// 기본 무기 추가 및 장착
-	TSubclassOf<ADPWeapon> rifleClass = ADPWeaponRifle::StaticClass();
+	TSubclassOf<ADPWeapon> gunClass = ADPWeaponGun::StaticClass();
 	if (weaponComponent) {
-		weaponComponent->AddWeapons(rifleClass);
-		weaponComponent->Equip(rifleClass);
+		weaponComponent->AddWeapons(gunClass);
+		weaponComponent->Equip(gunClass);
 	}
 }
 
