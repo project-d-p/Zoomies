@@ -6,7 +6,7 @@ class FUdpSendTask : public FBaseSendTask
 {
 public:
 	FUdpSendTask();
-	// virtual ~FUdpSendTask();
+	virtual ~FUdpSendTask();
 
 	virtual uint32 Run() override;
 	// virtual void Stop() override;

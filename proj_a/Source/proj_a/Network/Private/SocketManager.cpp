@@ -12,42 +12,89 @@
 #include "FUdpSendTask.h"
 #include "Common/UdpSocketBuilder.h"
 
-USocketManager* USocketManager::Instance = nullptr;
+FSocketManager* FSocketManager::Instance = nullptr;
 
-USocketManager* USocketManager::GetInstance()
+FSocketManager* FSocketManager::GetInstance()
 {
 	if (Instance == nullptr)
 	{
-		Instance = NewObject<USocketManager>();
+		Instance = new FSocketManager();
 	}
 	return Instance;
 }
 
-USocketManager::USocketManager()
+FSocketManager::FSocketManager()
 {
 	SockSubSystem = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM);
 }
 
-bool USocketManager::Connect(const FString& tIP, int32 tPort)
+FSocketManager::~FSocketManager()
+{
+	UE_LOG(LogTemp, Warning, TEXT("SocketManager start destroying."));
+	if (UdpReceiveTask && UdpReceiveTask->isRun())
+	{
+		UdpReceiveTask->Stop();
+		delete UdpReceiveTask;
+		UdpReceiveTask = nullptr;
+	}
+	if (TcpReceiveTask && TcpReceiveTask->isRun())
+	{
+		TcpReceiveTask->Stop();
+		delete TcpReceiveTask;
+		TcpReceiveTask = nullptr;
+	}
+	if (UdpSendTask && UdpSendTask->isRun())
+	{
+		UdpSendTask->Stop();
+		delete UdpSendTask;
+		UdpSendTask = nullptr;
+	}
+	if (TcpSendTask && TcpSendTask->isRun())
+	{
+		TcpSendTask->Stop();
+		delete TcpSendTask;
+		TcpSendTask = nullptr;
+	}
+	if (UdpSock)
+	{
+		UdpSock->Close();
+		SockSubSystem->DestroySocket(UdpSock);
+		UdpSock = nullptr;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("UdpSock is destroyed."));
+	if (TcpSock)
+	{
+		TcpSock->Close();
+		SockSubSystem->DestroySocket(TcpSock);
+		TcpSock = nullptr;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("TcpSock is destroyed."));
+	UE_LOG(LogTemp, Warning, TEXT("SocketManager is destroyed."));
+}
+
+bool FSocketManager::Connect(const FString& tIP, int32 tPort)
 {
 	FIPv4Address ip;
+	SockSubSystem = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM);
 	TSharedRef<FInternetAddr> addr = SockSubSystem->CreateInternetAddr();
 
 	FIPv4Address::Parse(tIP, ip);
 	addr->SetIp(ip.Value);
 	addr->SetPort(tPort);
 	TcpSock = SockSubSystem->CreateSocket(NAME_Stream, TEXT("InGame_TCP_Socket"), false);
-
+	TcpSock->SetNonBlocking(true);
+	
 	if (TcpSock->Connect(*addr))
 	{
 		UdpSock = FUdpSocketBuilder(TEXT("UdpClientSocket"));
+		UdpSock->SetNonBlocking(true);
 		return true;
 	}
 	FNetLogger::GetInstance().LogError(TEXT("Failed to connect to server.(TCP)"));
 	return false;
 }
 
-bool USocketManager::RunTask()
+bool FSocketManager::RunTask()
 {
 	TcpSendTask = new FTcpSendTask();
 	if (TcpSendTask->isRun())
@@ -63,16 +110,15 @@ bool USocketManager::RunTask()
 		return false;
 	}
 	UdpReceiveTask = new FUdpReceiveTask(Addr->ToString(false), Addr->GetPort());
-
 	return true;
 }
 
-FSocket* USocketManager::GetUDPSocket() const
+FSocket* FSocketManager::GetUDPSocket() const
 {
 	return UdpSock;
 }
 
-FSocket* USocketManager::GetTCPSocket() const
+FSocket* FSocketManager::GetTCPSocket() const
 {
 	return TcpSock;
 }

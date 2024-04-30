@@ -18,9 +18,15 @@ FUdpReceiveTask::FUdpReceiveTask(const FString Ip, int32 Port)
 	}
 }
 
+FUdpReceiveTask::~FUdpReceiveTask()
+{
+	UE_LOG(LogTemp, Warning, TEXT("UdpReceiveTask is destroyed."));
+}
+
+
 bool FUdpReceiveTask::InitializeSocket(const FString Ip, int32 Port)
 {
-	USocketManager* sockManager = USocketManager::GetInstance();
+	FSocketManager* sockManager = FSocketManager::GetInstance();
 	Socket = sockManager->GetUDPSocket();
 	if (!Socket && Socket->GetSocketType() == SOCKTYPE_Datagram)
 	{
@@ -60,6 +66,7 @@ uint32 FUdpReceiveTask::Run()
 	receiveData.SetNumZeroed(bufferSize);
 	while (ShouldRun)
 	{
+		FNetLogger::GetInstance().LogInfo(TEXT("UdpReceiveTask is running."));
 		int32 bytesReceived = 0;
 		if (Socket->Recv(receiveData.GetData(), bufferSize, bytesReceived))
 		{
@@ -70,6 +77,7 @@ uint32 FUdpReceiveTask::Run()
 				receiveData.SetNumZeroed(bufferSize);
 			}
 		}
+		FPlatformProcess::Sleep(0.1);
 	}
 	return 0;
 }

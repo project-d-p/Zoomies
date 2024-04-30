@@ -13,7 +13,7 @@ TQueue<FInputData, EQueueMode::Spsc> FBaseSendTask::InputQueue;
 
 FUdpSendTask::FUdpSendTask()
 {
-	USocketManager* SocketManager = USocketManager::GetInstance();
+	FSocketManager* SocketManager = FSocketManager::GetInstance();
 	Sock = SocketManager->GetUDPSocket();
 	if (Sock == nullptr)
 	{
@@ -27,22 +27,27 @@ FUdpSendTask::FUdpSendTask()
 	}
 }
 
+FUdpSendTask::~FUdpSendTask()
+{
+	UE_LOG(LogTemp, Warning, TEXT("UdpSendTask is destroyed."));
+}
+
 uint32 FUdpSendTask::Run()
 {
 	ISocketSubsystem* SocketSubsystem = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM);
 	TSharedRef<FInternetAddr> Addr = SocketSubsystem->CreateInternetAddr();
-	USocketManager* SocketManager = USocketManager::GetInstance();
+	FSocketManager* SocketManager = FSocketManager::GetInstance();
 
 	SocketManager->GetTCPSocket()->GetPeerAddress(*Addr);
 	uint32 uintIp;
 	Addr->GetIp(uintIp);
-	
+
 	FIPv4Address IP(uintIp);
 	// TODO: 주소 문제 해결
 	// FIPv4Address IP2(10, 19, 225, 124);
 	int32 Port = 5000;
 	FIPv4Endpoint Endpoint(IP, Port);
-		
+
 	FString AddressString = Endpoint.ToText().ToString();
 	bool bIsValid;
 	Addr->SetIp(*AddressString, bIsValid);
@@ -52,11 +57,13 @@ uint32 FUdpSendTask::Run()
 		return 1;
 	}
 	Addr->SetPort(Port);
-	
+
 	while (bShouldRun)
 	{
 		FInputData InputData;
 		FVector2D TotalData = FVector2D(0, 0);
+
+		FNetLogger::GetInstance().LogInfo(TEXT("UdpSendTask is running."));
 		while (InputQueue.Dequeue(InputData))
 		{
 			if (InputData.Type == 0)
@@ -77,14 +84,7 @@ uint32 FUdpSendTask::Run()
 		TArray<uint8> bData = Marshaller::SerializeMessage(msg);
 
 		int32 BytesSent = 0;
-		if (Sock->SendTo(bData.GetData(), bData.Num(), BytesSent, *Addr))
-		{
-			FNetLogger::GetInstance().LogInfo(TEXT("Sent %d bytes to %s"), BytesSent, *AddressString);
-		}
-		else
-		{
-			FNetLogger::GetInstance().LogError(TEXT("Failed to send data"));
-		}
+		Sock->SendTo(bData.GetData(), bData.Num(), BytesSent, *Addr);
 
 		FPlatformProcess::Sleep(0.1);
 	}

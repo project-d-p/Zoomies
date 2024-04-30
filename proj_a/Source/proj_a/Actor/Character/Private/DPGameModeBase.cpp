@@ -17,7 +17,7 @@ void ADPGameModeBase::StartPlay()
 	Super::StartPlay();
 
 	// 재시도 로직 추가 해야함.
-	USocketManager* SocketManager = USocketManager::GetInstance();
+	FSocketManager* SocketManager = FSocketManager::GetInstance();
 	
 	bool success = SocketManager->Connect("10.19.225.124", 4242);
 	if (success) {
@@ -25,20 +25,12 @@ void ADPGameModeBase::StartPlay()
 	} else {
 		UE_LOG(LogTemp, Warning, TEXT("Failed to establish connection."));
 	}
-	USocketManager::GetInstance()->RunTask();
+	FSocketManager::GetInstance()->RunTask();
 }
 
 void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-
-	USocketManager *sockManger = USocketManager::GetInstance();
-	// if (sockManger->UdpReceiveTask->isRun())
-	// 	USocketManager::GetInstance()->UdpReceiveTask->Stop();
-	// if (sockManger->TcpReceiveTask->isRun())
-	// 	USocketManager::GetInstance()->TcpReceiveTask->Stop();
-	// if (sockManger->UdpSendTask->isRun())
-	// 	USocketManager::GetInstance()->UdpSendTask->Stop();
-	// if (sockManger->TcpSendTask->isRun())
-	// 	USocketManager::GetInstance()->TcpSendTask->Stop();
+		UE_LOG(LogTemp, Warning, TEXT("Call end play."));
+	delete FSocketManager::GetInstance();
 }

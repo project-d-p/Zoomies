@@ -6,7 +6,7 @@ class FTcpSendTask : public FBaseSendTask
 {
 public:
 	FTcpSendTask();
-	// virtual ~FTcpSendTask();
+	virtual ~FTcpSendTask();
 
 	virtual uint32 Run() override;
 	// virtual void Stop() override;

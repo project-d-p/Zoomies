@@ -8,23 +8,19 @@
 #include "FTcpReceiveTask.h"
 #include "FUdpReceiveTask.h"
 #include "SocketSubsystem.h"
-#include "SocketManager.generated.h"
 
-UCLASS()
-class PROJ_A_API USocketManager : public UObject
+class PROJ_A_API FSocketManager
 {
-	GENERATED_BODY()
 public:
-	static USocketManager* GetInstance();
+	static FSocketManager* GetInstance();
 	
-	USocketManager();
+	FSocketManager();
+	~FSocketManager();
 	bool Connect(const FString& tIP, int32 tPort);
 	bool RunTask();
 
 	FSocket* GetUDPSocket() const;
 	FSocket* GetTCPSocket() const;
-	
-	void Close() const;
 
 	/* TCP, UDP sender task */
 	FBaseSendTask* TcpSendTask = nullptr;
@@ -34,9 +30,9 @@ public:
 	FTcpReceiveTask* TcpReceiveTask = nullptr;
 	FUdpReceiveTask* UdpReceiveTask	= nullptr;
 	//
-	ISocketSubsystem* SockSubSystem = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM);
+	ISocketSubsystem* SockSubSystem = nullptr;
 private:
-	static USocketManager* Instance;
+	static FSocketManager* Instance;
 	//
 	FSocket* UdpSock = nullptr;
 	FSocket* TcpSock = nullptr;

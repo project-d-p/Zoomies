@@ -5,7 +5,7 @@
 
 FTcpSendTask::FTcpSendTask()
 {
-	USocketManager* SocketManager = USocketManager::GetInstance();
+	FSocketManager* SocketManager = FSocketManager::GetInstance();
 	Sock = SocketManager->GetTCPSocket();
 	Thread = FRunnableThread::Create(this, TEXT("NetworkTaskThread"), 0, TPri_BelowNormal);
 	if (!Thread)
@@ -14,10 +14,16 @@ FTcpSendTask::FTcpSendTask()
 	}
 }
 
+FTcpSendTask::~FTcpSendTask()
+{
+	UE_LOG(LogTemp, Warning, TEXT("TcpSendTask is destroyed."));
+}
+
 uint32 FTcpSendTask::Run()
 {
 	// XXX: 할 일 생기면 추가
-	while (true)
+	FNetLogger::GetInstance().LogInfo(TEXT("TcpSendTask is running."));
+	while (bShouldRun)
 	{
 		;
 	}

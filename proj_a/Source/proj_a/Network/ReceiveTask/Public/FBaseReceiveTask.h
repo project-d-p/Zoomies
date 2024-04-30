@@ -8,7 +8,7 @@ class FBaseReceiveTask : public FRunnable
 protected:
 	FSocket* Socket;
 	FRunnableThread* Thread;
-	bool ShouldRun;
+	FThreadSafeBool ShouldRun;
 
 public:
 	FBaseReceiveTask() : Socket(nullptr), Thread(nullptr), ShouldRun(true) {}

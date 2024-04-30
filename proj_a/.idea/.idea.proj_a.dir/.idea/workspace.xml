@@ -8,44 +8,34 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="212ad15f-bcd5-4807-8db4-96a52264d0a8" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/DataHub/Private/FDataHub.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/DataHub/Public/FDataHub.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Network/NetLogger/Public/FNetLogger.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/message.pb.cc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/message.pb.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/movement.pb.cc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/movement.pb.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/player_position.pb.cc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/player_position.pb.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/state.pb.cc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/state.pb.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/vector.pb.cc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/vector.pb.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Proto_file/message.proto" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Proto_file/movement.proto" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Proto_file/player_position.proto" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Proto_file/state.proto" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Proto_file/vector.proto" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/proj_a.uproject.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.proj_a.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.proj_a.dir/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/StarterContent/Architecture/Floor_400x400.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/StarterContent/Architecture/Floor_400x400.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/StarterContent/Particles/P_Ambient_Dust.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/StarterContent/Particles/P_Ambient_Dust.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/proj_a/Actor/Character/Private/DPGameModeBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Actor/Character/Private/DPGameModeBase.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Actor/Controller/Private/DPPlayerController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Actor/Controller/Private/DPPlayerController.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Component/Private/NetComp.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Component/Private/NetComp.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Component/Public/NetComp.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Component/Public/NetComp.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/Private/Marshaller.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Network/Private/Marshaller.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/Private/MessageHandler.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Network/Private/MessageHandler.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/Private/SocketManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Network/Private/SocketManager.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/Public/Marshaller.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Network/Public/Marshaller.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/Public/MessageHandler.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Network/Public/MessageHandler.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/Public/SocketManager.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Network/Public/SocketManager.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/Tasks/Private/FBaseSendTask.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/Tasks/Private/FReceiveTask.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/Tasks/Private/FTcpSendTask.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/Tasks/Private/FUdpSendTask.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/Tasks/Public/FBaseSendTask.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/Tasks/Public/FReceiveTask.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/Tasks/Public/FTcpSendTask.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/Tasks/Public/FUdpSendTask.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/proj_a.Build.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/proj_a.Build.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/ReceiveTask/Private/FBaseReceiveTask.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Network/ReceiveTask/Private/FBaseReceiveTask.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/ReceiveTask/Private/FTcpReceiveTask.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Network/ReceiveTask/Private/FTcpReceiveTask.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/ReceiveTask/Private/FUdpReceiveTask.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Network/ReceiveTask/Private/FUdpReceiveTask.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/ReceiveTask/Public/FBaseReceiveTask.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Network/ReceiveTask/Public/FBaseReceiveTask.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/ReceiveTask/Public/FTcpReceiveTask.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Network/ReceiveTask/Public/FTcpReceiveTask.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/ReceiveTask/Public/FUdpReceiveTask.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Network/ReceiveTask/Public/FUdpReceiveTask.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/SendTask/Private/FTcpSendTask.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Network/SendTask/Private/FTcpSendTask.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/SendTask/Private/FUdpSendTask.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Network/SendTask/Private/FUdpSendTask.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/SendTask/Public/FBaseSendTask.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Network/SendTask/Public/FBaseSendTask.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/SendTask/Public/FTcpSendTask.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Network/SendTask/Public/FTcpSendTask.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/SendTask/Public/FUdpSendTask.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Network/SendTask/Public/FUdpSendTask.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/message.pb.cc" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/message.pb.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/message.pb.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/message.pb.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/movement.pb.cc" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/movement.pb.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/movement.pb.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/movement.pb.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/player_position.pb.cc" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/player_position.pb.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/player_position.pb.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/player_position.pb.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/state.pb.cc" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/state.pb.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/state.pb.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/state.pb.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/vector.pb.cc" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/vector.pb.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/vector.pb.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/vector.pb.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proj_a.uproject.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/proj_a.uproject.DotSettings.user" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,6 +65,96 @@
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="cidr-memory-view://9" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/proj_a/Core/Public/proj_a.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/proj_a/proj_a.Build.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
@@ -94,35 +174,107 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Attach to Process.22824:JetBrains.ProcessEnumerator.Worker32.executor&quot;: &quot;Debug&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;Uproject.proj_a.executor&quot;: &quot;Debug&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;1-c1-d-datahub&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Hansangmin/Client/proj_a/proj_a.uproject&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.Mappings&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Attach to Process.22824:JetBrains.ProcessEnumerator.Worker32.executor": "Debug",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "Uproject.proj_a.executor": "Run",
+    "git-widget-placeholder": "1-c1-d-datahub",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "C:/Users/Hansangmin/Client/proj_a/proj_a.uproject",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "IdeDpaMemoryAllocationsPageId"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;rider.external.source.directories&quot;: [
-      &quot;C:\\Users\\Hansangmin\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\DecompilerCache&quot;,
-      &quot;C:\\Users\\Hansangmin\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\SourcesCache&quot;,
-      &quot;C:\\Users\\Hansangmin\\AppData\\Local\\Symbols\\src&quot;
+  "keyToStringList": {
+    "rider.external.source.directories": [
+      "C:\\Users\\Hansangmin\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\DecompilerCache",
+      "C:\\Users\\Hansangmin\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\SourcesCache",
+      "C:\\Users\\Hansangmin\\AppData\\Local\\Symbols\\src"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CidrLocalAttachDebugger.recentlyUsed">
       <recent name="com.jetbrains.rider.cpp.debugger.RiderCppLLDBDriverConfiguration" />
     </key>
   </component>
   <component name="RunManager">
+    <configuration default="true" type="Uproject" factoryName="rider.uproject">
+      <configuration_1>
+        <option name="CONFIGURATION" value="DebugGame" />
+        <option name="PLATFORM" value="Win64" />
+        <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/proj_a.uproject" />
+        <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
+        <option name="EXECUTABLE_PATH" value="C:\Users\Hansangmin\Client\proj_a\Binaries\Win64\proj_a-Win64-DebugGame.exe" />
+        <option name="MANDATORY_PROGRAM_PARAMETERS" value="" />
+        <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
+        <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.3" />
+        <option name="PASS_PARENT_ENVS" value="1" />
+        <option name="USE_EXTERNAL_CONSOLE" value="0" />
+        <option name="TERMINAL_INTERACTION_BEHAVIOR" value="FORCE_CONSOLE" />
+      </configuration_1>
+      <configuration_2>
+        <option name="CONFIGURATION" value="DebugGame Editor" />
+        <option name="PLATFORM" value="Win64" />
+        <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/proj_a.uproject" />
+        <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
+        <option name="EXECUTABLE_PATH" value="C:\Program Files\Epic Games\UE_5.3\Engine\Binaries\Win64\UnrealEditor-Win64-DebugGame.exe" />
+        <option name="MANDATORY_PROGRAM_PARAMETERS" value=" &quot;C:\Users\Hansangmin\Client\proj_a\proj_a.uproject&quot;" />
+        <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
+        <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.3" />
+        <option name="PASS_PARENT_ENVS" value="1" />
+        <option name="USE_EXTERNAL_CONSOLE" value="0" />
+        <option name="TERMINAL_INTERACTION_BEHAVIOR" value="FORCE_CONSOLE" />
+      </configuration_2>
+      <configuration_3>
+        <option name="CONFIGURATION" value="Development Editor" />
+        <option name="PLATFORM" value="Win64" />
+        <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/proj_a.uproject" />
+        <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
+        <option name="EXECUTABLE_PATH" value="C:\Program Files\Epic Games\UE_5.3\Engine\Binaries\Win64\UnrealEditor.exe" />
+        <option name="MANDATORY_PROGRAM_PARAMETERS" value=" &quot;C:\Users\Hansangmin\Client\proj_a\proj_a.uproject&quot;" />
+        <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
+        <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.3" />
+        <option name="PASS_PARENT_ENVS" value="1" />
+        <option name="USE_EXTERNAL_CONSOLE" value="0" />
+        <option name="TERMINAL_INTERACTION_BEHAVIOR" value="FORCE_CONSOLE" />
+      </configuration_3>
+      <configuration_4>
+        <option name="CONFIGURATION" value="Development" />
+        <option name="PLATFORM" value="Win64" />
+        <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/proj_a.uproject" />
+        <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
+        <option name="EXECUTABLE_PATH" value="C:\Users\Hansangmin\Client\proj_a\Binaries\Win64\proj_a.exe" />
+        <option name="MANDATORY_PROGRAM_PARAMETERS" value="" />
+        <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
+        <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.3" />
+        <option name="PASS_PARENT_ENVS" value="1" />
+        <option name="USE_EXTERNAL_CONSOLE" value="0" />
+        <option name="TERMINAL_INTERACTION_BEHAVIOR" value="FORCE_CONSOLE" />
+      </configuration_4>
+      <configuration_5>
+        <option name="CONFIGURATION" value="Shipping" />
+        <option name="PLATFORM" value="Win64" />
+        <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/proj_a.uproject" />
+        <option name="CURRENT_LAUNCH_PROFILE" value="Local" />
+        <option name="EXECUTABLE_PATH" value="C:\Users\Hansangmin\Client\proj_a\Binaries\Win64\proj_a-Win64-Shipping.exe" />
+        <option name="MANDATORY_PROGRAM_PARAMETERS" value="" />
+        <option name="CUSTOM_PROGRAM_PARAMETERS" value="" />
+        <option name="WORKING_DIRECTORY" value="C:\Program Files\Epic Games\UE_5.3" />
+        <option name="PASS_PARENT_ENVS" value="1" />
+        <option name="USE_EXTERNAL_CONSOLE" value="0" />
+        <option name="TERMINAL_INTERACTION_BEHAVIOR" value="FORCE_CONSOLE" />
+      </configuration_5>
+      <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/proj_a.uproject" />
+      <option name="AUTO_SELECT_PRIORITY" value="10010" />
+      <method v="2">
+        <option name="Build" />
+      </method>
+    </configuration>
     <configuration name="proj_a" type="Uproject" factoryName="rider.uproject">
       <configuration_1>
         <option name="CONFIGURATION" value="Development Editor" />
@@ -225,6 +377,7 @@
       <workItem from="1714296345524" duration="2679000" />
       <workItem from="1714302393605" duration="5871000" />
       <workItem from="1714367944744" duration="9008000" />
+      <workItem from="1714457775802" duration="15145000" />
     </task>
     <servers />
   </component>
@@ -246,6 +399,17 @@
   <component name="UnrealLogPanelSettings">
     <option name="clearOnStart" value="true" />
     <option name="showTimestamps" value="true" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />

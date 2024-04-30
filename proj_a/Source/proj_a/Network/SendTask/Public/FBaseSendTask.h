@@ -30,11 +30,6 @@ public:
 			Thread->Kill(true);
 			delete Thread;
 		}
-		if (Sock)
-		{
-			Sock->Close();
-			ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(Sock);
-		}
 	}
 
 	virtual uint32 Run() = 0;

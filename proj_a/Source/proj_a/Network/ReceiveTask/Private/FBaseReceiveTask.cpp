@@ -1,7 +1,6 @@
 #pragma once
 
 #include "FBaseReceiveTask.h"
-#include "SocketSubsystem.h"
 
 FBaseReceiveTask::~FBaseReceiveTask()
 {
@@ -9,11 +8,6 @@ FBaseReceiveTask::~FBaseReceiveTask()
 	{
 		Thread->Kill(true);
 		delete Thread;
-	}
-	if (Socket)
-	{
-		Socket->Close();
-		ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(Socket);
 	}
 }
 
