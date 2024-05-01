@@ -12,7 +12,7 @@ protected:
 
 public:
 	FBaseReceiveTask() : Socket(nullptr), Thread(nullptr), ShouldRun(true) {}
-	virtual ~FBaseReceiveTask();
+	virtual ~FBaseReceiveTask() override;
 	
 	virtual bool isRun() { if (ShouldRun) { return true; } return false; }
 	virtual uint32 Run() override = 0;

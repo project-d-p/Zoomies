@@ -21,13 +21,18 @@ FTcpReceiveTask::FTcpReceiveTask()
 FTcpReceiveTask::~FTcpReceiveTask()
 {
 	UE_LOG(LogTemp, Warning, TEXT("TcpReceiveTask is destroyed."));
+	if (Thread)
+	{
+		delete Thread;
+		Thread = nullptr;
+	}
 }
 
 
 bool FTcpReceiveTask::InitializeSocket()
 {
-	FSocketManager* sockManager = FSocketManager::GetInstance();
-	Socket = sockManager->GetTCPSocket();
+	FSocketManager &sockManager = FSocketManager::GetInstance();
+	Socket = sockManager.GetTCPSocket();
 	
 	return Socket != nullptr;
 }

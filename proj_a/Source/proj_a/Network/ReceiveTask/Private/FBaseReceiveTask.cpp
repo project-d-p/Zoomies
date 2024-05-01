@@ -14,6 +14,7 @@ FBaseReceiveTask::~FBaseReceiveTask()
 void FBaseReceiveTask::Stop()
 {
 	ShouldRun = false;
+	Thread->WaitForCompletion();
 }
 
 void FBaseReceiveTask::Start(const TCHAR* ThreadName)

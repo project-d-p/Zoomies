@@ -21,13 +21,18 @@ FUdpReceiveTask::FUdpReceiveTask(const FString Ip, int32 Port)
 FUdpReceiveTask::~FUdpReceiveTask()
 {
 	UE_LOG(LogTemp, Warning, TEXT("UdpReceiveTask is destroyed."));
+	if (Thread)
+	{
+		delete Thread;
+		Thread = nullptr;
+	}
 }
 
 
 bool FUdpReceiveTask::InitializeSocket(const FString Ip, int32 Port)
 {
-	FSocketManager* sockManager = FSocketManager::GetInstance();
-	Socket = sockManager->GetUDPSocket();
+	FSocketManager &sockManager = FSocketManager::GetInstance();
+	Socket = sockManager.GetUDPSocket();
 	if (!Socket && Socket->GetSocketType() == SOCKTYPE_Datagram)
 	{
 		FNetLogger::GetInstance().LogError(TEXT("Failed to get UDP socket"));
@@ -77,7 +82,7 @@ uint32 FUdpReceiveTask::Run()
 				receiveData.SetNumZeroed(bufferSize);
 			}
 		}
-		FPlatformProcess::Sleep(0.1);
+		FPlatformProcess::Sleep(0.01);
 	}
 	return 0;
 }

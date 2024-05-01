@@ -1,0 +1,32 @@
+Index: Source/proj_a/DPPlayerController.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>// Fill out your copyright notice in the Description page of Project Settings.\r\n\r\n#include \"DPCharacter.h\"\r\n#include \"DPPlayerController.h\"\r\n#include \"EnhancedInputComponent.h\"\r\n#include \"EnhancedInputSubsystems.h\"\r\n#include \"InputMappingContext.h\"\r\n\r\nADPPlayerController::ADPPlayerController()\r\n{\r\n\tstatic ConstructorHelpers::FObjectFinder<UInputMappingContext>DEFAULT_CONTEXT\r\n\t(TEXT(\"/Game/input/imc_character.imc_character\"));\r\n\tif (DEFAULT_CONTEXT.Succeeded())\r\n\t\tdefaultContext = DEFAULT_CONTEXT.Object;\r\n\r\n\tstatic ConstructorHelpers::FObjectFinder<UInputAction>IA_MOVE\r\n\t(TEXT(\"/Game/input/ia_move.ia_move\"));\r\n\tif (IA_MOVE.Succeeded())\r\n\t\tmoveAction = IA_MOVE.Object;\r\n\r\n\tstatic ConstructorHelpers::FObjectFinder<UInputAction>IA_JUMP\r\n\t(TEXT(\"/Game/input/ia_jump.ia_jump\"));\r\n\tif (IA_JUMP.Succeeded())\r\n\t\tjumpAction = IA_JUMP.Object;\r\n\r\n\tstatic ConstructorHelpers::FObjectFinder<UInputAction>IA_ROTATE\r\n\t(TEXT(\"/Game/input/ia_rotate.ia_rotate\"));\r\n\tif (IA_ROTATE.Succeeded())\r\n\t\trotateAction = IA_ROTATE.Object;\r\n}\r\n\r\nvoid ADPPlayerController::BeginPlay()\r\n{\r\n\tSuper::BeginPlay();\r\n\r\n\t// ADPCharacter�� ĳ����, ���� Pawn�� character ������ �Ҵ�\r\n\tcharacter = Cast<ADPCharacter>(GetPawn());\r\n\r\n\t// character�� ��ȿ���� Ȯ��\r\n\tif (!character) {\r\n\t\tUE_LOG(LogTemp, Warning, TEXT(\"character null\"));\r\n\t\treturn;\r\n\t}\r\n\r\n\t// subsystem, IMC ����\r\n\tif (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))\r\n\t\tSubSystem->AddMappingContext(defaultContext, 0);\r\n}\r\n\r\nvoid ADPPlayerController::SetupInputComponent()\r\n{\r\n\tSuper::SetupInputComponent();\r\n\r\n\t// enhanced input component ĳ�����ϰ� ���ε�\r\n\tif (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent)) {\r\n\t\t// �÷��̾� �̵� ( w, a, d, s )\r\n\t\tEnhancedInputComponent->BindAction(moveAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Move);\r\n\t\t// �÷��̾� ���� ( space )\r\n\t\tEnhancedInputComponent->BindAction(jumpAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Jump);\r\n\t\t// ���� ��ȯ ( ���콺 ȸ�� )\r\n\t\tEnhancedInputComponent->BindAction(rotateAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Rotate);\r\n\t}\r\n}\r\n\r\nvoid ADPPlayerController::Move(const FInputActionValue& value)\r\n{\r\n\t// UE_LOG(LogTemp, Warning, TEXT(\"ia_move_x : %f\"), value.Get<FVector2D>().X);\r\n\t// UE_LOG(LogTemp, Warning, TEXT(\"ia_move_y : %f\"), value.Get<FVector2D>().Y);\r\n\r\n\tconst FVector2D actionValue = value.Get<FVector2D>();\r\n\tconst FRotator controlRotation = GetControlRotation();\r\n\tconst FRotator yaw(0.f, controlRotation.Yaw, 0.f);\r\n\r\n\tconst FVector forwardVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);\r\n\tconst FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);\r\n\t\r\n\t// send move command ( id, actionValue ) ( x = 1 forward, x = -1 backward, y = 1 right, y = -1 left )\r\n\tcharacter->AddMovementInput(forwardVector, actionValue.X);\r\n\tcharacter->AddMovementInput(rightVector, actionValue.Y);\r\n}\r\n\r\nvoid ADPPlayerController::Jump(const FInputActionValue& value)\r\n{\r\n\t//UE_LOG(LogTemp, Warning, TEXT(\"ia_jump : %d\"), value.Get<bool>());\r\n\t\r\n\tbool actionValue = value.Get<bool>();\r\n\tif (actionValue)\r\n\t\t// send jump command ( id, actionValue ) ( true = jump )\r\n\t\tcharacter->Jump();\r\n}\r\n\r\nvoid ADPPlayerController::Rotate(const FInputActionValue& value)\r\n{\r\n\t// UE_LOG(LogTemp, Warning, TEXT(\"ia_rotate_x : %f\"), value.Get<FVector2D>().X);\r\n\t// UE_LOG(LogTemp, Warning, TEXT(\"ia_rotate_y : %f\"), value.Get<FVector2D>().Y);\r\n\t\r\n\tFVector2D actionValue = value.Get<FVector2D>();\r\n\r\n\t// send rotate command ( id, actionValue )\t// �ü��� �Ⱥ����� ��������� ?\r\n\tcharacter->AddControllerYawInput(actionValue.X);\r\n\tcharacter->AddControllerPitchInput(actionValue.Y);\r\n}\r\n\r\nvoid ADPPlayerController::UpdatePlayer(/*DataHub result*/)\t// �ѹ��� �ޱ� ?\r\n{\r\n\t/*\r\n\tif (result.moveResult)\r\n\t\tcharacter->SetActorLocation(moveResult.x, moveResult.y, moveResult.z);\r\n\tif (result.jumpResult)\r\n\t\tcharacter->Jump();\r\n\tif (result.rotateResult)\r\n\t\tcharacter->\r\n\tcharacter->SetActorRotation();\r\n\tcharacter->SetActorLocationAndRotation();\r\n\t*/\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Source/proj_a/DPPlayerController.cpp b/Source/proj_a/DPPlayerController.cpp
+--- a/Source/proj_a/DPPlayerController.cpp	(revision dd7f5632ad176dcd5de22e9eee02ffc48edb8cdf)
++++ b/Source/proj_a/DPPlayerController.cpp	(date 1714378919110)
+@@ -1,7 +1,7 @@
+ // Fill out your copyright notice in the Description page of Project Settings.
+ 
+-#include "DPCharacter.h"
+ #include "DPPlayerController.h"
++#include "DPCharacter.h"
+ #include "EnhancedInputComponent.h"
+ #include "EnhancedInputSubsystems.h"
+ #include "InputMappingContext.h"
+Index: proj_a.uproject.DotSettings.user
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/proj_a.uproject.DotSettings.user b/proj_a.uproject.DotSettings.user
+new file mode 100644
+--- /dev/null	(date 1714378844727)
++++ b/proj_a.uproject.DotSettings.user	(date 1714378844727)
+@@ -0,0 +1,2 @@
++<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
++	<s:String x:Key="/Default/Environment/Highlighting/HighlightingSourceSnapshotLocation/@EntryValue">C:\Users\Hansangmin\AppData\Local\JetBrains\Rider2024.1\resharper-host\temp\Rider\vAny\CoverageData\_proj_a.1277153319\Snapshot\snapshot.utdcvr</s:String></wpf:ResourceDictionary>
+\ No newline at end of file

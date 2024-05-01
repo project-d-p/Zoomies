@@ -13,8 +13,8 @@ TQueue<FInputData, EQueueMode::Spsc> FBaseSendTask::InputQueue;
 
 FUdpSendTask::FUdpSendTask()
 {
-	FSocketManager* SocketManager = FSocketManager::GetInstance();
-	Sock = SocketManager->GetUDPSocket();
+	FSocketManager &SocketManager = FSocketManager::GetInstance();
+	Sock = SocketManager.GetUDPSocket();
 	if (Sock == nullptr)
 	{
 		FNetLogger::GetInstance().LogError(TEXT("UDP Socket is null!"));
@@ -36,9 +36,9 @@ uint32 FUdpSendTask::Run()
 {
 	ISocketSubsystem* SocketSubsystem = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM);
 	TSharedRef<FInternetAddr> Addr = SocketSubsystem->CreateInternetAddr();
-	FSocketManager* SocketManager = FSocketManager::GetInstance();
+	FSocketManager &SocketManager = FSocketManager::GetInstance();
 
-	SocketManager->GetTCPSocket()->GetPeerAddress(*Addr);
+	SocketManager.GetTCPSocket()->GetPeerAddress(*Addr);
 	uint32 uintIp;
 	Addr->GetIp(uintIp);
 

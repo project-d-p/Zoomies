@@ -27,14 +27,14 @@ public:
 	{
 		if (Thread)
 		{
-			Thread->Kill(true);
 			delete Thread;
+			Thread = nullptr;
 		}
 	}
 
 	virtual uint32 Run() = 0;
 	virtual bool isRun() { if (bShouldRun) { return true; } return false; }
-	virtual void Stop() { bShouldRun = false; }
+	virtual void Stop() { bShouldRun = false; Thread->WaitForCompletion(); }
 
 	// TCP, UDP의 행방 결정시 이동
 	static TQueue<FInputData, EQueueMode::Spsc> InputQueue;

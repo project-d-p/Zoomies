@@ -5,8 +5,8 @@
 
 FTcpSendTask::FTcpSendTask()
 {
-	FSocketManager* SocketManager = FSocketManager::GetInstance();
-	Sock = SocketManager->GetTCPSocket();
+	FSocketManager &SocketManager = FSocketManager::GetInstance();
+	Sock = SocketManager.GetTCPSocket();
 	Thread = FRunnableThread::Create(this, TEXT("NetworkTaskThread"), 0, TPri_BelowNormal);
 	if (!Thread)
 	{

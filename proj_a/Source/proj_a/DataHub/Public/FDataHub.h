@@ -1,3 +1,5 @@
+#pragma once
+
 #include "CoreMinimal.h"
 #include "Containers/Queue.h"
 #include "Message.pb.h"

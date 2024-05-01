@@ -12,23 +12,23 @@
 #include "FUdpSendTask.h"
 #include "Common/UdpSocketBuilder.h"
 
-FSocketManager* FSocketManager::Instance = nullptr;
-
-FSocketManager* FSocketManager::GetInstance()
+FSocketManager& FSocketManager::GetInstance()
 {
-	if (Instance == nullptr)
-	{
-		Instance = new FSocketManager();
-	}
+	static FSocketManager Instance;
 	return Instance;
 }
 
 FSocketManager::FSocketManager()
 {
-	SockSubSystem = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM);
+	
 }
 
 FSocketManager::~FSocketManager()
+{
+
+}
+
+void FSocketManager::Close()
 {
 	UE_LOG(LogTemp, Warning, TEXT("SocketManager start destroying."));
 	if (UdpReceiveTask && UdpReceiveTask->isRun())
@@ -72,12 +72,13 @@ FSocketManager::~FSocketManager()
 	UE_LOG(LogTemp, Warning, TEXT("SocketManager is destroyed."));
 }
 
+
 bool FSocketManager::Connect(const FString& tIP, int32 tPort)
 {
 	FIPv4Address ip;
 	SockSubSystem = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM);
 	TSharedRef<FInternetAddr> addr = SockSubSystem->CreateInternetAddr();
-
+	
 	FIPv4Address::Parse(tIP, ip);
 	addr->SetIp(ip.Value);
 	addr->SetPort(tPort);
@@ -99,7 +100,7 @@ bool FSocketManager::RunTask()
 	TcpSendTask = new FTcpSendTask();
 	if (TcpSendTask->isRun())
 		UdpSendTask = new FUdpSendTask();
-
+	
 	// TCPReceiveTask = new FReceiveTask(true);
 	TSharedRef<FInternetAddr> Addr = SockSubSystem->CreateInternetAddr();
 	GetTCPSocket()->GetAddress(*Addr);
