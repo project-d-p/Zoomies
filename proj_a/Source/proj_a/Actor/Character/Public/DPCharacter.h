@@ -31,9 +31,27 @@ public:
 	// FVector3f orientation;
 	// FString state;
 
-	// WeaponCompoment* weaponComponent;
-	// healthCompoment* healthComponent;
-	// StateComponent* stateComponent;
+public:	// component
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class UDPHpActorComponent* hpComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class UDPConstructionActorComponent* constructionComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class UDPWeaponActorComponent* weaponComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class UDPStateActorComponent* stateComponent;
+
+	// 局聪皋捞记 根鸥林
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
+	UAnimMontage* characterMontage;
+
+	void PlayAimAnimation();
+	void StopAimAnimation();
+	void PlayFireAnimation();
+	void ChangeAnimation();
+	void PlaceConstructionAnimation();
+	void DestroyConstructionAnimation();
+	void DyingAnimation();
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -41,4 +59,10 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class UCameraComponent* camera;
+
+public:
+	FVector currentVelocity{ 0.f, 0.f, 0.f };
+	UPROPERTY(BlueprintReadWrite)
+	float speed{ 0.f };
+	bool isAim{ false };
 };

@@ -1,11 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "DPPlayerController.h"
-
 #include "DPCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+#include "DPWeaponActorComponent.h"
+#include "DPConstructionActorComponent.h"
+#include "DPStateActorComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "NetComp.h"
 #include "ProtobufUtility.h"
 #include "movement.pb.h"
@@ -17,42 +20,68 @@ DEFINE_LOG_CATEGORY(LogNetwork);
 
 ADPPlayerController::ADPPlayerController()
 {
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext> DEFAULT_CONTEXT
-		(TEXT("/Game/input/imc_character.imc_character"));
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext>DEFAULT_CONTEXT
+	(TEXT("/Game/input/imc_character.imc_character"));
 	if (DEFAULT_CONTEXT.Succeeded())
 		defaultContext = DEFAULT_CONTEXT.Object;
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> IA_MOVE
-		(TEXT("/Game/input/ia_move.ia_move"));
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_MOVE
+	(TEXT("/Game/input/ia_move.ia_move"));
 	if (IA_MOVE.Succeeded())
 		moveAction = IA_MOVE.Object;
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> IA_JUMP
-		(TEXT("/Game/input/ia_jump.ia_jump"));
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_JUMP
+	(TEXT("/Game/input/ia_jump.ia_jump"));
 	if (IA_JUMP.Succeeded())
 		jumpAction = IA_JUMP.Object;
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> IA_ROTATE
-		(TEXT("/Game/input/ia_rotate.ia_rotate"));
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_ROTATE
+	(TEXT("/Game/input/ia_rotate.ia_rotate"));
 	if (IA_ROTATE.Succeeded())
 		rotateAction = IA_ROTATE.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_ACTIVE
+	(TEXT("/Game/input/ia_active.ia_active"));
+	if (IA_ACTIVE.Succeeded())
+		activeAction = IA_ACTIVE.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_ADDITIONALSETTING
+	(TEXT("/Game/input/ia_additionalSetting.ia_additionalSetting"));
+	if (IA_ADDITIONALSETTING.Succeeded())
+		additionalSettingAction = IA_ADDITIONALSETTING.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_AIM
+	(TEXT("/Game/input/ia_aim.ia_aim"));
+	if (IA_AIM.Succeeded())
+		aimAction = IA_AIM.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_CANCEL
+	(TEXT("/Game/input/ia_cancel.ia_cancel"));
+	if (IA_CANCEL.Succeeded())
+		cancelAction = IA_CANCEL.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_CHAT
+	(TEXT("/Game/input/ia_chat.ia_chat"));
+	if (IA_CHAT.Succeeded())
+		chatAction = IA_CHAT.Object;
 }
 
 void ADPPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ADPCharacterÎ°ú Ï∫êÏä§ÌåÖ, ÌòÑÏû¨ PawnÏùÑ character Î≥ÄÏàòÏóê Ìï†Îãπ
+	
 	character = Cast<ADPCharacter>(GetPawn());
-
-	// characterÍ∞Ä Ïú†Ìö®ÌïúÏßÄ ÌôïÏù∏
+	
 	if (!character)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("character null"));
 		return;
 	}
-
-	// subsystem, IMC Ïó∞Í≤∞
+	else {
+		state = Cast<UDPStateActorComponent>(character->GetComponentByClass(UDPStateActorComponent::StaticClass()));
+		construction = Cast<UDPConstructionActorComponent>(character->GetComponentByClass(UDPConstructionActorComponent::StaticClass()));
+	}
+	
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
 		GetLocalPlayer()))
 		SubSystem->AddMappingContext(defaultContext, 0);
@@ -74,15 +103,25 @@ void ADPPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	// enhanced input component Ï∫êÏä§ÌåÖÌïòÍ≥† Î∞îÏù∏Îî©
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
-	{
-		// ÌîåÎ†àÏù¥Ïñ¥ Ïù¥Îèô ( w, a, d, s )
+	// enhanced input component ƒ≥Ω∫∆√«œ∞Ì πŸ¿Œµ˘
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent)) {
+		// «√∑π¿ÃæÓ ¿Ãµø ( w, a, d, s )
 		EnhancedInputComponent->BindAction(moveAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Move);
-		// ÌîåÎ†àÏù¥Ïñ¥ Ï†êÌîÑ ( space )
+		// «√∑π¿ÃæÓ ¡°«¡ ( space )
 		EnhancedInputComponent->BindAction(jumpAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Jump);
-		// ÏãúÏ†ê Î≥ÄÌôò ( ÎßàÏö∞Ïä§ ÌöåÏ†Ñ )
+		// Ω√¡° ∫Ø»Ø ( ∏∂øÏΩ∫ »∏¿¸ )
 		EnhancedInputComponent->BindAction(rotateAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Rotate);
+		//	«‡µø, √— πﬂªÁ/∫Æ º≥ƒ°/≈Õ∑ø º≥ƒ° ( ∏∂øÏΩ∫ ¡¬≈¨∏Ø )
+		EnhancedInputComponent->BindAction(activeAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Active);
+		//	∫Ø∞Ê, π´±‚ ∫Ø∞Ê/∫Æ »∏¿¸ ( ∏∂øÏΩ∫ Ω∫≈©∑— )
+		EnhancedInputComponent->BindAction(additionalSettingAction, ETriggerEvent::Triggered, this, &ADPPlayerController::AdditionalSetting);
+		//	ø°¿” ( ∏∂øÏΩ∫ øÏ≈¨∏Ø )
+		EnhancedInputComponent->BindAction(aimAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Aim);	// 	key down
+		EnhancedInputComponent->BindAction(aimAction, ETriggerEvent::Completed, this, &ADPPlayerController::AimReleased);
+		//	√Îº“, √§∆√ ≤Ù±‚ ( esc - UE ø°µ≈Õø°º≠ ±‚∫ª ¥‹√‡≈∞ ∫Ø∞Ê « ø‰ )
+		EnhancedInputComponent->BindAction(cancelAction, ETriggerEvent::Triggered, this, &ADPPlayerController::ActionCancel);
+		//	√§∆√ ø≠±‚ ( enter )
+		EnhancedInputComponent->BindAction(chatAction, ETriggerEvent::Triggered, this, &ADPPlayerController::OpenChat);
 	}
 }
 
@@ -97,8 +136,7 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 
 	const FVector forwardVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
-
-	// XXX: 2Î≤àÏß∏ Ïù∏ÏûêÏù∏ typeÏùÄ ÎÇòÏ§ëÏóê ÏÇ¨Ïö©, 0Ïù¥ Í∏∞Î≥∏ Ïù¥Îèô Ï≤òÎ¶¨.
+	
 	// UNetComp::inputTCP(actionValue, 0);
 	UNetComp::InputUDP(actionValue);
 	// character->AddMovementInput(forwardVector, actionValue.X);
@@ -125,8 +163,120 @@ void ADPPlayerController::Rotate(const FInputActionValue& value)
 	// send rotate command ( id, actionValue )
 	character->AddControllerYawInput(actionValue.X);
 	character->AddControllerPitchInput(actionValue.Y);
-	// XXX: Ï∂îÌõÑÏóê ÏµúÏ†ÅÌôî Í∞ÄÎä•(ÌïÑÏöî)
 	FUdpSendTask::ProtoData.set_allocated_orientation(ProtobufUtility::ConvertToFVecToVec3(character->GetControlRotation().Vector()));
+}
+
+void ADPPlayerController::Active(const FInputActionValue& value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Active"));
+
+	if ("NONE" == state->equipmentState) {
+
+	}
+	if ("GUN" == state->equipmentState) {
+		if (character->isAim) {
+			character->PlayFireAnimation();
+			character->weaponComponent->Attack();
+		}
+	}
+	if ("WALL" == state->equipmentState) {
+		//if (character->isAim) {
+			character->GetCharacterMovement()->DisableMovement();
+			construction->MakeWall({ 0, 0, 0 }, { 0, 0, 0 });
+			character->constructionComponent->placeWall = true;
+			// ¥Ÿ¿Ω ∆Ωø° false∑Œ πŸ≤ﬁ
+			auto resetPlaceWall = [this]() {
+				character->constructionComponent->placeWall = false;
+			};
+			GetWorld()->GetTimerManager().SetTimerForNextTick(resetPlaceWall);
+
+			FTimerHandle waitTimer;
+			GetWorld()->GetTimerManager().SetTimer(waitTimer, FTimerDelegate::CreateLambda([&]() {
+				UE_LOG(LogTemp, Warning, TEXT("wall delay 1.63"));
+				character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);	// movement disable -> enable
+				GetWorldTimerManager().ClearTimer(waitTimer);
+			}), 1.63f, false);
+		//}
+	}
+	if ("TURRET" == state->equipmentState) {
+		if (character->isAim) {
+			character->GetCharacterMovement()->DisableMovement();
+			character->constructionComponent->placeturret = true;
+
+			auto resetPlaceTurret = [this]() {
+				character->constructionComponent->placeturret = false;
+			};
+			GetWorld()->GetTimerManager().SetTimerForNextTick(resetPlaceTurret);
+
+			FTimerHandle waitTimer;
+			GetWorld()->GetTimerManager().SetTimer(waitTimer, FTimerDelegate::CreateLambda([&]() {
+				UE_LOG(LogTemp, Warning, TEXT("turret delay 1.63"));
+				character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+				GetWorldTimerManager().ClearTimer(waitTimer);
+			}), 1.63f, false);
+		}
+	}
+}
+
+void ADPPlayerController::AdditionalSetting(const FInputActionValue& value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("AdditionalSetting"));
+	// Scroll Up : 1, Scroll Down : -1
+	// UE_LOG(LogTemp, Warning, TEXT("->	ia_rotate_x : %f"), value.Get<FVector2D>().X);
+
+	int stateValue = static_cast<int>(value.Get<FVector2D>().X);
+	character->ChangeAnimation();
+	character->stateComponent->ChangeEquipmentState(stateValue);
+}
+
+void ADPPlayerController::Aim(const FInputActionValue& value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Aim"));
+
+	if ("NONE" == state->equipmentState) {
+		
+	}
+	if ("GUN" == state->equipmentState) {
+		character->PlayAimAnimation();
+	}
+	if ("WALL" == state->equipmentState) {
+		character->isAim = true;
+		// πŸ∂Û∫∏¥¬ πÊ«‚ √ªªÁ¡¯ -> ¿Ã∂ß scrollΩ√ wall»∏¿¸µ«∞‘	// idAim = true -> active µ«∏È º≥ƒ°
+	}
+	if ("TURRET" == state->equipmentState) {
+		character->isAim = true;
+		// πŸ∂Û∫∏¥¬ πÊ«‚ √ªªÁ¡¯
+	}
+}
+
+void ADPPlayerController::AimReleased(const FInputActionValue& value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("AimReleased"));
+
+	if ("NONE" == state->equipmentState) {
+
+	}
+	if ("GUN" == state->equipmentState) {
+		character->StopAimAnimation();
+	}
+	if ("WALL" == state->equipmentState) {
+		character->isAim = false;
+		// √ªªÁ¡¯ ¡¶∞≈
+	}
+	if ("TURRET" == state->equipmentState) {
+		character->isAim = false;
+		// √ªªÁ¡¯ ¡¶∞≈
+	}
+}
+
+void ADPPlayerController::ActionCancel(const FInputActionValue& value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("ActionCancel"));
+}
+
+void ADPPlayerController::OpenChat(const FInputActionValue& value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("OpenChat"));
 }
 
 void ADPPlayerController::UpdatePlayer()
@@ -152,7 +302,6 @@ void ADPPlayerController::UpdatePlayer()
 		character->AddMovementInput(rightVector, actionValue.Y);
 	}
 	
-	// class ÏÜçÏÑ±ÏúºÎ°ú Ï∂îÍ∞Ä Í≥†Î†§.
 	// PlayerPosition result = FDataHub::PlayerPositions["1"];
 	// if (result.has_position())
 	// 	character->SetActorLocation(FVector(result.position().x(), result.position().y(), result.position().z()));
