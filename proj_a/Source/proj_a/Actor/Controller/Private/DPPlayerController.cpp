@@ -9,6 +9,14 @@
 #include "DPConstructionActorComponent.h"
 #include "DPStateActorComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "NetComp.h"
+#include "ProtobufUtility.h"
+#include "movement.pb.h"
+#include "FDataHub.h"
+#include "FNetLogger.h"
+#include "FUdpSendTask.h"
+
+DEFINE_LOG_CATEGORY(LogNetwork);
 
 ADPPlayerController::ADPPlayerController()
 {
@@ -61,12 +69,11 @@ ADPPlayerController::ADPPlayerController()
 void ADPPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ADPCharacter로 캐스팅, 현재 Pawn을 character 변수에 할당
+	
 	character = Cast<ADPCharacter>(GetPawn());
-
-	// character가 유효한지 확인
-	if (!character) {
+	
+	if (!character)
+	{
 		UE_LOG(LogTemp, Warning, TEXT("character null"));
 		return;
 	}
@@ -74,10 +81,22 @@ void ADPPlayerController::BeginPlay()
 		state = Cast<UDPStateActorComponent>(character->GetComponentByClass(UDPStateActorComponent::StaticClass()));
 		construction = Cast<UDPConstructionActorComponent>(character->GetComponentByClass(UDPConstructionActorComponent::StaticClass()));
 	}
-
-	// subsystem, IMC 연결
-	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+	
+	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
+		GetLocalPlayer()))
 		SubSystem->AddMappingContext(defaultContext, 0);
+}
+
+void ADPPlayerController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	UpdatePlayer();
+}
+
+void ADPPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
 }
 
 void ADPPlayerController::SetupInputComponent()
@@ -117,10 +136,11 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 
 	const FVector forwardVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
-
-	// send move command ( id, actionValue ) ( x = 1 forward, x = -1 backward, y = 1 right, y = -1 left )
-	character->AddMovementInput(forwardVector, actionValue.X);
-	character->AddMovementInput(rightVector, actionValue.Y);
+	
+	// UNetComp::inputTCP(actionValue, 0);
+	UNetComp::InputUDP(actionValue);
+	// character->AddMovementInput(forwardVector, actionValue.X);
+	// character->AddMovementInput(rightVector, actionValue.Y);
 }
 
 void ADPPlayerController::Jump(const FInputActionValue& value)
@@ -135,7 +155,7 @@ void ADPPlayerController::Jump(const FInputActionValue& value)
 
 void ADPPlayerController::Rotate(const FInputActionValue& value)
 {
-	// UE_LOG(LogTemp, Warning, TEXT("ia_rotate_X : %f"), value.Get<FVector2D>().X);
+	// UE_LOG(LogTemp, Warning, TEXT("ia_rotate_x : %f"), value.Get<FVector2D>().X);
 	// UE_LOG(LogTemp, Warning, TEXT("ia_rotate_y : %f"), value.Get<FVector2D>().Y);
 
 	FVector2D actionValue = value.Get<FVector2D>();
@@ -143,6 +163,7 @@ void ADPPlayerController::Rotate(const FInputActionValue& value)
 	// send rotate command ( id, actionValue )
 	character->AddControllerYawInput(actionValue.X);
 	character->AddControllerPitchInput(actionValue.Y);
+	FUdpSendTask::ProtoData.set_allocated_orientation(ProtobufUtility::ConvertToFVecToVec3(character->GetControlRotation().Vector()));
 }
 
 void ADPPlayerController::Active(const FInputActionValue& value)
@@ -258,17 +279,36 @@ void ADPPlayerController::OpenChat(const FInputActionValue& value)
 	UE_LOG(LogTemp, Warning, TEXT("OpenChat"));
 }
 
-
-void ADPPlayerController::UpdatePlayer(/*DataHub result*/)	// 한번에 받기 ?
+void ADPPlayerController::UpdatePlayer()
 {
-	/*
-	if (result.moveResult)
-		character->SetActorLocation(moveResult.x, moveResult.y, moveResult.z);
-	if (result.jumpResult)
-		character->Jump();
-	if (result.rotateResult)
-		character->
-	character->SetActorRotation();
-	character->SetActorLocationAndRotation();
-	*/
+	Movement movement;
+	if (!FDataHub::EchoData.Contains("1")) {
+		// UE_LOG(LogNetwork, Warning, TEXT("Player 1 data not found"));
+		return;
+	}
+	movement = FDataHub::EchoData["1"];
+	if (!movement.has_progess_vector())
+	{
+		// UE_LOG(LogNetwork, Warning, TEXT("progress vector not found"));
+	}
+	// UE_LOG(LogTemp, Warning, TEXT("Progress: %f %f %f"), movement.progess_vector().x(), movement.progess_vector().y(), movement.progess_vector().z());
+	if (movement.has_progess_vector())
+	{
+		FVector rightVector = character->GetActorRightVector();
+		FVector forwardVector(movement.orientation().x(), movement.orientation().y(), movement.orientation().z());
+		FVector actionValue = FVector(movement.progess_vector().x(), movement.progess_vector().y(), movement.progess_vector().z());
+		
+		character->AddMovementInput(forwardVector, actionValue.X);
+		character->AddMovementInput(rightVector, actionValue.Y);
+	}
+	
+	// PlayerPosition result = FDataHub::PlayerPositions["1"];
+	// if (result.has_position())
+	// 	character->SetActorLocation(FVector(result.position().x(), result.position().y(), result.position().z()));
+	// if (result.jumpResult)
+	// 	character->Jump();
+	// if (result.rotateResult)
+	// 	character->
+	// character->SetActorRotation();
+	// character->SetActorLocationAndRotation();
 }

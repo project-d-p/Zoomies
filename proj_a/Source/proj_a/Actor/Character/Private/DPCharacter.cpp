@@ -6,7 +6,7 @@
 #include "DPConstructionActorComponent.h"
 #include "DPWeaponActorComponent.h"
 #include "DPStateActorComponent.h"
-#include "DPWeaponGun.h"	// ¹«±â
+#include "DPWeaponGun.h"	// ï¿½ï¿½ï¿½ï¿½
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -40,11 +40,11 @@ ADPCharacter::ADPCharacter()
 	//springArm->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
 	springArm->bUsePawnControlRotation = true;
 
-	// ¿òÁ÷ÀÌ´Â ¹æÇâÀ» ÀÚµ¿À¸·Î º¸°Ô
+	// ï¿½ï¿½ï¿½ï¿½ï¿½Ì´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
 
-	// ¾Ö´Ï¸ÞÀÌ¼Ç ¸ðµå, Å¬·¡½º Àû¿ë
+	// ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½, Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
 	(TEXT("/Game/blueprints/characterAnimation.characterAnimation_C"));
@@ -52,7 +52,7 @@ ADPCharacter::ADPCharacter()
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}
 
-	// ¾Ö´Ï¸ÞÀÌ¼Ç ¸ùÅ¸ÁÖ
+	// ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½Å¸ï¿½ï¿½
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> CHARACTER_MONTAGE
 	(TEXT("/Game/blueprints/characterAnimMontage.characterAnimMontage"));
 	if (CHARACTER_MONTAGE.Succeeded()) {
@@ -71,7 +71,7 @@ void ADPCharacter::BeginPlay()
 	constructionComponent->placeWall = false;
 	constructionComponent->placeturret = false;
 
-	// ±âº» ¹«±â Ãß°¡ ¹× ÀåÂø
+	// ï¿½âº» ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	TSubclassOf<ADPWeapon> gunClass = ADPWeaponGun::StaticClass();
 	if (weaponComponent) {
 		weaponComponent->AddWeapons(gunClass);
@@ -84,7 +84,7 @@ void ADPCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// ÇöÀç ¼Óµµ º¤ÅÍ ±¸ÇÏ°í Å©±â
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½Óµï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ï°ï¿½ Å©ï¿½ï¿½
 	if (GetCharacterMovement()) {
 		currentVelocity = GetCharacterMovement()->Velocity;
 		speed = currentVelocity.Size();
@@ -135,15 +135,15 @@ void ADPCharacter::ChangeAnimation()
 
 void ADPCharacter::PlaceConstructionAnimation()
 {
-	// Çàµ¿ ¸·°í ¾Ö´Ï¸ÞÀÌ¼Ç Àç»ý
+	// ï¿½àµ¿ ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½
 }
 
 void ADPCharacter::DestroyConstructionAnimation()
 {
-	// Çàµ¿ ¸·°í ¾Ö´Ï¸ÞÀÌ¼Ç Àç»ý
+	// ï¿½àµ¿ ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½
 }
 
 void ADPCharacter::DyingAnimation()
 {
-	// Çàµ¿ ¸·°í ¾Ö´Ï¸ÞÀÌ¼Ç Àç»ý
+	// ï¿½àµ¿ ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½
 }

@@ -21,6 +21,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 private:
 	class ADPCharacter* character;
@@ -48,6 +49,8 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* chatAction;
 
+	virtual void Tick(float DeltaSeconds) override;
+	
 	void Move(const FInputActionValue& value);
 	void Jump(const FInputActionValue& value);
 	void Rotate(const FInputActionValue& value);
