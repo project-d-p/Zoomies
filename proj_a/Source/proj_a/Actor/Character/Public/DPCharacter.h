@@ -56,9 +56,13 @@ public:	// component
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* springArm;
-
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class UCameraComponent* camera;
+
+	UPROPERTY(VisibleAnywhere, Category = Camera)
+	class USpringArmComponent* sceneCaptureSpringArm;
+	UPROPERTY(VisibleAnywhere, Category = Camera)
+	class  USceneCaptureComponent2D* sceneCapture;
 
 public:
 	FVector currentVelocity{ 0.f, 0.f, 0.f };

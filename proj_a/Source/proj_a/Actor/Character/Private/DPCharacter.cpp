@@ -6,9 +6,11 @@
 #include "DPConstructionActorComponent.h"
 #include "DPWeaponActorComponent.h"
 #include "DPStateActorComponent.h"
-#include "DPWeaponGun.h"	// ����
+#include "DPWeaponGun.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/SceneCaptureComponent2D.h"
+#include "Engine/TextureRenderTarget2D.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -25,20 +27,42 @@ ADPCharacter::ADPCharacter()
 	springArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SPRINGARM"));
 	camera = CreateDefaultSubobject<UCameraComponent>(TEXT("CAMERA"));
 
+	sceneCaptureSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SCENECAPTURESPRINGARM"));
+	sceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SCENECAPTURE"));
+
 	springArm->SetupAttachment(RootComponent);
 	camera->SetupAttachment(springArm);
 
+	sceneCaptureSpringArm->SetupAttachment(RootComponent);
+	sceneCapture->SetupAttachment(sceneCaptureSpringArm);
+
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CHARACTER
-	(TEXT("/Game/model/player/Swat.Swat"));
+	(TEXT("/Game/model/steve/StickManForMixamo.StickManForMixamo"));
 	if (SK_CHARACTER.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_CHARACTER.Object);
 	}
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -90.f), FRotator(0.f, 270.f, 0.f));
+	GetMesh()->SetRelativeScale3D(FVector(0.35f, 0.35f, 0.35f));
 
 	springArm->TargetArmLength = 700.0f;
 	//springArm->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
 	springArm->bUsePawnControlRotation = true;
+
+	// minimap
+	static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D> RENDERTARGET
+	(TEXT("/Game/widget/minimap/rt_minimap.rt_minimap"));
+	if (RENDERTARGET.Succeeded()){
+		sceneCapture->TextureTarget = RENDERTARGET.Object;
+	}
+
+	sceneCaptureSpringArm->TargetArmLength = 700.0f;
+	sceneCaptureSpringArm->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
+	sceneCaptureSpringArm->bInheritPitch = false;
+	sceneCaptureSpringArm->bInheritYaw = false;
+	sceneCaptureSpringArm->bInheritRoll = false;
+	sceneCapture->ProjectionType = ECameraProjectionMode::Type::Orthographic;
+	sceneCapture->OrthoWidth = 1024.0f;
 
 	// �����̴� ������ �ڵ����� ����
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -47,14 +71,14 @@ ADPCharacter::ADPCharacter()
 	// �ִϸ��̼� ���, Ŭ���� ����
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(TEXT("/Game/blueprints/characterAnimation.characterAnimation_C"));
+	(TEXT("/Game/animation/steve/characterAnimation.characterAnimation_C"));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}
 
 	// �ִϸ��̼� ��Ÿ��
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> CHARACTER_MONTAGE
-	(TEXT("/Game/blueprints/characterAnimMontage.characterAnimMontage"));
+	(TEXT("/Game/animation/steve/characterAnimMontage.characterAnimMontage"));
 	if (CHARACTER_MONTAGE.Succeeded()) {
 		characterMontage = CHARACTER_MONTAGE.Object;
 	}
