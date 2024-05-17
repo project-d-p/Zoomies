@@ -139,8 +139,8 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 	
 	// UNetComp::inputTCP(actionValue, 0);
 	UNetComp::InputUDP(actionValue);
-	// character->AddMovementInput(forwardVector, actionValue.X);
-	// character->AddMovementInput(rightVector, actionValue.Y);
+	character->AddMovementInput(forwardVector, actionValue.X);
+	character->AddMovementInput(rightVector, actionValue.Y);
 }
 
 void ADPPlayerController::Jump(const FInputActionValue& value)
@@ -282,18 +282,16 @@ void ADPPlayerController::OpenChat(const FInputActionValue& value)
 void ADPPlayerController::UpdatePlayer()
 {
 	Movement movement;
-	if (!FDataHub::EchoData.Contains("1")) {
+	if (!FDataHub::EchoData.Contains("player1")) {
 		// UE_LOG(LogNetwork, Warning, TEXT("Player 1 data not found"));
 		return;
 	}
-	movement = FDataHub::EchoData["1"];
-	if (!movement.has_progess_vector())
-	{
-		// UE_LOG(LogNetwork, Warning, TEXT("progress vector not found"));
-	}
+	movement = FDataHub::EchoData["player1"];
+
 	// UE_LOG(LogTemp, Warning, TEXT("Progress: %f %f %f"), movement.progess_vector().x(), movement.progess_vector().y(), movement.progess_vector().z());
 	if (movement.has_progess_vector())
 	{
+		// XXX: 추후 RightVector 메시지 수정
 		FVector rightVector = character->GetActorRightVector();
 		FVector forwardVector(movement.orientation().x(), movement.orientation().y(), movement.orientation().z());
 		FVector actionValue = FVector(movement.progess_vector().x(), movement.progess_vector().y(), movement.progess_vector().z());
@@ -301,7 +299,9 @@ void ADPPlayerController::UpdatePlayer()
 		character->AddMovementInput(forwardVector, actionValue.X);
 		character->AddMovementInput(rightVector, actionValue.Y);
 	}
-	
+
+	// XXX: 추후 PlayerPosition 메시지가 정의되어 들어오면 새롭게 정의필요. 아래 주석 코드 참조.
+
 	// PlayerPosition result = FDataHub::PlayerPositions["1"];
 	// if (result.has_position())
 	// 	character->SetActorLocation(FVector(result.position().x(), result.position().y(), result.position().z()));

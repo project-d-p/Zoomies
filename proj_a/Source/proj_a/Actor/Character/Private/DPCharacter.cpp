@@ -63,20 +63,17 @@ ADPCharacter::ADPCharacter()
 	sceneCaptureSpringArm->bInheritRoll = false;
 	sceneCapture->ProjectionType = ECameraProjectionMode::Type::Orthographic;
 	sceneCapture->OrthoWidth = 1024.0f;
-
-	// �����̴� ������ �ڵ����� ����
+	
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
-
-	// �ִϸ��̼� ���, Ŭ���� ����
+	
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
 	(TEXT("/Game/animation/steve/characterAnimation.characterAnimation_C"));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}
-
-	// �ִϸ��̼� ��Ÿ��
+	
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> CHARACTER_MONTAGE
 	(TEXT("/Game/animation/steve/characterAnimMontage.characterAnimMontage"));
 	if (CHARACTER_MONTAGE.Succeeded()) {
@@ -94,8 +91,7 @@ void ADPCharacter::BeginPlay()
 	hpComponent->IsDead = false;
 	constructionComponent->placeWall = false;
 	constructionComponent->placeturret = false;
-
-	// �⺻ ���� �߰� �� ����
+	
 	TSubclassOf<ADPWeapon> gunClass = ADPWeaponGun::StaticClass();
 	if (weaponComponent) {
 		weaponComponent->AddWeapons(gunClass);
@@ -107,8 +103,7 @@ void ADPCharacter::BeginPlay()
 void ADPCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	// ���� �ӵ� ���� ���ϰ� ũ��
+	
 	if (GetCharacterMovement()) {
 		currentVelocity = GetCharacterMovement()->Velocity;
 		speed = currentVelocity.Size();
