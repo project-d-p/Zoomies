@@ -74,9 +74,9 @@ uint32 FUdpSendTask::Run()
 
 		Vec3* InputProgressData = ProtobufUtility::ConvertToFVecToVec3(FVector(TotalData, 0));
 		ProtoData.set_allocated_progess_vector(InputProgressData);
-		ProtoData.set_player_id("1");
+		ProtoData.set_player_id("player1");
 		ProtoData.set_state(State::STATE_RUN);
-		ProtoData.set_timestamp("1");
+		ProtoData.set_timestamp("player1");
 
 		Message msg;
 		*msg.mutable_movement() = ProtoData;
