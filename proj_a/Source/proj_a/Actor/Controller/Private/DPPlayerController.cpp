@@ -163,7 +163,7 @@ void ADPPlayerController::Rotate(const FInputActionValue& value)
 	// send rotate command ( id, actionValue )
 	character->AddControllerYawInput(actionValue.X);
 	character->AddControllerPitchInput(actionValue.Y);
-	FUdpSendTask::ProtoData.set_allocated_orientation(ProtobufUtility::ConvertToFVecToVec3(character->GetControlRotation().Vector()));
+	FUdpSendTask::ProtoData.set_allocated_progess_vector(ProtobufUtility::ConvertToFVecToVec3(character->GetControlRotation().Vector()));
 }
 
 void ADPPlayerController::Active(const FInputActionValue& value)
@@ -291,9 +291,8 @@ void ADPPlayerController::UpdatePlayer()
 	// UE_LOG(LogTemp, Warning, TEXT("Progress: %f %f %f"), movement.progess_vector().x(), movement.progess_vector().y(), movement.progess_vector().z());
 	if (movement.has_progess_vector())
 	{
-		// XXX: 추후 RightVector 메시지 수정
 		FVector rightVector = character->GetActorRightVector();
-		FVector forwardVector(movement.orientation().x(), movement.orientation().y(), movement.orientation().z());
+		FVector forwardVector = character->GetActorForwardVector();
 		FVector actionValue = FVector(movement.progess_vector().x(), movement.progess_vector().y(), movement.progess_vector().z());
 		
 		character->AddMovementInput(forwardVector, actionValue.X);

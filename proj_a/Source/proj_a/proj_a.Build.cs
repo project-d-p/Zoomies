@@ -46,10 +46,21 @@ public class proj_a : ModuleRules
 		
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
-
 		PublicDependencyModuleNames.AddRange(new string[]
-			{ "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "Sockets", "Networking" });
+		{
+			"Core",
+			"CoreUObject",
+			"Engine",
+			"InputCore",
+			"EnhancedInput",
+			"Sockets",
+			"Networking", 
+			"UMG",
+			"OnlineSubsystem", 
+			"OnlineSubsystemSteam",
+			"OnlineSubsystemUtils",
+		});
+		
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
 		// Uncomment if you are using Slate UI

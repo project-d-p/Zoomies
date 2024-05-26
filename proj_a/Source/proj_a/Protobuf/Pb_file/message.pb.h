@@ -31,7 +31,7 @@
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
 #include "movement.pb.h"
-#include "player_position.pb.h"
+#include "actor_position.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_message_2eproto
@@ -100,7 +100,7 @@ class Message final :
   }
   enum MessageTypeCase {
     kMovement = 1,
-    kPlayerPosition = 2,
+    kActorPosition = 2,
     MESSAGE_TYPE_NOT_SET = 0,
   };
 
@@ -183,7 +183,7 @@ class Message final :
 
   enum : int {
     kMovementFieldNumber = 1,
-    kPlayerPositionFieldNumber = 2,
+    kActorPositionFieldNumber = 2,
   };
   // .Movement movement = 1;
   bool has_movement() const;
@@ -203,23 +203,23 @@ class Message final :
       ::Movement* movement);
   ::Movement* unsafe_arena_release_movement();
 
-  // .PlayerPosition player_position = 2;
-  bool has_player_position() const;
+  // .ActorPosition actor_position = 2;
+  bool has_actor_position() const;
   private:
-  bool _internal_has_player_position() const;
+  bool _internal_has_actor_position() const;
   public:
-  void clear_player_position();
-  const ::PlayerPosition& player_position() const;
-  PROTOBUF_NODISCARD ::PlayerPosition* release_player_position();
-  ::PlayerPosition* mutable_player_position();
-  void set_allocated_player_position(::PlayerPosition* player_position);
+  void clear_actor_position();
+  const ::ActorPosition& actor_position() const;
+  PROTOBUF_NODISCARD ::ActorPosition* release_actor_position();
+  ::ActorPosition* mutable_actor_position();
+  void set_allocated_actor_position(::ActorPosition* actor_position);
   private:
-  const ::PlayerPosition& _internal_player_position() const;
-  ::PlayerPosition* _internal_mutable_player_position();
+  const ::ActorPosition& _internal_actor_position() const;
+  ::ActorPosition* _internal_mutable_actor_position();
   public:
-  void unsafe_arena_set_allocated_player_position(
-      ::PlayerPosition* player_position);
-  ::PlayerPosition* unsafe_arena_release_player_position();
+  void unsafe_arena_set_allocated_actor_position(
+      ::ActorPosition* actor_position);
+  ::ActorPosition* unsafe_arena_release_actor_position();
 
   void clear_message_type();
   MessageTypeCase message_type_case() const;
@@ -227,7 +227,7 @@ class Message final :
  private:
   class _Internal;
   void set_has_movement();
-  void set_has_player_position();
+  void set_has_actor_position();
 
   inline bool has_message_type() const;
   inline void clear_has_message_type();
@@ -240,7 +240,7 @@ class Message final :
       constexpr MessageTypeUnion() : _constinit_{} {}
         ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized _constinit_;
       ::Movement* movement_;
-      ::PlayerPosition* player_position_;
+      ::ActorPosition* actor_position_;
     } message_type_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
     uint32_t _oneof_case_[1];
@@ -326,69 +326,69 @@ inline ::Movement* Message::mutable_movement() {
   return _msg;
 }
 
-// .PlayerPosition player_position = 2;
-inline bool Message::_internal_has_player_position() const {
-  return message_type_case() == kPlayerPosition;
+// .ActorPosition actor_position = 2;
+inline bool Message::_internal_has_actor_position() const {
+  return message_type_case() == kActorPosition;
 }
-inline bool Message::has_player_position() const {
-  return _internal_has_player_position();
+inline bool Message::has_actor_position() const {
+  return _internal_has_actor_position();
 }
-inline void Message::set_has_player_position() {
-  _impl_._oneof_case_[0] = kPlayerPosition;
+inline void Message::set_has_actor_position() {
+  _impl_._oneof_case_[0] = kActorPosition;
 }
-inline ::PlayerPosition* Message::release_player_position() {
-  // @@protoc_insertion_point(field_release:Message.player_position)
-  if (_internal_has_player_position()) {
+inline ::ActorPosition* Message::release_actor_position() {
+  // @@protoc_insertion_point(field_release:Message.actor_position)
+  if (_internal_has_actor_position()) {
     clear_has_message_type();
-    ::PlayerPosition* temp = _impl_.message_type_.player_position_;
+    ::ActorPosition* temp = _impl_.message_type_.actor_position_;
     if (GetArenaForAllocation() != nullptr) {
       temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
     }
-    _impl_.message_type_.player_position_ = nullptr;
+    _impl_.message_type_.actor_position_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::PlayerPosition& Message::_internal_player_position() const {
-  return _internal_has_player_position()
-      ? *_impl_.message_type_.player_position_
-      : reinterpret_cast< ::PlayerPosition&>(::_PlayerPosition_default_instance_);
+inline const ::ActorPosition& Message::_internal_actor_position() const {
+  return _internal_has_actor_position()
+      ? *_impl_.message_type_.actor_position_
+      : reinterpret_cast< ::ActorPosition&>(::_ActorPosition_default_instance_);
 }
-inline const ::PlayerPosition& Message::player_position() const {
-  // @@protoc_insertion_point(field_get:Message.player_position)
-  return _internal_player_position();
+inline const ::ActorPosition& Message::actor_position() const {
+  // @@protoc_insertion_point(field_get:Message.actor_position)
+  return _internal_actor_position();
 }
-inline ::PlayerPosition* Message::unsafe_arena_release_player_position() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:Message.player_position)
-  if (_internal_has_player_position()) {
+inline ::ActorPosition* Message::unsafe_arena_release_actor_position() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:Message.actor_position)
+  if (_internal_has_actor_position()) {
     clear_has_message_type();
-    ::PlayerPosition* temp = _impl_.message_type_.player_position_;
-    _impl_.message_type_.player_position_ = nullptr;
+    ::ActorPosition* temp = _impl_.message_type_.actor_position_;
+    _impl_.message_type_.actor_position_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline void Message::unsafe_arena_set_allocated_player_position(::PlayerPosition* player_position) {
+inline void Message::unsafe_arena_set_allocated_actor_position(::ActorPosition* actor_position) {
   clear_message_type();
-  if (player_position) {
-    set_has_player_position();
-    _impl_.message_type_.player_position_ = player_position;
+  if (actor_position) {
+    set_has_actor_position();
+    _impl_.message_type_.actor_position_ = actor_position;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Message.player_position)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Message.actor_position)
 }
-inline ::PlayerPosition* Message::_internal_mutable_player_position() {
-  if (!_internal_has_player_position()) {
+inline ::ActorPosition* Message::_internal_mutable_actor_position() {
+  if (!_internal_has_actor_position()) {
     clear_message_type();
-    set_has_player_position();
-    _impl_.message_type_.player_position_ = CreateMaybeMessage< ::PlayerPosition >(GetArenaForAllocation());
+    set_has_actor_position();
+    _impl_.message_type_.actor_position_ = CreateMaybeMessage< ::ActorPosition >(GetArenaForAllocation());
   }
-  return _impl_.message_type_.player_position_;
+  return _impl_.message_type_.actor_position_;
 }
-inline ::PlayerPosition* Message::mutable_player_position() {
-  ::PlayerPosition* _msg = _internal_mutable_player_position();
-  // @@protoc_insertion_point(field_mutable:Message.player_position)
+inline ::ActorPosition* Message::mutable_actor_position() {
+  ::ActorPosition* _msg = _internal_mutable_actor_position();
+  // @@protoc_insertion_point(field_mutable:Message.actor_position)
   return _msg;
 }
 

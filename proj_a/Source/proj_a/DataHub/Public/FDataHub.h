@@ -8,11 +8,11 @@ class FDataHub
 {
 public:
 	// Player Data Map
-	static TMap<FString, PlayerPosition> PlayerPositions;
+	static TMap<FString, ActorPosition> actorPosition;
 	// Test Data Map
 	static TMap<FString, Movement> EchoData;
 	
-	static void PushPlayerDA(const PlayerPosition &NewData);
+	static void PushActorDA(const ActorPosition &NewData);
 	static void PushEchoDA(const Movement &NewData);
 	static void RemovePlayerDA(const FString &playerId);
 };

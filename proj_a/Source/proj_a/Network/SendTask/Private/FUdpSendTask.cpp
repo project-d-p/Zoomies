@@ -58,12 +58,12 @@ uint32 FUdpSendTask::Run()
 	}
 	Addr->SetPort(Port);
 
+	FNetLogger::GetInstance().LogInfo(TEXT("UdpSendTask is running."));
 	while (bShouldRun)
 	{
 		FInputData InputData;
 		FVector2D TotalData = FVector2D(0, 0);
-
-		FNetLogger::GetInstance().LogInfo(TEXT("UdpSendTask is running."));
+		
 		while (InputQueue.Dequeue(InputData))
 		{
 			if (InputData.Type == 0)
@@ -73,10 +73,10 @@ uint32 FUdpSendTask::Run()
 		}
 
 		Vec3* InputProgressData = ProtobufUtility::ConvertToFVecToVec3(FVector(TotalData, 0));
-		ProtoData.set_allocated_progess_vector(InputProgressData);
 		ProtoData.set_player_id("player1");
-		ProtoData.set_state(State::STATE_RUN);
-		ProtoData.set_timestamp("player1");
+		ProtoData.set_allocated_progess_vector(InputProgressData);
+		// ProtoData.set_allocated_rotation();
+		ProtoData.set_timestamp("4242");
 
 		Message msg;
 		*msg.mutable_movement() = ProtoData;

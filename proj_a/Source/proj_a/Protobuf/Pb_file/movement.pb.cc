@@ -24,9 +24,8 @@ PROTOBUF_CONSTEXPR Movement::Movement(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.player_id_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.timestamp_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
-  , /*decltype(_impl_.orientation_)*/nullptr
   , /*decltype(_impl_.progess_vector_)*/nullptr
-  , /*decltype(_impl_.state_)*/0
+  , /*decltype(_impl_.rotation_)*/nullptr
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct MovementDefaultTypeInternal {
   PROTOBUF_CONSTEXPR MovementDefaultTypeInternal()
@@ -49,9 +48,8 @@ const uint32_t TableStruct_movement_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::Movement, _impl_.player_id_),
-  PROTOBUF_FIELD_OFFSET(::Movement, _impl_.orientation_),
   PROTOBUF_FIELD_OFFSET(::Movement, _impl_.progess_vector_),
-  PROTOBUF_FIELD_OFFSET(::Movement, _impl_.state_),
+  PROTOBUF_FIELD_OFFSET(::Movement, _impl_.rotation_),
   PROTOBUF_FIELD_OFFSET(::Movement, _impl_.timestamp_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -63,21 +61,19 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_movement_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\016movement.proto\032\013state.proto\032\014vector.pr"
-  "oto\"\202\001\n\010Movement\022\021\n\tplayer_id\030\001 \001(\t\022\032\n\013o"
-  "rientation\030\002 \001(\0132\005.Vec3\022\035\n\016progess_vecto"
-  "r\030\003 \001(\0132\005.Vec3\022\025\n\005state\030\004 \001(\0162\006.State\022\021\n"
-  "\ttimestamp\030\005 \001(\tb\006proto3"
+  "\n\016movement.proto\032\014vector.proto\"h\n\010Moveme"
+  "nt\022\021\n\tplayer_id\030\001 \001(\t\022\035\n\016progess_vector\030"
+  "\002 \001(\0132\005.Vec3\022\027\n\010Rotation\030\003 \001(\0132\005.Vec2\022\021\n"
+  "\ttimestamp\030\004 \001(\tb\006proto3"
   ;
-static const ::_pbi::DescriptorTable* const descriptor_table_movement_2eproto_deps[2] = {
-  &::descriptor_table_state_2eproto,
+static const ::_pbi::DescriptorTable* const descriptor_table_movement_2eproto_deps[1] = {
   &::descriptor_table_vector_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_movement_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_movement_2eproto = {
-    false, false, 184, descriptor_table_protodef_movement_2eproto,
+    false, false, 144, descriptor_table_protodef_movement_2eproto,
     "movement.proto",
-    &descriptor_table_movement_2eproto_once, descriptor_table_movement_2eproto_deps, 2, 1,
+    &descriptor_table_movement_2eproto_once, descriptor_table_movement_2eproto_deps, 1, 1,
     schemas, file_default_instances, TableStruct_movement_2eproto::offsets,
     file_level_metadata_movement_2eproto, file_level_enum_descriptors_movement_2eproto,
     file_level_service_descriptors_movement_2eproto,
@@ -93,29 +89,29 @@ PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::_pbi::AddDescriptorsRunner dynamic_in
 
 class Movement::_Internal {
  public:
-  static const ::Vec3& orientation(const Movement* msg);
   static const ::Vec3& progess_vector(const Movement* msg);
+  static const ::Vec2& rotation(const Movement* msg);
 };
 
-const ::Vec3&
-Movement::_Internal::orientation(const Movement* msg) {
-  return *msg->_impl_.orientation_;
-}
 const ::Vec3&
 Movement::_Internal::progess_vector(const Movement* msg) {
   return *msg->_impl_.progess_vector_;
 }
-void Movement::clear_orientation() {
-  if (GetArenaForAllocation() == nullptr && _impl_.orientation_ != nullptr) {
-    delete _impl_.orientation_;
-  }
-  _impl_.orientation_ = nullptr;
+const ::Vec2&
+Movement::_Internal::rotation(const Movement* msg) {
+  return *msg->_impl_.rotation_;
 }
 void Movement::clear_progess_vector() {
   if (GetArenaForAllocation() == nullptr && _impl_.progess_vector_ != nullptr) {
     delete _impl_.progess_vector_;
   }
   _impl_.progess_vector_ = nullptr;
+}
+void Movement::clear_rotation() {
+  if (GetArenaForAllocation() == nullptr && _impl_.rotation_ != nullptr) {
+    delete _impl_.rotation_;
+  }
+  _impl_.rotation_ = nullptr;
 }
 Movement::Movement(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
@@ -129,9 +125,8 @@ Movement::Movement(const Movement& from)
   new (&_impl_) Impl_{
       decltype(_impl_.player_id_){}
     , decltype(_impl_.timestamp_){}
-    , decltype(_impl_.orientation_){nullptr}
     , decltype(_impl_.progess_vector_){nullptr}
-    , decltype(_impl_.state_){}
+    , decltype(_impl_.rotation_){nullptr}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
@@ -151,13 +146,12 @@ Movement::Movement(const Movement& from)
     _this->_impl_.timestamp_.Set(from._internal_timestamp(), 
       _this->GetArenaForAllocation());
   }
-  if (from._internal_has_orientation()) {
-    _this->_impl_.orientation_ = new ::Vec3(*from._impl_.orientation_);
-  }
   if (from._internal_has_progess_vector()) {
     _this->_impl_.progess_vector_ = new ::Vec3(*from._impl_.progess_vector_);
   }
-  _this->_impl_.state_ = from._impl_.state_;
+  if (from._internal_has_rotation()) {
+    _this->_impl_.rotation_ = new ::Vec2(*from._impl_.rotation_);
+  }
   // @@protoc_insertion_point(copy_constructor:Movement)
 }
 
@@ -168,9 +162,8 @@ inline void Movement::SharedCtor(
   new (&_impl_) Impl_{
       decltype(_impl_.player_id_){}
     , decltype(_impl_.timestamp_){}
-    , decltype(_impl_.orientation_){nullptr}
     , decltype(_impl_.progess_vector_){nullptr}
-    , decltype(_impl_.state_){0}
+    , decltype(_impl_.rotation_){nullptr}
     , /*decltype(_impl_._cached_size_)*/{}
   };
   _impl_.player_id_.InitDefault();
@@ -196,8 +189,8 @@ inline void Movement::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
   _impl_.player_id_.Destroy();
   _impl_.timestamp_.Destroy();
-  if (this != internal_default_instance()) delete _impl_.orientation_;
   if (this != internal_default_instance()) delete _impl_.progess_vector_;
+  if (this != internal_default_instance()) delete _impl_.rotation_;
 }
 
 void Movement::SetCachedSize(int size) const {
@@ -212,15 +205,14 @@ void Movement::Clear() {
 
   _impl_.player_id_.ClearToEmpty();
   _impl_.timestamp_.ClearToEmpty();
-  if (GetArenaForAllocation() == nullptr && _impl_.orientation_ != nullptr) {
-    delete _impl_.orientation_;
-  }
-  _impl_.orientation_ = nullptr;
   if (GetArenaForAllocation() == nullptr && _impl_.progess_vector_ != nullptr) {
     delete _impl_.progess_vector_;
   }
   _impl_.progess_vector_ = nullptr;
-  _impl_.state_ = 0;
+  if (GetArenaForAllocation() == nullptr && _impl_.rotation_ != nullptr) {
+    delete _impl_.rotation_;
+  }
+  _impl_.rotation_ = nullptr;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -240,34 +232,25 @@ const char* Movement::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx)
         } else
           goto handle_unusual;
         continue;
-      // .Vec3 orientation = 2;
+      // .Vec3 progess_vector = 2;
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
-          ptr = ctx->ParseMessage(_internal_mutable_orientation(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // .Vec3 progess_vector = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
           ptr = ctx->ParseMessage(_internal_mutable_progess_vector(), ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
-      // .State state = 4;
-      case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
-          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+      // .Vec2 Rotation = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
+          ptr = ctx->ParseMessage(_internal_mutable_rotation(), ptr);
           CHK_(ptr);
-          _internal_set_state(static_cast<::State>(val));
         } else
           goto handle_unusual;
         continue;
-      // string timestamp = 5;
-      case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
+      // string timestamp = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
           auto str = _internal_mutable_timestamp();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
@@ -314,35 +297,28 @@ uint8_t* Movement::_InternalSerialize(
         1, this->_internal_player_id(), target);
   }
 
-  // .Vec3 orientation = 2;
-  if (this->_internal_has_orientation()) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(2, _Internal::orientation(this),
-        _Internal::orientation(this).GetCachedSize(), target, stream);
-  }
-
-  // .Vec3 progess_vector = 3;
+  // .Vec3 progess_vector = 2;
   if (this->_internal_has_progess_vector()) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(3, _Internal::progess_vector(this),
+      InternalWriteMessage(2, _Internal::progess_vector(this),
         _Internal::progess_vector(this).GetCachedSize(), target, stream);
   }
 
-  // .State state = 4;
-  if (this->_internal_state() != 0) {
-    target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteEnumToArray(
-      4, this->_internal_state(), target);
+  // .Vec2 Rotation = 3;
+  if (this->_internal_has_rotation()) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(3, _Internal::rotation(this),
+        _Internal::rotation(this).GetCachedSize(), target, stream);
   }
 
-  // string timestamp = 5;
+  // string timestamp = 4;
   if (!this->_internal_timestamp().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_timestamp().data(), static_cast<int>(this->_internal_timestamp().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
       "Movement.timestamp");
     target = stream->WriteStringMaybeAliased(
-        5, this->_internal_timestamp(), target);
+        4, this->_internal_timestamp(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -368,31 +344,25 @@ size_t Movement::ByteSizeLong() const {
         this->_internal_player_id());
   }
 
-  // string timestamp = 5;
+  // string timestamp = 4;
   if (!this->_internal_timestamp().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_timestamp());
   }
 
-  // .Vec3 orientation = 2;
-  if (this->_internal_has_orientation()) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-        *_impl_.orientation_);
-  }
-
-  // .Vec3 progess_vector = 3;
+  // .Vec3 progess_vector = 2;
   if (this->_internal_has_progess_vector()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
         *_impl_.progess_vector_);
   }
 
-  // .State state = 4;
-  if (this->_internal_state() != 0) {
+  // .Vec2 Rotation = 3;
+  if (this->_internal_has_rotation()) {
     total_size += 1 +
-      ::_pbi::WireFormatLite::EnumSize(this->_internal_state());
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *_impl_.rotation_);
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
@@ -419,16 +389,13 @@ void Movement::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTO
   if (!from._internal_timestamp().empty()) {
     _this->_internal_set_timestamp(from._internal_timestamp());
   }
-  if (from._internal_has_orientation()) {
-    _this->_internal_mutable_orientation()->::Vec3::MergeFrom(
-        from._internal_orientation());
-  }
   if (from._internal_has_progess_vector()) {
     _this->_internal_mutable_progess_vector()->::Vec3::MergeFrom(
         from._internal_progess_vector());
   }
-  if (from._internal_state() != 0) {
-    _this->_internal_set_state(from._internal_state());
+  if (from._internal_has_rotation()) {
+    _this->_internal_mutable_rotation()->::Vec2::MergeFrom(
+        from._internal_rotation());
   }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
@@ -458,11 +425,11 @@ void Movement::InternalSwap(Movement* other) {
       &other->_impl_.timestamp_, rhs_arena
   );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(Movement, _impl_.state_)
-      + sizeof(Movement::_impl_.state_)
-      - PROTOBUF_FIELD_OFFSET(Movement, _impl_.orientation_)>(
-          reinterpret_cast<char*>(&_impl_.orientation_),
-          reinterpret_cast<char*>(&other->_impl_.orientation_));
+      PROTOBUF_FIELD_OFFSET(Movement, _impl_.rotation_)
+      + sizeof(Movement::_impl_.rotation_)
+      - PROTOBUF_FIELD_OFFSET(Movement, _impl_.progess_vector_)>(
+          reinterpret_cast<char*>(&_impl_.progess_vector_),
+          reinterpret_cast<char*>(&other->_impl_.progess_vector_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata Movement::GetMetadata() const {
