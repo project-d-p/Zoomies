@@ -49,7 +49,7 @@ void ADPGameModeBase::PostLogin(APlayerController* NewPlayer)
 		if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(
-				-1,
+				0,
 				15.f,
 				FColor::Cyan,
 				FString::Printf(TEXT("Client connected: %s"), *ClientAddress));

@@ -143,6 +143,7 @@ void UMyUserWidget::OnCreateSessionComplete(FName SessionName, bool bWasSuccssfu
 {
 	if (bWasSuccssful)
 	{
+		GetWorld()->ServerTravel("/Game/level/mainLevel?listen");
 		if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(
