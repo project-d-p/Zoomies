@@ -60,19 +60,19 @@ public class proj_a : ModuleRules
 
 		string SteamVersion = "Steamv153";
 		string SteamSDKPath = Path.Combine("C:", "Users", "idead", "UnrealEngine", "Engine", "Source", "ThirdParty", "Steamworks", SteamVersion, "sdk");
-		System.Console.WriteLine($"SteamSDKPath: {SteamSDKPath}");
 
 		if (Directory.Exists(SteamSDKPath))
 		{
-			System.Console.WriteLine("Steam SDK path exists");
 			PublicIncludePaths.Add(Path.Combine(SteamSDKPath, "public"));
-			System.Console.WriteLine(Path.Combine(SteamSDKPath, "public"));
 			PublicAdditionalLibraries.Add(Path.Combine(SteamSDKPath, "redistributable_bin", "win64", "steam_api64.lib"));
-			System.Console.WriteLine(Path.Combine(SteamSDKPath, "redistributable_bin", "win64", "steam_api64.lib"));
 			RuntimeDependencies.Add("$(ProjectDir)/Binaries/Win64/steam_api64.dll", Path.Combine(SteamSDKPath, "redistributable_bin", "win64", "steam_api64.dll"));
 			RuntimeDependencies.Add("$(ProjectDir)/steam_api64.dll", Path.Combine(SteamSDKPath, "redistributable_bin", "win64", "steam_api64.dll"));
-			System.Console.WriteLine($"ProjectDir: {ProjectDir}");
 		}
+		//System.Console.WriteLine($"SteamSDKPath: {SteamSDKPath}");
+		//System.Console.WriteLine("Steam SDK path exists");
+		//System.Console.WriteLine(Path.Combine(SteamSDKPath, "public"));
+		//System.Console.WriteLine(Path.Combine(SteamSDKPath, "redistributable_bin", "win64", "steam_api64.lib"));
+		//System.Console.WriteLine($"ProjectDir: {ProjectDir}");
         // Uncomment if you are using Slate UI
         // PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 

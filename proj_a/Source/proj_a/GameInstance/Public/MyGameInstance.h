@@ -30,7 +30,7 @@ private:
 	void CreateSession();
 	void OnCreateSessionComplete(FName sessionName, bool bWasSucessful);
 	void JoinSessionGame(const FOnlineSessionSearchResult& search_result);
-	void OnJoinSessionComplete(FName sessionName, bool bWasSuccessful);
+	void OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type Result);
 	bool IsServer();
 	
 

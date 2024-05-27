@@ -8,6 +8,7 @@
 #include "OnlineSessionSettings.h"
 
 void UMyGameInstance::StartMatchMaking() {
+    this->FindSession();
 }
 
 void UMyGameInstance::FindSession() {
@@ -60,13 +61,12 @@ void UMyGameInstance::JoinSessionGame(const FOnlineSessionSearchResult& search_r
     OnJoinSessionCompleteDelegateHandle = match_session_->AddOnJoinSessionCompleteDelegate_Handle(
         FOnJoinSessionCompleteDelegate::CreateUObject(this, &UMyGameInstance::OnJoinSessionComplete)
     );
-    FOnJoinSessionCompleteDelegate::CreateUObject();
     match_session_->JoinSession(0, *desired_session_name_, search_result);
 }
 
-void UMyGameInstance::OnJoinSessionComplete(FName sessionName, bool bWasSuccessful) {
+void UMyGameInstance::OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type Result) {
     match_session_->ClearOnJoinSessionCompleteDelegate_Handle(OnJoinSessionCompleteDelegateHandle);
-    if (bWasSuccessful) {
+    if (Result == EOnJoinSessionCompleteResult::Success) {
         UE_LOG(LogTemp, Log, TEXT("Join Sesison Success"));
     }
     else {

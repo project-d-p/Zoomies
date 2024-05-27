@@ -14,7 +14,8 @@ void ALobbyGameMode::PostLogin(APlayerController* newPlayer) {
 }
 
 void ALobbyGameMode::CheckAndStartGame() {
-	if (GetNumPlayers() >= 1)
+	UE_LOG(LogTemp, Log, TEXT("Number of Players: %d"), GetNumPlayers());
+	if (GetNumPlayers() >= 4)
 		this->StartGame();
 }
 
