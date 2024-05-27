@@ -15,16 +15,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="212ad15f-bcd5-4807-8db4-96a52264d0a8" name="Changes" comment="FEAT: 스팀 서브 시스템">
+    <list default="true" id="212ad15f-bcd5-4807-8db4-96a52264d0a8" name="Changes" comment="FEAT: Null test finish">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.proj_a.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.proj_a.dir/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Config/DefaultEngine.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultEngine.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/level/mainLevel.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/level/mainLevel.umap" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Package/Windows/Manifest_DebugFiles_Win64.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Package/Windows/Manifest_DebugFiles_Win64.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Package/Windows/Manifest_NonUFSFiles_Win64.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Package/Windows/Manifest_NonUFSFiles_Win64.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Package/Windows/Manifest_UFSFiles_Win64.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Package/Windows/Manifest_UFSFiles_Win64.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Package/Windows/proj_a/Content/Paks/proj_a-Windows.pak" beforeDir="false" afterPath="$PROJECT_DIR$/Package/Windows/proj_a/Content/Paks/proj_a-Windows.pak" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Package/Windows/proj_a/Content/Paks/proj_a-Windows.ucas" beforeDir="false" afterPath="$PROJECT_DIR$/Package/Windows/proj_a/Content/Paks/proj_a-Windows.ucas" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Package/Windows/proj_a/Content/Paks/proj_a-Windows.utoc" beforeDir="false" afterPath="$PROJECT_DIR$/Package/Windows/proj_a/Content/Paks/proj_a-Windows.utoc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Package/Windows/proj_a/Saved/Config/Windows/Engine.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Package/Windows/proj_a/Saved/Config/Windows/Engine.ini" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/proj_a/Actor/Character/Private/DPGameModeBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Actor/Character/Private/DPGameModeBase.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Actor/Character/Public/DPGameModeBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Actor/Character/Public/DPGameModeBase.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Actor/Controller/Private/DPPlayerController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Actor/Controller/Private/DPPlayerController.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Actor/Controller/Public/DPPlayerController.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Actor/Controller/Public/DPPlayerController.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/proj_a/Widget/Private/MyUserWidget.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Widget/Private/MyUserWidget.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -810,6 +814,7 @@
       <workItem from="1716450051975" duration="8117000" />
       <workItem from="1716677437484" duration="9575000" />
       <workItem from="1716690600731" duration="9120000" />
+      <workItem from="1716807569228" duration="745000" />
     </task>
     <task id="LOCAL-00001" summary="FEAT: 기본 네트워크 연결 마무리">
       <option name="closed" value="true" />
@@ -827,7 +832,15 @@
       <option name="project" value="LOCAL" />
       <updated>1716792047456</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="FEAT: Null test finish">
+      <option name="closed" value="true" />
+      <created>1716793500548</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1716793500548</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -865,7 +878,8 @@
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="FEAT: 기본 네트워크 연결 마무리" />
     <MESSAGE value="FEAT: 스팀 서브 시스템" />
-    <option name="LAST_COMMIT_MESSAGE" value="FEAT: 스팀 서브 시스템" />
+    <MESSAGE value="FEAT: Null test finish" />
+    <option name="LAST_COMMIT_MESSAGE" value="FEAT: Null test finish" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

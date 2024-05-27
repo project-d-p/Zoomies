@@ -7,6 +7,7 @@
 #include "InputMappingContext.h"
 #include "DPWeaponActorComponent.h"
 #include "DPConstructionActorComponent.h"
+#include "DPGameModeBase.h"
 #include "DPStateActorComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "NetComp.h"
@@ -276,7 +277,33 @@ void ADPPlayerController::ActionCancel(const FInputActionValue& value)
 
 void ADPPlayerController::OpenChat(const FInputActionValue& value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("OpenChat"));
+	ServerSendChatMessage(TEXT("Hello, this is a test message!"));
+}
+
+void ADPPlayerController::ServerSendChatMessage_Implementation(const FString& Message)
+{
+	if (ADPGameModeBase* GM = Cast<ADPGameModeBase>(GetWorld()->GetAuthGameMode()))
+	{
+		FString SenderName = TEXT("Unknown");
+		GM->BroadcastChatMessage(SenderName, Message);
+	}
+}
+
+bool ADPPlayerController::ServerSendChatMessage_Validate(const FString& Message)
+{
+	return !Message.IsEmpty();
+}
+
+void ADPPlayerController::ClientReceiveChatMessage_Implementation(const FString& SenderName, const FString& Message)
+{
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(
+			-1,
+			15.f,
+			FColor::Cyan,
+			FString::Printf(TEXT("%s: %s"), *SenderName, *Message));
+	}
 }
 
 void ADPPlayerController::UpdatePlayer()

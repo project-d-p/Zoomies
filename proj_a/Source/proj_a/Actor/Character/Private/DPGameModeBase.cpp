@@ -9,13 +9,12 @@
 ADPGameModeBase::ADPGameModeBase()
 {
 	DefaultPawnClass = ADPCharacter::StaticClass();
-    static ConstructorHelpers::FClassFinder<APawn> CHARACTER
-    (TEXT("/Game/blueprints/bp_character.bp_character_C"));
-    if (CHARACTER.Class != nullptr)
-    {
-        DefaultPawnClass = CHARACTER.Class;
-    }
-	
+    // static ConstructorHelpers::FClassFinder<APawn> CHARACTER
+    // (TEXT("/Game/blueprints/bp_character.bp_character_C"));
+    // if (CHARACTER.Class != nullptr)
+    // {
+    //     DefaultPawnClass = CHARACTER.Class;
+    // }
 	PlayerControllerClass = ADPPlayerController::StaticClass();
 }
 
@@ -54,6 +53,10 @@ void ADPGameModeBase::PostLogin(APlayerController* NewPlayer)
 				FColor::Cyan,
 				FString::Printf(TEXT("Client connected: %s"), *ClientAddress));
 		}
+		if (ADPPlayerController* PC = Cast<ADPPlayerController>(NewPlayer))
+		{
+			PC->ClientReceiveChatMessage_Implementation(TEXT("Server"), TEXT("Welcome to the game!"));
+		}
 	}
 	
 	if (DefaultPawnClass != nullptr && NewPlayer)
@@ -73,6 +76,18 @@ void ADPGameModeBase::PostLogin(APlayerController* NewPlayer)
 		{
 			// 포제션합니다.
 			NewPlayer->Possess(NewCharacter);
+		}
+	}
+}
+
+void ADPGameModeBase::BroadcastChatMessage_Implementation(const FString& SenderName, const FString& Message)
+{
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		ADPPlayerController* PC = Cast<ADPPlayerController>(It->Get());
+		if (PC)
+		{
+			PC->ClientReceiveChatMessage_Implementation(SenderName, Message);
 		}
 	}
 }
