@@ -63,7 +63,7 @@ uint32 FUdpSendTask::Run()
 		FInputData InputData;
 		FVector2D TotalData = FVector2D(0, 0);
 
-		FNetLogger::GetInstance().LogInfo(TEXT("UdpSendTask is running."));
+		//FNetLogger::GetInstance().LogInfo(TEXT("UdpSendTask is running."));
 		while (InputQueue.Dequeue(InputData))
 		{
 			if (InputData.Type == 0)
