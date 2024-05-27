@@ -51,6 +51,9 @@ Plugins/*/Binaries/*
 proj_a/Binaries/*
 proj_a/Plugins/*/Binaries/*
 
+# Package Files
+proj_a/Package/*
+
 # Builds
 Build/*
 

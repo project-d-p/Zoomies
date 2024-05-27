@@ -228,4 +228,5 @@ void UMyUserWidget::OnPlayer2_testButtenClicked()
 	// 여기에 버튼 클릭 시 실행할 코드를 작성합니다.
 	UE_LOG(LogTemp, Warning, TEXT("Player2_testButten was clicked!"));
 	InitializeSteamAPI();
+	JoinP2PSession("TestSession");
 }

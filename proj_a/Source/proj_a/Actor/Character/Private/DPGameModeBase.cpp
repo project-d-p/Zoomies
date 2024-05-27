@@ -39,6 +39,44 @@ void ADPGameModeBase::StartPlay()
 	// FSocketManager::GetInstance().RunTask();
 }
 
+void ADPGameModeBase::PostLogin(APlayerController* NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+
+	if (NewPlayer->GetNetConnection())
+	{
+		FString ClientAddress = NewPlayer->GetNetConnection()->LowLevelGetRemoteAddress();
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.f,
+				FColor::Cyan,
+				FString::Printf(TEXT("Client connected: %s"), *ClientAddress));
+		}
+	}
+	
+	if (DefaultPawnClass != nullptr && NewPlayer)
+	{
+		// 캐릭터를 스폰합니다.
+		FVector SpawnLocation = FVector(0.0f, 0.0f, 300.0f); // 적절한 스폰 위치 설정
+		FRotator SpawnRotation = FRotator::ZeroRotator;
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = NewPlayer;
+		SpawnParams.Instigator = NewPlayer->GetPawn();
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+		ACharacter* NewCharacter = GetWorld()->SpawnActor<ACharacter>(DefaultPawnClass, SpawnLocation, SpawnRotation, SpawnParams);
+        
+		if (NewCharacter)
+		{
+			// 포제션합니다.
+			NewPlayer->Possess(NewCharacter);
+		}
+	}
+}
+
 void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
