@@ -17,7 +17,12 @@ class PROJ_A_API ADPPlayerController : public APlayerController
 
 public:
 	ADPPlayerController();
+	
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSendChatMessage(const FString& Message);
 
+	UFUNCTION(Client, Reliable)
+	void ClientReceiveChatMessage(const FString& SenderName, const FString& Message);
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -46,8 +51,6 @@ private:
 	class UInputAction* aimAction;
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* cancelAction;
-	UPROPERTY(VisibleAnywhere, Category = Input)
-	class UInputAction* chatAction;
 
 	virtual void Tick(float DeltaSeconds) override;
 	
@@ -59,15 +62,6 @@ private:
 	void Aim(const FInputActionValue& value);
 	void AimReleased(const FInputActionValue& value);
 	void ActionCancel(const FInputActionValue& value);
-	void OpenChat(const FInputActionValue& value);
-
-	// 클라이언트에서 서버로 채팅 메시지 전송 함수 선언
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerSendChatMessage(const FString& Message);
-
-	// 서버에서 클라이언트로 채팅 메시지 수신 함수 선언
-	UFUNCTION(Client, Reliable)
-	void ClientReceiveChatMessage(const FString& SenderName, const FString& Message);
-
+	
 	void UpdatePlayer(/*DataHub result*/);
 };

@@ -37,6 +37,23 @@ public:
 		UE_LOG(LogNetwork, Log, TEXT("%s"), buffer);
 	}
 
+	static void EditerLog(FColor color, const TCHAR* format, ...)
+	{
+		va_list ArgPtr;
+		va_start(ArgPtr, format);
+		TCHAR buffer[256];
+		vswprintf(buffer, sizeof(buffer), format, ArgPtr);
+		va_end(ArgPtr);
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.f,
+				color,
+				FString::Printf(TEXT("%s"), buffer));
+		}
+	}
+
 private:
 	FNetLogger() {}
 };

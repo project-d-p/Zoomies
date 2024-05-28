@@ -41,7 +41,7 @@ void ADPGameModeBase::StartPlay()
 void ADPGameModeBase::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
-
+	
 	if (NewPlayer->GetNetConnection())
 	{
 		FString ClientAddress = NewPlayer->GetNetConnection()->LowLevelGetRemoteAddress();
@@ -55,7 +55,7 @@ void ADPGameModeBase::PostLogin(APlayerController* NewPlayer)
 		}
 		if (ADPPlayerController* PC = Cast<ADPPlayerController>(NewPlayer))
 		{
-			PC->ClientReceiveChatMessage_Implementation(TEXT("Server"), TEXT("Welcome to the game!"));
+			PC->ClientReceiveChatMessage(TEXT("Server"), TEXT("Welcome to the game!"));
 		}
 	}
 	
@@ -84,10 +84,10 @@ void ADPGameModeBase::BroadcastChatMessage_Implementation(const FString& SenderN
 {
 	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 	{
-		ADPPlayerController* PC = Cast<ADPPlayerController>(It->Get());
+		ADPPlayerController* PC = Cast<ADPPlayerController>(*It);
 		if (PC)
 		{
-			PC->ClientReceiveChatMessage_Implementation(SenderName, Message);
+			PC->ClientReceiveChatMessage(SenderName, Message);
 		}
 	}
 }

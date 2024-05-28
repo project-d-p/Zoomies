@@ -59,6 +59,7 @@ public class proj_a : ModuleRules
 			"OnlineSubsystem", 
 			"OnlineSubsystemSteam",
 			"OnlineSubsystemUtils",
+			"SlateCore",
 		});
 		
 		PrivateDependencyModuleNames.AddRange(new string[] {  });

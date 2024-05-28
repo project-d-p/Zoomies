@@ -6,6 +6,7 @@
     <file url="file://$PROJECT_DIR$/Source/proj_a/Component/Private/DPStateActorComponent.cpp" charset="x-windows-949" />
     <file url="file://$PROJECT_DIR$/Source/proj_a/Component/Private/DPWeaponGun.cpp" charset="x-windows-949" />
     <file url="file://$PROJECT_DIR$/Source/proj_a/DPPlayerController.cpp" charset="x-windows-949" />
+    <file url="file://$PROJECT_DIR$/Source/proj_a/Widget/Private/DPIngameWidget.cpp" charset="x-windows-949" />
     <file url="file://$PROJECT_DIR$/Source/proj_a/Widget/Private/MyUserWidget.cpp" charset="x-windows-949" />
     <file url="file://$PROJECT_DIR$/Source/proj_a/Widget/Public/MyUserWidget.h" charset="x-windows-949" />
     <file url="PROJECT" charset="x-windows-949" />

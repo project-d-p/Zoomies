@@ -60,11 +60,6 @@ ADPPlayerController::ADPPlayerController()
 	(TEXT("/Game/input/ia_cancel.ia_cancel"));
 	if (IA_CANCEL.Succeeded())
 		cancelAction = IA_CANCEL.Object;
-
-	static ConstructorHelpers::FObjectFinder<UInputAction>IA_CHAT
-	(TEXT("/Game/input/ia_chat.ia_chat"));
-	if (IA_CHAT.Succeeded())
-		chatAction = IA_CHAT.Object;
 }
 
 void ADPPlayerController::BeginPlay()
@@ -121,8 +116,6 @@ void ADPPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(aimAction, ETriggerEvent::Completed, this, &ADPPlayerController::AimReleased);
 		//	취소, 채팅 끄기 ( esc - UE 에디터에서 기본 단축키 변경 필요 )
 		EnhancedInputComponent->BindAction(cancelAction, ETriggerEvent::Triggered, this, &ADPPlayerController::ActionCancel);
-		//	채팅 열기 ( enter )
-		EnhancedInputComponent->BindAction(chatAction, ETriggerEvent::Triggered, this, &ADPPlayerController::OpenChat);
 	}
 }
 
@@ -273,11 +266,6 @@ void ADPPlayerController::AimReleased(const FInputActionValue& value)
 void ADPPlayerController::ActionCancel(const FInputActionValue& value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("ActionCancel"));
-}
-
-void ADPPlayerController::OpenChat(const FInputActionValue& value)
-{
-	ServerSendChatMessage(TEXT("Hello, this is a test message!"));
 }
 
 void ADPPlayerController::ServerSendChatMessage_Implementation(const FString& Message)
