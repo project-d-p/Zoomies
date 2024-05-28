@@ -17,7 +17,9 @@ class PROJ_A_API ALobbyGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 public:
+	ALobbyGameMode();
 	virtual void PostLogin(APlayerController* newPlayer);
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 private:
 	void CheckAndStartGame();
 	void StartGame();

@@ -55,7 +55,7 @@ public class proj_a : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
 
 		PublicDependencyModuleNames.AddRange(new string[]
-			{ "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "Sockets", "Networking", "OnlineSubsystemSteam", "OnlineSubsystem", "OnlineSubsystemUtils"});
+			{ "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "Sockets", "Networking", "OnlineSubsystemSteam", "OnlineSubsystem", "OnlineSubsystemUtils" });
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
 		string SteamVersion = "Steamv153";

@@ -37,3 +37,19 @@ void ALobbyGameMode::StartGame() {
 	//	}
 	//}
 }
+
+ALobbyGameMode::ALobbyGameMode() {
+	//GameSessionClass = NULL;
+}
+
+void ALobbyGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+	Super::InitGame(MapName, Options, ErrorMessage);
+	if (GetNetMode() != NM_Standalone) {
+
+		UE_LOG(LogTemp, Log, TEXT("Not Standalone"));
+	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("NM_Standalone"));
+	}
+}

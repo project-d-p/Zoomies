@@ -25,6 +25,7 @@ public:
 
 
 private:
+	void JoinLobby();
 	void FindSession();
 	void OnFindSessionsComplete(bool bWasSuccessful);
 	void CreateSession();
@@ -38,6 +39,9 @@ private:
 	FDelegateHandle OnFindSessionsCompleteDelegateHandle;
 	FDelegateHandle OnCreateSessionCompleteDelegateHandle;
 	FDelegateHandle OnJoinSessionCompleteDelegateHandle;
+	FOnCreateSessionComplete OnCreateSessionCompleteEvent;
+
+	TSharedPtr<FOnlineSessionSettings> session_settings_;
 
 	HSteamListenSocket listen_socket_;
 	IOnlineSubsystem* online_subsystem_;
