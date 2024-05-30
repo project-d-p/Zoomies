@@ -13,9 +13,12 @@ UCLASS()
 class PROJ_A_API ADPGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
 public:
+	virtual void PostLogin(APlayerController* newPlayer) override;
 	ADPGameModeBase();
 	virtual void StartPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+private:
+	void DisableReplicationForCharacters();
+	FTimerHandle TimerHandle_DisableReplication;
 };

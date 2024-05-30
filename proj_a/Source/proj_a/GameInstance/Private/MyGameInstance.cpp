@@ -159,7 +159,7 @@ void UMyGameInstance::OnJoinSessionComplete(FName sessionName, EOnJoinSessionCom
             if (World && World->GetMapName().Contains(TravelURL))
             {
                 UE_LOG(LogTemp, Log, TEXT("Already in the target map."));
-                return; // ÀÌ¹Ì ¸ñÇ¥ ¸Ê¿¡ ÀÖ´Â °æ¿ì ¾Æ¹«°Íµµ ÇÏÁö ¾ÊÀ½
+                return; // ï¿½Ì¹ï¿½ ï¿½ï¿½Ç¥ ï¿½Ê¿ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ ï¿½Æ¹ï¿½ï¿½Íµï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             }
             PlayerController->ClientTravel(TravelURL, ETravelType::TRAVEL_Absolute);
             UE_LOG(LogTemp, Log, TEXT("Join Sesison Success"));
@@ -195,7 +195,6 @@ void UMyGameInstance::Init() {
     {
         UE_LOG(LogTemp, Log, TEXT("STEAM INIT FAILED"));
 
-        // Ãß°¡ µð¹ö±ë Á¤º¸ Ãâ·Â
         FString FilePath = FPaths::Combine(FPaths::ProjectDir(), TEXT("steam_appid.txt"));
         FString FileContent;
         if (FFileHelper::LoadFileToString(FileContent, *FilePath))

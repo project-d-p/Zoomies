@@ -78,6 +78,8 @@ Plugins/*/Intermediate/*
 DerivedDataCache/*
 proj_a/DerivedDataCache/*
 
+# Rider Plugin
+proj_a/Plugins/Developer/RiderLink/
 
 server/server/x64
 *.exe
