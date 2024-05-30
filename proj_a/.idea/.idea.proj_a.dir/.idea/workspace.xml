@@ -499,6 +499,7 @@
       <change afterPath="$USER_HOME$/UnrealEngine/Engine/Plugins/Marketplace/Developer/RiderLink/Source/RiderShaderInfo/RiderShaderInfo.Build.cs" afterDir="false" />
       <change afterPath="$USER_HOME$/UnrealEngine/Engine/Plugins/Marketplace/Developer/RiderLink/Source/RiderShaderInfo/RiderShaderInfo.cpp" afterDir="false" />
       <change afterPath="$USER_HOME$/UnrealEngine/Engine/Plugins/Marketplace/Developer/RiderLink/Source/RiderShaderInfo/RiderShaderInfo.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.proj_a.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.proj_a.dir/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$USER_HOME$/UnrealEngine/Engine/Source/Runtime/Engine/Classes/GameFramework/Actor.h" beforeDir="false" afterPath="$USER_HOME$/UnrealEngine/Engine/Source/Runtime/Engine/Classes/GameFramework/Actor.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -20340,6 +20341,7 @@
       <workItem from="1716870691274" duration="121000" />
       <workItem from="1716870899252" duration="97000" />
       <workItem from="1716871016724" duration="7483000" />
+      <workItem from="1717061130241" duration="1220000" />
     </task>
     <task id="LOCAL-00001" summary="FEAT: 기본 네트워크 연결 마무리">
       <option name="closed" value="true" />
