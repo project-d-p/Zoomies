@@ -4,6 +4,7 @@
 #include "Interfaces/OnlineSessionInterface.h"
 #include "Blueprint/UserWidget.h"
 #include "OnlineSessionSettings.h"
+#include "ChatUI.h"
 #include "MyUserWidget.generated.h"
 
 UCLASS()
@@ -34,6 +35,8 @@ public:
 	UFUNCTION()
 	void OnCreateSessionComplete(FName SessionName, bool bWasSuccssful);
 	void OnJoinSessionComplate(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+
+	FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent);
 protected:
 	// XXX: 나중에 사용하도록 변경
 	FDelegateHandle OnCreateSessionCompleteDelegateHandle;
@@ -51,4 +54,8 @@ protected:
 
 	IOnlineSessionPtr Sessions;
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
+	
+	UPROPERTY(meta = (BindWidget))
+	UEditableTextBox* ChatBox;
+	UChatUI* ChatUI = nullptr;
 };
