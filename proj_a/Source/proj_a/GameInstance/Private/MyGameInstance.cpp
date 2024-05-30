@@ -8,17 +8,6 @@
 #include "OnlineSessionSettings.h"
 
 void UMyGameInstance::StartMatchMaking() {
-    UE_LOG(LogTemp, Log, TEXT("START MATCHING"));
-
-    if (GEngine)
-    {
-        GEngine->AddOnScreenDebugMessage(
-            -1,
-            15.f,
-            FColor::Cyan,
-            FString::Printf(TEXT("START MATCHING IN MATCHMAKING")));
-    }
-
     this->FindSession();
 }
 
@@ -30,7 +19,7 @@ void UMyGameInstance::FindSession() {
             -1,
             15.f,
             FColor::Cyan,
-            FString::Printf(TEXT("I'M HERE IN FIND SESSION")));
+            FString::Printf(TEXT("FINDING SESSION")));
     }
 
     session_search_ = MakeShareable(new FOnlineSessionSearch());
@@ -46,15 +35,6 @@ void UMyGameInstance::FindSession() {
 }
 
 void UMyGameInstance::OnFindSessionsComplete(bool bWasSuccessful) {
-    if (GEngine)
-    {
-        GEngine->AddOnScreenDebugMessage(
-            -1,
-            15.f,
-            FColor::Cyan,
-            FString::Printf(TEXT("FOUND HERE")));
-    }
-
     match_session_->ClearOnFindSessionsCompleteDelegate_Handle(OnFindSessionsCompleteDelegateHandle);
     if (bWasSuccessful && session_search_->SearchResults.Num() > 0) {
         if (GEngine)
@@ -209,8 +189,6 @@ void UMyGameInstance::Init() {
 
 	this->is_server_ = false;
     this->desired_session_name_ = "deulee_server";
-	//FString LobbyLevelName = TEXT("lobbyLevel");
-	//UGameplayStatics::OpenLevel(GetWorld(), *LobbyLevelName);
 }
 
 bool UMyGameInstance::IsServer() {
