@@ -5,7 +5,7 @@
 #include "Components/ActorComponent.h"
 #include "NetComp.generated.h"
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS()
 class PROJ_A_API UNetComp : public UActorComponent
 {
 	GENERATED_BODY()

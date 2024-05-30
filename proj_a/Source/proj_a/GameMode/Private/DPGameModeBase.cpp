@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "DPGameModeBase.h"
 #include "DPCharacter.h"
+#include "DPInGameState.h"
 #include "DPPlayerController.h"
 #include "SocketManager.h"
 
@@ -16,6 +16,7 @@ ADPGameModeBase::ADPGameModeBase()
     //     DefaultPawnClass = CHARACTER.Class;
     // }
 	PlayerControllerClass = ADPPlayerController::StaticClass();
+	GameStateClass = ADPInGameState::StaticClass();
 }
 
 void ADPGameModeBase::StartPlay()
@@ -37,6 +38,11 @@ void ADPGameModeBase::StartPlay()
 	// }
 	// FSocketManager::GetInstance().RunTask();
 }
+
+// ===================================================
+// 적절한 스폰 위치 설정
+#define SPAWN_LOCATION (FVector(0.0f, 0.0f, 300.0f));
+// ===================================================
 
 void ADPGameModeBase::PostLogin(APlayerController* NewPlayer)
 {
@@ -61,8 +67,7 @@ void ADPGameModeBase::PostLogin(APlayerController* NewPlayer)
 	
 	if (DefaultPawnClass != nullptr && NewPlayer)
 	{
-		// 캐릭터를 스폰합니다.
-		FVector SpawnLocation = FVector(0.0f, 0.0f, 300.0f); // 적절한 스폰 위치 설정
+		FVector SpawnLocation = SPAWN_LOCATION;
 		FRotator SpawnRotation = FRotator::ZeroRotator;
 
 		FActorSpawnParameters SpawnParams;
@@ -74,7 +79,6 @@ void ADPGameModeBase::PostLogin(APlayerController* NewPlayer)
         
 		if (NewCharacter)
 		{
-			// 포제션합니다.
 			NewPlayer->Possess(NewCharacter);
 		}
 	}

@@ -40,6 +40,8 @@ public class proj_a : ModuleRules
 			"proj_a/Network/SendTask/Public",
 			"proj_a/Network/NetLogger/Public",
 			"proj_a/Core/Public",
+			"proj_a/GameMode/Public",
+			"proj_a/GameState/Public",
 			"proj_a/Utility/Public",
 			"proj_a/Protobuf/Pb_File",
 		});
@@ -54,7 +56,7 @@ public class proj_a : ModuleRules
 			"InputCore",
 			"EnhancedInput",
 			"Sockets",
-			"Networking", 
+			"Networking",
 			"UMG",
 			"OnlineSubsystem", 
 			"OnlineSubsystemSteam",

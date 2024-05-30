@@ -15,30 +15,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="212ad15f-bcd5-4807-8db4-96a52264d0a8" name="Changes" comment="FEAT: Null test finish">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.proj_a.dir/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.proj_a.dir/.idea/encodings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.proj_a.dir/.idea/shelf/Changes.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.proj_a.dir/.idea/shelf/Changes.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.proj_a.dir/.idea/shelf/Uncommitted_changes_before_Update_at_2024-05-22__5_57__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.proj_a.dir/.idea/shelf/Uncommitted_changes_before_Update_at_2024-05-22__5_57__Changes_.xml" afterDir="false" />
+    <list default="true" id="212ad15f-bcd5-4807-8db4-96a52264d0a8" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Source/proj_a/Component/Private/ScoreManagerComponent.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/proj_a/Component/Public/ScoreManagerComponent.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/proj_a/GameState/Private/DPInGameState.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/proj_a/GameState/Public/DPInGameState.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.proj_a.dir/.idea/shelf/Uncommitted_changes_before_Update_at_2024-05-22__5_57__Changes_.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.proj_a.dir/.idea/shelf/Uncommitted_changes_before_Update_at_2024-05-22_오후_5_57_[Changes]/shelved.patch" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.proj_a.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.proj_a.dir/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/input/ia_chat.uasset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/input/imc_character.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/input/imc_character.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/level/mainLevel.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/level/mainLevel.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/widget/testWidget.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/widget/testWidget.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/widget/widget_ingame.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/widget/widget_ingame.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Actor/Character/Private/DPGameModeBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Actor/Character/Private/DPGameModeBase.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Actor/Controller/Private/DPPlayerController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Actor/Controller/Private/DPPlayerController.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Actor/Controller/Public/DPPlayerController.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Actor/Controller/Public/DPPlayerController.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/NetLogger/Public/FNetLogger.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Network/NetLogger/Public/FNetLogger.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/actor_position.pb.cc" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/actor_position.pb.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/actor_position.pb.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/actor_position.pb.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/message.pb.cc" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/message.pb.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/message.pb.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/message.pb.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/movement.pb.cc" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/movement.pb.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/movement.pb.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/movement.pb.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/state.pb.cc" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/state.pb.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/state.pb.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/state.pb.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/vector.pb.cc" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/vector.pb.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/vector.pb.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/vector.pb.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Widget/Private/DPIngameWidget.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Widget/Private/DPIngameWidget.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Widget/Public/DPIngameWidget.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Widget/Public/DPIngameWidget.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Actor/Character/Private/DPGameModeBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/GameMode/Private/DPGameModeBase.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Actor/Character/Public/DPCharacter.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Actor/Character/Public/DPCharacter.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Actor/Character/Public/DPGameModeBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/GameMode/Public/DPGameModeBase.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Component/Public/NetComp.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Component/Public/NetComp.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Widget/Private/MyUserWidget.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Widget/Private/MyUserWidget.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Widget/Public/MyUserWidget.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Widget/Public/MyUserWidget.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/proj_a/proj_a.Build.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/proj_a.Build.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -57,9 +50,8 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Source/proj_a/Actor/Character/Private/DPCharacter.cpp" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Source/proj_a/Actor/Character/Private/DPGameModeBase.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/proj_a/Actor/Character/Public/DPCharacter.h" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Source/proj_a/Actor/Character/Public/DPGameModeBase.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/Hansangmin/Proj_a/Client/proj_a/Source/proj_a/Actor/Character/Public/DPCharacter.h" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/proj_a/Actor/Controller/Private/DPPlayerController.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/proj_a/Actor/Controller/Public/DPPlayerController.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/proj_a/Component/Private/DPConstructionActorComponent.cpp" root0="FORCE_HIGHLIGHTING" />
@@ -77,7 +69,6 @@
     <setting file="file://$PROJECT_DIR$/Source/proj_a/Network/ReceiveTask/Public/FTcpReceiveTask.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/proj_a/Network/SendTask/Private/FTcpSendTask.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/proj_a/Network/SendTask/Private/FUdpSendTask.cpp" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/Hansangmin/Proj_a/Client/proj_a/Source/proj_a/Protobuf/Pb_file/actor_position.pb.cc" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/proj_a/Widget/Private/DPVoteWidget.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/proj_a/Widget/Private/MyUserWidget.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/proj_a/Widget/Public/MyUserWidget.h" root0="FORCE_HIGHLIGHTING" />
@@ -827,7 +818,9 @@
       <workItem from="1716690600731" duration="9120000" />
       <workItem from="1716807569228" duration="745000" />
       <workItem from="1716893901290" duration="5864000" />
-      <workItem from="1716901086386" duration="3015000" />
+      <workItem from="1716901086386" duration="3249000" />
+      <workItem from="1716964391470" duration="10356000" />
+      <workItem from="1717050440417" duration="3399000" />
     </task>
     <task id="LOCAL-00001" summary="FEAT: 기본 네트워크 연결 마무리">
       <option name="closed" value="true" />
@@ -853,7 +846,15 @@
       <option name="project" value="LOCAL" />
       <updated>1716793500548</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="FEAT: Implement chat functionality with server message broadcast (log)">
+      <option name="closed" value="true" />
+      <created>1716904290757</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1716904290757</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -892,7 +893,8 @@
     <MESSAGE value="FEAT: 기본 네트워크 연결 마무리" />
     <MESSAGE value="FEAT: 스팀 서브 시스템" />
     <MESSAGE value="FEAT: Null test finish" />
-    <option name="LAST_COMMIT_MESSAGE" value="FEAT: Null test finish" />
+    <MESSAGE value="FEAT: Implement chat functionality with server message broadcast (log)" />
+    <option name="LAST_COMMIT_MESSAGE" value="FEAT: Implement chat functionality with server message broadcast (log)" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

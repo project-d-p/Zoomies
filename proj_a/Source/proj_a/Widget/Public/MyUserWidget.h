@@ -19,6 +19,11 @@ public:
 	UFUNCTION()
 	void OnPlayer2_testButtenClicked();
 	UFUNCTION()
+	void OnScoreBT1Clicked();
+	UFUNCTION()
+	void OnScoreBT2Clicked();
+	
+	UFUNCTION()
 	void InitializeSteamAPI();
 	UFUNCTION()
 	bool CreateP2PSession(FName SessionName, int32 MaxPlayers);
@@ -39,6 +44,10 @@ protected:
 	class UButton* Player1_testButten;
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Player2_testButten;
+	UPROPERTY(meta = (BindWidget))
+	class UButton* ScoreBT1;
+	UPROPERTY(meta = (BindWidget))
+	class UButton* ScoreBT2;
 
 	IOnlineSessionPtr Sessions;
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;

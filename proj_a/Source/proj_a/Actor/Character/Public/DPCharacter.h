@@ -40,8 +40,7 @@ public:	// component
 	class UDPWeaponActorComponent* weaponComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UDPStateActorComponent* stateComponent;
-
-	// ??????? ?????
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
 	UAnimMontage* characterMontage;
 
