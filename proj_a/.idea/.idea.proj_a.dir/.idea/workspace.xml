@@ -98,6 +98,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="212ad15f-bcd5-4807-8db4-96a52264d0a8" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Source/proj_a/ServerNetworkIO/Private/ListenSocket.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Source/proj_a/ServerNetworkIO/Public/ListenSocket.h" afterDir="false" />
       <change afterPath="$USER_HOME$/UnrealEngine/Engine/Plugins/Marketplace/Developer/RiderLink/RiderLink.uplugin" afterDir="false" />
       <change afterPath="$USER_HOME$/UnrealEngine/Engine/Plugins/Marketplace/Developer/RiderLink/Source/RD/RD.Build.cs" afterDir="false" />
       <change afterPath="$USER_HOME$/UnrealEngine/Engine/Plugins/Marketplace/Developer/RiderLink/Source/RD/RD.cpp" afterDir="false" />
@@ -500,6 +502,11 @@
       <change afterPath="$USER_HOME$/UnrealEngine/Engine/Plugins/Marketplace/Developer/RiderLink/Source/RiderShaderInfo/RiderShaderInfo.cpp" afterDir="false" />
       <change afterPath="$USER_HOME$/UnrealEngine/Engine/Plugins/Marketplace/Developer/RiderLink/Source/RiderShaderInfo/RiderShaderInfo.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.proj_a.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.proj_a.dir/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/GameInstance/Private/MyGameInstance.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/GameInstance/Private/MyGameInstance.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/GameInstance/Public/MyGameInstance.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/GameInstance/Public/MyGameInstance.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Lobby/Private/LobbyGameMode.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Lobby/Private/LobbyGameMode.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Lobby/Public/LobbyGameMode.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Lobby/Public/LobbyGameMode.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/proj_a.Build.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/proj_a.Build.cs" afterDir="false" />
       <change beforePath="$USER_HOME$/UnrealEngine/Engine/Source/Runtime/Engine/Classes/GameFramework/Actor.h" beforeDir="false" afterPath="$USER_HOME$/UnrealEngine/Engine/Source/Runtime/Engine/Classes/GameFramework/Actor.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -20341,7 +20348,7 @@
       <workItem from="1716870691274" duration="121000" />
       <workItem from="1716870899252" duration="97000" />
       <workItem from="1716871016724" duration="7483000" />
-      <workItem from="1717061130241" duration="1220000" />
+      <workItem from="1717061130241" duration="5087000" />
     </task>
     <task id="LOCAL-00001" summary="FEAT: 기본 네트워크 연결 마무리">
       <option name="closed" value="true" />

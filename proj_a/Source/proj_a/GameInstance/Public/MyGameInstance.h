@@ -23,7 +23,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Network")
 	void StartMatchMaking();
 
-
 private:
 	void JoinLobby();
 	void FindSession();
@@ -32,20 +31,21 @@ private:
 	void OnCreateSessionComplete(FName sessionName, bool bWasSucessful);
 	void JoinSessionGame(const FOnlineSessionSearchResult& search_result);
 	void OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type Result);
-	bool IsServer();
-	
 
+	// for handling session callbacks
 	TSharedPtr<FOnlineSessionSearch> session_search_;
 	FDelegateHandle OnFindSessionsCompleteDelegateHandle;
 	FDelegateHandle OnCreateSessionCompleteDelegateHandle;
 	FDelegateHandle OnJoinSessionCompleteDelegateHandle;
 	FOnCreateSessionComplete OnCreateSessionCompleteEvent;
-
 	TSharedPtr<FOnlineSessionSettings> session_settings_;
 
-	HSteamListenSocket listen_socket_;
+	// for handling steam sockets
+	// HSteamListenSocket listen_socket_;
+	// socket for local testing
+	
+	
 	IOnlineSubsystem* online_subsystem_;
 	IOnlineSessionPtr match_session_;
 	FString desired_session_name_;
-	bool is_server_;
 };

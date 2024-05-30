@@ -4,8 +4,6 @@
 #include "LobbyGameMode.h"
 #include "GameFramework/PlayerController.h"
 #include "Engine/World.h"
-#include "Kismet/GameplayStatics.h"
-#include "DPCharacter.h"
 
 void ALobbyGameMode::PostLogin(APlayerController* newPlayer) {
 	Super::PostLogin(newPlayer);
@@ -22,24 +20,10 @@ void ALobbyGameMode::CheckAndStartGame() {
 	}
 }
 
-void ALobbyGameMode::StartGame() {
+void ALobbyGameMode::StartGame() const {
 	if (HasAuthority()) {
 		GetWorld()->ServerTravel(TEXT("mainLevel?listen"), true);
-	}
-}
-
-ALobbyGameMode::ALobbyGameMode() {
-	//GameSessionClass = NULL;
-}
-
-void ALobbyGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
-{
-	Super::InitGame(MapName, Options, ErrorMessage);
-	if (GetNetMode() != NM_Standalone) {
-
-		UE_LOG(LogTemp, Log, TEXT("Not Standalone"));
-	}
-	else {
-		UE_LOG(LogTemp, Log, TEXT("NM_Standalone"));
+	} else {
+		
 	}
 }

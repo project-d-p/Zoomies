@@ -42,6 +42,7 @@ public class proj_a : ModuleRules
 			"proj_a/Network/NetLogger/Public",
 			"proj_a/GameInstance/Public",
 			"proj_a/SteamGameManager/Public",
+			"proj_a/ServerNetworkIO/Public",
 			"proj_a/Lobby/Public",
 			"proj_a/Core/Public",
 			"proj_a/Utility/Public",

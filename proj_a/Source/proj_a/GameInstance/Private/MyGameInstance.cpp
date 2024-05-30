@@ -95,14 +95,8 @@ void UMyGameInstance::OnCreateSessionComplete(FName sessionName, bool bWasSucces
     match_session_->ClearOnCreateSessionCompleteDelegate_Handle(OnCreateSessionCompleteDelegateHandle);
     if (bWasSuccessful) {
         UE_LOG(LogTemp, Log, TEXT("Create Session Successfully"));
-
         FString ConnectString;
-        if (match_session_->GetResolvedConnectString(sessionName, ConnectString)) {
-            UE_LOG(LogTemp, Log, TEXT("Create ROOM SPEC[PASS]: %s"), *ConnectString);
-        }
-        else {
-            UE_LOG(LogTemp, Log, TEXT("Create ROOM SPEC[FAIL]: %s"), *ConnectString);
-        }
+        match_session_->GetResolvedConnectString(sessionName, ConnectString);
         OnCreateSessionCompleteEvent.Broadcast(*ConnectString, bWasSuccessful);
         JoinLobby();
     }
@@ -139,7 +133,7 @@ void UMyGameInstance::OnJoinSessionComplete(FName sessionName, EOnJoinSessionCom
             if (World && World->GetMapName().Contains(TravelURL))
             {
                 UE_LOG(LogTemp, Log, TEXT("Already in the target map."));
-                return; // �̹� ��ǥ �ʿ� �ִ� ��� �ƹ��͵� ���� ����
+                return;
             }
             PlayerController->ClientTravel(TravelURL, ETravelType::TRAVEL_Absolute);
             UE_LOG(LogTemp, Log, TEXT("Join Sesison Success"));
@@ -186,11 +180,5 @@ void UMyGameInstance::Init() {
             UE_LOG(LogTemp, Log, TEXT("Failed to load steam_appid.txt"));
         }
     }
-
-	this->is_server_ = false;
     this->desired_session_name_ = "deulee_server";
-}
-
-bool UMyGameInstance::IsServer() {
-	return this->is_server_;
 }
