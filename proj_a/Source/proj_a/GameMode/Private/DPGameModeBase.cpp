@@ -4,6 +4,7 @@
 #include "DPCharacter.h"
 #include "DPInGameState.h"
 #include "DPPlayerController.h"
+#include "FNetLogger.h"
 #include "SocketManager.h"
 
 ADPGameModeBase::ADPGameModeBase()
@@ -39,10 +40,10 @@ void ADPGameModeBase::StartPlay()
 	// FSocketManager::GetInstance().RunTask();
 }
 
-// ===================================================
-// 적절한 스폰 위치 설정
+/**
+ * 적절한 스폰 위치 설정  
+*/
 #define SPAWN_LOCATION (FVector(0.0f, 0.0f, 300.0f));
-// ===================================================
 
 void ADPGameModeBase::PostLogin(APlayerController* NewPlayer)
 {
@@ -51,18 +52,7 @@ void ADPGameModeBase::PostLogin(APlayerController* NewPlayer)
 	if (NewPlayer->GetNetConnection())
 	{
 		FString ClientAddress = NewPlayer->GetNetConnection()->LowLevelGetRemoteAddress();
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(
-				0,
-				15.f,
-				FColor::Cyan,
-				FString::Printf(TEXT("Client connected: %s"), *ClientAddress));
-		}
-		if (ADPPlayerController* PC = Cast<ADPPlayerController>(NewPlayer))
-		{
-			PC->ClientReceiveChatMessage(TEXT("Server"), TEXT("Welcome to the game!"));
-		}
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Client connected: %s"), *ClientAddress);
 	}
 	
 	if (DefaultPawnClass != nullptr && NewPlayer)
@@ -91,7 +81,7 @@ void ADPGameModeBase::BroadcastChatMessage_Implementation(const FString& SenderN
 		ADPPlayerController* PC = Cast<ADPPlayerController>(*It);
 		if (PC)
 		{
-			PC->ClientReceiveChatMessage(SenderName, Message);
+			PC->ReceiveChatMessage(SenderName, Message);
 		}
 	}
 }

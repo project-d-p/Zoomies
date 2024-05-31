@@ -120,8 +120,6 @@ void ADPCharacter::Tick(float DeltaTime)
 void ADPCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-
 }
 
 void ADPCharacter::PlayAimAnimation()

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "InputActionValue.h"
+#include "ChatManager.h"
 #include "DPPlayerController.generated.h"
 
 /**
@@ -18,11 +19,9 @@ class PROJ_A_API ADPPlayerController : public APlayerController
 public:
 	ADPPlayerController();
 	
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerSendChatMessage(const FString& Message);
-
-	UFUNCTION(Client, Reliable)
-	void ClientReceiveChatMessage(const FString& SenderName, const FString& Message);
+	void SendChatMessageToServer(const FString& Message);
+	void ReceiveChatMessage(const FString& SenderName, const FString& Message);
+	void InitChatManager(UChatUI* ChatUI);
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -33,7 +32,6 @@ private:
 	class UDPStateActorComponent* state;
 	class UDPConstructionActorComponent* construction;
 
-private:
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputMappingContext* defaultContext;
 
@@ -52,6 +50,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* cancelAction;
 
+	UPROPERTY()
+	UChatManager* ChatManager = nullptr;
+	
 	virtual void Tick(float DeltaSeconds) override;
 	
 	void Move(const FInputActionValue& value);

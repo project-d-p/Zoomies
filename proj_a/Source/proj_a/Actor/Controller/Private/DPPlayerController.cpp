@@ -7,7 +7,6 @@
 #include "InputMappingContext.h"
 #include "DPWeaponActorComponent.h"
 #include "DPConstructionActorComponent.h"
-#include "DPGameModeBase.h"
 #include "DPStateActorComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "NetComp.h"
@@ -60,6 +59,29 @@ ADPPlayerController::ADPPlayerController()
 	(TEXT("/Game/input/ia_cancel.ia_cancel"));
 	if (IA_CANCEL.Succeeded())
 		cancelAction = IA_CANCEL.Object;
+	
+	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
+}
+
+void ADPPlayerController::SendChatMessageToServer(const FString& Message)
+{
+	if (ChatManager)
+	{
+		ChatManager->ServerSendChatMessage(Message);
+	}
+}
+
+void ADPPlayerController::ReceiveChatMessage(const FString& SenderName, const FString& Message)
+{
+	if (ChatManager)
+	{
+		ChatManager->ClientReceiveChatMessage(SenderName, Message);
+	}
+}
+
+void ADPPlayerController::InitChatManager(UChatUI* ChatUI)
+{
+	ChatManager->setChatUI(ChatUI);
 }
 
 void ADPPlayerController::BeginPlay()
@@ -268,32 +290,6 @@ void ADPPlayerController::ActionCancel(const FInputActionValue& value)
 	UE_LOG(LogTemp, Warning, TEXT("ActionCancel"));
 }
 
-void ADPPlayerController::ServerSendChatMessage_Implementation(const FString& Message)
-{
-	if (ADPGameModeBase* GM = Cast<ADPGameModeBase>(GetWorld()->GetAuthGameMode()))
-	{
-		FString SenderName = TEXT("Unknown");
-		GM->BroadcastChatMessage(SenderName, Message);
-	}
-}
-
-bool ADPPlayerController::ServerSendChatMessage_Validate(const FString& Message)
-{
-	return !Message.IsEmpty();
-}
-
-void ADPPlayerController::ClientReceiveChatMessage_Implementation(const FString& SenderName, const FString& Message)
-{
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			15.f,
-			FColor::Cyan,
-			FString::Printf(TEXT("%s: %s"), *SenderName, *Message));
-	}
-}
-
 void ADPPlayerController::UpdatePlayer()
 {
 	Movement movement;
@@ -313,16 +309,4 @@ void ADPPlayerController::UpdatePlayer()
 		character->AddMovementInput(forwardVector, actionValue.X);
 		character->AddMovementInput(rightVector, actionValue.Y);
 	}
-
-	// XXX: 추후 PlayerPosition 메시지가 정의되어 들어오면 새롭게 정의필요. 아래 주석 코드 참조.
-
-	// PlayerPosition result = FDataHub::PlayerPositions["1"];
-	// if (result.has_position())
-	// 	character->SetActorLocation(FVector(result.position().x(), result.position().y(), result.position().z()));
-	// if (result.jumpResult)
-	// 	character->Jump();
-	// if (result.rotateResult)
-	// 	character->
-	// character->SetActorRotation();
-	// character->SetActorLocationAndRotation();
 }

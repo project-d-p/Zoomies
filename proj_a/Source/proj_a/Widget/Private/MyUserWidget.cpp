@@ -28,24 +28,11 @@ void UMyUserWidget::NativeConstruct()
 	{
 		ScoreBT2->OnClicked.AddDynamic(this, &UMyUserWidget::OnScoreBT2Clicked);
 	}
-	ChatUI = NewObject<UChatUI>(this);
-	if (ChatUI)
-	{
-		ChatUI->InitializeChatBox(ChatBox);
-	}
-	SetKeyboardFocus();
-}
-
-FReply UMyUserWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
-{
-	if (InKeyEvent.GetKey() == EKeys::Enter)
-	{
-		FNetLogger::EditerLog(FColor::Purple, TEXT("Enter Key Pressed"));
-		ChatUI->ShowChat();
-		return FReply::Handled();
-	}
-    
-	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
+	// ChatUI = NewObject<UChatUI>(this);
+	// if (ChatUI)
+	// {
+	// 	ChatUI->InitializeChatBox(ChatBox);
+	// }
 }
 
 bool UMyUserWidget::JoinP2PSession(FName SessionName)
