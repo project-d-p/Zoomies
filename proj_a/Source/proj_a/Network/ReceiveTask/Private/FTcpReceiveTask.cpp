@@ -48,7 +48,7 @@ uint32 FTcpReceiveTask::Run()
 	receiveData.SetNumZeroed(bufferSize);
 	while (ShouldRun)
 	{
-		FNetLogger::GetInstance().LogInfo(TEXT("TcpReceiveTask is running."));
+		//FNetLogger::GetInstance().LogInfo(TEXT("TcpReceiveTask is running."));
 		int32 BytesReceived = 0;
 		// XXX: 자주 오지 않는 데이터가 추가될 경우 HasPendingData()를 고려.
 		if (Socket->Recv(receiveData.GetData(), bufferSize, BytesReceived))

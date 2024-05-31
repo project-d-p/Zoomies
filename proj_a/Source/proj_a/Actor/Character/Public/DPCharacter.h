@@ -53,6 +53,7 @@ public:	// component
 	void DestroyConstructionAnimation();
 	void DyingAnimation();
 
+	void DisableReplication();
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* springArm;

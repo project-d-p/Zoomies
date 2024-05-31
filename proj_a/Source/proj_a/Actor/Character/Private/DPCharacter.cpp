@@ -79,6 +79,8 @@ ADPCharacter::ADPCharacter()
 	if (CHARACTER_MONTAGE.Succeeded()) {
 		characterMontage = CHARACTER_MONTAGE.Object;
 	}
+	// disable move replication : set bReplicateMovement to false
+	AActor::SetReplicatingMovement(false);
 }
 
 // Called when the game starts or when spawned
@@ -91,7 +93,8 @@ void ADPCharacter::BeginPlay()
 	hpComponent->IsDead = false;
 	constructionComponent->placeWall = false;
 	constructionComponent->placeturret = false;
-	
+
+	UE_LOG(LogTemp, Log, TEXT("is it replicaed: %d"), GetCharacterMovement()->GetIsReplicated());
 	TSubclassOf<ADPWeapon> gunClass = ADPWeaponGun::StaticClass();
 	if (weaponComponent) {
 		weaponComponent->AddWeapons(gunClass);
@@ -118,8 +121,6 @@ void ADPCharacter::Tick(float DeltaTime)
 void ADPCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-
 }
 
 void ADPCharacter::PlayAimAnimation()
@@ -165,4 +166,11 @@ void ADPCharacter::DestroyConstructionAnimation()
 void ADPCharacter::DyingAnimation()
 {
 	// �ൿ ���� �ִϸ��̼� ���
+}
+
+// disable replication
+void ADPCharacter::DisableReplication()
+{
+	bReplicates = false;
+	GetCharacterMovement()->SetIsReplicated(false);
 }

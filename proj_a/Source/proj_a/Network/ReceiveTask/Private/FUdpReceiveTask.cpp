@@ -71,7 +71,7 @@ uint32 FUdpReceiveTask::Run()
 	receiveData.SetNumZeroed(bufferSize);
 	while (ShouldRun)
 	{
-		FNetLogger::GetInstance().LogInfo(TEXT("UdpReceiveTask is running."));
+		//FNetLogger::GetInstance().LogInfo(TEXT("UdpReceiveTask is running."));
 		int32 bytesReceived = 0;
 		if (Socket->Recv(receiveData.GetData(), bufferSize, bytesReceived))
 		{
