@@ -28,11 +28,6 @@ void UMyUserWidget::NativeConstruct()
 	{
 		ScoreBT2->OnClicked.AddDynamic(this, &UMyUserWidget::OnScoreBT2Clicked);
 	}
-	// ChatUI = NewObject<UChatUI>(this);
-	// if (ChatUI)
-	// {
-	// 	ChatUI->InitializeChatBox(ChatBox);
-	// }
 }
 
 bool UMyUserWidget::JoinP2PSession(FName SessionName)

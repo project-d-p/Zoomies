@@ -52,8 +52,4 @@ protected:
 
 	IOnlineSessionPtr Sessions;
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
-	
-	// UPROPERTY(meta = (BindWidget))
-	// UEditableTextBox* ChatBox;
-	// UChatUI* ChatUI = nullptr;
 };
