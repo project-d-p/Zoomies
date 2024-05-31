@@ -73,7 +73,13 @@ public class proj_a : ModuleRules
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
 		string SteamVersion = "Steamv153";
-		string SteamSDKPath = Path.Combine("C:", "Users", "Hansangmin", "UnrealEngine", "Engine", "Source", "ThirdParty", "Steamworks", SteamVersion, "sdk");
+		string UE_PATH = System.Environment.GetEnvironmentVariable("UE_PATH");
+		
+		if (string.IsNullOrEmpty(UE_PATH))
+		{
+			throw new Exception("UE_PATH environment variable is not set");
+		}
+		string SteamSDKPath = Path.Combine(UE_PATH, "Engine", "Source", "ThirdParty", "Steamworks", SteamVersion, "sdk");
 
 		if (Directory.Exists(SteamSDKPath))
 		{
