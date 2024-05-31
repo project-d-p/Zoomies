@@ -17,13 +17,13 @@ FUdpSendTask::FUdpSendTask()
 	Sock = SocketManager.GetUDPSocket();
 	if (Sock == nullptr)
 	{
-		FNetLogger::GetInstance().LogError(TEXT("UDP Socket is null!"));
+		FNetLogger::LogError(TEXT("UDP Socket is null!"));
 		return;
 	}
 	Thread = FRunnableThread::Create(this, TEXT("NetworkTaskThread"), 0, TPri_BelowNormal);
 	if (!Thread)
 	{
-		FNetLogger::GetInstance().LogError(TEXT("Failed to create UDP thread"));
+		FNetLogger::LogError(TEXT("Failed to create UDP thread"));
 	}
 }
 
@@ -38,7 +38,7 @@ uint32 FUdpSendTask::Run()
 	TSharedRef<FInternetAddr> Addr = SocketSubsystem->CreateInternetAddr();
 	FSocketManager &SocketManager = FSocketManager::GetInstance();
 
-	SocketManager.GetTCPSocket()->GetPeerAddress(*Addr);
+	// SocketManager.GetTCPSocket()->GetPeerAddress(*Addr);
 	uint32 uintIp;
 	Addr->GetIp(uintIp);
 
@@ -53,7 +53,7 @@ uint32 FUdpSendTask::Run()
 	Addr->SetIp(*AddressString, bIsValid);
 	if (!bIsValid)
 	{
-		FNetLogger::GetInstance().LogError(TEXT("Failed to set IP"));
+		FNetLogger::LogError(TEXT("Failed to set IP"));
 		return 1;
 	}
 	Addr->SetPort(Port);

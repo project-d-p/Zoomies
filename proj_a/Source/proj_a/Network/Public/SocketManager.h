@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "FBaseSendTask.h"
-#include "FTcpReceiveTask.h"
 #include "FUdpReceiveTask.h"
 #include "SocketSubsystem.h"
 
@@ -23,21 +22,15 @@ public:
 	void Close();
 
 	FSocket* GetUDPSocket() const;
-	FSocket* GetTCPSocket() const;
 
 	/* TCP, UDP sender task */
 	FBaseSendTask* TcpSendTask = nullptr;
 	FBaseSendTask* UdpSendTask = nullptr;
 	//
-	/* TCP, UDP receiver task */
-	FTcpReceiveTask* TcpReceiveTask = nullptr;
+	/* UDP receiver task */
 	FUdpReceiveTask* UdpReceiveTask	= nullptr;
 	//
 	ISocketSubsystem* SockSubSystem = nullptr;
 private:
-	// static FSocketManager &Instance;
-	//
 	FSocket* UdpSock = nullptr;
-	FSocket* TcpSock = nullptr;
-	// FSocket* chatSock_;
 };

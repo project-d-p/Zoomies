@@ -1,5 +1,9 @@
 # Visual Studio 2015 user specific files
-.vs/
+proj_a/.vs/
+proj_a/.vsconfig
+
+# Rider user specific files
+proj_a/.idea
 
 # Compiled Object files
 *.slo
@@ -52,7 +56,7 @@ proj_a/Binaries/*
 proj_a/Plugins/*/Binaries/*
 
 # Package Files
-proj_a/Package/*
+proj_a/Package/
 
 # Builds
 Build/*

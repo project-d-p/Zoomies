@@ -53,8 +53,6 @@ public class proj_a : ModuleRules
 		});
 		
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-
-		string ProjectDir = Path.GetFullPath(Path.Combine(ModuleDirectory, "../../"));
 	
 		PublicDependencyModuleNames.AddRange(new string[]
 		{
@@ -75,7 +73,7 @@ public class proj_a : ModuleRules
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
 		string SteamVersion = "Steamv153";
-		string SteamSDKPath = Path.Combine("C:", "Users", "idead", "UnrealEngine", "Engine", "Source", "ThirdParty", "Steamworks", SteamVersion, "sdk");
+		string SteamSDKPath = Path.Combine("C:", "Users", "Hansangmin", "UnrealEngine", "Engine", "Source", "ThirdParty", "Steamworks", SteamVersion, "sdk");
 
 		if (Directory.Exists(SteamSDKPath))
 		{
