@@ -36,7 +36,7 @@ public:
 	void OnCreateSessionComplete(FName SessionName, bool bWasSuccssful);
 	void OnJoinSessionComplate(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 protected:
-	// XXX: ³ªÁß¿¡ »ç¿ëÇÏµµ·Ï º¯°æ
+	// XXX: ë‚˜ì¤‘ì— ì‚¬ìš©í•˜ë„ë¡ ë³€ê²½
 	FDelegateHandle OnCreateSessionCompleteDelegateHandle;
 	FDelegateHandle OnFindSessionsCompleteDelegateHandle;
 	FDelegateHandle OnJoinSessionCompleteDelegateHandle;
