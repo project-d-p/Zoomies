@@ -41,6 +41,10 @@ public class proj_a : ModuleRules
 			"proj_a/Network/ReceiveTask/Public",
 			"proj_a/Network/SendTask/Public",
 			"proj_a/Network/NetLogger/Public",
+			"proj_a/GameInstance/Public",
+			"proj_a/SteamGameManager/Public",
+			"proj_a/ServerNetworkIO/Public",
+			"proj_a/Lobby/Public",
 			"proj_a/Core/Public",
 			"proj_a/GameMode/Public",
 			"proj_a/GameState/Public",
@@ -49,6 +53,8 @@ public class proj_a : ModuleRules
 		});
 		
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+
+		string ProjectDir = Path.GetFullPath(Path.Combine(ModuleDirectory, "../../"));
 	
 		PublicDependencyModuleNames.AddRange(new string[]
 		{
@@ -68,14 +74,29 @@ public class proj_a : ModuleRules
 		
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
-		// Uncomment if you are using Slate UI
-		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
+		string SteamVersion = "Steamv153";
+		string SteamSDKPath = Path.Combine("C:", "Users", "idead", "UnrealEngine", "Engine", "Source", "ThirdParty", "Steamworks", SteamVersion, "sdk");
 
-		// Uncomment if you are using online features
-		// PrivateDependencyModuleNames.Add("OnlineSubsystem");
+		if (Directory.Exists(SteamSDKPath))
+		{
+			PublicIncludePaths.Add(Path.Combine(SteamSDKPath, "public"));
+			PublicAdditionalLibraries.Add(Path.Combine(SteamSDKPath, "redistributable_bin", "win64", "steam_api64.lib"));
+			RuntimeDependencies.Add("$(ProjectDir)/Binaries/Win64/steam_api64.dll", Path.Combine(SteamSDKPath, "redistributable_bin", "win64", "steam_api64.dll"));
+			RuntimeDependencies.Add("$(ProjectDir)/steam_api64.dll", Path.Combine(SteamSDKPath, "redistributable_bin", "win64", "steam_api64.dll"));
+		}
+		//System.Console.WriteLine($"SteamSDKPath: {SteamSDKPath}");
+		//System.Console.WriteLine("Steam SDK path exists");
+		//System.Console.WriteLine(Path.Combine(SteamSDKPath, "public"));
+		//System.Console.WriteLine(Path.Combine(SteamSDKPath, "redistributable_bin", "win64", "steam_api64.lib"));
+		//System.Console.WriteLine($"ProjectDir: {ProjectDir}");
+        // Uncomment if you are using Slate UI
+        // PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 
-		// To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
-	}
+        // Uncomment if you are using online features
+        // PrivateDependencyModuleNames.Add("OnlineSubsystem");
+
+        // To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
+    }
 
 	private void SetProtobuf(string protobufPath)
 	{
