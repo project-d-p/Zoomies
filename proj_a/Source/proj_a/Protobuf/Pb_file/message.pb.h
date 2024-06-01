@@ -182,9 +182,24 @@ class Message final :
   // accessors -------------------------------------------------------
 
   enum : int {
+    kTimestampFieldNumber = 3,
     kMovementFieldNumber = 1,
     kPlayerPositionFieldNumber = 2,
   };
+  // string timestamp = 3;
+  void clear_timestamp();
+  const std::string& timestamp() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_timestamp(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_timestamp();
+  PROTOBUF_NODISCARD std::string* release_timestamp();
+  void set_allocated_timestamp(std::string* timestamp);
+  private:
+  const std::string& _internal_timestamp() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_timestamp(const std::string& value);
+  std::string* _internal_mutable_timestamp();
+  public:
+
   // .Movement movement = 1;
   bool has_movement() const;
   private:
@@ -236,6 +251,7 @@ class Message final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr timestamp_;
     union MessageTypeUnion {
       constexpr MessageTypeUnion() : _constinit_{} {}
         ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized _constinit_;
@@ -390,6 +406,56 @@ inline ::PlayerPosition* Message::mutable_player_position() {
   ::PlayerPosition* _msg = _internal_mutable_player_position();
   // @@protoc_insertion_point(field_mutable:Message.player_position)
   return _msg;
+}
+
+// string timestamp = 3;
+inline void Message::clear_timestamp() {
+  _impl_.timestamp_.ClearToEmpty();
+}
+inline const std::string& Message::timestamp() const {
+  // @@protoc_insertion_point(field_get:Message.timestamp)
+  return _internal_timestamp();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void Message::set_timestamp(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.timestamp_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Message.timestamp)
+}
+inline std::string* Message::mutable_timestamp() {
+  std::string* _s = _internal_mutable_timestamp();
+  // @@protoc_insertion_point(field_mutable:Message.timestamp)
+  return _s;
+}
+inline const std::string& Message::_internal_timestamp() const {
+  return _impl_.timestamp_.Get();
+}
+inline void Message::_internal_set_timestamp(const std::string& value) {
+  
+  _impl_.timestamp_.Set(value, GetArenaForAllocation());
+}
+inline std::string* Message::_internal_mutable_timestamp() {
+  
+  return _impl_.timestamp_.Mutable(GetArenaForAllocation());
+}
+inline std::string* Message::release_timestamp() {
+  // @@protoc_insertion_point(field_release:Message.timestamp)
+  return _impl_.timestamp_.Release();
+}
+inline void Message::set_allocated_timestamp(std::string* timestamp) {
+  if (timestamp != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.timestamp_.SetAllocated(timestamp, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.timestamp_.IsDefault()) {
+    _impl_.timestamp_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:Message.timestamp)
 }
 
 inline bool Message::has_message_type() const {

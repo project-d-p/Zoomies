@@ -8,4 +8,5 @@ message Message {
     Movement movement = 1;
     PlayerPosition player_position = 2;
   }
+  string timestamp = 3;
 }

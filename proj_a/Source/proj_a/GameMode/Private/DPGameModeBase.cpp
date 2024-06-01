@@ -4,75 +4,104 @@
 #include "DPGameModeBase.h"
 #include "DPCharacter.h"
 #include "DPPlayerController.h"
-#include "SocketManager.h"
-#include "Kismet/GameplayStatics.h"
-#include "GameFramework/Character.h"
-#include "GameFramework/CharacterMovementComponent.h"
+#include "Net/UnrealNetwork.h"
 
 ADPGameModeBase::ADPGameModeBase()
 {
 	DefaultPawnClass = ADPCharacter::StaticClass();
 	PlayerControllerClass = ADPPlayerController::StaticClass();
+	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
 }
 
 void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 {
 	Super::PostLogin(newPlayer);
-
-	UE_LOG(LogTemp, Log, TEXT("mainLevel PostLogin"));
-	UE_LOG(LogTemp, Log, TEXT("SESSION JOINED: %d"), GetNumPlayers());
-	TArray<AActor*> FoundCharacters;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADPCharacter::StaticClass(), FoundCharacters);
-	int32 NumberOfCharacters = FoundCharacters.Num();
-
-	UE_LOG(LogTemp, Log, TEXT("Number of ADPCharacters in the world: %d"), NumberOfCharacters);
-	ADPCharacter* player_character = Cast<ADPCharacter>(newPlayer->GetPawn());
-	if (player_character != nullptr)
+	try
 	{
-		// if i set this to false, the character in client side was not seen.
-		// player_character->SetReplicates(false);
-		// if i set this to false, i don't know what happen. Nothings Different.
-		player_character->GetCharacterMovement()->SetIsReplicated(false);
+		if (listen_socket_ == nullptr)
+			listen_socket_ = new FListenSocketRunnable(b_is_game_started);
 	}
-}
-
-void ADPGameModeBase::DisableReplicationForCharacters()
-{
-	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADPCharacter::StaticClass(), FoundActors);
-	for (AActor* actor : FoundActors)
+	catch (std::exception& e)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Disable replication for character."));
-		ADPCharacter* character = Cast<ADPCharacter>(actor);
-		if (character)
-		{
-			character->SetReplicates(false);
-			character->GetCharacterMovement()->SetIsReplicated(false);
-		}
+		UE_LOG(LogTemp, Warning, TEXT("Failed to create listen socket: %hs"), UTF8_TO_TCHAR(e.what()));
 	}
 }
 
 void ADPGameModeBase::StartPlay()
 {
 	Super::StartPlay();
+}
 
-	// 재시도 로직 추가 해야함.
-	UE_LOG(LogTemp, Log, TEXT("Start play."));
-
-	TArray<AActor*> FoundCharacters;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADPCharacter::StaticClass(), FoundCharacters);
-	int32 NumberOfCharacters = FoundCharacters.Num();
-
-	UE_LOG(LogTemp, Log, TEXT("Number of ADPCharacters in the world: %d"), NumberOfCharacters);
-
-	UE_LOG(LogTemp, Log, TEXT("Number of Players in this Session: %d"), GetNumPlayers());
-	// this->DisableReplicationForCharacters();
-	// GetWorld()->GetTimerManager().SetTimer(TimerHandle_DisableReplication, this, &ADPGameModeBase::DisableReplicationForCharacters, 5.0f, false);
+void ADPGameModeBase::Tick(float delta_time)
+{
+	Super::Tick(delta_time);
+	if (b_is_game_started)
+	{
+		if (this->IsGameOver())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Game Over!"));
+			return ;
+		}
+		this->StartGameLogic(delta_time);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Game is not started yet."));
+	}
 }
 
 void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 	UE_LOG(LogTemp, Warning, TEXT("Call end play."));
-	FSocketManager::GetInstance().Close();
+	if (listen_socket_)
+	{
+		delete listen_socket_;
+		listen_socket_ = nullptr;
+	}
+}
+
+ADPGameModeBase::~ADPGameModeBase()
+{
+}
+
+void ADPGameModeBase::UpdateTime(float delta_time)
+{
+	time_accumulator_ += delta_time;
+	if (time_accumulator_ >= 1.0f)
+	{
+		remain_time_ -= 1;
+		time_accumulator_ = 0.0f;
+	}
+}
+
+bool ADPGameModeBase::IsGameOver() const
+{
+	return remain_time_ <= 0;
+}
+
+void ADPGameModeBase::StartGameLogic(float delta_time)
+{
+	this->MergeMessages();
+	while (!this->message_queue_.empty())
+	{
+		Message message = this->message_queue_.top();
+		this->message_queue_.pop();
+		UE_LOG(LogTemp, Warning, TEXT("Message: %s"), message.DebugString().c_str());
+	}
+	this->UpdateTime(delta_time);
+}
+
+void ADPGameModeBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ADPGameModeBase, remain_time_);
+}
+
+void ADPGameModeBase::MergeMessages()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Merge Messages."));
+	this->listen_socket_->FillMessageQueue(this->message_queue_);
 }
