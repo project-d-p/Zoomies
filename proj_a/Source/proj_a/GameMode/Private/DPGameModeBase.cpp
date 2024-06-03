@@ -12,6 +12,8 @@ ADPGameModeBase::ADPGameModeBase()
 	DefaultPawnClass = ADPCharacter::StaticClass();
 	PlayerControllerClass = ADPPlayerController::StaticClass();
 	GameStateClass = ADPInGameState::StaticClass();
+
+	TimerManager = CreateDefaultSubobject<UServerTimerManager>(TEXT("TimerManager"));
 }
 
 void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
@@ -32,18 +34,8 @@ void ADPGameModeBase::StartPlay()
 
 	UE_LOG(LogTemp, Log, TEXT("Number of ADPCharacters in the world: %d"), NumberOfCharacters);
 	UE_LOG(LogTemp, Log, TEXT("Number of Players in this Session: %d"), GetNumPlayers());
-}
 
-void ADPGameModeBase::BroadcastChatMessage_Implementation(const FString& SenderName, const FString& Message)
-{
-	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-	{
-		ADPPlayerController* PC = Cast<ADPPlayerController>(*It);
-		if (PC)
-		{
-			PC->ReceiveChatMessage(SenderName, Message);
-		}
-	}
+	TimerManager->StartTimer(60.0f);
 }
 
 void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)

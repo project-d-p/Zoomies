@@ -65,9 +65,18 @@ ADPPlayerController::ADPPlayerController()
 
 void ADPPlayerController::SendChatMessageToServer(const FString& Message)
 {
-	if (ChatManager)
+	if (ChatManager == nullptr)
 	{
-		ChatManager->ServerSendChatMessage(Message);
+		UE_LOG(LogTemp, Warning, TEXT("ChatManager is null"));
+		return;
+	}
+	if (HasAuthority())
+	{
+		ChatManager->BroadcastChatMessage("Unknown", Message);
+	}
+	else
+	{
+		ChatManager->ServerSendChatMessage("Unknown", Message);
 	}
 }
 

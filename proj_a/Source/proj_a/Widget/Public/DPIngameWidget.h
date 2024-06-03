@@ -13,4 +13,9 @@ UCLASS()
 class PROJ_A_API UDPIngameWidget : public UUserWidget
 {
 	GENERATED_BODY()
+public:
+	void UpdateTimerDisplay(float TimeRemaining);
+protected:
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* Time_Text;
 };

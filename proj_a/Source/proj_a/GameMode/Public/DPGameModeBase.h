@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "ServerTimerManager.h"
 #include "DPGameModeBase.generated.h"
 
 /**
@@ -14,13 +15,12 @@ class PROJ_A_API ADPGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 public:
-	virtual void PostLogin(APlayerController* newPlayer) override;
 	ADPGameModeBase();
+private:
+	UPROPERTY()
+	UServerTimerManager* TimerManager;
+public:
+	virtual void PostLogin(APlayerController* newPlayer) override;
 	virtual void StartPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-	UFUNCTION(NetMulticast, Reliable)
-	void BroadcastChatMessage(const FString& SenderName, const FString& Message);
-private:
-	void DisableReplicationForCharacters();
-	FTimerHandle TimerHandle_DisableReplication;
 };

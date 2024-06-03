@@ -11,11 +11,14 @@ class PROJ_A_API UChatManager : public UActorComponent
 	GENERATED_BODY()
 public:
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerSendChatMessage(const FString& Message);
+	void ServerSendChatMessage(const FString& SenderName, const FString& Message);
 	
 	UFUNCTION(Client, Reliable)
 	void ClientReceiveChatMessage(const FString& SenderName, const FString& Message);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void BroadcastChatMessage(const FString& SenderName, const FString& Message);
+	
 	void setChatUI(UChatUI* InChatUI);
 private:
 	UPROPERTY()
