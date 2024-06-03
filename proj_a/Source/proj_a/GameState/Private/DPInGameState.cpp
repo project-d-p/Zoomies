@@ -11,6 +11,11 @@ ADPInGameState::ADPInGameState()
 	TimerManager = CreateDefaultSubobject<UClientTimerManager>(TEXT("TimerManager"));
 }
 
+void ADPInGameState::InitTimerManager(UTimerUI* TimerUI)
+{
+	TimerManager->SetTimerUI(TimerUI);
+}
+
 void ADPInGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

@@ -12,6 +12,9 @@ class PROJ_A_API ADPInGameState : public AGameStateBase
 public:
 	ADPInGameState();
 
+	UFUNCTION()
+	void InitTimerManager(UTimerUI* TimerUI);
+	
 	UPROPERTY()
 	UScoreManagerComponent* ScoreManagerComponent;
 

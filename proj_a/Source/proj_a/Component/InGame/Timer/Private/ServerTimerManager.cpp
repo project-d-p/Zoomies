@@ -14,7 +14,7 @@ void UServerTimerManager::BeginPlay()
 	Super::BeginPlay();
 }
 
-#define INTERVAL 2.0f
+#define INTERVAL 0.1f
 
 void UServerTimerManager::StartTimer(float Duration)
 {
@@ -36,12 +36,11 @@ void UServerTimerManager::TimerFunction()
 		TimeRemaining -= INTERVAL;
 		
 		SetTimeRemaining();
-		UE_LOG(LogTemp, Warning, TEXT("Time remaining: %f"), TimeRemaining);
 	}
 	else
 	{
 		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
-		UE_LOG(LogTemp, Warning, TEXT("Timer ended!"));
+		UE_LOG(LogTemp, Warning, TEXT("Timer ended"));
 	}
 }
 

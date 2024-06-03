@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "TimerUI.h"
 #include "DPIngameWidget.generated.h"
 
 /**
@@ -14,8 +15,11 @@ class PROJ_A_API UDPIngameWidget : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	void UpdateTimerDisplay(float TimeRemaining);
+	virtual void NativeConstruct() override;
 protected:
+	UPROPERTY()
+	UTimerUI* TimerUI = nullptr;
+	
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Time_Text;
 };

@@ -5,15 +5,16 @@
 
 #include "Components/TextBlock.h"
 
-void UDPIngameWidget::UpdateTimerDisplay(float TimeRemaining)
+void UDPIngameWidget::NativeConstruct()
 {
-	if (Time_Text)
+	Super::NativeConstruct();
+
+	TimerUI = NewObject<UTimerUI>(Time_Text);
+	if (TimerUI)
 	{
-		Time_Text->SetText(
-			FText::FromString(
-				FString::Printf(TEXT("%02d : %02d"),
-					FMath::FloorToInt(TimeRemaining/60), FMath::FloorToInt(TimeRemaining)%60)
-				)
-			);
+		FTimerUiInitializer TimerUiInitializer;
+		TimerUiInitializer.Time_Text = Time_Text;
+		TimerUiInitializer.InWorld = GetWorld();
+		TimerUI->initTimerUI(TimerUiInitializer);
 	}
 }

@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "TimerUI.h"
 #include "ServerTimerManager.generated.h"
 
 UCLASS()
@@ -25,4 +26,7 @@ private:
 	FTimerHandle TimerHandle;
 	float TimeRemaining;
 	float TimerDuration;
+
+	UPROPERTY()
+	UTimerUI* TimerUI = nullptr;
 };
