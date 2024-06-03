@@ -28,8 +28,6 @@ void UClientTimerManager::SetTimeRemaining(float NewTime)
 
 void UClientTimerManager::OnRep_TimeRemaining()
 {
-	// XXX: UI 업데이트 코드로 변경
-	FNetLogger::EditerLog(FColor::Magenta, TEXT("Time remaining updated: %f"), TimeRemaining);
 	if (Time_Text)
 	{
 		Time_Text->UpdateTimerDisplay(TimeRemaining);
