@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "DPCharacter.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "DPHpActorComponent.h"
 #include "DPConstructionActorComponent.h"
 #include "DPWeaponActorComponent.h"
@@ -16,6 +15,8 @@
 // Sets default values
 ADPCharacter::ADPCharacter()
 {
+	bReplicates = true;
+	
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 

@@ -30,7 +30,6 @@
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
-#include "state.pb.h"
 #include "vector.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
@@ -177,10 +176,9 @@ class Movement final :
 
   enum : int {
     kPlayerIdFieldNumber = 1,
-    kTimestampFieldNumber = 5,
-    kOrientationFieldNumber = 2,
-    kProgessVectorFieldNumber = 3,
-    kStateFieldNumber = 4,
+    kTimestampFieldNumber = 4,
+    kProgessVectorFieldNumber = 2,
+    kRotationFieldNumber = 3,
   };
   // string player_id = 1;
   void clear_player_id();
@@ -196,7 +194,7 @@ class Movement final :
   std::string* _internal_mutable_player_id();
   public:
 
-  // string timestamp = 5;
+  // string timestamp = 4;
   void clear_timestamp();
   const std::string& timestamp() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -210,25 +208,7 @@ class Movement final :
   std::string* _internal_mutable_timestamp();
   public:
 
-  // .Vec3 orientation = 2;
-  bool has_orientation() const;
-  private:
-  bool _internal_has_orientation() const;
-  public:
-  void clear_orientation();
-  const ::Vec3& orientation() const;
-  PROTOBUF_NODISCARD ::Vec3* release_orientation();
-  ::Vec3* mutable_orientation();
-  void set_allocated_orientation(::Vec3* orientation);
-  private:
-  const ::Vec3& _internal_orientation() const;
-  ::Vec3* _internal_mutable_orientation();
-  public:
-  void unsafe_arena_set_allocated_orientation(
-      ::Vec3* orientation);
-  ::Vec3* unsafe_arena_release_orientation();
-
-  // .Vec3 progess_vector = 3;
+  // .Vec3 progess_vector = 2;
   bool has_progess_vector() const;
   private:
   bool _internal_has_progess_vector() const;
@@ -246,14 +226,23 @@ class Movement final :
       ::Vec3* progess_vector);
   ::Vec3* unsafe_arena_release_progess_vector();
 
-  // .State state = 4;
-  void clear_state();
-  ::State state() const;
-  void set_state(::State value);
+  // .Vec2 Rotation = 3;
+  bool has_rotation() const;
   private:
-  ::State _internal_state() const;
-  void _internal_set_state(::State value);
+  bool _internal_has_rotation() const;
   public:
+  void clear_rotation();
+  const ::Vec2& rotation() const;
+  PROTOBUF_NODISCARD ::Vec2* release_rotation();
+  ::Vec2* mutable_rotation();
+  void set_allocated_rotation(::Vec2* rotation);
+  private:
+  const ::Vec2& _internal_rotation() const;
+  ::Vec2* _internal_mutable_rotation();
+  public:
+  void unsafe_arena_set_allocated_rotation(
+      ::Vec2* rotation);
+  ::Vec2* unsafe_arena_release_rotation();
 
   // @@protoc_insertion_point(class_scope:Movement)
  private:
@@ -265,9 +254,8 @@ class Movement final :
   struct Impl_ {
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr player_id_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr timestamp_;
-    ::Vec3* orientation_;
     ::Vec3* progess_vector_;
-    int state_;
+    ::Vec2* rotation_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -334,92 +322,7 @@ inline void Movement::set_allocated_player_id(std::string* player_id) {
   // @@protoc_insertion_point(field_set_allocated:Movement.player_id)
 }
 
-// .Vec3 orientation = 2;
-inline bool Movement::_internal_has_orientation() const {
-  return this != internal_default_instance() && _impl_.orientation_ != nullptr;
-}
-inline bool Movement::has_orientation() const {
-  return _internal_has_orientation();
-}
-inline const ::Vec3& Movement::_internal_orientation() const {
-  const ::Vec3* p = _impl_.orientation_;
-  return p != nullptr ? *p : reinterpret_cast<const ::Vec3&>(
-      ::_Vec3_default_instance_);
-}
-inline const ::Vec3& Movement::orientation() const {
-  // @@protoc_insertion_point(field_get:Movement.orientation)
-  return _internal_orientation();
-}
-inline void Movement::unsafe_arena_set_allocated_orientation(
-    ::Vec3* orientation) {
-  if (GetArenaForAllocation() == nullptr) {
-    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.orientation_);
-  }
-  _impl_.orientation_ = orientation;
-  if (orientation) {
-    
-  } else {
-    
-  }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Movement.orientation)
-}
-inline ::Vec3* Movement::release_orientation() {
-  
-  ::Vec3* temp = _impl_.orientation_;
-  _impl_.orientation_ = nullptr;
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
-  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
-  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
-  if (GetArenaForAllocation() == nullptr) { delete old; }
-#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
-  if (GetArenaForAllocation() != nullptr) {
-    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
-  }
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
-  return temp;
-}
-inline ::Vec3* Movement::unsafe_arena_release_orientation() {
-  // @@protoc_insertion_point(field_release:Movement.orientation)
-  
-  ::Vec3* temp = _impl_.orientation_;
-  _impl_.orientation_ = nullptr;
-  return temp;
-}
-inline ::Vec3* Movement::_internal_mutable_orientation() {
-  
-  if (_impl_.orientation_ == nullptr) {
-    auto* p = CreateMaybeMessage<::Vec3>(GetArenaForAllocation());
-    _impl_.orientation_ = p;
-  }
-  return _impl_.orientation_;
-}
-inline ::Vec3* Movement::mutable_orientation() {
-  ::Vec3* _msg = _internal_mutable_orientation();
-  // @@protoc_insertion_point(field_mutable:Movement.orientation)
-  return _msg;
-}
-inline void Movement::set_allocated_orientation(::Vec3* orientation) {
-  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
-  if (message_arena == nullptr) {
-    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.orientation_);
-  }
-  if (orientation) {
-    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
-        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(
-                reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(orientation));
-    if (message_arena != submessage_arena) {
-      orientation = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
-          message_arena, orientation, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  _impl_.orientation_ = orientation;
-  // @@protoc_insertion_point(field_set_allocated:Movement.orientation)
-}
-
-// .Vec3 progess_vector = 3;
+// .Vec3 progess_vector = 2;
 inline bool Movement::_internal_has_progess_vector() const {
   return this != internal_default_instance() && _impl_.progess_vector_ != nullptr;
 }
@@ -504,27 +407,92 @@ inline void Movement::set_allocated_progess_vector(::Vec3* progess_vector) {
   // @@protoc_insertion_point(field_set_allocated:Movement.progess_vector)
 }
 
-// .State state = 4;
-inline void Movement::clear_state() {
-  _impl_.state_ = 0;
+// .Vec2 Rotation = 3;
+inline bool Movement::_internal_has_rotation() const {
+  return this != internal_default_instance() && _impl_.rotation_ != nullptr;
 }
-inline ::State Movement::_internal_state() const {
-  return static_cast< ::State >(_impl_.state_);
+inline bool Movement::has_rotation() const {
+  return _internal_has_rotation();
 }
-inline ::State Movement::state() const {
-  // @@protoc_insertion_point(field_get:Movement.state)
-  return _internal_state();
+inline const ::Vec2& Movement::_internal_rotation() const {
+  const ::Vec2* p = _impl_.rotation_;
+  return p != nullptr ? *p : reinterpret_cast<const ::Vec2&>(
+      ::_Vec2_default_instance_);
 }
-inline void Movement::_internal_set_state(::State value) {
+inline const ::Vec2& Movement::rotation() const {
+  // @@protoc_insertion_point(field_get:Movement.Rotation)
+  return _internal_rotation();
+}
+inline void Movement::unsafe_arena_set_allocated_rotation(
+    ::Vec2* rotation) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.rotation_);
+  }
+  _impl_.rotation_ = rotation;
+  if (rotation) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Movement.Rotation)
+}
+inline ::Vec2* Movement::release_rotation() {
   
-  _impl_.state_ = value;
+  ::Vec2* temp = _impl_.rotation_;
+  _impl_.rotation_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
 }
-inline void Movement::set_state(::State value) {
-  _internal_set_state(value);
-  // @@protoc_insertion_point(field_set:Movement.state)
+inline ::Vec2* Movement::unsafe_arena_release_rotation() {
+  // @@protoc_insertion_point(field_release:Movement.Rotation)
+  
+  ::Vec2* temp = _impl_.rotation_;
+  _impl_.rotation_ = nullptr;
+  return temp;
+}
+inline ::Vec2* Movement::_internal_mutable_rotation() {
+  
+  if (_impl_.rotation_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Vec2>(GetArenaForAllocation());
+    _impl_.rotation_ = p;
+  }
+  return _impl_.rotation_;
+}
+inline ::Vec2* Movement::mutable_rotation() {
+  ::Vec2* _msg = _internal_mutable_rotation();
+  // @@protoc_insertion_point(field_mutable:Movement.Rotation)
+  return _msg;
+}
+inline void Movement::set_allocated_rotation(::Vec2* rotation) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.rotation_);
+  }
+  if (rotation) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(
+                reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(rotation));
+    if (message_arena != submessage_arena) {
+      rotation = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, rotation, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  _impl_.rotation_ = rotation;
+  // @@protoc_insertion_point(field_set_allocated:Movement.Rotation)
 }
 
-// string timestamp = 5;
+// string timestamp = 4;
 inline void Movement::clear_timestamp() {
   _impl_.timestamp_.ClearToEmpty();
 }

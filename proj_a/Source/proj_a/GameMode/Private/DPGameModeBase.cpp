@@ -3,6 +3,7 @@
 
 #include "DPGameModeBase.h"
 #include "DPCharacter.h"
+#include "DPInGameState.h"
 #include "DPPlayerController.h"
 #include "Net/UnrealNetwork.h"
 
@@ -10,6 +11,9 @@ ADPGameModeBase::ADPGameModeBase()
 {
 	DefaultPawnClass = ADPCharacter::StaticClass();
 	PlayerControllerClass = ADPPlayerController::StaticClass();
+	GameStateClass = ADPInGameState::StaticClass();
+	TimerManager = CreateDefaultSubobject<UServerTimerManager>(TEXT("TimerManager"));
+
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
 }
@@ -52,6 +56,7 @@ void ADPGameModeBase::Tick(float delta_time)
 	Super::Tick(delta_time);
 	if (b_is_game_started)
 	{
+		TimerManager->StartTimer(60.0f);
 		this->ProcessData(delta_time);
 	}
 	else

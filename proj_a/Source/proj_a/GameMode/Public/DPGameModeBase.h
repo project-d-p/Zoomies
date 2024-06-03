@@ -11,6 +11,7 @@
 #include "MessageEndpoint.h"
 #include "MessageQueueFilter.h"
 #include "DPPlayerController.h"
+#include "ServerTimerManager.h"
 #include "DPGameModeBase.generated.h"
 
 /**
@@ -28,6 +29,11 @@ public:
 	ADPGameModeBase();
 
 	// Called when the game starts or when spawned
+	virtual void PostLogin(APlayerController* newPlayer) override;
+private:
+	UPROPERTY()
+	UServerTimerManager* TimerManager;
+public:
 	virtual void PostLogin(APlayerController* newPlayer) override;
 	virtual void StartPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;

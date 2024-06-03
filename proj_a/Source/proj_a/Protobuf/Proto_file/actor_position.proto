@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+import "state.proto";
+import "vector.proto";
+
+// server -> client
+message ActorPosition{
+  string player_id = 1;
+  Vec3 position = 2;
+  Vec3 orientation = 3;
+  Vec2 righ_vector = 4;
+  State state = 5;
+  string timestamp = 6;
+}

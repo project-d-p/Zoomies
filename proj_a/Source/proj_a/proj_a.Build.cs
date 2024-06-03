@@ -29,10 +29,12 @@ public class proj_a : ModuleRules
 		//
 		// 
 		PublicIncludePaths.AddRange(new string[] {
-			"proj_a/GameMode/Public",
 			"proj_a/Actor/Controller/Public",
 			"proj_a/Actor/Character/Public",
 			"proj_a/Component/Public",
+			"proj_a/Component/InGame/Score/Public",
+			"proj_a/Component/InGame/Chat/Public",
+			"proj_a/Component/InGame/Timer/Public",
             "proj_a/Widget/Public",
             "proj_a/DataHub/Public",
 			"proj_a/Network/Public",
@@ -45,22 +47,40 @@ public class proj_a : ModuleRules
 			"proj_a/ServerNetworkIO/Public",
 			"proj_a/Lobby/Public",
 			"proj_a/Core/Public",
+			"proj_a/GameMode/Public",
+			"proj_a/GameState/Public",
 			"proj_a/Utility/Public",
 			"proj_a/Protobuf/Pb_File",
 		});
 		
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-
-		string ProjectDir = Path.GetFullPath(Path.Combine(ModuleDirectory, "../../"));
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
-
 		PublicDependencyModuleNames.AddRange(new string[]
-			{ "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "Sockets", "Networking", "OnlineSubsystemSteam", "OnlineSubsystem", "OnlineSubsystemUtils" });
+		{
+			"Core",
+			"CoreUObject",
+			"Engine",
+			"InputCore",
+			"EnhancedInput",
+			"Sockets",
+			"Networking",
+			"UMG",
+			"OnlineSubsystem", 
+			"OnlineSubsystemSteam",
+			"OnlineSubsystemUtils",
+			"SlateCore",
+		});
+		
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
 		string SteamVersion = "Steamv153";
-		string SteamSDKPath = Path.Combine("C:", "Users", "idead", "UnrealEngine", "Engine", "Source", "ThirdParty", "Steamworks", SteamVersion, "sdk");
+		string UE_PATH = System.Environment.GetEnvironmentVariable("UE_PATH");
+		
+		if (string.IsNullOrEmpty(UE_PATH))
+		{
+			throw new Exception("UE_PATH environment variable is not set");
+		}
+		string SteamSDKPath = Path.Combine(UE_PATH, "Engine", "Source", "ThirdParty", "Steamworks", SteamVersion, "sdk");
 
 		if (Directory.Exists(SteamSDKPath))
 		{

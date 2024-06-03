@@ -44,10 +44,14 @@ struct TableStruct_vector_2eproto {
   static const uint32_t offsets[];
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_vector_2eproto;
+class Vec2;
+struct Vec2DefaultTypeInternal;
+extern Vec2DefaultTypeInternal _Vec2_default_instance_;
 class Vec3;
 struct Vec3DefaultTypeInternal;
 extern Vec3DefaultTypeInternal _Vec3_default_instance_;
 PROTOBUF_NAMESPACE_OPEN
+template<> ::Vec2* Arena::CreateMaybeMessage<::Vec2>(Arena*);
 template<> ::Vec3* Arena::CreateMaybeMessage<::Vec3>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 
@@ -221,6 +225,165 @@ class Vec3 final :
   union { Impl_ _impl_; };
   friend struct ::TableStruct_vector_2eproto;
 };
+// -------------------------------------------------------------------
+
+class Vec2 final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Vec2) */ {
+ public:
+  inline Vec2() : Vec2(nullptr) {}
+  ~Vec2() override;
+  explicit PROTOBUF_CONSTEXPR Vec2(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  Vec2(const Vec2& from);
+  Vec2(Vec2&& from) noexcept
+    : Vec2() {
+    *this = ::std::move(from);
+  }
+
+  inline Vec2& operator=(const Vec2& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline Vec2& operator=(Vec2&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const Vec2& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const Vec2* internal_default_instance() {
+    return reinterpret_cast<const Vec2*>(
+               &_Vec2_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    1;
+
+  friend void swap(Vec2& a, Vec2& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(Vec2* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(Vec2* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  Vec2* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<Vec2>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const Vec2& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const Vec2& from) {
+    Vec2::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Vec2* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Vec2";
+  }
+  protected:
+  explicit Vec2(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kXFieldNumber = 1,
+    kYFieldNumber = 2,
+  };
+  // double x = 1;
+  void clear_x();
+  double x() const;
+  void set_x(double value);
+  private:
+  double _internal_x() const;
+  void _internal_set_x(double value);
+  public:
+
+  // double y = 2;
+  void clear_y();
+  double y() const;
+  void set_y(double value);
+  private:
+  double _internal_y() const;
+  void _internal_set_y(double value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:Vec2)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    double x_;
+    double y_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_vector_2eproto;
+};
 // ===================================================================
 
 
@@ -292,9 +455,55 @@ inline void Vec3::set_z(double value) {
   // @@protoc_insertion_point(field_set:Vec3.z)
 }
 
+// -------------------------------------------------------------------
+
+// Vec2
+
+// double x = 1;
+inline void Vec2::clear_x() {
+  _impl_.x_ = 0;
+}
+inline double Vec2::_internal_x() const {
+  return _impl_.x_;
+}
+inline double Vec2::x() const {
+  // @@protoc_insertion_point(field_get:Vec2.x)
+  return _internal_x();
+}
+inline void Vec2::_internal_set_x(double value) {
+  
+  _impl_.x_ = value;
+}
+inline void Vec2::set_x(double value) {
+  _internal_set_x(value);
+  // @@protoc_insertion_point(field_set:Vec2.x)
+}
+
+// double y = 2;
+inline void Vec2::clear_y() {
+  _impl_.y_ = 0;
+}
+inline double Vec2::_internal_y() const {
+  return _impl_.y_;
+}
+inline double Vec2::y() const {
+  // @@protoc_insertion_point(field_get:Vec2.y)
+  return _internal_y();
+}
+inline void Vec2::_internal_set_y(double value) {
+  
+  _impl_.y_ = value;
+}
+inline void Vec2::set_y(double value) {
+  _internal_set_y(value);
+  // @@protoc_insertion_point(field_set:Vec2.y)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 

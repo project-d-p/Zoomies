@@ -59,11 +59,38 @@ ADPPlayerController::ADPPlayerController()
 	(TEXT("/Game/input/ia_cancel.ia_cancel"));
 	if (IA_CANCEL.Succeeded())
 		cancelAction = IA_CANCEL.Object;
+	
+	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
+}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction>IA_CHAT
-	(TEXT("/Game/input/ia_chat.ia_chat"));
-	if (IA_CHAT.Succeeded())
-		chatAction = IA_CHAT.Object;
+void ADPPlayerController::SendChatMessageToServer(const FString& Message)
+{
+	if (ChatManager == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ChatManager is null"));
+		return;
+	}
+	if (HasAuthority())
+	{
+		ChatManager->BroadcastChatMessage("Unknown", Message);
+	}
+	else
+	{
+		ChatManager->ServerSendChatMessage("Unknown", Message);
+	}
+}
+
+void ADPPlayerController::ReceiveChatMessage(const FString& SenderName, const FString& Message)
+{
+	if (ChatManager)
+	{
+		ChatManager->ClientReceiveChatMessage(SenderName, Message);
+	}
+}
+
+void ADPPlayerController::InitChatManager(UChatUI* ChatUI)
+{
+	ChatManager->setChatUI(ChatUI);
 }
 
 void ADPPlayerController::BeginPlay()
@@ -120,8 +147,6 @@ void ADPPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(aimAction, ETriggerEvent::Completed, this, &ADPPlayerController::AimReleased);
 		//	취소, 채팅 끄기 ( esc - UE 에디터에서 기본 단축키 변경 필요 )
 		EnhancedInputComponent->BindAction(cancelAction, ETriggerEvent::Triggered, this, &ADPPlayerController::ActionCancel);
-		//	채팅 열기 ( enter )
-		EnhancedInputComponent->BindAction(chatAction, ETriggerEvent::Triggered, this, &ADPPlayerController::OpenChat);
 	}
 }
 
@@ -163,7 +188,7 @@ void ADPPlayerController::Rotate(const FInputActionValue& value)
 	// send rotate command ( id, actionValue )
 	character->AddControllerYawInput(actionValue.X);
 	character->AddControllerPitchInput(actionValue.Y);
-	FUdpSendTask::ProtoData.set_allocated_orientation(ProtobufUtility::ConvertToFVecToVec3(character->GetControlRotation().Vector()));
+	FUdpSendTask::ProtoData.set_allocated_progess_vector(ProtobufUtility::ConvertToFVecToVec3(character->GetControlRotation().Vector()));
 }
 
 void ADPPlayerController::Active(const FInputActionValue& value)
@@ -274,11 +299,6 @@ void ADPPlayerController::ActionCancel(const FInputActionValue& value)
 	UE_LOG(LogTemp, Warning, TEXT("ActionCancel"));
 }
 
-void ADPPlayerController::OpenChat(const FInputActionValue& value)
-{
-	UE_LOG(LogTemp, Warning, TEXT("OpenChat"));
-}
-
 void ADPPlayerController::UpdatePlayer()
 {
 	Movement movement;
@@ -291,24 +311,11 @@ void ADPPlayerController::UpdatePlayer()
 	// UE_LOG(LogTemp, Warning, TEXT("Progress: %f %f %f"), movement.progess_vector().x(), movement.progess_vector().y(), movement.progess_vector().z());
 	if (movement.has_progess_vector())
 	{
-		// XXX: 추후 RightVector 메시지 수정
 		FVector rightVector = character->GetActorRightVector();
-		FVector forwardVector(movement.orientation().x(), movement.orientation().y(), movement.orientation().z());
+		FVector forwardVector = character->GetActorForwardVector();
 		FVector actionValue = FVector(movement.progess_vector().x(), movement.progess_vector().y(), movement.progess_vector().z());
 		
 		character->AddMovementInput(forwardVector, actionValue.X);
 		character->AddMovementInput(rightVector, actionValue.Y);
 	}
-
-	// XXX: 추후 PlayerPosition 메시지가 정의되어 들어오면 새롭게 정의필요. 아래 주석 코드 참조.
-
-	// PlayerPosition result = FDataHub::PlayerPositions["1"];
-	// if (result.has_position())
-	// 	character->SetActorLocation(FVector(result.position().x(), result.position().y(), result.position().z()));
-	// if (result.jumpResult)
-	// 	character->Jump();
-	// if (result.rotateResult)
-	// 	character->
-	// character->SetActorRotation();
-	// character->SetActorLocationAndRotation();
 }
