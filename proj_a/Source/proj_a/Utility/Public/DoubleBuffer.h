@@ -7,17 +7,20 @@
 class DoubleBuffer
 {
 public:
+	// consturctor, destructor, copy constructor, copy assignment operator, move constructor, move assignment operator
 	DoubleBuffer();
 	DoubleBuffer(const DoubleBuffer&) = delete;
 	DoubleBuffer& operator=(const DoubleBuffer&) = delete;
 	DoubleBuffer(DoubleBuffer&&) noexcept;
 	DoubleBuffer& operator=(DoubleBuffer&&) noexcept;
-	void Push(Message& message);
-	Message Pop();
-	void Swap();
-	int GetSizeOfReadBuffer() const;
-	bool Empty() const;
 	~DoubleBuffer();
+
+	// member functions
+	Message Pop();
+	void Push(Message& message);
+	void Swap();
+	bool Empty() const;
+	int GetSizeOfReadBuffer() const;
 private:
 	enum { READ = 0, WRITE = 1 };
 	std::queue<Message>* ptr_[2];

@@ -99,8 +99,8 @@ class Message final :
     return *internal_default_instance();
   }
   enum MessageTypeCase {
-    kMovement = 1,
-    kPlayerPosition = 2,
+    kMovement = 2,
+    kPlayerPosition = 3,
     MESSAGE_TYPE_NOT_SET = 0,
   };
 
@@ -182,11 +182,26 @@ class Message final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kTimestampFieldNumber = 3,
-    kMovementFieldNumber = 1,
-    kPlayerPositionFieldNumber = 2,
+    kPlayerIdFieldNumber = 1,
+    kTimestampFieldNumber = 4,
+    kMovementFieldNumber = 2,
+    kPlayerPositionFieldNumber = 3,
   };
-  // string timestamp = 3;
+  // string player_id = 1;
+  void clear_player_id();
+  const std::string& player_id() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_player_id(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_player_id();
+  PROTOBUF_NODISCARD std::string* release_player_id();
+  void set_allocated_player_id(std::string* player_id);
+  private:
+  const std::string& _internal_player_id() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_player_id(const std::string& value);
+  std::string* _internal_mutable_player_id();
+  public:
+
+  // string timestamp = 4;
   void clear_timestamp();
   const std::string& timestamp() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -200,7 +215,7 @@ class Message final :
   std::string* _internal_mutable_timestamp();
   public:
 
-  // .Movement movement = 1;
+  // .Movement movement = 2;
   bool has_movement() const;
   private:
   bool _internal_has_movement() const;
@@ -218,7 +233,7 @@ class Message final :
       ::Movement* movement);
   ::Movement* unsafe_arena_release_movement();
 
-  // .PlayerPosition player_position = 2;
+  // .PlayerPosition player_position = 3;
   bool has_player_position() const;
   private:
   bool _internal_has_player_position() const;
@@ -251,6 +266,7 @@ class Message final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr player_id_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr timestamp_;
     union MessageTypeUnion {
       constexpr MessageTypeUnion() : _constinit_{} {}
@@ -276,7 +292,57 @@ class Message final :
 #endif  // __GNUC__
 // Message
 
-// .Movement movement = 1;
+// string player_id = 1;
+inline void Message::clear_player_id() {
+  _impl_.player_id_.ClearToEmpty();
+}
+inline const std::string& Message::player_id() const {
+  // @@protoc_insertion_point(field_get:Message.player_id)
+  return _internal_player_id();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void Message::set_player_id(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.player_id_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Message.player_id)
+}
+inline std::string* Message::mutable_player_id() {
+  std::string* _s = _internal_mutable_player_id();
+  // @@protoc_insertion_point(field_mutable:Message.player_id)
+  return _s;
+}
+inline const std::string& Message::_internal_player_id() const {
+  return _impl_.player_id_.Get();
+}
+inline void Message::_internal_set_player_id(const std::string& value) {
+  
+  _impl_.player_id_.Set(value, GetArenaForAllocation());
+}
+inline std::string* Message::_internal_mutable_player_id() {
+  
+  return _impl_.player_id_.Mutable(GetArenaForAllocation());
+}
+inline std::string* Message::release_player_id() {
+  // @@protoc_insertion_point(field_release:Message.player_id)
+  return _impl_.player_id_.Release();
+}
+inline void Message::set_allocated_player_id(std::string* player_id) {
+  if (player_id != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.player_id_.SetAllocated(player_id, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.player_id_.IsDefault()) {
+    _impl_.player_id_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:Message.player_id)
+}
+
+// .Movement movement = 2;
 inline bool Message::_internal_has_movement() const {
   return message_type_case() == kMovement;
 }
@@ -342,7 +408,7 @@ inline ::Movement* Message::mutable_movement() {
   return _msg;
 }
 
-// .PlayerPosition player_position = 2;
+// .PlayerPosition player_position = 3;
 inline bool Message::_internal_has_player_position() const {
   return message_type_case() == kPlayerPosition;
 }
@@ -408,7 +474,7 @@ inline ::PlayerPosition* Message::mutable_player_position() {
   return _msg;
 }
 
-// string timestamp = 3;
+// string timestamp = 4;
 inline void Message::clear_timestamp() {
   _impl_.timestamp_.ClearToEmpty();
 }

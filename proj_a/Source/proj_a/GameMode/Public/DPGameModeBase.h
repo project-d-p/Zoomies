@@ -10,6 +10,7 @@
 #include "message.pb.h"
 #include "MessageEndpoint.h"
 #include "MessageQueueFilter.h"
+#include "DPPlayerController.h"
 #include "DPGameModeBase.generated.h"
 
 /**
@@ -39,19 +40,20 @@ public:
 	
 	// Destructor
 	virtual ~ADPGameModeBase() override;
+
 private:
-	void StartGameLogic(float delta_time);
+	// Implementations
+	void ProcessData(float delta_time);
 	void UpdateTime(float delta_time);
 	bool IsGameOver() const;
 	void MergeMessages();
 	
+private:
+	// Member variables
 	enum { NUM_OF_MAX_CLIENTS = 2 };
 	FListenSocketRunnable* listen_socket_ = nullptr;
 	bool b_is_game_started = false;
 	float time_accumulator_ = 0.0f;
 	MessageQueue_t message_queue_;
-private:
-	// For Replicated
-	UPROPERTY(Replicated)
-	int32 remain_time_ = 300;
+	std::map<FString, ADPPlayerController*> player_controllers_;
 };

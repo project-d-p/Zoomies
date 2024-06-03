@@ -22,7 +22,8 @@ namespace _pbi = _pb::internal;
 
 PROTOBUF_CONSTEXPR Message::Message(
     ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_.timestamp_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+    /*decltype(_impl_.player_id_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.timestamp_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.message_type_)*/{}
   , /*decltype(_impl_._cached_size_)*/{}
   , /*decltype(_impl_._oneof_case_)*/{}} {}
@@ -46,6 +47,7 @@ const uint32_t TableStruct_message_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(
   PROTOBUF_FIELD_OFFSET(::Message, _impl_._oneof_case_[0]),
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::Message, _impl_.player_id_),
   ::_pbi::kInvalidFieldOffsetTag,
   ::_pbi::kInvalidFieldOffsetTag,
   PROTOBUF_FIELD_OFFSET(::Message, _impl_.timestamp_),
@@ -61,10 +63,11 @@ static const ::_pb::Message* const file_default_instances[] = {
 
 const char descriptor_table_protodef_message_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\rmessage.proto\032\016movement.proto\032\025player_"
-  "position.proto\"w\n\007Message\022\035\n\010movement\030\001 "
-  "\001(\0132\t.MovementH\000\022*\n\017player_position\030\002 \001("
-  "\0132\017.PlayerPositionH\000\022\021\n\ttimestamp\030\003 \001(\tB"
-  "\016\n\014message_typeb\006proto3"
+  "position.proto\"\212\001\n\007Message\022\021\n\tplayer_id\030"
+  "\001 \001(\t\022\035\n\010movement\030\002 \001(\0132\t.MovementH\000\022*\n\017"
+  "player_position\030\003 \001(\0132\017.PlayerPositionH\000"
+  "\022\021\n\ttimestamp\030\004 \001(\tB\016\n\014message_typeb\006pro"
+  "to3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_message_2eproto_deps[2] = {
   &::descriptor_table_movement_2eproto,
@@ -72,7 +75,7 @@ static const ::_pbi::DescriptorTable* const descriptor_table_message_2eproto_dep
 };
 static ::_pbi::once_flag descriptor_table_message_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_message_2eproto = {
-    false, false, 183, descriptor_table_protodef_message_2eproto,
+    false, false, 203, descriptor_table_protodef_message_2eproto,
     "message.proto",
     &descriptor_table_message_2eproto_once, descriptor_table_message_2eproto_deps, 2, 1,
     schemas, file_default_instances, TableStruct_message_2eproto::offsets,
@@ -160,12 +163,21 @@ Message::Message(const Message& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   Message* const _this = this; (void)_this;
   new (&_impl_) Impl_{
-      decltype(_impl_.timestamp_){}
+      decltype(_impl_.player_id_){}
+    , decltype(_impl_.timestamp_){}
     , decltype(_impl_.message_type_){}
     , /*decltype(_impl_._cached_size_)*/{}
     , /*decltype(_impl_._oneof_case_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _impl_.player_id_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.player_id_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_player_id().empty()) {
+    _this->_impl_.player_id_.Set(from._internal_player_id(), 
+      _this->GetArenaForAllocation());
+  }
   _impl_.timestamp_.InitDefault();
   #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
     _impl_.timestamp_.Set("", GetArenaForAllocation());
@@ -198,11 +210,16 @@ inline void Message::SharedCtor(
   (void)arena;
   (void)is_message_owned;
   new (&_impl_) Impl_{
-      decltype(_impl_.timestamp_){}
+      decltype(_impl_.player_id_){}
+    , decltype(_impl_.timestamp_){}
     , decltype(_impl_.message_type_){}
     , /*decltype(_impl_._cached_size_)*/{}
     , /*decltype(_impl_._oneof_case_)*/{}
   };
+  _impl_.player_id_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.player_id_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   _impl_.timestamp_.InitDefault();
   #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
     _impl_.timestamp_.Set("", GetArenaForAllocation());
@@ -221,6 +238,7 @@ Message::~Message() {
 
 inline void Message::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.player_id_.Destroy();
   _impl_.timestamp_.Destroy();
   if (has_message_type()) {
     clear_message_type();
@@ -260,6 +278,7 @@ void Message::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  _impl_.player_id_.ClearToEmpty();
   _impl_.timestamp_.ClearToEmpty();
   clear_message_type();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
@@ -271,25 +290,35 @@ const char* Message::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) 
     uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
-      // .Movement movement = 1;
+      // string player_id = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
+          auto str = _internal_mutable_player_id();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "Message.player_id"));
+        } else
+          goto handle_unusual;
+        continue;
+      // .Movement movement = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
           ptr = ctx->ParseMessage(_internal_mutable_movement(), ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
-      // .PlayerPosition player_position = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
+      // .PlayerPosition player_position = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
           ptr = ctx->ParseMessage(_internal_mutable_player_position(), ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
-      // string timestamp = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
+      // string timestamp = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
           auto str = _internal_mutable_timestamp();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
@@ -326,28 +355,38 @@ uint8_t* Message::_InternalSerialize(
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .Movement movement = 1;
+  // string player_id = 1;
+  if (!this->_internal_player_id().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_player_id().data(), static_cast<int>(this->_internal_player_id().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "Message.player_id");
+    target = stream->WriteStringMaybeAliased(
+        1, this->_internal_player_id(), target);
+  }
+
+  // .Movement movement = 2;
   if (_internal_has_movement()) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(1, _Internal::movement(this),
+      InternalWriteMessage(2, _Internal::movement(this),
         _Internal::movement(this).GetCachedSize(), target, stream);
   }
 
-  // .PlayerPosition player_position = 2;
+  // .PlayerPosition player_position = 3;
   if (_internal_has_player_position()) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(2, _Internal::player_position(this),
+      InternalWriteMessage(3, _Internal::player_position(this),
         _Internal::player_position(this).GetCachedSize(), target, stream);
   }
 
-  // string timestamp = 3;
+  // string timestamp = 4;
   if (!this->_internal_timestamp().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_timestamp().data(), static_cast<int>(this->_internal_timestamp().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
       "Message.timestamp");
     target = stream->WriteStringMaybeAliased(
-        3, this->_internal_timestamp(), target);
+        4, this->_internal_timestamp(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -366,7 +405,14 @@ size_t Message::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // string timestamp = 3;
+  // string player_id = 1;
+  if (!this->_internal_player_id().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_player_id());
+  }
+
+  // string timestamp = 4;
   if (!this->_internal_timestamp().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
@@ -374,14 +420,14 @@ size_t Message::ByteSizeLong() const {
   }
 
   switch (message_type_case()) {
-    // .Movement movement = 1;
+    // .Movement movement = 2;
     case kMovement: {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
           *_impl_.message_type_.movement_);
       break;
     }
-    // .PlayerPosition player_position = 2;
+    // .PlayerPosition player_position = 3;
     case kPlayerPosition: {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
@@ -410,6 +456,9 @@ void Message::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOB
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (!from._internal_player_id().empty()) {
+    _this->_internal_set_player_id(from._internal_player_id());
+  }
   if (!from._internal_timestamp().empty()) {
     _this->_internal_set_timestamp(from._internal_timestamp());
   }
@@ -447,6 +496,10 @@ void Message::InternalSwap(Message* other) {
   auto* lhs_arena = GetArenaForAllocation();
   auto* rhs_arena = other->GetArenaForAllocation();
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.player_id_, lhs_arena,
+      &other->_impl_.player_id_, rhs_arena
+  );
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
       &_impl_.timestamp_, lhs_arena,
       &other->_impl_.timestamp_, rhs_arena

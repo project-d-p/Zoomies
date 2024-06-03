@@ -94,10 +94,6 @@ void FListenSocketRunnable::FillMessageQueue(MessageQueue_t& message_queue_)
 	{
 		buffer.Swap();
 		while (!buffer.Empty())
-		{
-			Message message = buffer.Pop();
-			// std::string key = message.GetTimestamp();
-			// message_queue_.push(buffer.Pop());
-		}
+			message_queue_.push(buffer.Pop());
 	}
 }

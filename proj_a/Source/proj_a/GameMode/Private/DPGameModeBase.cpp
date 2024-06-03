@@ -26,6 +26,20 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Failed to create listen socket: %hs"), UTF8_TO_TCHAR(e.what()));
 	}
+	if (newPlayer)
+	{
+		APawn* pawn = newPlayer->GetPawn();
+		if (pawn)
+		{
+			FString name = pawn->GetName();
+			UE_LOG(LogTemp, Warning, TEXT("Player name: %s"), *name);
+			player_controllers_.emplace(name, Cast<ADPPlayerController>(newPlayer));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("NO PLAYER NAME"));
+		}
+	}
 }
 
 void ADPGameModeBase::StartPlay()
@@ -38,12 +52,7 @@ void ADPGameModeBase::Tick(float delta_time)
 	Super::Tick(delta_time);
 	if (b_is_game_started)
 	{
-		if (this->IsGameOver())
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Game Over!"));
-			return ;
-		}
-		this->StartGameLogic(delta_time);
+		this->ProcessData(delta_time);
 	}
 	else
 	{
@@ -66,38 +75,17 @@ ADPGameModeBase::~ADPGameModeBase()
 {
 }
 
-void ADPGameModeBase::UpdateTime(float delta_time)
-{
-	time_accumulator_ += delta_time;
-	if (time_accumulator_ >= 1.0f)
-	{
-		remain_time_ -= 1;
-		time_accumulator_ = 0.0f;
-	}
-}
-
-bool ADPGameModeBase::IsGameOver() const
-{
-	return remain_time_ <= 0;
-}
-
-void ADPGameModeBase::StartGameLogic(float delta_time)
+void ADPGameModeBase::ProcessData(float delta_time)
 {
 	this->MergeMessages();
 	while (!this->message_queue_.empty())
 	{
 		Message message = this->message_queue_.top();
 		this->message_queue_.pop();
-		UE_LOG(LogTemp, Warning, TEXT("Message: %s"), message.DebugString().c_str());
+		ADPPlayerController* controller = this->player_controllers_[message.player_id().c_str()];
+		
 	}
 	this->UpdateTime(delta_time);
-}
-
-void ADPGameModeBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ADPGameModeBase, remain_time_);
 }
 
 void ADPGameModeBase::MergeMessages()

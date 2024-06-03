@@ -1,5 +1,8 @@
 #include "FClientHandler.h"
 
+#include "Marshaller.h"
+#include "message.pb.h"
+
 FClientHandler::FClientHandler(FSocket* client_socket, DoubleBuffer& double_buffer)
 	: client_socket_(client_socket), double_buffer_(double_buffer)
 {
@@ -22,19 +25,21 @@ FClientHandler::~FClientHandler()
 
 uint32 FClientHandler::Run()
 {
+	const int32 buffer_size = 1024;
+	TArray<uint8> data;
+	
+	data.Reserve(buffer_size);
+	data.SetNumZeroed(buffer_size);
 	while (client_socket_)
 	{
 		uint32 size;
 		while (client_socket_->HasPendingData(size))
 		{
-			uint8* data = new uint8[size];
 			int32 read = 0;
-			client_socket_->Recv(data, size, read);
-			if (read > 0)
-			{
-				UE_LOG(LogTemp, Log, TEXT("CLIENT: %s"), ANSI_TO_TCHAR((char*)data));
-			}
-			delete[] data;
+			client_socket_->Recv(data.GetData(), size, read);
+			Message msg = Marshaller::DeserializeMessage(data);
+			double_buffer_.Push(msg);
+			data.SetNumZeroed(buffer_size);
 		}
 		FPlatformProcess::Sleep(0.01f);
 	}

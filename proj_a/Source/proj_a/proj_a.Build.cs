@@ -27,7 +27,7 @@ public class proj_a : ModuleRules
 		System.Console.WriteLine("Compiling .proto files...");
 		CompileProtoFiles(protocPath, protoFilesPath, generatedProtoFilesPath);
 		//
-		
+		// 
 		PublicIncludePaths.AddRange(new string[] {
 			"proj_a/GameMode/Public",
 			"proj_a/Actor/Controller/Public",
@@ -68,6 +68,7 @@ public class proj_a : ModuleRules
 			PublicAdditionalLibraries.Add(Path.Combine(SteamSDKPath, "redistributable_bin", "win64", "steam_api64.lib"));
 			RuntimeDependencies.Add("$(ProjectDir)/Binaries/Win64/steam_api64.dll", Path.Combine(SteamSDKPath, "redistributable_bin", "win64", "steam_api64.dll"));
 			RuntimeDependencies.Add("$(ProjectDir)/steam_api64.dll", Path.Combine(SteamSDKPath, "redistributable_bin", "win64", "steam_api64.dll"));
+			PublicDefinitions.Add("_CRT_SECURE_NO_WARNINGS");
 		}
 		//System.Console.WriteLine($"SteamSDKPath: {SteamSDKPath}");
 		//System.Console.WriteLine("Steam SDK path exists");
