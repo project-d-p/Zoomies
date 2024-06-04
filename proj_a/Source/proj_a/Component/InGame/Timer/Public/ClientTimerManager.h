@@ -19,13 +19,14 @@ public:
 	float TimeRemaining;
 
 	UFUNCTION()
+	void OnRep_TimeRemaining();
+	
+	UFUNCTION()
 	void SetTimerUI(UTimerUI* inTime_Text);
 protected:
 	virtual void BeginPlay() override;
 private:
 	FTimerHandle TimerHandle;
-	UFUNCTION()
-	void OnRep_TimeRemaining();
 
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

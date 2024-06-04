@@ -14,7 +14,7 @@ void UServerTimerManager::BeginPlay()
 	Super::BeginPlay();
 }
 
-#define INTERVAL 0.1f
+#define INTERVAL 0.3f
 
 void UServerTimerManager::StartTimer(float Duration)
 {
@@ -49,5 +49,6 @@ void UServerTimerManager::SetTimeRemaining()
 	if (ADPInGameState* GS = GetWorld()->GetGameState<ADPInGameState>())
 	{
 		GS->TimerManager->SetTimeRemaining(TimeRemaining);
+		GS->TimerManager->OnRep_TimeRemaining();
 	}
 }
