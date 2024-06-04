@@ -93,7 +93,6 @@ void ADPCharacter::BeginPlay()
 	hpComponent->IsDead = false;
 	constructionComponent->placeWall = false;
 	constructionComponent->placeturret = false;
-
 	UE_LOG(LogTemp, Log, TEXT("is it replicaed: %d"), GetCharacterMovement()->GetIsReplicated());
 	TSubclassOf<ADPWeapon> gunClass = ADPWeaponGun::StaticClass();
 	if (weaponComponent) {
@@ -155,17 +154,14 @@ void ADPCharacter::ChangeAnimation()
 
 void ADPCharacter::PlaceConstructionAnimation()
 {
-	// �ൿ ���� �ִϸ��̼� ���
 }
 
 void ADPCharacter::DestroyConstructionAnimation()
 {
-	// �ൿ ���� �ִϸ��̼� ���
 }
 
 void ADPCharacter::DyingAnimation()
 {
-	// �ൿ ���� �ִϸ��̼� ���
 }
 
 // disable replication

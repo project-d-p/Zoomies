@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Steam/steam_api.h"
+#include "steam_api.h"
 #include "HAL/Runnable.h"
 #include "HAL/RunnableThread.h"
 

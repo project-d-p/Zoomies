@@ -2,8 +2,8 @@
 
 using UnrealBuildTool;
 using System.IO;
-using System.Diagnostics;
 using System;
+using System.Diagnostics;
 
 public class proj_a : ModuleRules
 {
@@ -20,20 +20,20 @@ public class proj_a : ModuleRules
 		SetProtobuf(thirdPartyDir);
 		
 		// XXX: 배포시에 컴파일 코드 삭제(혹은 주석 처리)
-		// string protocPath = "";
-		// if (Target.Platform == UnrealTargetPlatform.Win64)
-		// {
-		// 	protocPath = Path.Combine(protobufPath, "bin", "protoc.exe");
-		// }
-		// else if (Target.Platform == UnrealTargetPlatform.Mac)
-		// {
-		// 	protocPath = Path.Combine(protobufPath, "bin", "protoc");
-		// }
-		// string protoFilesPath = Path.Combine(ModuleDirectory, "Protobuf", "Proto_file");
-		// string generatedProtoFilesPath = Path.Combine(ModuleDirectory, "Protobuf", "Pb_File");
-		//
-		// System.Console.WriteLine("Compiling .proto files...");
-		// CompileProtoFiles(protocPath, protoFilesPath, generatedProtoFilesPath);
+		string protocPath = "";
+		if (Target.Platform == UnrealTargetPlatform.Win64)
+		{
+			protocPath = Path.Combine(thirdPartyDir, "Win64", "Protobuf", "bin", "protoc.exe");
+		}
+		else if (Target.Platform == UnrealTargetPlatform.Mac)
+		{
+			protocPath = Path.Combine(thirdPartyDir, "Mac", "Protobuf", "bin", "protoc");
+		}
+		string protoFilesPath = Path.Combine(ModuleDirectory, "Protobuf", "Proto_file");
+		string generatedProtoFilesPath = Path.Combine(ModuleDirectory, "Protobuf", "Pb_File");
+		
+		System.Console.WriteLine("Compiling .proto files...");
+		CompileProtoFiles(protocPath, protoFilesPath, generatedProtoFilesPath);
 		//
 		
 		PublicIncludePaths.AddRange(new string[] {
@@ -96,66 +96,76 @@ public class proj_a : ModuleRules
 
 	private void SetProtobuf(string thirdPartyDir)
 	{
-		string protobufPath = Path.Combine(thirdPartyDir, "Protobuf");
-		string abseilPath = Path.Combine(thirdPartyDir, "abseil-cpp");
-		PublicIncludePaths.Add(Path.Combine(protobufPath, "include"));
-		PublicIncludePaths.Add(Path.Combine(abseilPath, "include"));
-		
+		string wind64Path = Path.Combine(thirdPartyDir, "Win64");
+		string macPath = Path.Combine(thirdPartyDir, "Mac");
+		string protobufPath = "";
+		string abseilPath = "";
+		string grpcPath = "";
 		if (Target.Platform == UnrealTargetPlatform.Win64)
 		{
-			// Abseil
-			PublicAdditionalLibraries.Add(Path.Combine(abseilPath, "lib", "Win64", "absl_base.lib"));
-			PublicAdditionalLibraries.Add(Path.Combine(abseilPath, "lib", "Win64", "absl_city.lib"));
-			PublicAdditionalLibraries.Add(Path.Combine(abseilPath, "lib", "Win64", "absl_hash.lib"));
-			PublicAdditionalLibraries.Add(Path.Combine(abseilPath, "lib", "Win64", "absl_low_level_hash.lib"));
-			PublicAdditionalLibraries.Add(Path.Combine(abseilPath, "lib", "Win64", "absl_raw_hash.lib"));
-			PublicAdditionalLibraries.Add(Path.Combine(abseilPath, "lib", "Win64", "absl_raw_logging_internal.lib"));
-			PublicAdditionalLibraries.Add(Path.Combine(abseilPath, "lib", "Win64", "absl_throw_delegate.lib"));
-			
-			// ProtoBuf
-			PublicAdditionalLibraries.Add(Path.Combine(protobufPath, "lib", "Win64", "libprotoc.lib"));
-			PublicAdditionalLibraries.Add(Path.Combine(protobufPath, "lib", "Win64", "libprotobuf.lib"));
+			protobufPath = Path.Combine(wind64Path, "Protobuf");
+			abseilPath = Path.Combine(wind64Path, "abseil-cpp");
+			grpcPath = Path.Combine(wind64Path, "grpc");
 		}
 		else if (Target.Platform == UnrealTargetPlatform.Mac)
 		{
-			// Abseil
-			PublicAdditionalLibraries.Add(Path.Combine(abseilPath, "lib", "Mac", "libabsl_base.a"));
-			PublicAdditionalLibraries.Add(Path.Combine(abseilPath, "lib", "Mac", "libabsl_city.a"));
-			PublicAdditionalLibraries.Add(Path.Combine(abseilPath, "lib", "Mac", "libabsl_hash.a"));
-			PublicAdditionalLibraries.Add(Path.Combine(abseilPath, "lib", "Mac", "libabsl_low_level_hash.a"));
-			PublicAdditionalLibraries.Add(Path.Combine(abseilPath, "lib", "Mac", "libabsl_raw_hash.a"));
-			PublicAdditionalLibraries.Add(Path.Combine(abseilPath, "lib", "Mac", "libabsl_raw_logging_internal.a"));
-			PublicAdditionalLibraries.Add(Path.Combine(abseilPath, "lib", "Mac", "libabsl_throw_delegate.a"));
-
-			// ProtoBuf
-			PublicAdditionalLibraries.Add(Path.Combine(protobufPath, "lib", "Mac", "libprotoc.a"));
-			PublicAdditionalLibraries.Add(Path.Combine(protobufPath, "lib", "Mac", "libprotobuf.a"));
+			protobufPath = Path.Combine(macPath, "Protobuf");
+			abseilPath = Path.Combine(macPath, "abseil-cpp");
+			grpcPath = Path.Combine(macPath, "grpc");
 		}
+		if (protobufPath == "" || abseilPath == "" || grpcPath == "")
+		{
+			throw new Exception("Cant find Protobuf or Abseil path or GrpcPath.");
+		}
+
+		PublicIncludePaths.Add(Path.Combine(protobufPath, "include"));
+		PublicIncludePaths.Add(Path.Combine(abseilPath, "include"));
+		PublicIncludePaths.Add(Path.Combine(grpcPath, "include"));
+		AddAllLibrariesFromPath(Path.Combine(protobufPath, "lib"));
+		AddAllLibrariesFromPath(Path.Combine(grpcPath, "lib"));
+		AddAllLibrariesFromPath(Path.Combine(abseilPath, "lib"));
+	
 		PublicDefinitions.Add("GOOGLE_PROTOBUF_INTERNAL_DONATE_STEAL_INLINE");
 		PublicDefinitions.Add("PROTOBUF_ENABLE_DEBUG_LOGGING_MAY_LEAK_PII=0");
 	}
+
+    private void AddAllLibrariesFromPath(string path)
+    {
+        if (Directory.Exists(path))
+        {
+            string[] files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
+            foreach (string file in files)
+            {
+				PublicAdditionalLibraries.Add(file);
+            }
+        }
+        else
+        {
+            System.Console.WriteLine($"Directory {path} does not exist.");
+        }
+    }	
+
+	private void CompileProtoFiles(string protocPath, string inputPath, string outputPath)
+	{
+		var protoFiles = Directory.GetFiles(inputPath, "*.proto");
+		foreach (var protoFile in protoFiles)
+		{
+			var process = new Process();
+			process.StartInfo.FileName = protocPath;
+			process.StartInfo.Arguments = $"--proto_path={inputPath} --cpp_out={outputPath} {protoFile}";
+			process.StartInfo.UseShellExecute = false;
+			process.StartInfo.RedirectStandardOutput = true;
+			process.StartInfo.RedirectStandardError = true;
+			process.Start();
+			process.WaitForExit();
 	
-	// private void CompileProtoFiles(string protocPath, string inputPath, string outputPath)
-	// {
-	// 	var protoFiles = Directory.GetFiles(inputPath, "*.proto");
-	// 	foreach (var protoFile in protoFiles)
-	// 	{
-	// 		var process = new Process();
-	// 		process.StartInfo.FileName = protocPath;
-	// 		process.StartInfo.Arguments = $"--proto_path={inputPath} --cpp_out={outputPath} {protoFile}";
-	// 		process.StartInfo.UseShellExecute = false;
-	// 		process.StartInfo.RedirectStandardOutput = true;
-	// 		process.StartInfo.RedirectStandardError = true;
-	// 		process.Start();
-	// 		process.WaitForExit();
-	//
-	// 		string output = process.StandardOutput.ReadToEnd();
-	// 		string errors = process.StandardError.ReadToEnd();
-	// 		if (!string.IsNullOrEmpty(errors) || process.ExitCode != 0)
-	// 		{
-	// 			throw new Exception("Error compiling " + protoFile + ": " + errors);
-	// 		}
-	// 		System.Console.WriteLine(output);
-	// 	}
-	// }
+			string output = process.StandardOutput.ReadToEnd();
+			string errors = process.StandardError.ReadToEnd();
+			if (!string.IsNullOrEmpty(errors) || process.ExitCode != 0)
+			{
+				throw new Exception("Error compiling " + protoFile + ": " + errors);
+			}
+			System.Console.WriteLine(output);
+		}
+	}
 }
