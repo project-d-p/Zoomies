@@ -16,9 +16,6 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ClientReceiveChatMessage(const FString& SenderName, const FString& Message);
 
-	UFUNCTION(NetMulticast, Reliable)
-	void BroadcastChatMessage(const FString& SenderName, const FString& Message);
-
 	UFUNCTION()
 	void setChatUI(UChatUI* InChatUI);
 private:

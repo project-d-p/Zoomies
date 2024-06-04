@@ -14,6 +14,12 @@ ADPGameModeBase::ADPGameModeBase()
 	GameStateClass = ADPInGameState::StaticClass();
 
 	TimerManager = CreateDefaultSubobject<UServerTimerManager>(TEXT("TimerManager"));
+	ChatManager = CreateDefaultSubobject<UServerChatManager>(TEXT("ChatManager"));
+}
+
+void ADPGameModeBase::SendChatToAllClients(const FString& SenderName, const FString& Message)
+{
+	ChatManager->BroadcastChatMessage(SenderName, Message);
 }
 
 void ADPGameModeBase::PostLogin(APlayerController* newPlayer)

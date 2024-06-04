@@ -63,6 +63,7 @@ void UChatUI::OnChatBoxCommitted(const FText& Text, ETextCommit::Type CommitMeth
 		if (!Text.IsEmpty())
 		{
 			FString Message = Text.ToString();
+			
 			ChatBox->SetText(FText::GetEmpty());
 			DPPlayerController->SendChatMessageToServer(Message);
 		}

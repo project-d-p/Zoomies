@@ -7,7 +7,7 @@ ADPInGameState::ADPInGameState()
 {
 	bReplicates = true;
 	
-	ScoreManagerComponent = CreateDefaultSubobject<UScoreManagerComponent>(TEXT("ScoreManagerComponent"));
+	ScoreManagerComponent = CreateDefaultSubobject<UScoreManager>(TEXT("ScoreManagerComponent"));
 	TimerManager = CreateDefaultSubobject<UClientTimerManager>(TEXT("TimerManager"));
 }
 

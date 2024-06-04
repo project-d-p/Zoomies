@@ -5,7 +5,19 @@
 
 void UChatManager::ServerSendChatMessage_Implementation(const FString& SenderName, const FString& Message)
 {
-	BroadcastChatMessage(SenderName, Message);
+	UWorld* World = GetWorld();
+    if (World)
+    {
+    	AGameModeBase* GameMode = GetWorld()->GetAuthGameMode();
+    	if (GameMode)
+		{
+			ADPGameModeBase* DPGameMode = Cast<ADPGameModeBase>(GameMode);
+			if (DPGameMode)
+			{
+				DPGameMode->SendChatToAllClients(SenderName, Message);
+			}
+		}
+    }
 }
 
 bool UChatManager::ServerSendChatMessage_Validate(const FString& SenderName, const FString& Message)
@@ -18,21 +30,6 @@ void UChatManager::ClientReceiveChatMessage_Implementation(const FString& Sender
 	if (ChatUI)
 	{
 		ChatUI->AddChatMessage(SenderName, Message);
-	}
-}
-
-void UChatManager::BroadcastChatMessage_Implementation(const FString& SenderName, const FString& Message)
-{
-	if (AActor* Owner = GetOwner())
-		if (!Owner->HasAuthority())
-			return;
-	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-	{
-		ADPPlayerController* PC = Cast<ADPPlayerController>(*It);
-		if (PC)
-		{
-			PC->ReceiveChatMessage(SenderName, Message);
-		}
 	}
 }
 

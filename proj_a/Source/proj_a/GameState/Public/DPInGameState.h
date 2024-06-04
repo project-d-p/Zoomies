@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ScoreManagerComponent.h"
+#include "ScoreManager.h"
 #include "GameFramework/GameStateBase.h"
 #include "ClientTimerManager.h"
 #include "DPInGameState.generated.h"
@@ -16,7 +16,7 @@ public:
 	void InitTimerManager(UTimerUI* TimerUI);
 	
 	UPROPERTY()
-	UScoreManagerComponent* ScoreManagerComponent;
+	UScoreManager* ScoreManagerComponent;
 
 	UPROPERTY(Replicated)
 	UClientTimerManager* TimerManager;

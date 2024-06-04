@@ -7,6 +7,7 @@
 #include "InputMappingContext.h"
 #include "DPWeaponActorComponent.h"
 #include "DPConstructionActorComponent.h"
+#include "DPGameModeBase.h"
 #include "DPStateActorComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "NetComp.h"
@@ -16,6 +17,7 @@
 #include "FNetLogger.h"
 #include "FUdpSendTask.h"
 
+class ADPGameModeBase;
 DEFINE_LOG_CATEGORY(LogNetwork);
 
 ADPPlayerController::ADPPlayerController()
@@ -70,13 +72,28 @@ void ADPPlayerController::SendChatMessageToServer(const FString& Message)
 		UE_LOG(LogTemp, Warning, TEXT("ChatManager is null"));
 		return;
 	}
+	
+	APawn* PA = GetPawn();
+	FString SenderName = PA->GetName();
 	if (HasAuthority())
 	{
-		ChatManager->BroadcastChatMessage("Unknown", Message);
+		UWorld* World = GetWorld();
+		if (World)
+		{
+			AGameModeBase* GameMode = GetWorld()->GetAuthGameMode();
+			if (GameMode)
+			{
+				ADPGameModeBase* GM = Cast<ADPGameModeBase>(GameMode);
+				if (GM)
+				{
+					GM->SendChatToAllClients(SenderName, Message);
+				}
+			}
+		}
 	}
 	else
 	{
-		ChatManager->ServerSendChatMessage("Unknown", Message);
+		ChatManager->ServerSendChatMessage(SenderName, Message);
 	}
 }
 

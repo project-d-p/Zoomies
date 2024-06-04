@@ -31,6 +31,7 @@ public class proj_a : ModuleRules
 		PublicIncludePaths.AddRange(new string[] {
 			"proj_a/Actor/Controller/Public",
 			"proj_a/Actor/Character/Public",
+			"proj_a/Actor/Character/PlayerState/Public",
 			"proj_a/Component/Public",
 			"proj_a/Component/InGame/Score/Public",
 			"proj_a/Component/InGame/Chat/Public",
