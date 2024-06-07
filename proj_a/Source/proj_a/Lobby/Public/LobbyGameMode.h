@@ -6,9 +6,6 @@
 #include "GameFramework/GameModeBase.h"
 #include "LobbyGameMode.generated.h"
 
-/**
- * this class is responsible for handling the lobby game mode
- */
 UCLASS()
 class PROJ_A_API ALobbyGameMode : public AGameModeBase
 {

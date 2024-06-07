@@ -93,3 +93,6 @@ server/server/x64
 *.lastbuildstate
 *.suo
 *.db
+
+# Mac OS X Finder
+.DS_Store
