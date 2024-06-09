@@ -13,7 +13,7 @@ class PROJ_A_API AGM_MatchingLobby : public AGameModeBase
 public:
 	AGM_MatchingLobby();
 	virtual void PostLogin(APlayerController* NewPlayer) override;
-private:
 	void CheckReadyToStart();
+private:
 	void StartGame_t() const;
 };

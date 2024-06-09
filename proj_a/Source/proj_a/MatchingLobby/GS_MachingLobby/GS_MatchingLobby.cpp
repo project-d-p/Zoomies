@@ -2,38 +2,84 @@
 #include "Net/UnrealNetwork.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerState.h"
+#include "proj_a/MatchingLobby/GM_MatchingLobby/GM_MatchingLobby.h"
 
 AGS_MatchingLobby::AGS_MatchingLobby() {
+	// Set Players Num. need to be Set
 	ReadyPlayers.SetNum(2, false);
+	BestHostPlayer = nullptr;
+	LowestAveragePing = 202406071806.0f;
 	HostPlayerIndex = -1;
 }
 
-// when the ReadyPlayers array is replicated, this function is called
 void AGS_MatchingLobby::OnRep_ReadyPlayers()
 {
-	//need Ready UI changes logic
+	//ReadypPlayers array has been replicated
 }
 
 void AGS_MatchingLobby::SetPlayerReady(int32 PlayerIndex, bool bIsReady)
 {
 	int32 PlayerOrder = PlayerIndex - HostPlayerIndex;
-	//playerIndex Logging
+	if (PlayerOrder >= 0 && PlayerOrder < ReadyPlayers.Num())
+	{
+		ReadyPlayers[PlayerOrder] = bIsReady;
+	}
+	// logging
 	if (GEngine)
 	{
 		GEngine->AddOnScreenDebugMessage(
 			-1,
 			30.f,
 			FColor::Green,
-			FString::Printf(TEXT("PlayerIndex: %d try to Ready"), PlayerIndex));
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			30.f,
-			FColor::Green,
-			FString::Printf(TEXT("PlayerOrder: %d try to Ready"), PlayerOrder));
+			FString::Printf(TEXT("Player %d is %s"), PlayerIndex, bIsReady ? TEXT("Ready") : TEXT("Not Ready")));
 	}
-	if (PlayerOrder >= 0 && PlayerOrder < ReadyPlayers.Num())
+	if (HasAuthority())
 	{
-		ReadyPlayers[PlayerOrder] = bIsReady;
+		AGM_MatchingLobby* GM = GetWorld()->GetAuthGameMode<AGM_MatchingLobby>();
+		if (GM)
+		{
+			GM->CheckReadyToStart();
+		}
+	}
+}
+
+// set the ReadyPlayers array to be replicated
+void AGS_MatchingLobby::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AGS_MatchingLobby, ReadyPlayers);
+	DOREPLIFETIME(AGS_MatchingLobby, LowestAveragePing);
+	DOREPLIFETIME(AGS_MatchingLobby, BestHostPlayer);
+}
+
+bool AGS_MatchingLobby::AreAllPlayersReady()
+{
+	for (int32 i = 0; i < ReadyPlayers.Num(); ++i)
+	{
+		if (!ReadyPlayers[i])
+		{
+			return false;
+		}
+	}
+	FindFastestPlayer();
+	return true;
+}
+
+//Find the fastest player
+void AGS_MatchingLobby::FindFastestPlayer() 
+{
+	float average_ping = 0.0f;
+	APlayerState* CurrentPlayerState = GetWorld()->GetFirstPlayerController()->PlayerState;
+	
+	AGameStateBase* GameState = GetWorld()->GetGameState<AGameStateBase>();
+	if (GameState)
+	{
+		for (APlayerState* PlayerState : GameState->PlayerArray)
+		{
+			float PlayerPing = PlayerState->ExactPing;
+			average_ping += PlayerPing;
+		}
+		average_ping /= GameState->PlayerArray.Num();
 		
 		//logging
 		if (GEngine)
@@ -42,74 +88,18 @@ void AGS_MatchingLobby::SetPlayerReady(int32 PlayerIndex, bool bIsReady)
 				-1,
 				30.f,
 				FColor::Green,
-				FString::Printf(TEXT("Player %d is ready"), PlayerIndex));
+				FString::Printf(TEXT("Average Ping: %f"), average_ping));
 		}
-		OnRep_ReadyPlayers();
-	}	
+		ReportPing(CurrentPlayerState, average_ping);
+	}
 }
 
-// set the ReadyPlayers array to be replicated
-void AGS_MatchingLobby::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void AGS_MatchingLobby::ReportPing_Implementation(APlayerState* ReportingPlayer, float AveragePing)
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(AGS_MatchingLobby, ReadyPlayers);
+	if (AveragePing < LowestAveragePing)
+	{
+		LowestAveragePing = AveragePing;
+		BestHostPlayer = ReportingPlayer;
+	}
 }
 
-bool AGS_MatchingLobby::AreAllPlayersReady() const
-{
-	for (int32 i = 0; i < ReadyPlayers.Num(); ++i)
-	{
-		if (!ReadyPlayers[i])
-		{
-			//logging
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(
-					-1,
-					30.f,
-					FColor::Green,
-					FString::Printf(TEXT("Player %d is not ready"), i + HostPlayerIndex));
-			}
-			return false;
-		}
-	}
-	FindFastestPlayer();
-	//logging
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			30.f,
-			FColor::Green,
-			FString::Printf(TEXT("All players are ready")));
-	}
-	// GetWorld()->ServerTravel(TEXT("mainLevel?listen"), true);
-	return true;
-}
-
-APlayerState* AGS_MatchingLobby::FindFastestPlayer() const
-{
-	APlayerState* FastestPlayer = nullptr;
-	float LowestPing = 202406071305;
-
-	for (APlayerState* PlayerState : GetWorld()->GetGameState()->PlayerArray)
-	{
-		float PlayerPing = PlayerState->ExactPing;
-
-		if (PlayerPing < LowestPing)
-		{
-			LowestPing = PlayerPing;
-			FastestPlayer = PlayerState;
-		}
-	}
-	//logging
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			30.f,
-			FColor::Green,
-			FString::Printf(TEXT("Fastest Player: %s"), *FastestPlayer->GetPlayerName()));
-	}
-	return FastestPlayer;
-}

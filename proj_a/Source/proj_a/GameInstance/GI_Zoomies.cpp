@@ -15,7 +15,7 @@ void UGI_Zoomies::Init()
 		session_interface_ = online_subsystem_->GetSessionInterface();
 		if (!session_interface_.IsValid())
 		{
-			UE_LOG(LogTemp, Error, TEXT("Failed to get session interface"))
+			UE_LOG(LogTemp, Error, TEXT("Failed to get session interface"));	
 			return ;
 		}
 		UE_LOG(
@@ -42,7 +42,6 @@ void UGI_Zoomies::Init()
 }
 
 // matching session Functions
-
 void UGI_Zoomies::StartMatchMaking()
 {
 	FindSession_t();
@@ -53,8 +52,8 @@ void UGI_Zoomies::FindSession_t()
 	// session search settings	
 	session_search_ = MakeShareable(new FOnlineSessionSearch());
 	session_search_->bIsLanQuery = true;
-	// online testing
-	// session_search_->bIsLanQuery = false;
+		// online testing
+		// session_search_->bIsLanQuery = false;
 	session_search_->MaxSearchResults = 20;
 	session_search_->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 	
@@ -70,16 +69,6 @@ void UGI_Zoomies::FindSession_t()
 	session_interface_->FindSessions(
 		*local_player->GetPreferredUniqueNetId(),
 		session_search_.ToSharedRef());
-
-	// logging
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			30.f,
-			FColor::Cyan,
-			FString::Printf(TEXT("start finding sessions")));
-	}
 }
 
 void UGI_Zoomies::OnFindComplete(bool bWasSuccessful)
@@ -93,28 +82,11 @@ void UGI_Zoomies::OnFindComplete(bool bWasSuccessful)
 	if (bWasSuccessful && session_search_.IsValid())
 	{
 		if (session_search_->SearchResults.Num() > 0)
-		{	//logging
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(
-					-1,
-					30.f,
-					FColor::Cyan,
-					FString::Printf(TEXT("call join session")));
+		{	
 			JoinSession_t(session_search_->SearchResults[0]);
-		}
 		}
 		else
 		{
-			//logging
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(
-					-1,
-					30.f,
-					FColor::Cyan,
-					FString::Printf(TEXT("call create session")));
-			}
 			CreateSession_t();
 		}
 	}
@@ -149,16 +121,6 @@ void UGI_Zoomies::CreateSession_t()
 		*local_player->GetPreferredUniqueNetId(),
 		NAME_GameSession,
 		*session_settings_);
-	
-	//logging
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			30.f,
-			FColor::Cyan,
-			FString::Printf(TEXT("start create session")));
-	}
 }
 
 void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
@@ -171,15 +133,6 @@ void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
 	// if the session was created successfully, travel to the lobby level
 	if (bWasSuccessful)
 	{
-		//logging
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(
-				-1,
-				30.f,
-				FColor::Cyan,
-				FString::Printf(TEXT("create session success")));
-		}
 		// travel to lobby level
 		GetWorld()->ServerTravel(TEXT("matchLobby?listen"), true);
 	}
@@ -204,16 +157,6 @@ void UGI_Zoomies::JoinSession_t(const FOnlineSessionSearchResult& search_result)
 		*local_player->GetPreferredUniqueNetId(),
 		NAME_GameSession,
 		search_result);
-	
-	//logging
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			30.f,
-			FColor::Cyan,
-			FString::Printf(TEXT("start join session")));
-	}
 }
 
 void UGI_Zoomies::onJoinComplete(FName session_name, EOnJoinSessionCompleteResult::Type result)
@@ -246,15 +189,6 @@ void UGI_Zoomies::onJoinComplete(FName session_name, EOnJoinSessionCompleteResul
 			else
 			{
 				player_controller->ClientTravel(travel_url, ETravelType::TRAVEL_Absolute);
-				//logging
-				if (GEngine)
-				{
-					GEngine->AddOnScreenDebugMessage(
-						-1,
-						30.f,
-						FColor::Cyan,
-						FString::Printf(TEXT("join complete & travel to target map")));
-				}
 			}
 		}
 		else

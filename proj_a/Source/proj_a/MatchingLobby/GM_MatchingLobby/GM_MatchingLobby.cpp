@@ -17,15 +17,6 @@ void AGM_MatchingLobby::PostLogin(APlayerController* NewPlayer) {
 	if (GS->HostPlayerIndex == -1)
 	{
 		GS->HostPlayerIndex = NewPlayer->PlayerState->GetPlayerId();
-		//logging
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(
-				-1,
-				30.f,
-				FColor::Green,
-				FString::Printf(TEXT("Player %d is Host"), GS->HostPlayerIndex));
-		}
 	}
 }
 
@@ -36,15 +27,6 @@ void AGM_MatchingLobby::CheckReadyToStart()
 		AGS_MatchingLobby* GS = GetGameState<AGS_MatchingLobby>();
 		if (GS && GS->AreAllPlayersReady() && GetNumPlayers() >= 2)
 		{
-			// logging
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(
-					-1,
-					30.f,
-					FColor::Green,
-					FString::Printf(TEXT("All players are ready")));
-			}
 			StartGame_t();
 		}
 	}
