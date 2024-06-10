@@ -23,9 +23,7 @@ public class proj_a : ModuleRules
 		string protocPath = "";
 		if (Target.Platform == UnrealTargetPlatform.Win64)
 		{
-			string protobufPath = System.Environment.GetEnvironmentVariable("Protobuf");
-			protocPath = Path.Combine(protobufPath, "tools", "protobuf", "protoc.exe");
-			// protocPath = Path.Combine(thirdPartyDir, "Win64", "Protobuf", "bin", "Win64", "x64", "Release", "protoc.exe");
+			protocPath = Path.Combine(thirdPartyDir, "Win64", "Protobuf", "tools", "protobuf", "protoc.exe");
 		}
 		else if (Target.Platform == UnrealTargetPlatform.Mac)
 		{
