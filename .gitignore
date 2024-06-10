@@ -96,3 +96,6 @@ server/server/x64
 
 # Mac OS X Finder
 .DS_Store
+
+# IntelliJ IDEA 
+.idea/
