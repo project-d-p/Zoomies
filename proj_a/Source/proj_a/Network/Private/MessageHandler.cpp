@@ -15,7 +15,7 @@ FMessageHandler::FMessageHandler()
 	MessageHandlers.Add(Message::kActorPosition, FMessageDelegate::CreateLambda([](const Message& Msg)
 	{
 		// FNetLogger::GetInstance().LogInfo(TEXT("Player position update received: %s", *FString(Msg.DebugString().c_str())));
-		FDataHub::PushActorDA(Msg.actor_position());
+		FDataHub::PushActorDA(Msg);
 	}));
 }
 

@@ -16,6 +16,7 @@
 #include "FNetLogger.h"
 #include "FUdpSendTask.h"
 #include "MessageMaker.h"
+#include "PlayerName.h"
 #include "DSP/Chorus.h"
 #include "Settings/LevelEditorPlayNetworkEmulationSettings.h"
 
@@ -163,13 +164,6 @@ void ADPPlayerController::SendCompressedMovement()
 	AccumulatedForwardInput = FVector::ZeroVector;
 	AccumulatedRightInput = FVector::ZeroVector;
 }
-
-// void ADPPlayerController::Tick(float DeltaSeconds)
-// {
-// 	Super::Tick(DeltaSeconds);
-//
-// 	// UpdatePlayer();
-// }
 
 void ADPPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {

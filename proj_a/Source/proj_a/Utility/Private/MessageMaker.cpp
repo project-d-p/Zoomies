@@ -13,8 +13,8 @@ Message MessageMaker::MakeMessage(const ADPPlayerController* Controller, const F
 
 	// 올바른 방법
 	// TODO: 서버하고 클라이언트가 같은지 테스트 필요
-	msg.set_player_id(std::to_string(Controller->GetUniqueID()));
-	
+	// msg.set_player_id(TCHAR_TO_UTF8(*(Controller->GetPawn()->GetName())));
+	msg.set_player_id(PlayerName::GetNamePlayerOne());
 	Movement movement;
 	Vec3 progress_vector;
 	progress_vector.set_x(Input.X);

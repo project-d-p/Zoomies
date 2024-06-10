@@ -15,7 +15,7 @@ public:
 	// Test Data Map
 	static TMap<ID_TYPE, Movement> EchoData;
 	
-	static void PushActorDA(const ActorPosition &NewData);
+	static void PushActorDA(const Message &NewData);
 	static void PushEchoDA(const Message &NewData);
 	static void RemovePlayerDA(const ID_TYPE &playerId);
 };
