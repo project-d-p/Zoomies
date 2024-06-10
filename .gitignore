@@ -6,6 +6,9 @@ proj_a/.vsconfig
 proj_a/.idea/
 .idea/
 
+# ThirdParty
+proj_a/ThirdParty/
+
 # Compiled Object files
 *.slo
 *.lo
