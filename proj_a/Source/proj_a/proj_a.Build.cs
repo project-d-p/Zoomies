@@ -23,7 +23,9 @@ public class proj_a : ModuleRules
 		string protocPath = "";
 		if (Target.Platform == UnrealTargetPlatform.Win64)
 		{
-			protocPath = Path.Combine(thirdPartyDir, "Win64", "Protobuf", "bin", "protoc.exe");
+			string protobufPath = System.Environment.GetEnvironmentVariable("Protobuf");
+			protocPath = Path.Combine(protobufPath, "tools", "protobuf", "protoc.exe");
+			// protocPath = Path.Combine(thirdPartyDir, "Win64", "Protobuf", "bin", "Win64", "x64", "Release", "protoc.exe");
 		}
 		else if (Target.Platform == UnrealTargetPlatform.Mac)
 		{
@@ -104,8 +106,8 @@ public class proj_a : ModuleRules
 		if (Target.Platform == UnrealTargetPlatform.Win64)
 		{
 			protobufPath = Path.Combine(wind64Path, "Protobuf");
-			abseilPath = Path.Combine(wind64Path, "abseil-cpp");
-			grpcPath = Path.Combine(wind64Path, "grpc");
+			// abseilPath = Path.Combine(wind64Path, "abseil-cpp");
+			// grpcPath = Path.Combine(wind64Path, "grpc");
 		}
 		else if (Target.Platform == UnrealTargetPlatform.Mac)
 		{
@@ -113,17 +115,18 @@ public class proj_a : ModuleRules
 			abseilPath = Path.Combine(macPath, "abseil-cpp");
 			grpcPath = Path.Combine(macPath, "grpc");
 		}
-		if (protobufPath == "" || abseilPath == "" || grpcPath == "")
-		{
-			throw new Exception("Cant find Protobuf or Abseil path or GrpcPath.");
-		}
+		// if (protobufPath == "" || abseilPath == "" || grpcPath == "")
+		// {
+		// 	throw new Exception("Cant find Protobuf or Abseil path or GrpcPath.");
+		// }
 
 		PublicIncludePaths.Add(Path.Combine(protobufPath, "include"));
-		PublicIncludePaths.Add(Path.Combine(abseilPath, "include"));
-		PublicIncludePaths.Add(Path.Combine(grpcPath, "include"));
+		
+		// PublicIncludePaths.Add(Path.Combine(abseilPath, "include"));
+		// PublicIncludePaths.Add(Path.Combine(grpcPath, "include"));
 		AddAllLibrariesFromPath(Path.Combine(protobufPath, "lib"));
-		AddAllLibrariesFromPath(Path.Combine(grpcPath, "lib"));
-		AddAllLibrariesFromPath(Path.Combine(abseilPath, "lib"));
+		// AddAllLibrariesFromPath(Path.Combine(grpcPath, "lib"));
+		// AddAllLibrariesFromPath(Path.Combine(abseilPath, "lib"));
 	
 		PublicDefinitions.Add("GOOGLE_PROTOBUF_INTERNAL_DONATE_STEAL_INLINE");
 		PublicDefinitions.Add("PROTOBUF_ENABLE_DEBUG_LOGGING_MAY_LEAK_PII=0");

@@ -51,6 +51,9 @@ Plugins/*/Binaries/*
 proj_a/Binaries/*
 proj_a/Plugins/*/Binaries/*
 
+# Third party libraries
+proj_a/ThirdParty/*
+
 # Builds
 Build/*
 
