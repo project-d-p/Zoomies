@@ -2,7 +2,7 @@
 #include "DPPlayerController.h"
 #include "PlayerName.h"
 
-Message MessageMaker::MakeMessage(const ADPPlayerController* Controller, const FVector2D& Input, const FVector& Forward, const FVector& Right)
+Message MessageMaker::MakeMessage(const ADPPlayerController* Controller, const FVector2D& Input, const FVector& Forward, const FVector& Right, const FVector& Velocity)
 {
 	Message msg;
 	// msg.set_player_id(TCHAR_TO_UTF8(*(Controller->GetPawn()->GetName())));
@@ -29,6 +29,12 @@ Message MessageMaker::MakeMessage(const ADPPlayerController* Controller, const F
 	right.set_y(Right.Y);
 	right.set_z(Right.Z);
 	*movement.mutable_right_vector() = right;
+	Vec3 velocity;
+	velocity.set_x(Velocity.X);
+	velocity.set_y(Velocity.Y);
+	velocity.set_z(Velocity.Z);
+	*movement.mutable_velocity() = velocity;
+	movement.set_velocity_size(Velocity.Size());
 	// Vec3 rotation;
 	*msg.mutable_movement() = movement;
 	// msg.set_timestamp();

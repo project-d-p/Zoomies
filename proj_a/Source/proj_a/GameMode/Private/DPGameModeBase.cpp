@@ -14,7 +14,7 @@ ADPGameModeBase::ADPGameModeBase()
 	TimerManager = CreateDefaultSubobject<UServerTimerManager>(TEXT("TimerManager"));
 
 	PrimaryActorTick.bCanEverTick = true;
-	PrimaryActorTick.TickInterval = 0.01f;
+	// PrimaryActorTick.TickInterval = 0.01f;
 	bReplicates = true;
 }
 
@@ -87,7 +87,7 @@ void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void ADPGameModeBase::ProcessData(float delta_time)
 {
 	this->MergeMessages();
-	FNetLogger::EditerLog(FColor::Red, TEXT("size of message queue: %d"), this->message_queue_.size());
+	// FNetLogger::EditerLog(FColor::Red, TEXT("size of message queue: %d"), this->message_queue_.size());
 	while (!this->message_queue_.empty())
 	{
 		Message message = this->message_queue_.front();

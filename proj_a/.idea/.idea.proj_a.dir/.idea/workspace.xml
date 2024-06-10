@@ -104,21 +104,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="212ad15f-bcd5-4807-8db4-96a52264d0a8" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Component/ClientNetwork/Private/ClientReadTask.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Component/ClientNetwork/Private/ClientWriteTask.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Component/ClientNetwork/Private/DPMySocket.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Component/ClientNetwork/Public/ClientReadTask.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Component/ClientNetwork/Public/ClientWriteTask.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Component/ClientNetwork/Public/DPMySocket.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/GameMode/Private/DPGameModeBase.cpp~" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/ServerMessageHandler/Private/ServerMessageHandler.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/ServerMessageHandler/Public/ServerMessageHandler.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/ServerNetworkIO/Private/FUdpFlush.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/ServerNetworkIO/Public/FUdpFlush.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Utility/Private/MessageMaker.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Utility/Private/PlayerName.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Utility/Public/MessageMaker.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Source/proj_a/Utility/Public/PlayerName.h" afterDir="false" />
       <change afterPath="$USER_HOME$/UnrealEngine/Engine/Plugins/Marketplace/Developer/RiderLink/RiderLink.uplugin" afterDir="false" />
       <change afterPath="$USER_HOME$/UnrealEngine/Engine/Plugins/Marketplace/Developer/RiderLink/Source/RD/RD.Build.cs" afterDir="false" />
       <change afterPath="$USER_HOME$/UnrealEngine/Engine/Plugins/Marketplace/Developer/RiderLink/Source/RD/RD.cpp" afterDir="false" />
@@ -524,31 +509,22 @@
       <change beforePath="$PROJECT_DIR$/Source/proj_a/Actor/Character/Private/DPCharacter.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Actor/Character/Private/DPCharacter.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/proj_a/Actor/Character/Public/DPCharacter.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Actor/Character/Public/DPCharacter.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/proj_a/Actor/Controller/Private/DPPlayerController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Actor/Controller/Private/DPPlayerController.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Actor/Controller/Public/DPPlayerController.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Actor/Controller/Public/DPPlayerController.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Component/InGame/Timer/Private/ClientTimerManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Component/InGame/Timer/Private/ClientTimerManager.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/DataHub/Private/FDataHub.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/DataHub/Private/FDataHub.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/DataHub/Public/FDataHub.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/DataHub/Public/FDataHub.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/proj_a/GameMode/Private/DPGameModeBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/GameMode/Private/DPGameModeBase.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/GameMode/Public/DPGameModeBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/GameMode/Public/DPGameModeBase.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/GameState/Private/DPInGameState.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/GameState/Private/DPInGameState.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/GameState/Public/DPInGameState.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/GameState/Public/DPInGameState.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/Private/MessageHandler.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Network/Private/MessageHandler.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/Private/SocketManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Network/Private/SocketManager.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Network/SendTask/Private/FUdpSendTask.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Network/SendTask/Private/FUdpSendTask.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/message.pb.cc" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/message.pb.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/message.pb.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/message.pb.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/movement.pb.cc" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/movement.pb.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/movement.pb.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/movement.pb.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Proto_file/message.proto" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Proto_file/message.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/GameMode/Private/DPGameModeBase.cpp~" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/actor_position.pb.cc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/actor_position.pb.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/message.pb.cc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/message.pb.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/movement.pb.cc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/movement.pb.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/state.pb.cc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/state.pb.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/vector.pb.cc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/vector.pb.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Proto_file/movement.proto" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Proto_file/movement.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/ServerNetworkIO/Private/FClientHandler.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/ServerNetworkIO/Private/FClientHandler.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/ServerNetworkIO/Private/ListenSocket.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/ServerNetworkIO/Private/ListenSocket.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/ServerNetworkIO/Public/FClientHandler.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/ServerNetworkIO/Public/FClientHandler.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/ServerNetworkIO/Public/ListenSocket.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/ServerNetworkIO/Public/ListenSocket.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Utility/Private/DoubleBuffer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Utility/Private/DoubleBuffer.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Utility/Public/DoubleBuffer.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Utility/Public/DoubleBuffer.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/proj_a.Build.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/proj_a.Build.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proj_a.uproject" beforeDir="false" afterPath="$PROJECT_DIR$/proj_a.uproject" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Utility/Private/MessageMaker.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Utility/Private/MessageMaker.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Utility/Public/MessageMaker.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Utility/Public/MessageMaker.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Utility/Public/PlayerName.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Utility/Public/PlayerName.h" afterDir="false" />
       <change beforePath="$USER_HOME$/UnrealEngine/Engine/Source/Runtime/Engine/Classes/GameFramework/Actor.h" beforeDir="false" afterPath="$USER_HOME$/UnrealEngine/Engine/Source/Runtime/Engine/Classes/GameFramework/Actor.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -566,7 +542,6 @@
     <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../../../../../Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/include/queue" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Intermediate/Build/Win64/x64/UnrealEditor/Development/proj_a/Definitions.proj_a.h" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/proj_a/Actor/Character/Private/DPCharacter.cpp" root0="FORCE_HIGHLIGHTING" />
@@ -598,7 +573,7 @@
     <setting file="file://$PROJECT_DIR$/Source/proj_a/Utility/Private/MessageQueueFilter.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/proj_a/Utility/Public/DoubleBuffer.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Source/proj_a/proj_a.Build.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$USER_HOME$/UnrealEngine/Engine/Plugins/Marketplace/Developer/RiderLink/Source/RD/src/rd_framework_cpp/src/main/serialization/AbstractPolymorphic.h" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$USER_HOME$/UnrealEngine/Engine/Plugins/Marketplace/Developer/RiderLink/Source/RD/src/rd_framework_cpp/src/main/serialization/AbstractPolymorphic.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/UnrealEngine/Engine/Plugins/Marketplace/Developer/RiderLink/Source/RD/thirdparty/clsocket/src/ActiveSocket.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/UnrealEngine/Engine/Source/ThirdParty/GoogleTest/include/gtest/internal/gtest-internal.h" root0="SKIP_HIGHLIGHTING" />
   </component>
@@ -20421,7 +20396,7 @@
       <workItem from="1717465483999" duration="20831000" />
       <workItem from="1717503756273" duration="11199000" />
       <workItem from="1717824631097" duration="31937000" />
-      <workItem from="1717928059415" duration="17023000" />
+      <workItem from="1717928059415" duration="19522000" />
     </task>
     <task id="LOCAL-00001" summary="FEAT: 기본 네트워크 연결 마무리">
       <option name="closed" value="true" />
@@ -20468,7 +20443,8 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="FEAT: 기본 네트워크 연결 마무리" />
-    <option name="LAST_COMMIT_MESSAGE" value="FEAT: 기본 네트워크 연결 마무리" />
+    <MESSAGE value="remove&#10;Merge remote-tracking branch 'origin/feature/data-binding-ui' into feature/p2p-server&#10;&#10;# Conflicts:&#10;#&#9;proj_a/.idea/.idea.proj_a.dir/.idea/workspace.xml&#10;#&#9;proj_a/Source/proj_a/GameMode/Private/DPGameModeBase.cpp&#10;#&#9;proj_a/Source/proj_a/GameMode/Public/DPGameModeBase.h&#10;#&#9;proj_a/Source/proj_a/Protobuf/Pb_file/message.pb.cc&#10;#&#9;proj_a/Source/proj_a/Protobuf/Pb_file/message.pb.h&#10;#&#9;proj_a/Source/proj_a/Protobuf/Proto_file/message.proto" />
+    <option name="LAST_COMMIT_MESSAGE" value="" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

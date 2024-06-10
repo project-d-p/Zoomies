@@ -8,4 +8,5 @@ private:
 	static std::string player_one;
 public:
 	static std::string& GetNamePlayerOne();
+	// static std::string& GetNamePlayerTwo();
 };

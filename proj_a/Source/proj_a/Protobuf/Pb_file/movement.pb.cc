@@ -25,6 +25,8 @@ PROTOBUF_CONSTEXPR Movement::Movement(
     /*decltype(_impl_.progess_vector_)*/nullptr
   , /*decltype(_impl_.forward_vector_)*/nullptr
   , /*decltype(_impl_.right_vector_)*/nullptr
+  , /*decltype(_impl_.velocity_)*/nullptr
+  , /*decltype(_impl_.velocity_size_)*/0
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct MovementDefaultTypeInternal {
   PROTOBUF_CONSTEXPR MovementDefaultTypeInternal()
@@ -49,6 +51,8 @@ const uint32_t TableStruct_movement_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE
   PROTOBUF_FIELD_OFFSET(::Movement, _impl_.progess_vector_),
   PROTOBUF_FIELD_OFFSET(::Movement, _impl_.forward_vector_),
   PROTOBUF_FIELD_OFFSET(::Movement, _impl_.right_vector_),
+  PROTOBUF_FIELD_OFFSET(::Movement, _impl_.velocity_),
+  PROTOBUF_FIELD_OFFSET(::Movement, _impl_.velocity_size_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::Movement)},
@@ -59,17 +63,18 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_movement_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\016movement.proto\032\014vector.proto\"e\n\010Moveme"
-  "nt\022\035\n\016progess_vector\030\001 \001(\0132\005.Vec3\022\035\n\016for"
-  "ward_vector\030\002 \001(\0132\005.Vec3\022\033\n\014right_vector"
-  "\030\003 \001(\0132\005.Vec3b\006proto3"
+  "\n\016movement.proto\032\014vector.proto\"\225\001\n\010Movem"
+  "ent\022\035\n\016progess_vector\030\001 \001(\0132\005.Vec3\022\035\n\016fo"
+  "rward_vector\030\002 \001(\0132\005.Vec3\022\033\n\014right_vecto"
+  "r\030\003 \001(\0132\005.Vec3\022\027\n\010velocity\030\004 \001(\0132\005.Vec3\022"
+  "\025\n\rvelocity_size\030\005 \001(\002b\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_movement_2eproto_deps[1] = {
   &::descriptor_table_vector_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_movement_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_movement_2eproto = {
-    false, false, 141, descriptor_table_protodef_movement_2eproto,
+    false, false, 190, descriptor_table_protodef_movement_2eproto,
     "movement.proto",
     &descriptor_table_movement_2eproto_once, descriptor_table_movement_2eproto_deps, 1, 1,
     schemas, file_default_instances, TableStruct_movement_2eproto::offsets,
@@ -90,6 +95,7 @@ class Movement::_Internal {
   static const ::Vec3& progess_vector(const Movement* msg);
   static const ::Vec3& forward_vector(const Movement* msg);
   static const ::Vec3& right_vector(const Movement* msg);
+  static const ::Vec3& velocity(const Movement* msg);
 };
 
 const ::Vec3&
@@ -103,6 +109,10 @@ Movement::_Internal::forward_vector(const Movement* msg) {
 const ::Vec3&
 Movement::_Internal::right_vector(const Movement* msg) {
   return *msg->_impl_.right_vector_;
+}
+const ::Vec3&
+Movement::_Internal::velocity(const Movement* msg) {
+  return *msg->_impl_.velocity_;
 }
 void Movement::clear_progess_vector() {
   if (GetArenaForAllocation() == nullptr && _impl_.progess_vector_ != nullptr) {
@@ -122,6 +132,12 @@ void Movement::clear_right_vector() {
   }
   _impl_.right_vector_ = nullptr;
 }
+void Movement::clear_velocity() {
+  if (GetArenaForAllocation() == nullptr && _impl_.velocity_ != nullptr) {
+    delete _impl_.velocity_;
+  }
+  _impl_.velocity_ = nullptr;
+}
 Movement::Movement(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
@@ -135,6 +151,8 @@ Movement::Movement(const Movement& from)
       decltype(_impl_.progess_vector_){nullptr}
     , decltype(_impl_.forward_vector_){nullptr}
     , decltype(_impl_.right_vector_){nullptr}
+    , decltype(_impl_.velocity_){nullptr}
+    , decltype(_impl_.velocity_size_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
@@ -147,6 +165,10 @@ Movement::Movement(const Movement& from)
   if (from._internal_has_right_vector()) {
     _this->_impl_.right_vector_ = new ::Vec3(*from._impl_.right_vector_);
   }
+  if (from._internal_has_velocity()) {
+    _this->_impl_.velocity_ = new ::Vec3(*from._impl_.velocity_);
+  }
+  _this->_impl_.velocity_size_ = from._impl_.velocity_size_;
   // @@protoc_insertion_point(copy_constructor:Movement)
 }
 
@@ -158,6 +180,8 @@ inline void Movement::SharedCtor(
       decltype(_impl_.progess_vector_){nullptr}
     , decltype(_impl_.forward_vector_){nullptr}
     , decltype(_impl_.right_vector_){nullptr}
+    , decltype(_impl_.velocity_){nullptr}
+    , decltype(_impl_.velocity_size_){0}
     , /*decltype(_impl_._cached_size_)*/{}
   };
 }
@@ -176,6 +200,7 @@ inline void Movement::SharedDtor() {
   if (this != internal_default_instance()) delete _impl_.progess_vector_;
   if (this != internal_default_instance()) delete _impl_.forward_vector_;
   if (this != internal_default_instance()) delete _impl_.right_vector_;
+  if (this != internal_default_instance()) delete _impl_.velocity_;
 }
 
 void Movement::SetCachedSize(int size) const {
@@ -200,6 +225,11 @@ void Movement::Clear() {
     delete _impl_.right_vector_;
   }
   _impl_.right_vector_ = nullptr;
+  if (GetArenaForAllocation() == nullptr && _impl_.velocity_ != nullptr) {
+    delete _impl_.velocity_;
+  }
+  _impl_.velocity_ = nullptr;
+  _impl_.velocity_size_ = 0;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -230,6 +260,22 @@ const char* Movement::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx)
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
           ptr = ctx->ParseMessage(_internal_mutable_right_vector(), ptr);
           CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // .Vec3 velocity = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
+          ptr = ctx->ParseMessage(_internal_mutable_velocity(), ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // float velocity_size = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 45)) {
+          _impl_.velocity_size_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
         } else
           goto handle_unusual;
         continue;
@@ -283,6 +329,23 @@ uint8_t* Movement::_InternalSerialize(
         _Internal::right_vector(this).GetCachedSize(), target, stream);
   }
 
+  // .Vec3 velocity = 4;
+  if (this->_internal_has_velocity()) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(4, _Internal::velocity(this),
+        _Internal::velocity(this).GetCachedSize(), target, stream);
+  }
+
+  // float velocity_size = 5;
+  static_assert(sizeof(uint32_t) == sizeof(float), "Code assumes uint32_t and float are the same size.");
+  float tmp_velocity_size = this->_internal_velocity_size();
+  uint32_t raw_velocity_size;
+  memcpy(&raw_velocity_size, &tmp_velocity_size, sizeof(tmp_velocity_size));
+  if (raw_velocity_size != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteFloatToArray(5, this->_internal_velocity_size(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -320,6 +383,22 @@ size_t Movement::ByteSizeLong() const {
         *_impl_.right_vector_);
   }
 
+  // .Vec3 velocity = 4;
+  if (this->_internal_has_velocity()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *_impl_.velocity_);
+  }
+
+  // float velocity_size = 5;
+  static_assert(sizeof(uint32_t) == sizeof(float), "Code assumes uint32_t and float are the same size.");
+  float tmp_velocity_size = this->_internal_velocity_size();
+  uint32_t raw_velocity_size;
+  memcpy(&raw_velocity_size, &tmp_velocity_size, sizeof(tmp_velocity_size));
+  if (raw_velocity_size != 0) {
+    total_size += 1 + 4;
+  }
+
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
@@ -350,6 +429,17 @@ void Movement::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTO
     _this->_internal_mutable_right_vector()->::Vec3::MergeFrom(
         from._internal_right_vector());
   }
+  if (from._internal_has_velocity()) {
+    _this->_internal_mutable_velocity()->::Vec3::MergeFrom(
+        from._internal_velocity());
+  }
+  static_assert(sizeof(uint32_t) == sizeof(float), "Code assumes uint32_t and float are the same size.");
+  float tmp_velocity_size = from._internal_velocity_size();
+  uint32_t raw_velocity_size;
+  memcpy(&raw_velocity_size, &tmp_velocity_size, sizeof(tmp_velocity_size));
+  if (raw_velocity_size != 0) {
+    _this->_internal_set_velocity_size(from._internal_velocity_size());
+  }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -368,8 +458,8 @@ void Movement::InternalSwap(Movement* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(Movement, _impl_.right_vector_)
-      + sizeof(Movement::_impl_.right_vector_)
+      PROTOBUF_FIELD_OFFSET(Movement, _impl_.velocity_size_)
+      + sizeof(Movement::_impl_.velocity_size_)
       - PROTOBUF_FIELD_OFFSET(Movement, _impl_.progess_vector_)>(
           reinterpret_cast<char*>(&_impl_.progess_vector_),
           reinterpret_cast<char*>(&other->_impl_.progess_vector_));

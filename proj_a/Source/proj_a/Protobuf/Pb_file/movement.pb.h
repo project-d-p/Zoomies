@@ -178,6 +178,8 @@ class Movement final :
     kProgessVectorFieldNumber = 1,
     kForwardVectorFieldNumber = 2,
     kRightVectorFieldNumber = 3,
+    kVelocityFieldNumber = 4,
+    kVelocitySizeFieldNumber = 5,
   };
   // .Vec3 progess_vector = 1;
   bool has_progess_vector() const;
@@ -233,6 +235,33 @@ class Movement final :
       ::Vec3* right_vector);
   ::Vec3* unsafe_arena_release_right_vector();
 
+  // .Vec3 velocity = 4;
+  bool has_velocity() const;
+  private:
+  bool _internal_has_velocity() const;
+  public:
+  void clear_velocity();
+  const ::Vec3& velocity() const;
+  PROTOBUF_NODISCARD ::Vec3* release_velocity();
+  ::Vec3* mutable_velocity();
+  void set_allocated_velocity(::Vec3* velocity);
+  private:
+  const ::Vec3& _internal_velocity() const;
+  ::Vec3* _internal_mutable_velocity();
+  public:
+  void unsafe_arena_set_allocated_velocity(
+      ::Vec3* velocity);
+  ::Vec3* unsafe_arena_release_velocity();
+
+  // float velocity_size = 5;
+  void clear_velocity_size();
+  float velocity_size() const;
+  void set_velocity_size(float value);
+  private:
+  float _internal_velocity_size() const;
+  void _internal_set_velocity_size(float value);
+  public:
+
   // @@protoc_insertion_point(class_scope:Movement)
  private:
   class _Internal;
@@ -244,6 +273,8 @@ class Movement final :
     ::Vec3* progess_vector_;
     ::Vec3* forward_vector_;
     ::Vec3* right_vector_;
+    ::Vec3* velocity_;
+    float velocity_size_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -513,6 +544,111 @@ inline void Movement::set_allocated_right_vector(::Vec3* right_vector) {
   }
   _impl_.right_vector_ = right_vector;
   // @@protoc_insertion_point(field_set_allocated:Movement.right_vector)
+}
+
+// .Vec3 velocity = 4;
+inline bool Movement::_internal_has_velocity() const {
+  return this != internal_default_instance() && _impl_.velocity_ != nullptr;
+}
+inline bool Movement::has_velocity() const {
+  return _internal_has_velocity();
+}
+inline const ::Vec3& Movement::_internal_velocity() const {
+  const ::Vec3* p = _impl_.velocity_;
+  return p != nullptr ? *p : reinterpret_cast<const ::Vec3&>(
+      ::_Vec3_default_instance_);
+}
+inline const ::Vec3& Movement::velocity() const {
+  // @@protoc_insertion_point(field_get:Movement.velocity)
+  return _internal_velocity();
+}
+inline void Movement::unsafe_arena_set_allocated_velocity(
+    ::Vec3* velocity) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.velocity_);
+  }
+  _impl_.velocity_ = velocity;
+  if (velocity) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Movement.velocity)
+}
+inline ::Vec3* Movement::release_velocity() {
+  
+  ::Vec3* temp = _impl_.velocity_;
+  _impl_.velocity_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::Vec3* Movement::unsafe_arena_release_velocity() {
+  // @@protoc_insertion_point(field_release:Movement.velocity)
+  
+  ::Vec3* temp = _impl_.velocity_;
+  _impl_.velocity_ = nullptr;
+  return temp;
+}
+inline ::Vec3* Movement::_internal_mutable_velocity() {
+  
+  if (_impl_.velocity_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Vec3>(GetArenaForAllocation());
+    _impl_.velocity_ = p;
+  }
+  return _impl_.velocity_;
+}
+inline ::Vec3* Movement::mutable_velocity() {
+  ::Vec3* _msg = _internal_mutable_velocity();
+  // @@protoc_insertion_point(field_mutable:Movement.velocity)
+  return _msg;
+}
+inline void Movement::set_allocated_velocity(::Vec3* velocity) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.velocity_);
+  }
+  if (velocity) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(
+                reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(velocity));
+    if (message_arena != submessage_arena) {
+      velocity = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, velocity, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  _impl_.velocity_ = velocity;
+  // @@protoc_insertion_point(field_set_allocated:Movement.velocity)
+}
+
+// float velocity_size = 5;
+inline void Movement::clear_velocity_size() {
+  _impl_.velocity_size_ = 0;
+}
+inline float Movement::_internal_velocity_size() const {
+  return _impl_.velocity_size_;
+}
+inline float Movement::velocity_size() const {
+  // @@protoc_insertion_point(field_get:Movement.velocity_size)
+  return _internal_velocity_size();
+}
+inline void Movement::_internal_set_velocity_size(float value) {
+  
+  _impl_.velocity_size_ = value;
+}
+inline void Movement::set_velocity_size(float value) {
+  _internal_set_velocity_size(value);
+  // @@protoc_insertion_point(field_set:Movement.velocity_size)
 }
 
 #ifdef __GNUC__

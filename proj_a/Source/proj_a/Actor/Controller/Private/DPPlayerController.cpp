@@ -251,12 +251,17 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 
 	MovementCount++;
 	FNetLogger::EditerLog(FColor::Red, TEXT("MovementCount: %d"), MovementCount);
-	Message message = MessageMaker::MakeMessage(this, actionValue, forwardVector, rightVector);
+
+	FVector Velocity = character->GetCharacterMovement()->Velocity;
+	Message message = MessageMaker::MakeMessage(this, actionValue, forwardVector, rightVector, Velocity);
 	Socket->SendPacket(message);
 	
 	character->AddMovementInput(forwardVector, actionValue.X);
 	character->AddMovementInput(rightVector, actionValue.Y);
 
+	FNetLogger::EditerLog(FColor::Emerald, TEXT("Character Velocity Size: %f"), character->GetCharacterMovement()->Velocity.Size());
+	FNetLogger::EditerLog(FColor::Emerald, TEXT("Character Velocity: %f %f %f"), character->GetCharacterMovement()->Velocity.X, character->GetCharacterMovement()->Velocity.Y, character->GetCharacterMovement()->Velocity.Z);
+	
 	// character->speed = character->GetCharacterMovement()->Velocity.Size();
 }
 
@@ -425,6 +430,8 @@ void ADPPlayerController::HandleMovement(const Movement& movement, DoubleBuffer&
 	FVector forwardVector = FVector(movement.forward_vector().x(), movement.forward_vector().y(), movement.forward_vector().z());
 	FVector rightVector = FVector(movement.right_vector().x(), movement.right_vector().y(), movement.right_vector().z());
 	FVector actionValue = FVector(movement.progess_vector().x(), movement.progess_vector().y(), movement.progess_vector().z());
+	FVector velocity = FVector(movement.velocity().x(), movement.velocity().y(), movement.velocity().z());
+	float velocitySize = movement.velocity_size();
 
 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Action: %f %f %f"), actionValue.X, actionValue.Y, actionValue.Z);
 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Forward: %f %f %f"), forwardVector.X, forwardVector.Y, forwardVector.Z);
@@ -436,19 +443,13 @@ void ADPPlayerController::HandleMovement(const Movement& movement, DoubleBuffer&
 		return ;
 	}
 
-	// 컨트롤러의 방향을 기준으로 입력 벡터 변환
-	// FRotator controlRotation = character->GetControlRotation();
-	// FRotationMatrix rotationMatrix(controlRotation);
-	//
-	// FVector transformedForwardVector = rotationMatrix.TransformVector(forwardVector);
-	// FVector transformedRightVector = rotationMatrix.TransformVector(rightVector);
-
-	FVector lastVector = character->GetLastMovementInputVector();
+	character->GetCharacterMovement()->Velocity = velocity;
 	
 	ServerReceivedMovementCount++;
 	FNetLogger::EditerLog(FColor::Red, TEXT("ServerReceivedMovementCount: %d"), ServerReceivedMovementCount);
 	
 	character->AddMovementInput(forwardVector, actionValue.X);
 	character->AddMovementInput(rightVector, actionValue.Y);
-	// character->speed = character->GetCharacterMovement()->Velocity.Size();
+	FNetLogger::EditerLog(FColor::Emerald, TEXT("Character Velocity Size: %f"), character->GetCharacterMovement()->Velocity.Size());
+	FNetLogger::EditerLog(FColor::Emerald, TEXT("Character Velocity: %f %f %f"), character->GetCharacterMovement()->Velocity.X, character->GetCharacterMovement()->Velocity.Y, character->GetCharacterMovement()->Velocity.Z);
 }
