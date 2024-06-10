@@ -3,8 +3,8 @@ proj_a/.vs/
 proj_a/.vsconfig
 
 # Rider user specific files
-proj_a/.idea/*
-.idea/*
+proj_a/.idea/
+.idea/
 
 # Compiled Object files
 *.slo
