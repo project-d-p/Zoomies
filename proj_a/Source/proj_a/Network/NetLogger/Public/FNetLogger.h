@@ -9,7 +9,7 @@ public:
 		va_list ArgPtr;
 		va_start(ArgPtr, format);
 		TCHAR buffer[256];
-		vswprintf(buffer, sizeof(buffer), format, ArgPtr);
+		FCString::GetVarArgs(buffer, sizeof(buffer), format, ArgPtr);
 		va_end(ArgPtr);
 		UE_LOG(LogNetwork, Error, TEXT("%s"), buffer);
 	}
@@ -18,7 +18,7 @@ public:
 		va_list ArgPtr;
 		va_start(ArgPtr, format);
 		TCHAR buffer[256];
-		vswprintf(buffer, sizeof(buffer), format, ArgPtr);
+		FCString::GetVarArgs(buffer, sizeof(buffer), format, ArgPtr);
 		va_end(ArgPtr);
 		UE_LOG(LogNetwork, Warning, TEXT("%s"), buffer);
 	}
@@ -27,7 +27,7 @@ public:
 		va_list ArgPtr;
 		va_start(ArgPtr, format);
 		TCHAR buffer[256];
-		vswprintf(buffer, sizeof(buffer), format, ArgPtr);
+		FCString::GetVarArgs(buffer, sizeof(buffer), format, ArgPtr);
 		va_end(ArgPtr);
 		UE_LOG(LogNetwork, Log, TEXT("%s"), buffer);
 	}
