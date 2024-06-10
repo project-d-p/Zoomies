@@ -12,7 +12,8 @@ Message MessageMaker::MakeMessage(const ADPPlayerController* Controller, const F
 	// msg.set_player_id(player_id);
 
 	// 올바른 방법
-	msg.set_player_id(PlayerName::GetNamePlayerOne());
+	// TODO: 서버하고 클라이언트가 같은지 테스트 필요
+	msg.set_player_id(std::to_string(Controller->GetUniqueID()));
 	
 	Movement movement;
 	Vec3 progress_vector;

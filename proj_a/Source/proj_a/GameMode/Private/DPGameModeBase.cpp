@@ -48,9 +48,9 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 		return;
 	}
 	
-	FString name = pawn->GetName();
-	FNetLogger::EditerLog(FColor::Blue, TEXT("Player name: %s"), *name);
-	std::string key = TCHAR_TO_UTF8(*name);
+	uint32 id = newPlayer->GetUniqueID();
+	std::string key = std::to_string(id);
+	FNetLogger::EditerLog(FColor::Blue, TEXT("Player name: %s"), key);
 	player_controllers_[key] = Cast<ADPPlayerController>(newPlayer);
 }
 

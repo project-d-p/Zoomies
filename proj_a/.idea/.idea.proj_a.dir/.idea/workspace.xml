@@ -505,25 +505,9 @@
       <change afterPath="$USER_HOME$/UnrealEngine/Engine/Plugins/Marketplace/Developer/RiderLink/Source/RiderShaderInfo/RiderShaderInfo.Build.cs" afterDir="false" />
       <change afterPath="$USER_HOME$/UnrealEngine/Engine/Plugins/Marketplace/Developer/RiderLink/Source/RiderShaderInfo/RiderShaderInfo.cpp" afterDir="false" />
       <change afterPath="$USER_HOME$/UnrealEngine/Engine/Plugins/Marketplace/Developer/RiderLink/Source/RiderShaderInfo/RiderShaderInfo.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.proj_a.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.proj_a.dir/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Actor/Character/Private/DPCharacter.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Actor/Character/Private/DPCharacter.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Actor/Character/Public/DPCharacter.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Actor/Character/Public/DPCharacter.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Actor/Controller/Private/DPPlayerController.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Actor/Controller/Private/DPPlayerController.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/proj_a/GameMode/Private/DPGameModeBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/GameMode/Private/DPGameModeBase.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/GameMode/Private/DPGameModeBase.cpp~" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/actor_position.pb.cc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/actor_position.pb.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/message.pb.cc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/message.pb.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/movement.pb.cc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/movement.pb.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/state.pb.cc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/state.pb.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/vector.pb.cc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Pb_file/vector.pb.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Proto_file/movement.proto" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Proto_file/movement.proto" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/proj_a/Protobuf/Proto_file/actor_position.proto" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Protobuf/Proto_file/actor_position.proto" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/proj_a/Utility/Private/MessageMaker.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Utility/Private/MessageMaker.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/proj_a/Utility/Public/MessageMaker.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Utility/Public/MessageMaker.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/proj_a/Utility/Public/PlayerName.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/proj_a/Utility/Public/PlayerName.h" afterDir="false" />
       <change beforePath="$USER_HOME$/UnrealEngine/Engine/Source/Runtime/Engine/Classes/GameFramework/Actor.h" beforeDir="false" afterPath="$USER_HOME$/UnrealEngine/Engine/Source/Runtime/Engine/Classes/GameFramework/Actor.h" afterDir="false" />
     </list>
@@ -20396,7 +20380,7 @@
       <workItem from="1717465483999" duration="20831000" />
       <workItem from="1717503756273" duration="11199000" />
       <workItem from="1717824631097" duration="31937000" />
-      <workItem from="1717928059415" duration="19522000" />
+      <workItem from="1717928059415" duration="20908000" />
     </task>
     <task id="LOCAL-00001" summary="FEAT: 기본 네트워크 연결 마무리">
       <option name="closed" value="true" />
