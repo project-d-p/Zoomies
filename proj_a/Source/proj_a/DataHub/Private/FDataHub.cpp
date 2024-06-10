@@ -14,13 +14,13 @@ void FDataHub::PushActorDA(const ActorPosition &NewData)
     actorPosition.Add(key, NewData);
 }
 
-void FDataHub::PushEchoDA(const Movement &NewData)
+void FDataHub::PushEchoDA(const Message& NewData)
 {
     const FString key = NewData.player_id().c_str();
     if (!EchoData.Contains(key)) {
         // 새로운 데이터 생성 알림
     }
-    EchoData.Add(key, NewData);
+    EchoData.Add(key, NewData.movement());
 }
 
 void FDataHub::RemovePlayerDA(const FString &playerId)

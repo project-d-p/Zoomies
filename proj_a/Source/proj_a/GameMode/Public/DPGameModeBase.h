@@ -6,12 +6,12 @@
 #include "GameFramework/GameModeBase.h"
 #include "ListenSocket.h"
 #include <queue>
-#include <functional>
 #include "message.pb.h"
-#include "MessageEndpoint.h"
+#include "ServerMessageHandler.h"
 #include "MessageQueueFilter.h"
 #include "DPPlayerController.h"
 #include "ServerTimerManager.h"
+#include "DPInGameState.h"
 #include "DPGameModeBase.generated.h"
 
 /**
@@ -23,17 +23,13 @@ class PROJ_A_API ADPGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 
-	typedef std::priority_queue<Message, std::vector<Message>, MessageQueueFilter> MessageQueue_t;
 public:
+	// typedef std::priority_queue<Message, std::vector<Message>, MessageQueueFilter> FMessageQueue_T;
+	typedef std::queue<Message> FMessageQueue_T;
 	// Sets default values for this character's properties
 	ADPGameModeBase();
 
 	// Called when the game starts or when spawned
-	virtual void PostLogin(APlayerController* newPlayer) override;
-private:
-	UPROPERTY()
-	UServerTimerManager* TimerManager;
-public:
 	virtual void PostLogin(APlayerController* newPlayer) override;
 	virtual void StartPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -41,17 +37,12 @@ public:
 	// Called every frame
 	virtual void Tick(float delta_time) override;
 
-	// bind for RPC
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	
 	// Destructor
 	virtual ~ADPGameModeBase() override;
 
 private:
 	// Implementations
 	void ProcessData(float delta_time);
-	void UpdateTime(float delta_time);
-	bool IsGameOver() const;
 	void MergeMessages();
 	
 private:
@@ -60,6 +51,12 @@ private:
 	FListenSocketRunnable* listen_socket_ = nullptr;
 	bool b_is_game_started = false;
 	float time_accumulator_ = 0.0f;
-	MessageQueue_t message_queue_;
-	std::map<FString, ADPPlayerController*> player_controllers_;
+	FMessageQueue_T message_queue_;
+	std::map<std::string, ADPPlayerController*> player_controllers_;
+	ServerMessageHandler message_handler_;
+	
+private:
+	// Time Manager
+	UPROPERTY()
+	UServerTimerManager* TimerManager;
 };

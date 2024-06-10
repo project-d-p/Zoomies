@@ -15,6 +15,9 @@
 #include "FDataHub.h"
 #include "FNetLogger.h"
 #include "FUdpSendTask.h"
+#include "MessageMaker.h"
+#include "DSP/Chorus.h"
+#include "Settings/LevelEditorPlayNetworkEmulationSettings.h"
 
 DEFINE_LOG_CATEGORY(LogNetwork);
 
@@ -61,6 +64,7 @@ ADPPlayerController::ADPPlayerController()
 		cancelAction = IA_CANCEL.Object;
 	
 	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
+	Socket = CreateDefaultSubobject<UMySocket>(TEXT("MySocket"));
 }
 
 void ADPPlayerController::SendChatMessageToServer(const FString& Message)
@@ -93,37 +97,104 @@ void ADPPlayerController::InitChatManager(UChatUI* ChatUI)
 	ChatManager->setChatUI(ChatUI);
 }
 
+void ADPPlayerController::CreateSocket()
+{
+	this->Socket->CreateSocket();
+}
+
+void ADPPlayerController::Connect(FString ip, uint32 port)
+{
+	this->Socket->Connect(ip, port);
+}
+
+void ADPPlayerController::RunTask()
+{
+	this->Socket->RunTask();
+}
+
 void ADPPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	
 	character = Cast<ADPCharacter>(GetPawn());
-	
-	if (!character)
+	if (character)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("character null"));
-		return;
-	}
-	else {
 		state = Cast<UDPStateActorComponent>(character->GetComponentByClass(UDPStateActorComponent::StaticClass()));
 		construction = Cast<UDPConstructionActorComponent>(character->GetComponentByClass(UDPConstructionActorComponent::StaticClass()));
+	}
+	else
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("Character is null in BeginPlay"));
 	}
 	
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
 		GetLocalPlayer()))
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("Add Mapping Context [Begin Play]"));
 		SubSystem->AddMappingContext(defaultContext, 0);
+	}
+	
+	GetWorldTimerManager().SetTimer(MovementTimerHandle, this, &ADPPlayerController::SendCompressedMovement, 0.01f, true);
 }
 
-void ADPPlayerController::Tick(float DeltaSeconds)
+
+void ADPPlayerController::SendCompressedMovement()
 {
-	Super::Tick(DeltaSeconds);
-
-	UpdatePlayer();
+	if (HasAuthority())
+	{
+		return ;
+	}
+	if (AccumulatedMovementInput.IsNearlyZero())
+	{
+		return ;
+	}
+	
+	FNetLogger::EditerLog(FColor::Blue, TEXT("Send Movement[Client]: %f %f"), AccumulatedMovementInput.X, AccumulatedMovementInput.Y);
+	FNetLogger::EditerLog(FColor::Blue, TEXT("Send Forward[Client]: %f %f %f"), AccumulatedForwardInput.X, AccumulatedForwardInput.Y, AccumulatedForwardInput.Z);
+	FNetLogger::EditerLog(FColor::Blue, TEXT("Send Right[Client]: %f %f %f"), AccumulatedRightInput.X, AccumulatedRightInput.Y, AccumulatedRightInput.Z);
+	// Send Server
+	// Message message = MessageMaker::MakeMessage(this, AccumulatedMovementInput, AccumulatedForwardInput, AccumulatedRightInput);
+	// Socket->SendPacket(message);
+	AccumulatedMovementInput = FVector2D::ZeroVector;
+	AccumulatedForwardInput = FVector::ZeroVector;
+	AccumulatedRightInput = FVector::ZeroVector;
 }
+
+// void ADPPlayerController::Tick(float DeltaSeconds)
+// {
+// 	Super::Tick(DeltaSeconds);
+//
+// 	// UpdatePlayer();
+// }
 
 void ADPPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+}
+
+void ADPPlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+
+	FNetLogger::EditerLog(FColor::Red, TEXT("OnPossess"));
+	
+	character = Cast<ADPCharacter>(GetPawn());
+
+	if (!character)
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("Character is null in OnPossess"));
+		UE_LOG(LogTemp, Warning, TEXT("character null"));
+		return;
+	}
+	
+	state = Cast<UDPStateActorComponent>(character->GetComponentByClass(UDPStateActorComponent::StaticClass()));
+	construction = Cast<UDPConstructionActorComponent>(character->GetComponentByClass(UDPConstructionActorComponent::StaticClass()));
+
+	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("Add Mapping Context [On Possess]"));
+		SubSystem->AddMappingContext(defaultContext, 0);
+	}
 }
 
 void ADPPlayerController::SetupInputComponent()
@@ -154,18 +225,39 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 {
 	// UE_LOG(LogTemp, Warning, TEXT("ia_move_x : %f"), value.Get<FVector2D>().X);
 	// UE_LOG(LogTemp, Warning, TEXT("ia_move_y : %f"), value.Get<FVector2D>().Y);
-
 	const FVector2D actionValue = value.Get<FVector2D>();
 	const FRotator controlRotation = GetControlRotation();
 	const FRotator yaw(0.f, controlRotation.Yaw, 0.f);
 
 	const FVector forwardVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
+	if (HasAuthority())
+	{
+		// 해당 부분에서 서버로 이동 명령을 보내야 하나?
+		FNetLogger::EditerLog(FColor::Blue, TEXT("Send Movement[Server]: %f %f"), actionValue.X, actionValue.Y);
+	}
+	else
+	{
+		AccumulatedForwardInput = forwardVector;
+		AccumulatedRightInput = rightVector;
+		AccumulatedMovementInput += actionValue;
+		// 클라이언트면 보내야함
+		// FNetLogger::EditerLog(FColor::Blue, TEXT("Send Movement[Client]: %f %f"), actionValue.X, actionValue.Y);
+	}
+
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("actionValue: %f %f"), actionValue.X, actionValue.Y);
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("forwardVector: %f %f %f"), forwardVector.X, forwardVector.Y, forwardVector.Z);
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("rightVector: %f %f %f"), rightVector.X, rightVector.Y, rightVector.Z);
+
+	MovementCount++;
+	FNetLogger::EditerLog(FColor::Red, TEXT("MovementCount: %d"), MovementCount);
+	Message message = MessageMaker::MakeMessage(this, actionValue, forwardVector, rightVector);
+	Socket->SendPacket(message);
 	
-	// UNetComp::inputTCP(actionValue, 0);
-	UNetComp::InputUDP(actionValue);
 	character->AddMovementInput(forwardVector, actionValue.X);
 	character->AddMovementInput(rightVector, actionValue.Y);
+
+	// character->speed = character->GetCharacterMovement()->Velocity.Size();
 }
 
 void ADPPlayerController::Jump(const FInputActionValue& value)
@@ -318,4 +410,45 @@ void ADPPlayerController::UpdatePlayer()
 		character->AddMovementInput(forwardVector, actionValue.X);
 		character->AddMovementInput(rightVector, actionValue.Y);
 	}
+}
+
+/*
+ * 1. Handler Player Movement in Server (W, A, S, D) - Move Function with Movement Message
+ */
+void ADPPlayerController::HandleMovement(const Movement& movement, DoubleBuffer& udp_send_buffer)
+{
+	if (!movement.has_progess_vector())
+	{
+		return ;
+	}
+	
+	FVector forwardVector = FVector(movement.forward_vector().x(), movement.forward_vector().y(), movement.forward_vector().z());
+	FVector rightVector = FVector(movement.right_vector().x(), movement.right_vector().y(), movement.right_vector().z());
+	FVector actionValue = FVector(movement.progess_vector().x(), movement.progess_vector().y(), movement.progess_vector().z());
+
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Action: %f %f %f"), actionValue.X, actionValue.Y, actionValue.Z);
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Forward: %f %f %f"), forwardVector.X, forwardVector.Y, forwardVector.Z);
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Right: %f %f %f"), rightVector.X, rightVector.Y, rightVector.Z);
+
+	if (!character)
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("Character is null in HandleMovement"));
+		return ;
+	}
+
+	// 컨트롤러의 방향을 기준으로 입력 벡터 변환
+	// FRotator controlRotation = character->GetControlRotation();
+	// FRotationMatrix rotationMatrix(controlRotation);
+	//
+	// FVector transformedForwardVector = rotationMatrix.TransformVector(forwardVector);
+	// FVector transformedRightVector = rotationMatrix.TransformVector(rightVector);
+
+	FVector lastVector = character->GetLastMovementInputVector();
+	
+	ServerReceivedMovementCount++;
+	FNetLogger::EditerLog(FColor::Red, TEXT("ServerReceivedMovementCount: %d"), ServerReceivedMovementCount);
+	
+	character->AddMovementInput(forwardVector, actionValue.X);
+	character->AddMovementInput(rightVector, actionValue.Y);
+	// character->speed = character->GetCharacterMovement()->Velocity.Size();
 }

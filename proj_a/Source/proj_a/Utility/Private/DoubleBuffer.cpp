@@ -18,7 +18,7 @@ DoubleBuffer::~DoubleBuffer()
 	}
 }
 
-void DoubleBuffer::Push(Message& message)
+void DoubleBuffer::Push(const Message& message)
 {
 	std::lock_guard<std::mutex> lock(mutex_);
 	ptr_[WRITE]->push(message);
@@ -35,6 +35,8 @@ void DoubleBuffer::Swap()
 {
 	std::lock_guard<std::mutex> lock(mutex_);
 	std::swap(this->ptr_[0], this->ptr_[1]);
+	std::queue<Message> empty;
+	std::swap(*(this->ptr_[WRITE]), empty);
 }
 
 int DoubleBuffer::GetSizeOfReadBuffer() const
@@ -67,4 +69,10 @@ DoubleBuffer& DoubleBuffer::operator=(DoubleBuffer&& other) noexcept
 		second_buffer_ = std::move(other.second_buffer_);
 	}
 	return *this;
+}
+
+std::queue<Message> DoubleBuffer::GetReadBuffer()
+{
+	std::lock_guard<std::mutex> lock(mutex_);
+	return *ptr_[READ];
 }

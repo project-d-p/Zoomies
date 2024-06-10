@@ -29,12 +29,12 @@ void UClientTimerManager::Update()
 		if (Owner->HasAuthority())
 			return;
 	TimeRemaining = 10.0f;
-	FNetLogger::EditerLog(FColor::Magenta, TEXT("Time remaining updated: %f"), TimeRemaining);
+	// FNetLogger::EditerLog(FColor::Magenta, TEXT("Time remaining updated: %f"), TimeRemaining);
 }
 
 void UClientTimerManager::OnRep_TimeRemaining()
 {
-	FNetLogger::EditerLog(FColor::Magenta, TEXT("Time remaining updated: %f"), TimeRemaining);
+	// FNetLogger::EditerLog(FColor::Magenta, TEXT("Time remaining updated: %f"), TimeRemaining);
 }
 
 void UClientTimerManager::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

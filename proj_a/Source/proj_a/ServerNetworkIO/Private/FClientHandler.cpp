@@ -45,3 +45,8 @@ uint32 FClientHandler::Run()
 	}
 	return 0;
 }
+
+FSocket* FClientHandler::GetClientSocket() const
+{
+	return client_socket_;
+}

@@ -1,14 +1,19 @@
+
 #include "ListenSocket.h"
 #include "Networking.h"
 #include "SocketSubsystem.h"
 #include "Interfaces/IPv4/IPv4Address.h"
+#include "FUdpFlush.h"
 #include <exception>
 
 FListenSocketRunnable::FListenSocketRunnable(bool& bis_game_started)
 	: bis_game_started_(bis_game_started)
 {
 	if (this->CreateListenSocket(this->ip_, this->port_))
+	{
 		this->RunListenSocket();
+		this->RunUdpFlush();
+	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Failed to create listen socket."));
@@ -96,4 +101,15 @@ void FListenSocketRunnable::FillMessageQueue(MessageQueue_t& message_queue_)
 		while (!buffer.Empty())
 			message_queue_.push(buffer.Pop());
 	}
+}
+
+DoubleBuffer& FListenSocketRunnable::GetUdpSendBuffer()
+{
+	return this->udp_send_buffer_;
+}
+
+void FListenSocketRunnable::RunUdpFlush()
+{
+	
+	this->udp_flush_thread = FRunnableThread::Create(new FUdpFlushRunnable(this), TEXT("UdpFlushThread"));
 }

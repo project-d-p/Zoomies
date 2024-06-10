@@ -13,6 +13,6 @@ public:
 	static TMap<FString, Movement> EchoData;
 	
 	static void PushActorDA(const ActorPosition &NewData);
-	static void PushEchoDA(const Movement &NewData);
+	static void PushEchoDA(const Message &NewData);
 	static void RemovePlayerDA(const FString &playerId);
 };

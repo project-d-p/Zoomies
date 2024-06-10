@@ -18,7 +18,7 @@ ADPCharacter::ADPCharacter()
 	bReplicates = true;
 	
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	// PrimaryActorTick.bCanEverTick = true;
 
 	hpComponent = CreateDefaultSubobject<UDPHpActorComponent>(TEXT("HPComponent"));
 	constructionComponent = CreateDefaultSubobject<UDPConstructionActorComponent>(TEXT("ConstructionComponent"));
@@ -82,6 +82,10 @@ ADPCharacter::ADPCharacter()
 	}
 	// disable move replication : set bReplicateMovement to false
 	AActor::SetReplicatingMovement(false);
+	// bReplicateMovement
+
+	// Set Mass and Collision Profile
+	GetCharacterMovement()->Mass = 0.1f;
 }
 
 // Called when the game starts or when spawned
@@ -104,24 +108,33 @@ void ADPCharacter::BeginPlay()
 }
 
 // Called every frame
-void ADPCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	
-	if (GetCharacterMovement()) {
-		currentVelocity = GetCharacterMovement()->Velocity;
-		speed = currentVelocity.Size();
-	}
-	else
-		UE_LOG(LogTemp, Warning, TEXT("null GetCharacterMovement"));
+// void ADPCharacter::Tick(float DeltaTime)
+// {
+// 	Super::Tick(DeltaTime);
 
-	//UE_LOG(LogTemp, Warning, TEXT("speed : %f"), speed);
-}
+	// if (HasAuthority())
+	// {
+	// 	if (GetCharacterMovement()) {
+	// 		currentVelocity = GetCharacterMovement()->Velocity;
+	// 		speed = currentVelocity.Size();
+	// 	}
+	// 	else
+	// 		UE_LOG(LogTemp, Warning, TEXT("null GetCharacterMovement"));
+	// }
+// }
 
 // Called to bind functionality to input
 void ADPCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+bool ADPCharacter::IsLocallyControlled() const
+{
+	// Super::IsLocallyControlled();
+	if (HasAuthority())
+		return true;
+	return Super::IsLocallyControlled();
 }
 
 void ADPCharacter::PlayAimAnimation()
@@ -167,11 +180,4 @@ void ADPCharacter::DestroyConstructionAnimation()
 void ADPCharacter::DyingAnimation()
 {
 	// �ൿ ���� �ִϸ��̼� ���
-}
-
-// disable replication
-void ADPCharacter::DisableReplication()
-{
-	bReplicates = false;
-	GetCharacterMovement()->SetIsReplicated(false);
 }

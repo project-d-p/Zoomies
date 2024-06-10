@@ -62,20 +62,19 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_message_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\rmessage.proto\032\016movement.proto\032\025player_"
-  "position.proto\"\212\001\n\007Message\022\021\n\tplayer_id\030"
-  "\001 \001(\t\022\035\n\010movement\030\002 \001(\0132\t.MovementH\000\022*\n\017"
-  "player_position\030\003 \001(\0132\017.PlayerPositionH\000"
-  "\022\021\n\ttimestamp\030\004 \001(\tB\016\n\014message_typeb\006pro"
-  "to3"
+  "\n\rmessage.proto\032\016movement.proto\032\024actor_p"
+  "osition.proto\"\210\001\n\007Message\022\021\n\tplayer_id\030\001"
+  " \001(\t\022\035\n\010movement\030\002 \001(\0132\t.MovementH\000\022(\n\016a"
+  "ctor_position\030\003 \001(\0132\016.ActorPositionH\000\022\021\n"
+  "\ttimestamp\030\004 \001(\tB\016\n\014message_typeb\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_message_2eproto_deps[2] = {
+  &::descriptor_table_actor_5fposition_2eproto,
   &::descriptor_table_movement_2eproto,
-  &::descriptor_table_player_5fposition_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_message_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_message_2eproto = {
-    false, false, 203, descriptor_table_protodef_message_2eproto,
+    false, false, 200, descriptor_table_protodef_message_2eproto,
     "message.proto",
     &descriptor_table_message_2eproto_once, descriptor_table_message_2eproto_deps, 2, 1,
     schemas, file_default_instances, TableStruct_message_2eproto::offsets,
@@ -94,16 +93,16 @@ PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::_pbi::AddDescriptorsRunner dynamic_in
 class Message::_Internal {
  public:
   static const ::Movement& movement(const Message* msg);
-  static const ::PlayerPosition& player_position(const Message* msg);
+  static const ::ActorPosition& actor_position(const Message* msg);
 };
 
 const ::Movement&
 Message::_Internal::movement(const Message* msg) {
   return *msg->_impl_.message_type_.movement_;
 }
-const ::PlayerPosition&
-Message::_Internal::player_position(const Message* msg) {
-  return *msg->_impl_.message_type_.player_position_;
+const ::ActorPosition&
+Message::_Internal::actor_position(const Message* msg) {
+  return *msg->_impl_.message_type_.actor_position_;
 }
 void Message::set_allocated_movement(::Movement* movement) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
@@ -129,26 +128,26 @@ void Message::clear_movement() {
     clear_has_message_type();
   }
 }
-void Message::set_allocated_player_position(::PlayerPosition* player_position) {
+void Message::set_allocated_actor_position(::ActorPosition* actor_position) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
   clear_message_type();
-  if (player_position) {
+  if (actor_position) {
     ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
         ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(
-                reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(player_position));
+                reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(actor_position));
     if (message_arena != submessage_arena) {
-      player_position = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
-          message_arena, player_position, submessage_arena);
+      actor_position = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, actor_position, submessage_arena);
     }
-    set_has_player_position();
-    _impl_.message_type_.player_position_ = player_position;
+    set_has_actor_position();
+    _impl_.message_type_.actor_position_ = actor_position;
   }
-  // @@protoc_insertion_point(field_set_allocated:Message.player_position)
+  // @@protoc_insertion_point(field_set_allocated:Message.actor_position)
 }
-void Message::clear_player_position() {
-  if (_internal_has_player_position()) {
+void Message::clear_actor_position() {
+  if (_internal_has_actor_position()) {
     if (GetArenaForAllocation() == nullptr) {
-      delete _impl_.message_type_.player_position_;
+      delete _impl_.message_type_.actor_position_;
     }
     clear_has_message_type();
   }
@@ -193,9 +192,9 @@ Message::Message(const Message& from)
           from._internal_movement());
       break;
     }
-    case kPlayerPosition: {
-      _this->_internal_mutable_player_position()->::PlayerPosition::MergeFrom(
-          from._internal_player_position());
+    case kActorPosition: {
+      _this->_internal_mutable_actor_position()->::ActorPosition::MergeFrom(
+          from._internal_actor_position());
       break;
     }
     case MESSAGE_TYPE_NOT_SET: {
@@ -258,9 +257,9 @@ void Message::clear_message_type() {
       }
       break;
     }
-    case kPlayerPosition: {
+    case kActorPosition: {
       if (GetArenaForAllocation() == nullptr) {
-        delete _impl_.message_type_.player_position_;
+        delete _impl_.message_type_.actor_position_;
       }
       break;
     }
@@ -308,10 +307,10 @@ const char* Message::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) 
         } else
           goto handle_unusual;
         continue;
-      // .PlayerPosition player_position = 3;
+      // .ActorPosition actor_position = 3;
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
-          ptr = ctx->ParseMessage(_internal_mutable_player_position(), ptr);
+          ptr = ctx->ParseMessage(_internal_mutable_actor_position(), ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -372,11 +371,11 @@ uint8_t* Message::_InternalSerialize(
         _Internal::movement(this).GetCachedSize(), target, stream);
   }
 
-  // .PlayerPosition player_position = 3;
-  if (_internal_has_player_position()) {
+  // .ActorPosition actor_position = 3;
+  if (_internal_has_actor_position()) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(3, _Internal::player_position(this),
-        _Internal::player_position(this).GetCachedSize(), target, stream);
+      InternalWriteMessage(3, _Internal::actor_position(this),
+        _Internal::actor_position(this).GetCachedSize(), target, stream);
   }
 
   // string timestamp = 4;
@@ -427,11 +426,11 @@ size_t Message::ByteSizeLong() const {
           *_impl_.message_type_.movement_);
       break;
     }
-    // .PlayerPosition player_position = 3;
-    case kPlayerPosition: {
+    // .ActorPosition actor_position = 3;
+    case kActorPosition: {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *_impl_.message_type_.player_position_);
+          *_impl_.message_type_.actor_position_);
       break;
     }
     case MESSAGE_TYPE_NOT_SET: {
@@ -468,9 +467,9 @@ void Message::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOB
           from._internal_movement());
       break;
     }
-    case kPlayerPosition: {
-      _this->_internal_mutable_player_position()->::PlayerPosition::MergeFrom(
-          from._internal_player_position());
+    case kActorPosition: {
+      _this->_internal_mutable_actor_position()->::ActorPosition::MergeFrom(
+          from._internal_actor_position());
       break;
     }
     case MESSAGE_TYPE_NOT_SET: {

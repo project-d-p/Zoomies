@@ -10,6 +10,7 @@ class FClientHandler : public FRunnable
 {
 public:
 	FClientHandler(FSocket* client_socket, DoubleBuffer& double_buffer);
+	FSocket* GetClientSocket() const;
 	virtual  ~FClientHandler() override;
 private:
 	virtual uint32 Run() override;

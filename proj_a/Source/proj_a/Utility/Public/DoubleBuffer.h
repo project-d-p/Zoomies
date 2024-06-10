@@ -17,10 +17,11 @@ public:
 
 	// member functions
 	Message Pop();
-	void Push(Message& message);
+	void Push(const Message& message);
 	void Swap();
 	bool Empty() const;
 	int GetSizeOfReadBuffer() const;
+	std::queue<Message> GetReadBuffer();
 private:
 	enum { READ = 0, WRITE = 1 };
 	std::queue<Message>* ptr_[2];

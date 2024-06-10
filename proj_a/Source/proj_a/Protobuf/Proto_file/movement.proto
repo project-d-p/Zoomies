@@ -5,10 +5,8 @@ import "vector.proto";
 // client->Server
 
 message Movement {
-  string player_id = 1; // 플레이어의 id
   //Vec3 orientation = 2; // 플레이어의 바라보는 방향
-  //Vec2 right_vector = 3;
-  Vec3 progess_vector = 2; // 플레이어의 진행 방향
-  Vec2 Rotation = 3;
-  string timestamp = 4;
+  Vec3 progess_vector = 1; // 플레이어의 입력 키 바인딩
+  Vec3 forward_vector = 2; // 진행 방향
+  Vec3 right_vector = 3; // 오른쪽 방향
 }

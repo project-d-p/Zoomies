@@ -17,6 +17,12 @@ public:
 
 	UPROPERTY(Replicated)
 	UClientTimerManager* TimerManager;
+
+	UPROPERTY(ReplicatedUsing=OnRep_ServerTraveled)
+	bool bServerTraveled;
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UFUNCTION()
+	void OnRep_ServerTraveled() const;
 };

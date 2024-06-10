@@ -6,6 +6,9 @@
 #include "GameFramework/PlayerController.h"
 #include "InputActionValue.h"
 #include "ChatManager.h"
+#include "message.pb.h"
+#include "DoubleBuffer.h"
+#include "DPMySocket.h"
 #include "DPPlayerController.generated.h"
 
 /**
@@ -22,10 +25,18 @@ public:
 	void SendChatMessageToServer(const FString& Message);
 	void ReceiveChatMessage(const FString& SenderName, const FString& Message);
 	void InitChatManager(UChatUI* ChatUI);
+
+	void CreateSocket();
+	void Connect(FString ip, uint32 port);
+	void RunTask();
+	
+	void HandleMovement(const Movement& movement, DoubleBuffer& udp_send_buffer);
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void OnPossess(APawn* InPawn) override;
 
 private:
 	class ADPCharacter* character;
@@ -52,8 +63,22 @@ private:
 
 	UPROPERTY()
 	UChatManager* ChatManager = nullptr;
+
+	UPROPERTY()
+	UMySocket *Socket;
+
+	FTimerHandle MovementTimerHandle;
+
+	FVector2D AccumulatedMovementInput;
+	FVector AccumulatedForwardInput;
+	FVector AccumulatedRightInput;
+
+	int32 MovementCount = 0;
+	int32 ServerReceivedMovementCount = 0;
+
+	void SendCompressedMovement();
 	
-	virtual void Tick(float DeltaSeconds) override;
+	// virtual void Tick(float DeltaSeconds) override;
 	
 	void Move(const FInputActionValue& value);
 	void Jump(const FInputActionValue& value);
@@ -63,6 +88,6 @@ private:
 	void Aim(const FInputActionValue& value);
 	void AimReleased(const FInputActionValue& value);
 	void ActionCancel(const FInputActionValue& value);
-	
+
 	void UpdatePlayer(/*DataHub result*/);
 };
