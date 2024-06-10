@@ -11,8 +11,8 @@ Message MessageMaker::MakeMessage(const ADPPlayerController* Controller, const F
 	// std::string player_id("DPCharacter_1");
 	// msg.set_player_id(player_id);
 
-	// 올바른 방법
-	msg.set_player_id(PlayerName::GetNamePlayerOne());
+	// 일단 to_string 사용
+	msg.set_player_id(std::to_string(Controller->GetUniqueID()));
 	
 	Movement movement;
 	Vec3 progress_vector;
