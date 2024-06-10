@@ -1,29 +1,29 @@
 #include "FDataHub.h"
 
-TMap<FString, ActorPosition> FDataHub::actorPosition;
-TMap<FString, Movement> FDataHub::EchoData;
+TMap<ID_TYPE, ActorPosition> FDataHub::actorPosition;
+TMap<ID_TYPE, Movement> FDataHub::EchoData;
 
 //XXX: Player, Enermy 등등 각자의 Map을 가질 예정.
 
 void FDataHub::PushActorDA(const ActorPosition &NewData)
 {
-    // const FString key = NewData.player_id().c_str();
-    // if (!actorPosition.Contains(key)) {
-    //     // 새로운 데이터 생성 알림
-    // }
-    // actorPosition.Add(key, NewData);
+    const ID_TYPE key = NewData.player_id().c_str();
+    if (!actorPosition.Contains(key)) {
+        // 새로운 데이터 생성 알림
+    }
+    actorPosition.Add(key, NewData);
 }
 
 void FDataHub::PushEchoDA(const Message& NewData)
 {
-    const FString key = NewData.player_id().c_str();
+    const ID_TYPE key = NewData.player_id().c_str();
     if (!EchoData.Contains(key)) {
         // 새로운 데이터 생성 알림
     }
     EchoData.Add(key, NewData.movement());
 }
 
-void FDataHub::RemovePlayerDA(const FString &playerId)
+void FDataHub::RemovePlayerDA(const FString& playerId)
 {
     actorPosition.Remove(playerId);
 }

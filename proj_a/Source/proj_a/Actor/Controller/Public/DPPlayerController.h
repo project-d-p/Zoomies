@@ -68,6 +68,7 @@ private:
 	UMySocket *Socket;
 
 	FTimerHandle MovementTimerHandle;
+	FTimerHandle SynchronizeHandle;
 
 	FVector2D AccumulatedMovementInput;
 	FVector AccumulatedForwardInput;

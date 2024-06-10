@@ -135,6 +135,10 @@ void ADPPlayerController::BeginPlay()
 	}
 	
 	GetWorldTimerManager().SetTimer(MovementTimerHandle, this, &ADPPlayerController::SendCompressedMovement, 0.01f, true);
+	if (!HasAuthority())
+	{
+		GetWorldTimerManager().SetTimer(SynchronizeHandle, this, &ADPPlayerController::UpdatePlayer, 5.00f, true);
+	}
 }
 
 
@@ -398,23 +402,25 @@ void ADPPlayerController::ActionCancel(const FInputActionValue& value)
 
 void ADPPlayerController::UpdatePlayer()
 {
-	Movement movement;
-	if (!FDataHub::EchoData.Contains("player1")) {
+	ActorPosition actorPosition;
+	const FString PlayerId = std::to_string(GetUniqueID()).c_str();
+	if (!FDataHub::actorPosition.Contains(PlayerId))
+	{
+		/** 포함되지 않았을 경우 */
 		// UE_LOG(LogNetwork, Warning, TEXT("Player 1 data not found"));
 		return;
 	}
-	movement = FDataHub::EchoData["player1"];
-
-	// UE_LOG(LogTemp, Warning, TEXT("Progress: %f %f %f"), movement.progess_vector().x(), movement.progess_vector().y(), movement.progess_vector().z());
-	if (movement.has_progess_vector())
-	{
-		FVector rightVector = character->GetActorRightVector();
-		FVector forwardVector = character->GetActorForwardVector();
-		FVector actionValue = FVector(movement.progess_vector().x(), movement.progess_vector().y(), movement.progess_vector().z());
-		
-		character->AddMovementInput(forwardVector, actionValue.X);
-		character->AddMovementInput(rightVector, actionValue.Y);
-	}
+	actorPosition = FDataHub::actorPosition[PlayerId];
+	// if (actorPosition.Position.IsSet())
+	// {
+	// 	FVector NewLocation = actorPosition.Position.GetValue();
+	// 	AActor* ControlledActor = GetPawn();
+	//
+	// 	if (ControlledActor)
+	// 	{
+	// 		ControlledActor->SetActorLocation(NewLocation);
+	// 	}
+	// }
 }
 
 /*
