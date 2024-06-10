@@ -6,12 +6,10 @@
 #include "GameFramework/PlayerController.h"
 #include "InputActionValue.h"
 #include "ChatManager.h"
-#include "ClientTimerManager.h"
 #include "DPPlayerController.generated.h"
 
-/**
- * 
- */
+class UPlayerScoreComp;
+
 UCLASS()
 class PROJ_A_API ADPPlayerController : public APlayerController
 {
@@ -23,6 +21,8 @@ public:
 	void SendChatMessageToServer(const FString& Message);
 	void ReceiveChatMessage(const FString& SenderName, const FString& Message);
 	void InitChatManager(UChatUI* ChatUI);
+
+	UPlayerScoreComp* GetScoreManagerComponent() const;
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;

@@ -26,7 +26,4 @@ private:
 	FTimerHandle TimerHandle;
 	float TimeRemaining;
 	float TimerDuration;
-
-	UPROPERTY()
-	UTimerUI* TimerUI = nullptr;
 };

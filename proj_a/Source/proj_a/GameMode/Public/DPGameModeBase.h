@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ScoreManager.h"
 #include "ServerChatManager.h"
 #include "GameFramework/GameModeBase.h"
 #include "ServerTimerManager.h"
@@ -18,14 +19,18 @@ class PROJ_A_API ADPGameModeBase : public AGameModeBase
 public:
 	ADPGameModeBase();
 
-	void SendChatToAllClients(const FString& SenderName, const FString& Message); 
+	void SendChatToAllClients(const FString& SenderName, const FString& Message);
+
+	/** 테스트를 위해서 임시로 public에 선언 */
+	UPROPERTY()
+	UScoreManagerComp* ScoreManager;
 private:
 	UPROPERTY()
 	UServerTimerManager* TimerManager;
 	UPROPERTY()
 	UServerChatManager* ChatManager;
+	
 public:
-	virtual void PostLogin(APlayerController* newPlayer) override;
 	virtual void StartPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 };

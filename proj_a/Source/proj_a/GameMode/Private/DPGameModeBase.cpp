@@ -4,6 +4,8 @@
 #include "DPCharacter.h"
 #include "DPInGameState.h"
 #include "DPPlayerController.h"
+#include "DPPlayerState.h"
+#include "FNetLogger.h"
 #include "SocketManager.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -11,20 +13,17 @@ ADPGameModeBase::ADPGameModeBase()
 {
 	DefaultPawnClass = ADPCharacter::StaticClass();
 	PlayerControllerClass = ADPPlayerController::StaticClass();
+	PlayerStateClass = ADPPlayerState::StaticClass();
 	GameStateClass = ADPInGameState::StaticClass();
 
 	TimerManager = CreateDefaultSubobject<UServerTimerManager>(TEXT("TimerManager"));
 	ChatManager = CreateDefaultSubobject<UServerChatManager>(TEXT("ChatManager"));
+	ScoreManager = CreateDefaultSubobject<UScoreManagerComp>(TEXT("ScoreManager"));
 }
 
 void ADPGameModeBase::SendChatToAllClients(const FString& SenderName, const FString& Message)
 {
 	ChatManager->BroadcastChatMessage(SenderName, Message);
-}
-
-void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
-{
-	Super::PostLogin(newPlayer);
 }
 
 void ADPGameModeBase::StartPlay()

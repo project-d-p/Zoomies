@@ -1,28 +1,30 @@
 #include "GameHelper.h"
+
+#include "DPGameModeBase.h"
 #include "Engine/World.h"
 #include "GameFramework/GameModeBase.h"
 #include "GameFramework/GameStateBase.h"
 
-UWorld* UGameHelper::GetWorldFromContext(UObject* ContextObject)
+ADPGameModeBase* UGameHelper::GetInGameMode(UWorld* World)
 {
-	if (!ContextObject) return nullptr;
-	return ContextObject->GetWorld();
-}
-
-AGameModeBase* UGameHelper::GetGameMode(UObject* ContextObject)
-{
-	if (UWorld* World = GetWorldFromContext(ContextObject))
+	if (World)
 	{
-		return World->GetAuthGameMode<AGameModeBase>();
+		if (AGameModeBase* GameMode = World->GetAuthGameMode())
+		{
+			if (ADPGameModeBase* DPGameMode = Cast<ADPGameModeBase>(GameMode))
+			{
+				return DPGameMode;
+			}
+		}
 	}
 	return nullptr;
 }
 
-AGameStateBase* UGameHelper::GetGameState(UObject* ContextObject)
+AGameStateBase* UGameHelper::GetInGameState(UObject* ContextObject)
 {
-	if (UWorld* World = GetWorldFromContext(ContextObject))
-	{
-		return World->GetGameState<AGameStateBase>();
-	}
+	// if (UWorld* World = GetWorldFromContext(ContextObject))
+	// {
+	// 	return World->GetGameState<AGameStateBase>();
+	// }
 	return nullptr;
 }

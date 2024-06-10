@@ -6,7 +6,6 @@
 UClientTimerManager::UClientTimerManager()
 {
 	SetIsReplicatedByDefault(true);
-	// PrimaryComponentTick.bCanEverTick = true;
 
 	TimeRemaining = 0.0f;
 }

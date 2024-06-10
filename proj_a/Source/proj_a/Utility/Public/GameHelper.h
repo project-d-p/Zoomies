@@ -10,11 +10,8 @@ class PROJ_A_API UGameHelper : public UObject
 	GENERATED_BODY()
 public:
 	UFUNCTION()
-	static UWorld* GetWorldFromContext(UObject* ContextObject);
+	static ADPGameModeBase* GetInGameMode(UWorld* World);
 	
 	UFUNCTION()
-	static AGameModeBase* GetGameMode(UObject* ContextObject);
-	
-	UFUNCTION()
-	static AGameStateBase* GetGameState(UObject* ContextObject);
+	static AGameStateBase* GetInGameState(UObject* ContextObject);
 };

@@ -1,15 +1,29 @@
 #include "DPPlayerState.h"
 
+#include "FNetLogger.h"
+#include "PlayerScoreComp.h"
 #include "Net/UnrealNetwork.h"
 
 ADPPlayerState::ADPPlayerState()
 {
-	bReplicates = true;
+	// bReplicates = true;
+	
+	PlayerScoreComp = CreateDefaultSubobject<UPlayerScoreComp>(TEXT("PlayerScore"));
 }
 
-void ADPPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+UPlayerScoreComp* ADPPlayerState::GetPlayerScoreComp() const
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ADPPlayerState, ScoreManager);
+	return PlayerScoreComp;
 }
+
+void ADPPlayerState::BeginPlay()
+{
+	Super::BeginPlay();
+}
+//
+// void ADPPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+// {
+// 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+//
+// 	DOREPLIFETIME(ADPPlayerState, PlayerScoreComp);
+// }

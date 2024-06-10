@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "TimerUI.h"
+#include "ScoreUI.h"
 #include "DPIngameWidget.generated.h"
 
 /**
@@ -19,7 +20,18 @@ public:
 protected:
 	UPROPERTY()
 	UTimerUI* TimerUI = nullptr;
+	UPROPERTY()
+	UScoreUI* ScoreUI = nullptr;
 	
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* Time_Text;
+	UTextBlock* Time_Text;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* score_Text;
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* player1Score_Text;
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* player2Score_Text;
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* player3Score_Text;
 };

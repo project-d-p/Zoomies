@@ -1,29 +1,33 @@
 #include "ScoreManager.h"
-#include "Net/UnrealNetwork.h"
 
-UScoreManager::UScoreManager()
+#include "DPInGameState.h"
+#include "DPPlayerController.h"
+#include "FNetLogger.h"
+#include "PlayerScoreComp.h"
+
+UScoreManagerComp::UScoreManagerComp()
 {
-	SetIsReplicatedByDefault(true);
+	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UScoreManager::BeginPlay()
+void UScoreManagerComp::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void UScoreManager::IncreasePlayerScore_Implementation(int32 Amount)
+void UScoreManagerComp::IncreasePlayerScore(APlayerController* PlayerController, int32 ScoreAmount)
 {
-	PlayerScores += Amount;
-}
+	if (PlayerController == nullptr) return;
 
-void UScoreManager::OnRep_PlayerScoresUpdated()
-{
-	// UI 업데이트 로직 추가
-}
-
-void UScoreManager::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	ADPPlayerController* PC = Cast<ADPPlayerController>(PlayerController);
+	if (PC == nullptr || PC->PlayerState == nullptr) return;
 	
-	DOREPLIFETIME(UScoreManager, PlayerScores);
+	UPlayerScoreComp* SM = PC->GetScoreManagerComponent();
+	if (SM == nullptr) return;
+
+	FNetLogger::EditerLog(FColor::Blue, TEXT("player ID: %d"), PC->PlayerState->GetPlayerId());
+	int32 CurrentScore = SM->PlayerScores;
+	SM->PlayerScores = CurrentScore + ScoreAmount;
+
+	SM->OnRep_PlayerScores();
 }

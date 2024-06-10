@@ -6,7 +6,6 @@ UServerTimerManager::UServerTimerManager()
 	: TimeRemaining(0), TimerDuration(0)
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	// PrimaryComponentTick.bCanEverTick = false;
 }
 
 void UServerTimerManager::BeginPlay()

@@ -8,6 +8,8 @@
 #include "DPWeaponActorComponent.h"
 #include "DPConstructionActorComponent.h"
 #include "DPGameModeBase.h"
+#include "DPInGameState.h"
+#include "DPPlayerState.h"
 #include "DPStateActorComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "NetComp.h"
@@ -16,6 +18,7 @@
 #include "FDataHub.h"
 #include "FNetLogger.h"
 #include "FUdpSendTask.h"
+#include "GameHelper.h"
 
 class ADPGameModeBase;
 DEFINE_LOG_CATEGORY(LogNetwork);
@@ -77,18 +80,10 @@ void ADPPlayerController::SendChatMessageToServer(const FString& Message)
 	FString SenderName = PA->GetName();
 	if (HasAuthority())
 	{
-		UWorld* World = GetWorld();
-		if (World)
+		ADPGameModeBase* GM = UGameHelper::GetInGameMode(GetWorld());
+		if (GM)
 		{
-			AGameModeBase* GameMode = GetWorld()->GetAuthGameMode();
-			if (GameMode)
-			{
-				ADPGameModeBase* GM = Cast<ADPGameModeBase>(GameMode);
-				if (GM)
-				{
-					GM->SendChatToAllClients(SenderName, Message);
-				}
-			}
+			GM->SendChatToAllClients(SenderName, Message);
 		}
 	}
 	else
@@ -108,6 +103,15 @@ void ADPPlayerController::ReceiveChatMessage(const FString& SenderName, const FS
 void ADPPlayerController::InitChatManager(UChatUI* ChatUI)
 {
 	ChatManager->setChatUI(ChatUI);
+}
+
+UPlayerScoreComp* ADPPlayerController::GetScoreManagerComponent() const
+{
+	if (PlayerState == nullptr)
+	{
+		return nullptr;
+	}
+	return Cast<ADPPlayerState>(PlayerState)->GetPlayerScoreComp();
 }
 
 void ADPPlayerController::BeginPlay()

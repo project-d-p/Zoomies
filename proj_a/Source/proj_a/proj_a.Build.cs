@@ -37,6 +37,7 @@ public class proj_a : ModuleRules
 			"proj_a/Component/InGame/Chat/Public",
 			"proj_a/Component/InGame/Timer/Public",
             "proj_a/Widget/Public",
+            "proj_a/Widget/InGame/Public",
             "proj_a/DataHub/Public",
 			"proj_a/Network/Public",
 			"proj_a/Network/NetLogger/Public",

@@ -1,23 +1,15 @@
 #include "ChatManager.h"
 
 #include "DPGameModeBase.h"
-#include "DPPlayerController.h"
+#include "GameHelper.h"
 
 void UChatManager::ServerSendChatMessage_Implementation(const FString& SenderName, const FString& Message)
 {
-	UWorld* World = GetWorld();
-    if (World)
-    {
-    	AGameModeBase* GameMode = GetWorld()->GetAuthGameMode();
-    	if (GameMode)
-		{
-			ADPGameModeBase* DPGameMode = Cast<ADPGameModeBase>(GameMode);
-			if (DPGameMode)
-			{
-				DPGameMode->SendChatToAllClients(SenderName, Message);
-			}
-		}
-    }
+	ADPGameModeBase* DPGameMode = UGameHelper::GetInGameMode(GetWorld());
+	if (DPGameMode)
+	{
+		DPGameMode->SendChatToAllClients(SenderName, Message);
+	}
 }
 
 bool UChatManager::ServerSendChatMessage_Validate(const FString& SenderName, const FString& Message)

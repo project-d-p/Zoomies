@@ -1,19 +1,28 @@
 #include "DPInGameState.h"
 
+#include "DPPlayerState.h"
 #include "FNetLogger.h"
 #include "Net/UnrealNetwork.h"
 
 ADPInGameState::ADPInGameState()
 {
 	bReplicates = true;
-	
-	ScoreManagerComponent = CreateDefaultSubobject<UScoreManager>(TEXT("ScoreManagerComponent"));
 	TimerManager = CreateDefaultSubobject<UClientTimerManager>(TEXT("TimerManager"));
+	ScoreManager = CreateDefaultSubobject<UClientScoreMananger>(TEXT("ScoreManager"));
 }
 
-void ADPInGameState::InitTimerManager(UTimerUI* TimerUI)
+void ADPInGameState::AddPlayerState(APlayerState* PlayerState)
 {
-	TimerManager->SetTimerUI(TimerUI);
+	Super::AddPlayerState(PlayerState);
+
+	ScoreManager->InitScoreUi();
+}
+
+void ADPInGameState::BeginPlay()
+{
+	Super::BeginPlay();
+
+	ScoreManager->InitScoreUi();
 }
 
 void ADPInGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -21,5 +30,5 @@ void ADPInGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ADPInGameState, TimerManager);
-	// DOREPLIFETIME(ADPInGameState, ScoreManagerComponent);
+	DOREPLIFETIME(ADPInGameState, ScoreManager);
 }
