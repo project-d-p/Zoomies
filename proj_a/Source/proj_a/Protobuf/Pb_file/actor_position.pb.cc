@@ -22,12 +22,7 @@ namespace _pbi = _pb::internal;
 
 PROTOBUF_CONSTEXPR ActorPosition::ActorPosition(
     ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_.player_id_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
-  , /*decltype(_impl_.timestamp_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
-  , /*decltype(_impl_.position_)*/nullptr
-  , /*decltype(_impl_.orientation_)*/nullptr
-  , /*decltype(_impl_.righ_vector_)*/nullptr
-  , /*decltype(_impl_.state_)*/0
+    /*decltype(_impl_.position_)*/nullptr
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct ActorPositionDefaultTypeInternal {
   PROTOBUF_CONSTEXPR ActorPositionDefaultTypeInternal()
@@ -49,12 +44,7 @@ const uint32_t TableStruct_actor_5fposition_2eproto::offsets[] PROTOBUF_SECTION_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::ActorPosition, _impl_.player_id_),
   PROTOBUF_FIELD_OFFSET(::ActorPosition, _impl_.position_),
-  PROTOBUF_FIELD_OFFSET(::ActorPosition, _impl_.orientation_),
-  PROTOBUF_FIELD_OFFSET(::ActorPosition, _impl_.righ_vector_),
-  PROTOBUF_FIELD_OFFSET(::ActorPosition, _impl_.state_),
-  PROTOBUF_FIELD_OFFSET(::ActorPosition, _impl_.timestamp_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::ActorPosition)},
@@ -65,22 +55,18 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_actor_5fposition_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\024actor_position.proto\032\013state.proto\032\014vec"
-  "tor.proto\"\235\001\n\rActorPosition\022\021\n\tplayer_id"
-  "\030\001 \001(\t\022\027\n\010position\030\002 \001(\0132\005.Vec3\022\032\n\013orien"
-  "tation\030\003 \001(\0132\005.Vec3\022\032\n\013righ_vector\030\004 \001(\013"
-  "2\005.Vec2\022\025\n\005state\030\005 \001(\0162\006.State\022\021\n\ttimest"
-  "amp\030\006 \001(\tb\006proto3"
+  "\n\024actor_position.proto\032\014vector.proto\"(\n\r"
+  "ActorPosition\022\027\n\010position\030\001 \001(\0132\005.Vec3b\006"
+  "proto3"
   ;
-static const ::_pbi::DescriptorTable* const descriptor_table_actor_5fposition_2eproto_deps[2] = {
-  &::descriptor_table_state_2eproto,
+static const ::_pbi::DescriptorTable* const descriptor_table_actor_5fposition_2eproto_deps[1] = {
   &::descriptor_table_vector_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_actor_5fposition_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_actor_5fposition_2eproto = {
-    false, false, 217, descriptor_table_protodef_actor_5fposition_2eproto,
+    false, false, 86, descriptor_table_protodef_actor_5fposition_2eproto,
     "actor_position.proto",
-    &descriptor_table_actor_5fposition_2eproto_once, descriptor_table_actor_5fposition_2eproto_deps, 2, 1,
+    &descriptor_table_actor_5fposition_2eproto_once, descriptor_table_actor_5fposition_2eproto_deps, 1, 1,
     schemas, file_default_instances, TableStruct_actor_5fposition_2eproto::offsets,
     file_level_metadata_actor_5fposition_2eproto, file_level_enum_descriptors_actor_5fposition_2eproto,
     file_level_service_descriptors_actor_5fposition_2eproto,
@@ -97,39 +83,17 @@ PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::_pbi::AddDescriptorsRunner dynamic_in
 class ActorPosition::_Internal {
  public:
   static const ::Vec3& position(const ActorPosition* msg);
-  static const ::Vec3& orientation(const ActorPosition* msg);
-  static const ::Vec2& righ_vector(const ActorPosition* msg);
 };
 
 const ::Vec3&
 ActorPosition::_Internal::position(const ActorPosition* msg) {
   return *msg->_impl_.position_;
 }
-const ::Vec3&
-ActorPosition::_Internal::orientation(const ActorPosition* msg) {
-  return *msg->_impl_.orientation_;
-}
-const ::Vec2&
-ActorPosition::_Internal::righ_vector(const ActorPosition* msg) {
-  return *msg->_impl_.righ_vector_;
-}
 void ActorPosition::clear_position() {
   if (GetArenaForAllocation() == nullptr && _impl_.position_ != nullptr) {
     delete _impl_.position_;
   }
   _impl_.position_ = nullptr;
-}
-void ActorPosition::clear_orientation() {
-  if (GetArenaForAllocation() == nullptr && _impl_.orientation_ != nullptr) {
-    delete _impl_.orientation_;
-  }
-  _impl_.orientation_ = nullptr;
-}
-void ActorPosition::clear_righ_vector() {
-  if (GetArenaForAllocation() == nullptr && _impl_.righ_vector_ != nullptr) {
-    delete _impl_.righ_vector_;
-  }
-  _impl_.righ_vector_ = nullptr;
 }
 ActorPosition::ActorPosition(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
@@ -141,41 +105,13 @@ ActorPosition::ActorPosition(const ActorPosition& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   ActorPosition* const _this = this; (void)_this;
   new (&_impl_) Impl_{
-      decltype(_impl_.player_id_){}
-    , decltype(_impl_.timestamp_){}
-    , decltype(_impl_.position_){nullptr}
-    , decltype(_impl_.orientation_){nullptr}
-    , decltype(_impl_.righ_vector_){nullptr}
-    , decltype(_impl_.state_){}
+      decltype(_impl_.position_){nullptr}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  _impl_.player_id_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.player_id_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (!from._internal_player_id().empty()) {
-    _this->_impl_.player_id_.Set(from._internal_player_id(), 
-      _this->GetArenaForAllocation());
-  }
-  _impl_.timestamp_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.timestamp_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (!from._internal_timestamp().empty()) {
-    _this->_impl_.timestamp_.Set(from._internal_timestamp(), 
-      _this->GetArenaForAllocation());
-  }
   if (from._internal_has_position()) {
     _this->_impl_.position_ = new ::Vec3(*from._impl_.position_);
   }
-  if (from._internal_has_orientation()) {
-    _this->_impl_.orientation_ = new ::Vec3(*from._impl_.orientation_);
-  }
-  if (from._internal_has_righ_vector()) {
-    _this->_impl_.righ_vector_ = new ::Vec2(*from._impl_.righ_vector_);
-  }
-  _this->_impl_.state_ = from._impl_.state_;
   // @@protoc_insertion_point(copy_constructor:ActorPosition)
 }
 
@@ -184,22 +120,9 @@ inline void ActorPosition::SharedCtor(
   (void)arena;
   (void)is_message_owned;
   new (&_impl_) Impl_{
-      decltype(_impl_.player_id_){}
-    , decltype(_impl_.timestamp_){}
-    , decltype(_impl_.position_){nullptr}
-    , decltype(_impl_.orientation_){nullptr}
-    , decltype(_impl_.righ_vector_){nullptr}
-    , decltype(_impl_.state_){0}
+      decltype(_impl_.position_){nullptr}
     , /*decltype(_impl_._cached_size_)*/{}
   };
-  _impl_.player_id_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.player_id_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  _impl_.timestamp_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.timestamp_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 }
 
 ActorPosition::~ActorPosition() {
@@ -213,11 +136,7 @@ ActorPosition::~ActorPosition() {
 
 inline void ActorPosition::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
-  _impl_.player_id_.Destroy();
-  _impl_.timestamp_.Destroy();
   if (this != internal_default_instance()) delete _impl_.position_;
-  if (this != internal_default_instance()) delete _impl_.orientation_;
-  if (this != internal_default_instance()) delete _impl_.righ_vector_;
 }
 
 void ActorPosition::SetCachedSize(int size) const {
@@ -230,21 +149,10 @@ void ActorPosition::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  _impl_.player_id_.ClearToEmpty();
-  _impl_.timestamp_.ClearToEmpty();
   if (GetArenaForAllocation() == nullptr && _impl_.position_ != nullptr) {
     delete _impl_.position_;
   }
   _impl_.position_ = nullptr;
-  if (GetArenaForAllocation() == nullptr && _impl_.orientation_ != nullptr) {
-    delete _impl_.orientation_;
-  }
-  _impl_.orientation_ = nullptr;
-  if (GetArenaForAllocation() == nullptr && _impl_.righ_vector_ != nullptr) {
-    delete _impl_.righ_vector_;
-  }
-  _impl_.righ_vector_ = nullptr;
-  _impl_.state_ = 0;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -254,56 +162,11 @@ const char* ActorPosition::_InternalParse(const char* ptr, ::_pbi::ParseContext*
     uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
-      // string player_id = 1;
+      // .Vec3 position = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
-          auto str = _internal_mutable_player_id();
-          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(ptr);
-          CHK_(::_pbi::VerifyUTF8(str, "ActorPosition.player_id"));
-        } else
-          goto handle_unusual;
-        continue;
-      // .Vec3 position = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
           ptr = ctx->ParseMessage(_internal_mutable_position(), ptr);
           CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // .Vec3 orientation = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
-          ptr = ctx->ParseMessage(_internal_mutable_orientation(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // .Vec2 righ_vector = 4;
-      case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
-          ptr = ctx->ParseMessage(_internal_mutable_righ_vector(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // .State state = 5;
-      case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
-          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-          _internal_set_state(static_cast<::State>(val));
-        } else
-          goto handle_unusual;
-        continue;
-      // string timestamp = 6;
-      case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 50)) {
-          auto str = _internal_mutable_timestamp();
-          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(ptr);
-          CHK_(::_pbi::VerifyUTF8(str, "ActorPosition.timestamp"));
         } else
           goto handle_unusual;
         continue;
@@ -336,52 +199,11 @@ uint8_t* ActorPosition::_InternalSerialize(
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string player_id = 1;
-  if (!this->_internal_player_id().empty()) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->_internal_player_id().data(), static_cast<int>(this->_internal_player_id().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "ActorPosition.player_id");
-    target = stream->WriteStringMaybeAliased(
-        1, this->_internal_player_id(), target);
-  }
-
-  // .Vec3 position = 2;
+  // .Vec3 position = 1;
   if (this->_internal_has_position()) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(2, _Internal::position(this),
+      InternalWriteMessage(1, _Internal::position(this),
         _Internal::position(this).GetCachedSize(), target, stream);
-  }
-
-  // .Vec3 orientation = 3;
-  if (this->_internal_has_orientation()) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(3, _Internal::orientation(this),
-        _Internal::orientation(this).GetCachedSize(), target, stream);
-  }
-
-  // .Vec2 righ_vector = 4;
-  if (this->_internal_has_righ_vector()) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(4, _Internal::righ_vector(this),
-        _Internal::righ_vector(this).GetCachedSize(), target, stream);
-  }
-
-  // .State state = 5;
-  if (this->_internal_state() != 0) {
-    target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteEnumToArray(
-      5, this->_internal_state(), target);
-  }
-
-  // string timestamp = 6;
-  if (!this->_internal_timestamp().empty()) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->_internal_timestamp().data(), static_cast<int>(this->_internal_timestamp().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "ActorPosition.timestamp");
-    target = stream->WriteStringMaybeAliased(
-        6, this->_internal_timestamp(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -400,45 +222,11 @@ size_t ActorPosition::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // string player_id = 1;
-  if (!this->_internal_player_id().empty()) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-        this->_internal_player_id());
-  }
-
-  // string timestamp = 6;
-  if (!this->_internal_timestamp().empty()) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-        this->_internal_timestamp());
-  }
-
-  // .Vec3 position = 2;
+  // .Vec3 position = 1;
   if (this->_internal_has_position()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
         *_impl_.position_);
-  }
-
-  // .Vec3 orientation = 3;
-  if (this->_internal_has_orientation()) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-        *_impl_.orientation_);
-  }
-
-  // .Vec2 righ_vector = 4;
-  if (this->_internal_has_righ_vector()) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-        *_impl_.righ_vector_);
-  }
-
-  // .State state = 5;
-  if (this->_internal_state() != 0) {
-    total_size += 1 +
-      ::_pbi::WireFormatLite::EnumSize(this->_internal_state());
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
@@ -459,26 +247,9 @@ void ActorPosition::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (!from._internal_player_id().empty()) {
-    _this->_internal_set_player_id(from._internal_player_id());
-  }
-  if (!from._internal_timestamp().empty()) {
-    _this->_internal_set_timestamp(from._internal_timestamp());
-  }
   if (from._internal_has_position()) {
     _this->_internal_mutable_position()->::Vec3::MergeFrom(
         from._internal_position());
-  }
-  if (from._internal_has_orientation()) {
-    _this->_internal_mutable_orientation()->::Vec3::MergeFrom(
-        from._internal_orientation());
-  }
-  if (from._internal_has_righ_vector()) {
-    _this->_internal_mutable_righ_vector()->::Vec2::MergeFrom(
-        from._internal_righ_vector());
-  }
-  if (from._internal_state() != 0) {
-    _this->_internal_set_state(from._internal_state());
   }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
@@ -496,23 +267,8 @@ bool ActorPosition::IsInitialized() const {
 
 void ActorPosition::InternalSwap(ActorPosition* other) {
   using std::swap;
-  auto* lhs_arena = GetArenaForAllocation();
-  auto* rhs_arena = other->GetArenaForAllocation();
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
-      &_impl_.player_id_, lhs_arena,
-      &other->_impl_.player_id_, rhs_arena
-  );
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
-      &_impl_.timestamp_, lhs_arena,
-      &other->_impl_.timestamp_, rhs_arena
-  );
-  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(ActorPosition, _impl_.state_)
-      + sizeof(ActorPosition::_impl_.state_)
-      - PROTOBUF_FIELD_OFFSET(ActorPosition, _impl_.position_)>(
-          reinterpret_cast<char*>(&_impl_.position_),
-          reinterpret_cast<char*>(&other->_impl_.position_));
+  swap(_impl_.position_, other->_impl_.position_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata ActorPosition::GetMetadata() const {

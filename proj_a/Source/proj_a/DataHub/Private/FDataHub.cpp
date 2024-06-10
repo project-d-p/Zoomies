@@ -7,11 +7,11 @@ TMap<FString, Movement> FDataHub::EchoData;
 
 void FDataHub::PushActorDA(const ActorPosition &NewData)
 {
-    const FString key = NewData.player_id().c_str();
-    if (!actorPosition.Contains(key)) {
-        // 새로운 데이터 생성 알림
-    }
-    actorPosition.Add(key, NewData);
+    // const FString key = NewData.player_id().c_str();
+    // if (!actorPosition.Contains(key)) {
+    //     // 새로운 데이터 생성 알림
+    // }
+    // actorPosition.Add(key, NewData);
 }
 
 void FDataHub::PushEchoDA(const Message& NewData)

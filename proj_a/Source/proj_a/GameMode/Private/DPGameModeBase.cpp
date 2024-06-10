@@ -50,7 +50,7 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 	
 	uint32 id = newPlayer->GetUniqueID();
 	std::string key = std::to_string(id);
-	FNetLogger::EditerLog(FColor::Blue, TEXT("Player name: %s"), key);
+	FNetLogger::EditerLog(FColor::Blue, TEXT("Player name: %s"), key.c_str());
 	player_controllers_[key] = Cast<ADPPlayerController>(newPlayer);
 }
 

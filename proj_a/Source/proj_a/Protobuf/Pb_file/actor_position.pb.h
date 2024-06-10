@@ -30,7 +30,6 @@
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
-#include "state.pb.h"
 #include "vector.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
@@ -176,42 +175,9 @@ class ActorPosition final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kPlayerIdFieldNumber = 1,
-    kTimestampFieldNumber = 6,
-    kPositionFieldNumber = 2,
-    kOrientationFieldNumber = 3,
-    kRighVectorFieldNumber = 4,
-    kStateFieldNumber = 5,
+    kPositionFieldNumber = 1,
   };
-  // string player_id = 1;
-  void clear_player_id();
-  const std::string& player_id() const;
-  template <typename ArgT0 = const std::string&, typename... ArgT>
-  void set_player_id(ArgT0&& arg0, ArgT... args);
-  std::string* mutable_player_id();
-  PROTOBUF_NODISCARD std::string* release_player_id();
-  void set_allocated_player_id(std::string* player_id);
-  private:
-  const std::string& _internal_player_id() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_player_id(const std::string& value);
-  std::string* _internal_mutable_player_id();
-  public:
-
-  // string timestamp = 6;
-  void clear_timestamp();
-  const std::string& timestamp() const;
-  template <typename ArgT0 = const std::string&, typename... ArgT>
-  void set_timestamp(ArgT0&& arg0, ArgT... args);
-  std::string* mutable_timestamp();
-  PROTOBUF_NODISCARD std::string* release_timestamp();
-  void set_allocated_timestamp(std::string* timestamp);
-  private:
-  const std::string& _internal_timestamp() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_timestamp(const std::string& value);
-  std::string* _internal_mutable_timestamp();
-  public:
-
-  // .Vec3 position = 2;
+  // .Vec3 position = 1;
   bool has_position() const;
   private:
   bool _internal_has_position() const;
@@ -229,51 +195,6 @@ class ActorPosition final :
       ::Vec3* position);
   ::Vec3* unsafe_arena_release_position();
 
-  // .Vec3 orientation = 3;
-  bool has_orientation() const;
-  private:
-  bool _internal_has_orientation() const;
-  public:
-  void clear_orientation();
-  const ::Vec3& orientation() const;
-  PROTOBUF_NODISCARD ::Vec3* release_orientation();
-  ::Vec3* mutable_orientation();
-  void set_allocated_orientation(::Vec3* orientation);
-  private:
-  const ::Vec3& _internal_orientation() const;
-  ::Vec3* _internal_mutable_orientation();
-  public:
-  void unsafe_arena_set_allocated_orientation(
-      ::Vec3* orientation);
-  ::Vec3* unsafe_arena_release_orientation();
-
-  // .Vec2 righ_vector = 4;
-  bool has_righ_vector() const;
-  private:
-  bool _internal_has_righ_vector() const;
-  public:
-  void clear_righ_vector();
-  const ::Vec2& righ_vector() const;
-  PROTOBUF_NODISCARD ::Vec2* release_righ_vector();
-  ::Vec2* mutable_righ_vector();
-  void set_allocated_righ_vector(::Vec2* righ_vector);
-  private:
-  const ::Vec2& _internal_righ_vector() const;
-  ::Vec2* _internal_mutable_righ_vector();
-  public:
-  void unsafe_arena_set_allocated_righ_vector(
-      ::Vec2* righ_vector);
-  ::Vec2* unsafe_arena_release_righ_vector();
-
-  // .State state = 5;
-  void clear_state();
-  ::State state() const;
-  void set_state(::State value);
-  private:
-  ::State _internal_state() const;
-  void _internal_set_state(::State value);
-  public:
-
   // @@protoc_insertion_point(class_scope:ActorPosition)
  private:
   class _Internal;
@@ -282,12 +203,7 @@ class ActorPosition final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
-    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr player_id_;
-    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr timestamp_;
     ::Vec3* position_;
-    ::Vec3* orientation_;
-    ::Vec2* righ_vector_;
-    int state_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -304,57 +220,7 @@ class ActorPosition final :
 #endif  // __GNUC__
 // ActorPosition
 
-// string player_id = 1;
-inline void ActorPosition::clear_player_id() {
-  _impl_.player_id_.ClearToEmpty();
-}
-inline const std::string& ActorPosition::player_id() const {
-  // @@protoc_insertion_point(field_get:ActorPosition.player_id)
-  return _internal_player_id();
-}
-template <typename ArgT0, typename... ArgT>
-inline PROTOBUF_ALWAYS_INLINE
-void ActorPosition::set_player_id(ArgT0&& arg0, ArgT... args) {
- 
- _impl_.player_id_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:ActorPosition.player_id)
-}
-inline std::string* ActorPosition::mutable_player_id() {
-  std::string* _s = _internal_mutable_player_id();
-  // @@protoc_insertion_point(field_mutable:ActorPosition.player_id)
-  return _s;
-}
-inline const std::string& ActorPosition::_internal_player_id() const {
-  return _impl_.player_id_.Get();
-}
-inline void ActorPosition::_internal_set_player_id(const std::string& value) {
-  
-  _impl_.player_id_.Set(value, GetArenaForAllocation());
-}
-inline std::string* ActorPosition::_internal_mutable_player_id() {
-  
-  return _impl_.player_id_.Mutable(GetArenaForAllocation());
-}
-inline std::string* ActorPosition::release_player_id() {
-  // @@protoc_insertion_point(field_release:ActorPosition.player_id)
-  return _impl_.player_id_.Release();
-}
-inline void ActorPosition::set_allocated_player_id(std::string* player_id) {
-  if (player_id != nullptr) {
-    
-  } else {
-    
-  }
-  _impl_.player_id_.SetAllocated(player_id, GetArenaForAllocation());
-#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (_impl_.player_id_.IsDefault()) {
-    _impl_.player_id_.Set("", GetArenaForAllocation());
-  }
-#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:ActorPosition.player_id)
-}
-
-// .Vec3 position = 2;
+// .Vec3 position = 1;
 inline bool ActorPosition::_internal_has_position() const {
   return this != internal_default_instance() && _impl_.position_ != nullptr;
 }
@@ -437,246 +303,6 @@ inline void ActorPosition::set_allocated_position(::Vec3* position) {
   }
   _impl_.position_ = position;
   // @@protoc_insertion_point(field_set_allocated:ActorPosition.position)
-}
-
-// .Vec3 orientation = 3;
-inline bool ActorPosition::_internal_has_orientation() const {
-  return this != internal_default_instance() && _impl_.orientation_ != nullptr;
-}
-inline bool ActorPosition::has_orientation() const {
-  return _internal_has_orientation();
-}
-inline const ::Vec3& ActorPosition::_internal_orientation() const {
-  const ::Vec3* p = _impl_.orientation_;
-  return p != nullptr ? *p : reinterpret_cast<const ::Vec3&>(
-      ::_Vec3_default_instance_);
-}
-inline const ::Vec3& ActorPosition::orientation() const {
-  // @@protoc_insertion_point(field_get:ActorPosition.orientation)
-  return _internal_orientation();
-}
-inline void ActorPosition::unsafe_arena_set_allocated_orientation(
-    ::Vec3* orientation) {
-  if (GetArenaForAllocation() == nullptr) {
-    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.orientation_);
-  }
-  _impl_.orientation_ = orientation;
-  if (orientation) {
-    
-  } else {
-    
-  }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:ActorPosition.orientation)
-}
-inline ::Vec3* ActorPosition::release_orientation() {
-  
-  ::Vec3* temp = _impl_.orientation_;
-  _impl_.orientation_ = nullptr;
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
-  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
-  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
-  if (GetArenaForAllocation() == nullptr) { delete old; }
-#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
-  if (GetArenaForAllocation() != nullptr) {
-    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
-  }
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
-  return temp;
-}
-inline ::Vec3* ActorPosition::unsafe_arena_release_orientation() {
-  // @@protoc_insertion_point(field_release:ActorPosition.orientation)
-  
-  ::Vec3* temp = _impl_.orientation_;
-  _impl_.orientation_ = nullptr;
-  return temp;
-}
-inline ::Vec3* ActorPosition::_internal_mutable_orientation() {
-  
-  if (_impl_.orientation_ == nullptr) {
-    auto* p = CreateMaybeMessage<::Vec3>(GetArenaForAllocation());
-    _impl_.orientation_ = p;
-  }
-  return _impl_.orientation_;
-}
-inline ::Vec3* ActorPosition::mutable_orientation() {
-  ::Vec3* _msg = _internal_mutable_orientation();
-  // @@protoc_insertion_point(field_mutable:ActorPosition.orientation)
-  return _msg;
-}
-inline void ActorPosition::set_allocated_orientation(::Vec3* orientation) {
-  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
-  if (message_arena == nullptr) {
-    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.orientation_);
-  }
-  if (orientation) {
-    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
-        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(
-                reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(orientation));
-    if (message_arena != submessage_arena) {
-      orientation = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
-          message_arena, orientation, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  _impl_.orientation_ = orientation;
-  // @@protoc_insertion_point(field_set_allocated:ActorPosition.orientation)
-}
-
-// .Vec2 righ_vector = 4;
-inline bool ActorPosition::_internal_has_righ_vector() const {
-  return this != internal_default_instance() && _impl_.righ_vector_ != nullptr;
-}
-inline bool ActorPosition::has_righ_vector() const {
-  return _internal_has_righ_vector();
-}
-inline const ::Vec2& ActorPosition::_internal_righ_vector() const {
-  const ::Vec2* p = _impl_.righ_vector_;
-  return p != nullptr ? *p : reinterpret_cast<const ::Vec2&>(
-      ::_Vec2_default_instance_);
-}
-inline const ::Vec2& ActorPosition::righ_vector() const {
-  // @@protoc_insertion_point(field_get:ActorPosition.righ_vector)
-  return _internal_righ_vector();
-}
-inline void ActorPosition::unsafe_arena_set_allocated_righ_vector(
-    ::Vec2* righ_vector) {
-  if (GetArenaForAllocation() == nullptr) {
-    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.righ_vector_);
-  }
-  _impl_.righ_vector_ = righ_vector;
-  if (righ_vector) {
-    
-  } else {
-    
-  }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:ActorPosition.righ_vector)
-}
-inline ::Vec2* ActorPosition::release_righ_vector() {
-  
-  ::Vec2* temp = _impl_.righ_vector_;
-  _impl_.righ_vector_ = nullptr;
-#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
-  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
-  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
-  if (GetArenaForAllocation() == nullptr) { delete old; }
-#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
-  if (GetArenaForAllocation() != nullptr) {
-    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
-  }
-#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
-  return temp;
-}
-inline ::Vec2* ActorPosition::unsafe_arena_release_righ_vector() {
-  // @@protoc_insertion_point(field_release:ActorPosition.righ_vector)
-  
-  ::Vec2* temp = _impl_.righ_vector_;
-  _impl_.righ_vector_ = nullptr;
-  return temp;
-}
-inline ::Vec2* ActorPosition::_internal_mutable_righ_vector() {
-  
-  if (_impl_.righ_vector_ == nullptr) {
-    auto* p = CreateMaybeMessage<::Vec2>(GetArenaForAllocation());
-    _impl_.righ_vector_ = p;
-  }
-  return _impl_.righ_vector_;
-}
-inline ::Vec2* ActorPosition::mutable_righ_vector() {
-  ::Vec2* _msg = _internal_mutable_righ_vector();
-  // @@protoc_insertion_point(field_mutable:ActorPosition.righ_vector)
-  return _msg;
-}
-inline void ActorPosition::set_allocated_righ_vector(::Vec2* righ_vector) {
-  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
-  if (message_arena == nullptr) {
-    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.righ_vector_);
-  }
-  if (righ_vector) {
-    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
-        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(
-                reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(righ_vector));
-    if (message_arena != submessage_arena) {
-      righ_vector = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
-          message_arena, righ_vector, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  _impl_.righ_vector_ = righ_vector;
-  // @@protoc_insertion_point(field_set_allocated:ActorPosition.righ_vector)
-}
-
-// .State state = 5;
-inline void ActorPosition::clear_state() {
-  _impl_.state_ = 0;
-}
-inline ::State ActorPosition::_internal_state() const {
-  return static_cast< ::State >(_impl_.state_);
-}
-inline ::State ActorPosition::state() const {
-  // @@protoc_insertion_point(field_get:ActorPosition.state)
-  return _internal_state();
-}
-inline void ActorPosition::_internal_set_state(::State value) {
-  
-  _impl_.state_ = value;
-}
-inline void ActorPosition::set_state(::State value) {
-  _internal_set_state(value);
-  // @@protoc_insertion_point(field_set:ActorPosition.state)
-}
-
-// string timestamp = 6;
-inline void ActorPosition::clear_timestamp() {
-  _impl_.timestamp_.ClearToEmpty();
-}
-inline const std::string& ActorPosition::timestamp() const {
-  // @@protoc_insertion_point(field_get:ActorPosition.timestamp)
-  return _internal_timestamp();
-}
-template <typename ArgT0, typename... ArgT>
-inline PROTOBUF_ALWAYS_INLINE
-void ActorPosition::set_timestamp(ArgT0&& arg0, ArgT... args) {
- 
- _impl_.timestamp_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:ActorPosition.timestamp)
-}
-inline std::string* ActorPosition::mutable_timestamp() {
-  std::string* _s = _internal_mutable_timestamp();
-  // @@protoc_insertion_point(field_mutable:ActorPosition.timestamp)
-  return _s;
-}
-inline const std::string& ActorPosition::_internal_timestamp() const {
-  return _impl_.timestamp_.Get();
-}
-inline void ActorPosition::_internal_set_timestamp(const std::string& value) {
-  
-  _impl_.timestamp_.Set(value, GetArenaForAllocation());
-}
-inline std::string* ActorPosition::_internal_mutable_timestamp() {
-  
-  return _impl_.timestamp_.Mutable(GetArenaForAllocation());
-}
-inline std::string* ActorPosition::release_timestamp() {
-  // @@protoc_insertion_point(field_release:ActorPosition.timestamp)
-  return _impl_.timestamp_.Release();
-}
-inline void ActorPosition::set_allocated_timestamp(std::string* timestamp) {
-  if (timestamp != nullptr) {
-    
-  } else {
-    
-  }
-  _impl_.timestamp_.SetAllocated(timestamp, GetArenaForAllocation());
-#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (_impl_.timestamp_.IsDefault()) {
-    _impl_.timestamp_.Set("", GetArenaForAllocation());
-  }
-#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:ActorPosition.timestamp)
 }
 
 #ifdef __GNUC__

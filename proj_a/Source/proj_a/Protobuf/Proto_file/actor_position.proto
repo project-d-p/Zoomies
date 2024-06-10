@@ -1,6 +1,5 @@
 syntax = "proto3";
 
-import "state.proto";
 import "vector.proto";
 
 // server -> client
