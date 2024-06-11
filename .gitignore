@@ -110,3 +110,7 @@ server/server/x64
 
 # idea folder
 proj_a/.idea/*
+
+# Protobuf generated files
+*.pb.cc
+*.pb.h
