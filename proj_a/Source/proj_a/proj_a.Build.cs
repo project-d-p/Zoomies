@@ -38,9 +38,12 @@ public class proj_a : ModuleRules
 		
 		PublicIncludePaths.AddRange(new string[] {
 			"proj_a/GameMode/Public",
+			"proj_a/GameState/Public",
 			"proj_a/Actor/Controller/Public",
 			"proj_a/Actor/Character/Public",
 			"proj_a/Component/Public",
+			"proj_a/Component/Score/Public",
+			"proj_a/Component/Chat/Public",
             "proj_a/Widget/Public",
             "proj_a/DataHub/Public",
 			"proj_a/Network/Public",
@@ -70,7 +73,8 @@ public class proj_a : ModuleRules
 			"Networking",
 			"OnlineSubsystemSteam",
 			"OnlineSubsystem",
-			"OnlineSubsystemUtils" 
+			"OnlineSubsystemUtils",
+			"SlateCore",
 		});
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
