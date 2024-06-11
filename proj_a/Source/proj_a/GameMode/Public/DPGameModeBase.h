@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ScoreManager.h"
+#include "ServerChatManager.h"
 #include "GameFramework/GameModeBase.h"
 #include "ListenSocket.h"
 #include <queue>
@@ -17,17 +19,21 @@
 /**
  * 
  */
-
 UCLASS()
 class PROJ_A_API ADPGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-
 public:
 	// typedef std::priority_queue<Message, std::vector<Message>, MessageQueueFilter> FMessageQueue_T;
 	typedef std::queue<Message> FMessageQueue_T;
 	// Sets default values for this character's properties
 	ADPGameModeBase();
+
+	void SendChatToAllClients(const FString& SenderName, const FString& Message);
+
+	/** 테스트를 위해서 임시로 public에 선언 */
+	UPROPERTY()
+	UScoreManagerComp* ScoreManager;
 
 	// Called when the game starts or when spawned
 	virtual void PostLogin(APlayerController* newPlayer) override;
@@ -60,4 +66,6 @@ private:
 	// Time Manager
 	UPROPERTY()
 	UServerTimerManager* TimerManager;
+	UPROPERTY()
+	UServerChatManager* ChatManager;
 };

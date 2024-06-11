@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TimerUI.h"
 #include "Components/ActorComponent.h"
 #include "ClientTimerManager.generated.h"
 
@@ -13,19 +14,23 @@ public:
 	UClientTimerManager();
 	
 	void SetTimeRemaining(float NewTime);
-	void Update();
 
 	UPROPERTY(ReplicatedUsing = OnRep_TimeRemaining)
-	// UPROPERTY()
 	float TimeRemaining;
 
+	UFUNCTION()
+	void OnRep_TimeRemaining();
+	
+	UFUNCTION()
+	void SetTimerUI(UTimerUI* inTime_Text);
 protected:
 	virtual void BeginPlay() override;
 private:
 	FTimerHandle TimerHandle;
-	UFUNCTION()
-	void OnRep_TimeRemaining();
 
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UPROPERTY()
+	UTimerUI* Time_Text = nullptr;
 };

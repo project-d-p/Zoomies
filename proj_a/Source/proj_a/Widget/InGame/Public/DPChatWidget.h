@@ -25,8 +25,8 @@ public:
 	UEditableTextBox* chatEditableTextBox;
 	
 	UPROPERTY(meta = (BindWidget))
-	class UScrollBox* chatScrollBox;
+	UScrollBox* chatScrollBox;
 
 	UPROPERTY(meta = (BindWidget))
-	class UVerticalBox* ChatLogBox;
+	UVerticalBox* ChatLogBox;
 };

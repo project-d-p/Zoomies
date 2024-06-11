@@ -6,7 +6,6 @@ UServerTimerManager::UServerTimerManager()
 	: TimeRemaining(0), TimerDuration(0)
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	// PrimaryComponentTick.bCanEverTick = false;
 }
 
 void UServerTimerManager::BeginPlay()
@@ -14,7 +13,7 @@ void UServerTimerManager::BeginPlay()
 	Super::BeginPlay();
 }
 
-#define INTERVAL 2.0f
+#define INTERVAL 0.3f
 
 void UServerTimerManager::StartTimer(float Duration)
 {
@@ -36,12 +35,11 @@ void UServerTimerManager::TimerFunction()
 		TimeRemaining -= INTERVAL;
 		
 		SetTimeRemaining();
-		UE_LOG(LogTemp, Warning, TEXT("Time remaining: %f"), TimeRemaining);
 	}
 	else
 	{
 		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
-		UE_LOG(LogTemp, Warning, TEXT("Timer ended!"));
+		UE_LOG(LogTemp, Warning, TEXT("Timer ended"));
 	}
 }
 
@@ -50,5 +48,6 @@ void UServerTimerManager::SetTimeRemaining()
 	if (ADPInGameState* GS = GetWorld()->GetGameState<ADPInGameState>())
 	{
 		GS->TimerManager->SetTimeRemaining(TimeRemaining);
+		GS->TimerManager->OnRep_TimeRemaining();
 	}
 }

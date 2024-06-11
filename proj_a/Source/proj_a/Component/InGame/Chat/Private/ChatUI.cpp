@@ -21,10 +21,10 @@ void UChatUI::InitializeChatBox(FChatUiInitializer& Initializer)
 	{
 		World = Initializer.InWorld;
 
-		ADPPlayerController* PlayerController = Cast<ADPPlayerController>(World->GetFirstPlayerController());
-		if (PlayerController)
+		ADPPlayerController* PC = Cast<ADPPlayerController>(World->GetFirstPlayerController());
+		if (PC)
 		{
-			PlayerController->InitChatManager(this);
+			PC->InitChatManager(this);
 		}
 	}
 	if (Initializer.ChatEditableTextBox)
@@ -49,29 +49,27 @@ void UChatUI::OnChatBoxCommitted(const FText& Text, ETextCommit::Type CommitMeth
 {
 	if (CommitMethod == ETextCommit::OnEnter)
 	{
+		if (World == nullptr)
+		{
+			FNetLogger::EditerLog(FColor::Red, TEXT("World is nullptr"));
+			return;
+		}
+		ADPPlayerController* DPPlayerController = Cast<ADPPlayerController>(World->GetFirstPlayerController());
+		if (DPPlayerController == nullptr)
+		{
+			FNetLogger::EditerLog(FColor::Red, TEXT("PlayerController is nullptr"));
+			return;
+		}
 		if (!Text.IsEmpty())
 		{
 			FString Message = Text.ToString();
-
+			
 			ChatBox->SetText(FText::GetEmpty());
-
-			if (World == nullptr)
-			{
-				FNetLogger::EditerLog(FColor::Red, TEXT("World is nullptr"));
-				return;
-			}
-			ADPPlayerController* DPPlayerController = Cast<ADPPlayerController>(World->GetFirstPlayerController());
-			if (DPPlayerController == nullptr)
-			{
-				FNetLogger::EditerLog(FColor::Red, TEXT("PlayerController is nullptr"));
-				return;
-			}
 			DPPlayerController->SendChatMessageToServer(Message);
-
-			FInputModeGameOnly InputMode;
-			DPPlayerController->SetInputMode(InputMode);
-			DPPlayerController->bShowMouseCursor = false;
 		}
+		FInputModeGameOnly InputMode;
+		DPPlayerController->SetInputMode(InputMode);
+		DPPlayerController->bShowMouseCursor = false;
 	}
 }
 

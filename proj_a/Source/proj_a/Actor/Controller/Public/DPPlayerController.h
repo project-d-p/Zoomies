@@ -11,9 +11,8 @@
 #include "DPMySocket.h"
 #include "DPPlayerController.generated.h"
 
-/**
- * 
- */
+class UPlayerScoreComp;
+
 UCLASS()
 class PROJ_A_API ADPPlayerController : public APlayerController
 {
@@ -32,6 +31,7 @@ public:
 
 	void HandleMovement(const Movement& movement);
 	
+	UPlayerScoreComp* GetScoreManagerComponent() const;
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
