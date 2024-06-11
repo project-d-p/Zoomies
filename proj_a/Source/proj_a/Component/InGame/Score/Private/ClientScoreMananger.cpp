@@ -3,7 +3,6 @@
 #include "DPInGameState.h"
 #include "FNetLogger.h"
 #include "PlayerScoreComp.h"
-#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
 UClientScoreMananger::UClientScoreMananger()
@@ -16,14 +15,14 @@ void UClientScoreMananger::InitScoreUi()
 	ADPPlayerState* MyPlayerState = GetWorld()->GetFirstPlayerController()->GetPlayerState<ADPPlayerState>();
 	if (MyPlayerState == nullptr)
 	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("PlayerState is not found!"));
+		// FNetLogger::EditerLog(FColor::Red, TEXT("PlayerState is not found!"));
 		return;
 	}
 	TArray<TObjectPtr<APlayerState>> PlayerStates = Cast<ADPInGameState>(GetOwner())->PlayerArray;
 	//
 	for (APlayerState* PlayerState : PlayerStates)
 	{
-		FNetLogger::EditerLog(FColor::Blue, TEXT("PlayerState: %d"), PlayerState->GetPlayerId());
+		// FNetLogger::EditerLog(FColor::Blue, TEXT("PlayerState: %d"), PlayerState->GetPlayerId());
 		UTextBlock* TextBlock;
 		if (ScoreUI == nullptr)
 		{

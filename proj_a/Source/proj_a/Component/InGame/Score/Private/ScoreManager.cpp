@@ -1,8 +1,6 @@
 #include "ScoreManager.h"
 
-#include "DPInGameState.h"
 #include "DPPlayerController.h"
-#include "FNetLogger.h"
 #include "PlayerScoreComp.h"
 
 UScoreManagerComp::UScoreManagerComp()
@@ -24,8 +22,7 @@ void UScoreManagerComp::IncreasePlayerScore(APlayerController* PlayerController,
 	
 	UPlayerScoreComp* SM = PC->GetScoreManagerComponent();
 	if (SM == nullptr) return;
-
-	FNetLogger::EditerLog(FColor::Blue, TEXT("player ID: %d"), PC->PlayerState->GetPlayerId());
+	
 	int32 CurrentScore = SM->PlayerScores;
 	SM->PlayerScores = CurrentScore + ScoreAmount;
 

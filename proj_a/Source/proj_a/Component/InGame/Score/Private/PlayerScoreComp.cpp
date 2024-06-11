@@ -17,13 +17,12 @@ void UPlayerScoreComp::OnRep_PlayerScores()
 
 	if (PlayerScore_Text == nullptr)
 	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("PlayerScore_Text is nullptr in PS"));
+		// FNetLogger::EditerLog(FColor::Red, TEXT("PlayerScore_Text is nullptr in PS"));
 		Cast<ADPInGameState>(GetWorld()->GetGameState())->ScoreManager->InitScoreUi();
 		return;
 	}
 	// XXX: 추후 ScoreUI에서 업데이트 하는 형식으로 변경.
 	PlayerScore_Text->SetText(FText::AsNumber(PlayerScores));
-	FNetLogger::EditerLog(FColor::Blue, TEXT("Player %d Score: %d udpate in PS"), PS->GetPlayerId(), PlayerScores);
 }
 
 void UPlayerScoreComp::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

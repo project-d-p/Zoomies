@@ -12,9 +12,6 @@ class PROJ_A_API ADPInGameState : public AGameStateBase
 public:
 	ADPInGameState();
 
-	// UFUNCTION()
-	// void InitTimerManager(UTimerUI* TimerUI);
-
 	UPROPERTY(Replicated)
 	UClientTimerManager* TimerManager;
 	UPROPERTY(Replicated)
