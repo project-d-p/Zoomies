@@ -1,7 +1,5 @@
 #include "DPInGameState.h"
 
-#include "DPPlayerState.h"
-#include "FNetLogger.h"
 #include "Net/UnrealNetwork.h"
 
 ADPInGameState::ADPInGameState()

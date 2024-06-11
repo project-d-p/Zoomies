@@ -1,8 +1,6 @@
 #include "ScoreUI.h"
 
 #include "DPInGameState.h"
-#include "DPPlayerState.h"
-#include "FNetLogger.h"
 #include "Components/TextBlock.h"
 #include "GameFramework/GameStateBase.h"
 

@@ -1,7 +1,6 @@
 #include "TimerUI.h"
 
 #include "DPInGameState.h"
-#include "DPPlayerController.h"
 #include "Components/TextBlock.h"
 
 void UTimerUI::UpdateTimerDisplay(float TimeRemaining)
