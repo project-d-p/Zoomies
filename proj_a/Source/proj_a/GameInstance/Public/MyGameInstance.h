@@ -7,7 +7,7 @@
 #include "OnlineSubsystem.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "OnlineSessionSettings.h"
-#include "Steam/steam_api.h"
+#include "steam_api.h"
 #include "MyGameInstance.generated.h"
 
 /**
