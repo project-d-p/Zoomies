@@ -5,6 +5,7 @@
 #include "DPInGameState.h"
 #include "DPPlayerController.h"
 #include "FNetLogger.h"
+#include "MessageMaker.h"
 
 ADPGameModeBase::ADPGameModeBase()
 {
@@ -94,9 +95,10 @@ void ADPGameModeBase::ProcessData(float delta_time)
 		// Message message = this->message_queue_.top();
 		this->message_queue_.pop();
 		ADPPlayerController* controller = this->player_controllers_[message.player_id()];
-		message_handler_.HandleMessage(message)->ExecuteIfBound(controller, message, listen_socket_->GetUdpSendBuffer());
+		message_handler_.HandleMessage(message)->ExecuteIfBound(controller, message);
 	}
-	listen_socket_->GetUdpSendBuffer().Swap();
+	this->SyncMovement();
+	listen_socket_->FlushUdpQueue();
 }
 
 void ADPGameModeBase::MergeMessages()
@@ -107,4 +109,13 @@ void ADPGameModeBase::MergeMessages()
 
 ADPGameModeBase::~ADPGameModeBase()
 {
+}
+
+void ADPGameModeBase::SyncMovement()
+{
+	for (auto& pair: player_controllers_)
+	{
+		Message msg = MessageMaker::MakeMessage(pair.second);
+		listen_socket_->PushUdpFlushMessage(msg);
+	}
 }

@@ -193,6 +193,7 @@ void ADPPlayerController::OnPossess(APawn* InPawn)
 		FNetLogger::EditerLog(FColor::Red, TEXT("Add Mapping Context [On Possess]"));
 		SubSystem->AddMappingContext(defaultContext, 0);
 	}
+	// TODO: Name Should be Changed
 }
 
 void ADPPlayerController::SetupInputComponent()
@@ -420,7 +421,7 @@ void ADPPlayerController::UpdatePlayer()
 /*
  * 1. Handler Player Movement in Server (W, A, S, D) - Move Function with Movement Message
  */
-void ADPPlayerController::HandleMovement(const Movement& movement, DoubleBuffer& udp_send_buffer)
+void ADPPlayerController::HandleMovement(const Movement& movement)
 {
 	if (!movement.has_progess_vector())
 	{

@@ -22,7 +22,8 @@ public:
 	FListenSocketRunnable(bool& is_game_started);
 
 	void FillMessageQueue(MessageQueue_t& message_queue_);
-	DoubleBuffer& GetUdpSendBuffer();
+	void PushUdpFlushMessage(const Message& msg) const;
+	void FlushUdpQueue();
 	
 	virtual ~FListenSocketRunnable() override;
 	
@@ -43,11 +44,11 @@ private:
 	bool& bis_game_started_;
 	FSocket* listen_socket_ = nullptr;
 	FRunnableThread* thread_ = nullptr;
-	FRunnableThread* udp_flush_thread = nullptr;
+	FUdpFlushRunnable* udp_flush_runnable_ = nullptr;
+	FRunnableThread* udp_flush_thread_ = nullptr;
 
 	std::vector<FClientHandler*> client_handlers_;
 	std::vector<DoubleBuffer> double_buffers_;
-	DoubleBuffer udp_send_buffer_;
 
 	// For Steam
 	// HSteamListenSocket steam_listen_socket_;

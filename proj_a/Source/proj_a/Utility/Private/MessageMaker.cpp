@@ -7,12 +7,12 @@ Message MessageMaker::MakeMessage(const ADPPlayerController* Controller, const F
 	Message msg;
 	// msg.set_player_id(TCHAR_TO_UTF8(*(Controller->GetPawn()->GetName())));
 
-	// ¾Æ·¡ÀÇ ¹æ¹ýÀ¸·Î ÇÏ°Ô µÇ¸é ¾²·¹±â °ªÀÌ Ãâ·ÂµÊ. ¸Þ¸ð¸® ¹ÝÈ¯ ÀÌ½´
+	// ì•„ëž˜ì˜ ë°©ë²•ìœ¼ë¡œ í•˜ê²Œ ë˜ë©´ ì“°ë ˆê¸° ê°’ì´ ì¶œë ¥ë¨. ë©”ëª¨ë¦¬ ë°˜í™˜ ì´ìŠˆ
 	// std::string player_id("DPCharacter_1");
 	// msg.set_player_id(player_id);
 
-	// ¿Ã¹Ù¸¥ ¹æ¹ý
-	// TODO: ¼­¹öÇÏ°í Å¬¶óÀÌ¾ðÆ®°¡ °°ÀºÁö Å×½ºÆ® ÇÊ¿ä
+	// ì˜¬ë°”ë¥¸ ë°©ë²•
+	// TODO: ì„œë²„í•˜ê³  í´ë¼ì´ì–¸íŠ¸ê°€ ê°™ì€ì§€ í…ŒìŠ¤íŠ¸ í•„ìš”
 	// msg.set_player_id(TCHAR_TO_UTF8(*(Controller->GetPawn()->GetName())));
 	msg.set_player_id(PlayerName::GetNamePlayerOne());
 	Movement movement;
@@ -39,5 +39,29 @@ Message MessageMaker::MakeMessage(const ADPPlayerController* Controller, const F
 	// Vec3 rotation;
 	*msg.mutable_movement() = movement;
 	// msg.set_timestamp();
+	return msg;
+}
+
+Message MessageMaker::MakeMessage(const ADPPlayerController* Controller)
+{
+	Message msg;
+	msg.set_player_id(TCHAR_TO_UTF8(*(Controller->GetPackage()->GetName())));
+	ActorPosition actor_position;
+	Vec3 position;
+	position.set_x(Controller->GetPawn()->GetActorLocation().X);
+	position.set_y(Controller->GetPawn()->GetActorLocation().Y);
+	position.set_z(Controller->GetPawn()->GetActorLocation().Z);
+	*actor_position.mutable_position() = position;
+	Vec3 rotation;
+	rotation.set_x(Controller->GetPawn()->GetActorRotation().Roll);
+	rotation.set_y(Controller->GetPawn()->GetActorRotation().Pitch);
+	rotation.set_z(Controller->GetPawn()->GetActorRotation().Yaw);
+	*actor_position.mutable_rotation() = rotation;
+	Vec3 velocity;
+	velocity.set_x(Controller->GetPawn()->GetVelocity().X);
+	velocity.set_y(Controller->GetPawn()->GetVelocity().Y);
+	velocity.set_z(Controller->GetPawn()->GetVelocity().Z);
+	*actor_position.mutable_velocity() = velocity;
+	*msg.mutable_actor_position() = actor_position;
 	return msg;
 }

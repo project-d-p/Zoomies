@@ -33,6 +33,15 @@ FListenSocketRunnable::~FListenSocketRunnable()
 		listen_socket_->Close();
 		delete listen_socket_;
 	}
+	if (udp_flush_thread_)
+	{
+		udp_flush_thread_->Kill(true);
+		delete udp_flush_thread_;
+	}
+	if (udp_flush_runnable_)
+	{
+		delete udp_flush_runnable_;
+	}
 }
 
 uint32 FListenSocketRunnable::Run()
@@ -103,13 +112,18 @@ void FListenSocketRunnable::FillMessageQueue(MessageQueue_t& message_queue_)
 	}
 }
 
-DoubleBuffer& FListenSocketRunnable::GetUdpSendBuffer()
+void FListenSocketRunnable::PushUdpFlushMessage(const Message& msg) const
 {
-	return this->udp_send_buffer_;
+	udp_flush_runnable_->PushUdpFlushMessage(msg);
+}
+
+void FListenSocketRunnable::FlushUdpQueue()
+{
+	udp_flush_runnable_->Flush();
 }
 
 void FListenSocketRunnable::RunUdpFlush()
 {
-	
-	this->udp_flush_thread = FRunnableThread::Create(new FUdpFlushRunnable(this), TEXT("UdpFlushThread"));
+	udp_flush_runnable_ = new FUdpFlushRunnable(this);
+	this->udp_flush_thread_ = FRunnableThread::Create(udp_flush_runnable_, TEXT("UdpFlushThread"));
 }

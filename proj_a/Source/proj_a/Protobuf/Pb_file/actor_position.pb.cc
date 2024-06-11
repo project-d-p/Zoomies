@@ -23,6 +23,8 @@ namespace _pbi = _pb::internal;
 PROTOBUF_CONSTEXPR ActorPosition::ActorPosition(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.position_)*/nullptr
+  , /*decltype(_impl_.rotation_)*/nullptr
+  , /*decltype(_impl_.velocity_)*/nullptr
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct ActorPositionDefaultTypeInternal {
   PROTOBUF_CONSTEXPR ActorPositionDefaultTypeInternal()
@@ -45,6 +47,8 @@ const uint32_t TableStruct_actor_5fposition_2eproto::offsets[] PROTOBUF_SECTION_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::ActorPosition, _impl_.position_),
+  PROTOBUF_FIELD_OFFSET(::ActorPosition, _impl_.rotation_),
+  PROTOBUF_FIELD_OFFSET(::ActorPosition, _impl_.velocity_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::ActorPosition)},
@@ -55,16 +59,17 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_actor_5fposition_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\024actor_position.proto\032\014vector.proto\"(\n\r"
-  "ActorPosition\022\027\n\010position\030\001 \001(\0132\005.Vec3b\006"
-  "proto3"
+  "\n\024actor_position.proto\032\014vector.proto\"Z\n\r"
+  "ActorPosition\022\027\n\010position\030\001 \001(\0132\005.Vec3\022\027"
+  "\n\010rotation\030\002 \001(\0132\005.Vec3\022\027\n\010Velocity\030\003 \001("
+  "\0132\005.Vec3b\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_actor_5fposition_2eproto_deps[1] = {
   &::descriptor_table_vector_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_actor_5fposition_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_actor_5fposition_2eproto = {
-    false, false, 86, descriptor_table_protodef_actor_5fposition_2eproto,
+    false, false, 136, descriptor_table_protodef_actor_5fposition_2eproto,
     "actor_position.proto",
     &descriptor_table_actor_5fposition_2eproto_once, descriptor_table_actor_5fposition_2eproto_deps, 1, 1,
     schemas, file_default_instances, TableStruct_actor_5fposition_2eproto::offsets,
@@ -83,17 +88,39 @@ PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::_pbi::AddDescriptorsRunner dynamic_in
 class ActorPosition::_Internal {
  public:
   static const ::Vec3& position(const ActorPosition* msg);
+  static const ::Vec3& rotation(const ActorPosition* msg);
+  static const ::Vec3& velocity(const ActorPosition* msg);
 };
 
 const ::Vec3&
 ActorPosition::_Internal::position(const ActorPosition* msg) {
   return *msg->_impl_.position_;
 }
+const ::Vec3&
+ActorPosition::_Internal::rotation(const ActorPosition* msg) {
+  return *msg->_impl_.rotation_;
+}
+const ::Vec3&
+ActorPosition::_Internal::velocity(const ActorPosition* msg) {
+  return *msg->_impl_.velocity_;
+}
 void ActorPosition::clear_position() {
   if (GetArenaForAllocation() == nullptr && _impl_.position_ != nullptr) {
     delete _impl_.position_;
   }
   _impl_.position_ = nullptr;
+}
+void ActorPosition::clear_rotation() {
+  if (GetArenaForAllocation() == nullptr && _impl_.rotation_ != nullptr) {
+    delete _impl_.rotation_;
+  }
+  _impl_.rotation_ = nullptr;
+}
+void ActorPosition::clear_velocity() {
+  if (GetArenaForAllocation() == nullptr && _impl_.velocity_ != nullptr) {
+    delete _impl_.velocity_;
+  }
+  _impl_.velocity_ = nullptr;
 }
 ActorPosition::ActorPosition(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
@@ -106,11 +133,19 @@ ActorPosition::ActorPosition(const ActorPosition& from)
   ActorPosition* const _this = this; (void)_this;
   new (&_impl_) Impl_{
       decltype(_impl_.position_){nullptr}
+    , decltype(_impl_.rotation_){nullptr}
+    , decltype(_impl_.velocity_){nullptr}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   if (from._internal_has_position()) {
     _this->_impl_.position_ = new ::Vec3(*from._impl_.position_);
+  }
+  if (from._internal_has_rotation()) {
+    _this->_impl_.rotation_ = new ::Vec3(*from._impl_.rotation_);
+  }
+  if (from._internal_has_velocity()) {
+    _this->_impl_.velocity_ = new ::Vec3(*from._impl_.velocity_);
   }
   // @@protoc_insertion_point(copy_constructor:ActorPosition)
 }
@@ -121,6 +156,8 @@ inline void ActorPosition::SharedCtor(
   (void)is_message_owned;
   new (&_impl_) Impl_{
       decltype(_impl_.position_){nullptr}
+    , decltype(_impl_.rotation_){nullptr}
+    , decltype(_impl_.velocity_){nullptr}
     , /*decltype(_impl_._cached_size_)*/{}
   };
 }
@@ -137,6 +174,8 @@ ActorPosition::~ActorPosition() {
 inline void ActorPosition::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
   if (this != internal_default_instance()) delete _impl_.position_;
+  if (this != internal_default_instance()) delete _impl_.rotation_;
+  if (this != internal_default_instance()) delete _impl_.velocity_;
 }
 
 void ActorPosition::SetCachedSize(int size) const {
@@ -153,6 +192,14 @@ void ActorPosition::Clear() {
     delete _impl_.position_;
   }
   _impl_.position_ = nullptr;
+  if (GetArenaForAllocation() == nullptr && _impl_.rotation_ != nullptr) {
+    delete _impl_.rotation_;
+  }
+  _impl_.rotation_ = nullptr;
+  if (GetArenaForAllocation() == nullptr && _impl_.velocity_ != nullptr) {
+    delete _impl_.velocity_;
+  }
+  _impl_.velocity_ = nullptr;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -166,6 +213,22 @@ const char* ActorPosition::_InternalParse(const char* ptr, ::_pbi::ParseContext*
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           ptr = ctx->ParseMessage(_internal_mutable_position(), ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // .Vec3 rotation = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
+          ptr = ctx->ParseMessage(_internal_mutable_rotation(), ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // .Vec3 Velocity = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
+          ptr = ctx->ParseMessage(_internal_mutable_velocity(), ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -206,6 +269,20 @@ uint8_t* ActorPosition::_InternalSerialize(
         _Internal::position(this).GetCachedSize(), target, stream);
   }
 
+  // .Vec3 rotation = 2;
+  if (this->_internal_has_rotation()) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(2, _Internal::rotation(this),
+        _Internal::rotation(this).GetCachedSize(), target, stream);
+  }
+
+  // .Vec3 Velocity = 3;
+  if (this->_internal_has_velocity()) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(3, _Internal::velocity(this),
+        _Internal::velocity(this).GetCachedSize(), target, stream);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -227,6 +304,20 @@ size_t ActorPosition::ByteSizeLong() const {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
         *_impl_.position_);
+  }
+
+  // .Vec3 rotation = 2;
+  if (this->_internal_has_rotation()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *_impl_.rotation_);
+  }
+
+  // .Vec3 Velocity = 3;
+  if (this->_internal_has_velocity()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *_impl_.velocity_);
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
@@ -251,6 +342,14 @@ void ActorPosition::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::
     _this->_internal_mutable_position()->::Vec3::MergeFrom(
         from._internal_position());
   }
+  if (from._internal_has_rotation()) {
+    _this->_internal_mutable_rotation()->::Vec3::MergeFrom(
+        from._internal_rotation());
+  }
+  if (from._internal_has_velocity()) {
+    _this->_internal_mutable_velocity()->::Vec3::MergeFrom(
+        from._internal_velocity());
+  }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -268,7 +367,12 @@ bool ActorPosition::IsInitialized() const {
 void ActorPosition::InternalSwap(ActorPosition* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
-  swap(_impl_.position_, other->_impl_.position_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(ActorPosition, _impl_.velocity_)
+      + sizeof(ActorPosition::_impl_.velocity_)
+      - PROTOBUF_FIELD_OFFSET(ActorPosition, _impl_.position_)>(
+          reinterpret_cast<char*>(&_impl_.position_),
+          reinterpret_cast<char*>(&other->_impl_.position_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata ActorPosition::GetMetadata() const {

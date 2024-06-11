@@ -176,6 +176,8 @@ class ActorPosition final :
 
   enum : int {
     kPositionFieldNumber = 1,
+    kRotationFieldNumber = 2,
+    kVelocityFieldNumber = 3,
   };
   // .Vec3 position = 1;
   bool has_position() const;
@@ -195,6 +197,42 @@ class ActorPosition final :
       ::Vec3* position);
   ::Vec3* unsafe_arena_release_position();
 
+  // .Vec3 rotation = 2;
+  bool has_rotation() const;
+  private:
+  bool _internal_has_rotation() const;
+  public:
+  void clear_rotation();
+  const ::Vec3& rotation() const;
+  PROTOBUF_NODISCARD ::Vec3* release_rotation();
+  ::Vec3* mutable_rotation();
+  void set_allocated_rotation(::Vec3* rotation);
+  private:
+  const ::Vec3& _internal_rotation() const;
+  ::Vec3* _internal_mutable_rotation();
+  public:
+  void unsafe_arena_set_allocated_rotation(
+      ::Vec3* rotation);
+  ::Vec3* unsafe_arena_release_rotation();
+
+  // .Vec3 Velocity = 3;
+  bool has_velocity() const;
+  private:
+  bool _internal_has_velocity() const;
+  public:
+  void clear_velocity();
+  const ::Vec3& velocity() const;
+  PROTOBUF_NODISCARD ::Vec3* release_velocity();
+  ::Vec3* mutable_velocity();
+  void set_allocated_velocity(::Vec3* velocity);
+  private:
+  const ::Vec3& _internal_velocity() const;
+  ::Vec3* _internal_mutable_velocity();
+  public:
+  void unsafe_arena_set_allocated_velocity(
+      ::Vec3* velocity);
+  ::Vec3* unsafe_arena_release_velocity();
+
   // @@protoc_insertion_point(class_scope:ActorPosition)
  private:
   class _Internal;
@@ -204,6 +242,8 @@ class ActorPosition final :
   typedef void DestructorSkippable_;
   struct Impl_ {
     ::Vec3* position_;
+    ::Vec3* rotation_;
+    ::Vec3* velocity_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -303,6 +343,176 @@ inline void ActorPosition::set_allocated_position(::Vec3* position) {
   }
   _impl_.position_ = position;
   // @@protoc_insertion_point(field_set_allocated:ActorPosition.position)
+}
+
+// .Vec3 rotation = 2;
+inline bool ActorPosition::_internal_has_rotation() const {
+  return this != internal_default_instance() && _impl_.rotation_ != nullptr;
+}
+inline bool ActorPosition::has_rotation() const {
+  return _internal_has_rotation();
+}
+inline const ::Vec3& ActorPosition::_internal_rotation() const {
+  const ::Vec3* p = _impl_.rotation_;
+  return p != nullptr ? *p : reinterpret_cast<const ::Vec3&>(
+      ::_Vec3_default_instance_);
+}
+inline const ::Vec3& ActorPosition::rotation() const {
+  // @@protoc_insertion_point(field_get:ActorPosition.rotation)
+  return _internal_rotation();
+}
+inline void ActorPosition::unsafe_arena_set_allocated_rotation(
+    ::Vec3* rotation) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.rotation_);
+  }
+  _impl_.rotation_ = rotation;
+  if (rotation) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:ActorPosition.rotation)
+}
+inline ::Vec3* ActorPosition::release_rotation() {
+  
+  ::Vec3* temp = _impl_.rotation_;
+  _impl_.rotation_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::Vec3* ActorPosition::unsafe_arena_release_rotation() {
+  // @@protoc_insertion_point(field_release:ActorPosition.rotation)
+  
+  ::Vec3* temp = _impl_.rotation_;
+  _impl_.rotation_ = nullptr;
+  return temp;
+}
+inline ::Vec3* ActorPosition::_internal_mutable_rotation() {
+  
+  if (_impl_.rotation_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Vec3>(GetArenaForAllocation());
+    _impl_.rotation_ = p;
+  }
+  return _impl_.rotation_;
+}
+inline ::Vec3* ActorPosition::mutable_rotation() {
+  ::Vec3* _msg = _internal_mutable_rotation();
+  // @@protoc_insertion_point(field_mutable:ActorPosition.rotation)
+  return _msg;
+}
+inline void ActorPosition::set_allocated_rotation(::Vec3* rotation) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.rotation_);
+  }
+  if (rotation) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(
+                reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(rotation));
+    if (message_arena != submessage_arena) {
+      rotation = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, rotation, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  _impl_.rotation_ = rotation;
+  // @@protoc_insertion_point(field_set_allocated:ActorPosition.rotation)
+}
+
+// .Vec3 Velocity = 3;
+inline bool ActorPosition::_internal_has_velocity() const {
+  return this != internal_default_instance() && _impl_.velocity_ != nullptr;
+}
+inline bool ActorPosition::has_velocity() const {
+  return _internal_has_velocity();
+}
+inline const ::Vec3& ActorPosition::_internal_velocity() const {
+  const ::Vec3* p = _impl_.velocity_;
+  return p != nullptr ? *p : reinterpret_cast<const ::Vec3&>(
+      ::_Vec3_default_instance_);
+}
+inline const ::Vec3& ActorPosition::velocity() const {
+  // @@protoc_insertion_point(field_get:ActorPosition.Velocity)
+  return _internal_velocity();
+}
+inline void ActorPosition::unsafe_arena_set_allocated_velocity(
+    ::Vec3* velocity) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.velocity_);
+  }
+  _impl_.velocity_ = velocity;
+  if (velocity) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:ActorPosition.Velocity)
+}
+inline ::Vec3* ActorPosition::release_velocity() {
+  
+  ::Vec3* temp = _impl_.velocity_;
+  _impl_.velocity_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::Vec3* ActorPosition::unsafe_arena_release_velocity() {
+  // @@protoc_insertion_point(field_release:ActorPosition.Velocity)
+  
+  ::Vec3* temp = _impl_.velocity_;
+  _impl_.velocity_ = nullptr;
+  return temp;
+}
+inline ::Vec3* ActorPosition::_internal_mutable_velocity() {
+  
+  if (_impl_.velocity_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Vec3>(GetArenaForAllocation());
+    _impl_.velocity_ = p;
+  }
+  return _impl_.velocity_;
+}
+inline ::Vec3* ActorPosition::mutable_velocity() {
+  ::Vec3* _msg = _internal_mutable_velocity();
+  // @@protoc_insertion_point(field_mutable:ActorPosition.Velocity)
+  return _msg;
+}
+inline void ActorPosition::set_allocated_velocity(::Vec3* velocity) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.velocity_);
+  }
+  if (velocity) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(
+                reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(velocity));
+    if (message_arena != submessage_arena) {
+      velocity = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, velocity, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  _impl_.velocity_ = velocity;
+  // @@protoc_insertion_point(field_set_allocated:ActorPosition.Velocity)
 }
 
 #ifdef __GNUC__

@@ -29,8 +29,8 @@ public:
 	void CreateSocket();
 	void Connect(FString ip, uint32 port);
 	void RunTask();
-	
-	void HandleMovement(const Movement& movement, DoubleBuffer& udp_send_buffer);
+
+	void HandleMovement(const Movement& movement);
 	
 protected:
 	virtual void BeginPlay() override;
