@@ -80,7 +80,7 @@ void ADPPlayerController::SendChatMessageToServer(const FString& Message)
 		return;
 	}
 	
-	// FString SenderName = PA->GetName();
+	FString SenderName = "";
 	if (HasAuthority())
 	{
 		ADPGameModeBase* GM = UGameHelper::GetInGameMode(GetWorld());
