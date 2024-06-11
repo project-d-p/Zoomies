@@ -28,9 +28,9 @@ struct FTextBlockStruct
 	GENERATED_BODY()
 
 	UPROPERTY()
-	UTextBlock* TextBlock;
+	UTextBlock* TextBlock = nullptr;
 	UPROPERTY()
-	bool bIsSet;
+	bool bIsSet = false;
 };
 
 UCLASS()
