@@ -44,10 +44,10 @@ uint32 FUdpSendTask::Run()
 
 	FIPv4Address IP(uintIp);
 	// TODO: 주소 문제 해결
-	// FIPv4Address IP2(10, 19, 225, 124);
-	int32 Port = 5000;
+	FIPv4Address IP2(127, 0, 0, 1);
+	int32 Port = 4242;
 	FIPv4Endpoint Endpoint(IP, Port);
-
+	
 	FString AddressString = Endpoint.ToText().ToString();
 	bool bIsValid;
 	Addr->SetIp(*AddressString, bIsValid);
@@ -57,7 +57,7 @@ uint32 FUdpSendTask::Run()
 		return 1;
 	}
 	Addr->SetPort(Port);
-
+	
 	while (bShouldRun)
 	{
 		FInputData InputData;
@@ -73,10 +73,11 @@ uint32 FUdpSendTask::Run()
 		}
 
 		Vec3* InputProgressData = ProtobufUtility::ConvertToFVecToVec3(FVector(TotalData, 0));
-		ProtoData.set_player_id("player1");
+		ProtoData.set_allocated_progess_vector(InputProgressData);
+		// ProtoData.set_player_id("player1");
 		ProtoData.set_allocated_progess_vector(InputProgressData);
 		// ProtoData.set_allocated_rotation();
-		ProtoData.set_timestamp("4242");
+		// ProtoData.set_timestamp("4242");
 
 		Message msg;
 		*msg.mutable_movement() = ProtoData;
@@ -84,7 +85,7 @@ uint32 FUdpSendTask::Run()
 		TArray<uint8> bData = Marshaller::SerializeMessage(msg);
 
 		int32 BytesSent = 0;
-		Sock->SendTo(bData.GetData(), bData.Num(), BytesSent, *Addr);
+		Sock->Send(bData.GetData(), bData.Num(), BytesSent);
 
 		FPlatformProcess::Sleep(0.1);
 	}

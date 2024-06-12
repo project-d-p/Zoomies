@@ -13,6 +13,7 @@ public:
 	
 	UFUNCTION()
 	UPlayerScoreComp* GetPlayerScoreComp() const;
+
 private:
 	UPROPERTY()
 	UPlayerScoreComp* PlayerScoreComp = nullptr;

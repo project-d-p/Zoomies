@@ -63,9 +63,11 @@ bool FSocketManager::Connect(const FString& tIP, int32 tPort)
 	FIPv4Address::Parse(tIP, ip);
 	addr->SetIp(ip.Value);
 	addr->SetPort(tPort);
-	
-	UdpSock = FUdpSocketBuilder(TEXT("UdpClientSocket"));
+
+	UdpSock = SockSubSystem->CreateSocket(NAME_Stream, TEXT("InGame_TCP_Socket"), false);
 	UdpSock->SetNonBlocking(true);
+
+	UdpSock->Connect(*addr);
 	return true;
 }
 

@@ -59,6 +59,9 @@ proj_a/Plugins/*/Binaries/*
 
 proj_a/Package/*
 
+# protobuf compiled file
+proj_a/Protobuf/Pb_file/
+
 # Third party libraries
 proj_a/ThirdParty/*
 

@@ -4,8 +4,10 @@ import "movement.proto";
 import "actor_position.proto";
 
 message Message {
+  string player_id = 1;
   oneof message_type {
-    Movement movement = 1;
-    ActorPosition actor_position = 2;
+    Movement movement = 2;
+    ActorPosition actor_position = 3;
   }
+  string timestamp = 4;
 }
