@@ -1,11 +1,15 @@
 #include "GM_MatchingLobby.h"
 
+#include "DPCharacter.h"
+#include "DPPlayerController.h"
 #include "GameFramework/PlayerState.h"
 #include "proj_a/MatchingLobby/GS_MachingLobby/GS_MatchingLobby.h"
 #include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
 #include "Kismet/GameplayStatics.h"
 
 AGM_MatchingLobby::AGM_MatchingLobby() {
+	// DefaultPawnClass = ADPCharacter::StaticClass();
+	// PlayerControllerClass = ADPPlayerController::StaticClass();
 	GameStateClass = AGS_MatchingLobby::StaticClass();
 	PlayerControllerClass = APC_MatchingLobby::StaticClass();
 }

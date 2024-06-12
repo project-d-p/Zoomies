@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "DPCharacter.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "DPHpActorComponent.h"
 #include "DPConstructionActorComponent.h"
 #include "DPWeaponActorComponent.h"
@@ -31,12 +32,22 @@ ADPCharacter::ADPCharacter()
 	sceneCaptureSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SCENECAPTURESPRINGARM"));
 	sceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SCENECAPTURE"));
 
+	UE_LOG(LogTemp, Warning, TEXT("DPCharacter Constructor"));
+	gun = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GunMesh"));
+
 	springArm->SetupAttachment(RootComponent);
 	camera->SetupAttachment(springArm);
 
 	sceneCaptureSpringArm->SetupAttachment(RootComponent);
 	sceneCapture->SetupAttachment(sceneCaptureSpringArm);
 
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> GUNASSET
+	(TEXT("/Game/model/weapon/simpleGun.simpleGun"));
+	if (GUNASSET.Succeeded()) {
+		gun->SetStaticMesh(GUNASSET.Object);
+		gun->SetupAttachment(GetMesh(), TEXT("gunSocket"));
+	}
+	
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CHARACTER
 	(TEXT("/Game/model/steve/StickManForMixamo.StickManForMixamo"));
 	if (SK_CHARACTER.Succeeded()) {
@@ -71,7 +82,7 @@ ADPCharacter::ADPCharacter()
 	
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(TEXT("/Game/animation/steve/characterAnimation.characterAnimation_C"));
+	(TEXT("/Game/animation/steve/steveAnimation.steveAnimation_C"));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}
@@ -118,6 +129,8 @@ void ADPCharacter::Tick(float DeltaTime)
 	}
 	else
 		UE_LOG(LogTemp, Warning, TEXT("null GetCharacterMovement"));
+
+
 }
 
 // Called to bind functionality to input
