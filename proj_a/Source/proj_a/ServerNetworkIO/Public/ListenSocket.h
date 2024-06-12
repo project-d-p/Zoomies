@@ -8,6 +8,7 @@
 #include "DoubleBuffer.h"
 #include "message.pb.h"
 #include "MessageQueueFilter.h"
+#include "FUdpFlush.h"
 #include <queue>
 #include <utility>
 #include <vector>

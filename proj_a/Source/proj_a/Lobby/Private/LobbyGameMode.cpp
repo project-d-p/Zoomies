@@ -9,7 +9,7 @@ void ALobbyGameMode::PostLogin(APlayerController* newPlayer) {
 	Super::PostLogin(newPlayer);
 
 	UE_LOG(LogTemp, Log, TEXT("SESSION JOINED"));
-	this->CheckAndStartGame();
+	CheckAndStartGame();
 }
 
 void ALobbyGameMode::CheckAndStartGame() {
@@ -22,8 +22,6 @@ void ALobbyGameMode::CheckAndStartGame() {
 
 void ALobbyGameMode::StartGame() const {
 	if (HasAuthority()) {
-		GetWorld()->ServerTravel(TEXT("mainLevel?listen"), true);
-	} else {
-		
+		GetWorld()->ServerTravel(TEXT("matchLobby?listen"), true);
 	}
 }

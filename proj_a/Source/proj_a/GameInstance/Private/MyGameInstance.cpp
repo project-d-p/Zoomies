@@ -7,6 +7,45 @@
 #include "Online/OnlineSessionNames.h"
 #include "OnlineSessionSettings.h"
 
+void UMyGameInstance::Init() {
+	Super::Init();
+
+    online_subsystem_ = IOnlineSubsystem::Get();
+    if (online_subsystem_)
+    {
+        match_session_ = online_subsystem_->GetSessionInterface();
+        if (!match_session_.IsValid()) {
+            UE_LOG(LogTemp, Warning, TEXT("session interface failed"));
+            return;
+        }
+        FName SubsystemName = online_subsystem_->GetSubsystemName();
+        UE_LOG(LogTemp, Log, TEXT("Current Online Subsystem: %s"), *SubsystemName.ToString());
+    }
+
+    if (SteamAPI_Init())
+    {
+        CSteamID steamID = SteamUser()->GetSteamID();
+        FString steamUsername = UTF8_TO_TCHAR(SteamFriends()->GetPersonaName());
+        UE_LOG(LogTemp, Log, TEXT("Steam ID: %llu, Username: %s"), steamID.ConvertToUint64(), *steamUsername);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Log, TEXT("STEAM INIT FAILED"));
+
+        FString FilePath = FPaths::Combine(FPaths::ProjectDir(), TEXT("steam_appid.txt"));
+        FString FileContent;
+        if (FFileHelper::LoadFileToString(FileContent, *FilePath))
+        {
+            UE_LOG(LogTemp, Log, TEXT("Loaded steam_appid.txt content: %s"), *FileContent);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Log, TEXT("Failed to load steam_appid.txt"));
+        }
+    }
+    this->desired_session_name_ = "zoomies_lobby";
+}
+
 void UMyGameInstance::StartMatchMaking() {
     this->FindSession();
 }
@@ -17,7 +56,7 @@ void UMyGameInstance::FindSession() {
 
     session_search_ = MakeShareable(new FOnlineSessionSearch());
     session_search_->bIsLanQuery = true;
-    session_search_->MaxSearchResults = 100000;
+    session_search_->MaxSearchResults = 20;
 
     OnFindSessionsCompleteDelegateHandle = match_session_->AddOnFindSessionsCompleteDelegate_Handle(
         FOnFindSessionsCompleteDelegate::CreateUObject(this, &UMyGameInstance::OnFindSessionsComplete));
@@ -113,41 +152,3 @@ void UMyGameInstance::OnJoinSessionComplete(FName sessionName, EOnJoinSessionCom
     }
 }
 
-void UMyGameInstance::Init() {
-	Super::Init();
-
-    online_subsystem_ = IOnlineSubsystem::Get();
-    if (online_subsystem_)
-    {
-        match_session_ = online_subsystem_->GetSessionInterface();
-        if (!match_session_.IsValid()) {
-            UE_LOG(LogTemp, Warning, TEXT("session interface failed"));
-            return;
-        }
-        FName SubsystemName = online_subsystem_->GetSubsystemName();
-        UE_LOG(LogTemp, Log, TEXT("Current Online Subsystem: %s"), *SubsystemName.ToString());
-    }
-
-    if (SteamAPI_Init())
-    {
-        CSteamID steamID = SteamUser()->GetSteamID();
-        FString steamUsername = UTF8_TO_TCHAR(SteamFriends()->GetPersonaName());
-        UE_LOG(LogTemp, Log, TEXT("Steam ID: %llu, Username: %s"), steamID.ConvertToUint64(), *steamUsername);
-    }
-    else
-    {
-        UE_LOG(LogTemp, Log, TEXT("STEAM INIT FAILED"));
-
-        FString FilePath = FPaths::Combine(FPaths::ProjectDir(), TEXT("steam_appid.txt"));
-        FString FileContent;
-        if (FFileHelper::LoadFileToString(FileContent, *FilePath))
-        {
-            UE_LOG(LogTemp, Log, TEXT("Loaded steam_appid.txt content: %s"), *FileContent);
-        }
-        else
-        {
-            UE_LOG(LogTemp, Log, TEXT("Failed to load steam_appid.txt"));
-        }
-    }
-    this->desired_session_name_ = "deulee_server";
-}

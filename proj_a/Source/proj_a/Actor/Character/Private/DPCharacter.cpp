@@ -62,6 +62,7 @@ ADPCharacter::ADPCharacter()
 	sceneCaptureSpringArm->bInheritPitch = false;
 	sceneCaptureSpringArm->bInheritYaw = false;
 	sceneCaptureSpringArm->bInheritRoll = false;
+	sceneCaptureSpringArm->bDoCollisionTest = false;
 	sceneCapture->ProjectionType = ECameraProjectionMode::Type::Orthographic;
 	sceneCapture->OrthoWidth = 1024.0f;
 	

@@ -73,7 +73,7 @@ void ADPGameModeBase::StartPlay()
 {
 	Super::StartPlay();
 
-	// Àç½Ãµµ ·ÎÁ÷ Ãß°¡ ÇØ¾ßÇÔ.
+	// ì¬ì‹œë„ ë¡œì§ ì¶”ê°€ í•´ì•¼í•¨.
 	UE_LOG(LogTemp, Log, TEXT("Start play."));
 
 	TArray<AActor*> FoundCharacters;
