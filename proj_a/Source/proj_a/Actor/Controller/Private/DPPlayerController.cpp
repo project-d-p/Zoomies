@@ -336,43 +336,43 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 			character->weaponComponent->Attack();
 		}
 	}
-	if ("WALL" == state->equipmentState) {
-		//if (character->isAim) {
-			character->GetCharacterMovement()->DisableMovement();
-			construction->MakeWall({ 0, 0, 0 }, { 0, 0, 0 });
-			character->constructionComponent->placeWall = true;
-			// ´ÙÀ½ Æ½¿¡ false·Î ¹Ù²Þ
-			auto resetPlaceWall = [this]() {
-				character->constructionComponent->placeWall = false;
-			};
-			GetWorld()->GetTimerManager().SetTimerForNextTick(resetPlaceWall);
-
-			FTimerHandle waitTimer;
-			GetWorld()->GetTimerManager().SetTimer(waitTimer, FTimerDelegate::CreateLambda([&]() {
-				UE_LOG(LogTemp, Warning, TEXT("wall delay 1.63"));
-				character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);	// movement disable -> enable
-				GetWorldTimerManager().ClearTimer(waitTimer);
-			}), 1.63f, false);
-		//}
-	}
-	if ("TURRET" == state->equipmentState) {
-		if (character->isAim) {
-			character->GetCharacterMovement()->DisableMovement();
-			character->constructionComponent->placeturret = true;
-
-			auto resetPlaceTurret = [this]() {
-				character->constructionComponent->placeturret = false;
-			};
-			GetWorld()->GetTimerManager().SetTimerForNextTick(resetPlaceTurret);
-
-			FTimerHandle waitTimer;
-			GetWorld()->GetTimerManager().SetTimer(waitTimer, FTimerDelegate::CreateLambda([&]() {
-				UE_LOG(LogTemp, Warning, TEXT("turret delay 1.63"));
-				character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-				GetWorldTimerManager().ClearTimer(waitTimer);
-			}), 1.63f, false);
-		}
-	}
+	// if ("WALL" == state->equipmentState) {
+	// 	//if (character->isAim) {
+	// 		character->GetCharacterMovement()->DisableMovement();
+	// 		construction->MakeWall({ 0, 0, 0 }, { 0, 0, 0 });
+	// 		character->constructionComponent->placeWall = true;
+	// 		// ´ÙÀ½ Æ½¿¡ false·Î ¹Ù²Þ
+	// 		auto resetPlaceWall = [this]() {
+	// 			character->constructionComponent->placeWall = false;
+	// 		};
+	// 		GetWorld()->GetTimerManager().SetTimerForNextTick(resetPlaceWall);
+	//
+	// 		FTimerHandle waitTimer;
+	// 		GetWorld()->GetTimerManager().SetTimer(waitTimer, FTimerDelegate::CreateLambda([&]() {
+	// 			UE_LOG(LogTemp, Warning, TEXT("wall delay 1.63"));
+	// 			character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);	// movement disable -> enable
+	// 			GetWorldTimerManager().ClearTimer(waitTimer);
+	// 		}), 1.63f, false);
+	// 	//}
+	// }
+	// if ("TURRET" == state->equipmentState) {
+	// 	if (character->isAim) {
+	// 		character->GetCharacterMovement()->DisableMovement();
+	// 		character->constructionComponent->placeturret = true;
+	//
+	// 		auto resetPlaceTurret = [this]() {
+	// 			character->constructionComponent->placeturret = false;
+	// 		};
+	// 		GetWorld()->GetTimerManager().SetTimerForNextTick(resetPlaceTurret);
+	//
+	// 		FTimerHandle waitTimer;
+	// 		GetWorld()->GetTimerManager().SetTimer(waitTimer, FTimerDelegate::CreateLambda([&]() {
+	// 			UE_LOG(LogTemp, Warning, TEXT("turret delay 1.63"));
+	// 			character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	// 			GetWorldTimerManager().ClearTimer(waitTimer);
+	// 		}), 1.63f, false);
+	// 	}
+	// }
 }
 
 void ADPPlayerController::AdditionalSetting(const FInputActionValue& value)

@@ -32,6 +32,7 @@ ADPCharacter::ADPCharacter()
 	sceneCaptureSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SCENECAPTURESPRINGARM"));
 	sceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SCENECAPTURE"));
 
+	UE_LOG(LogTemp, Warning, TEXT("DPCharacter Constructor"));
 	gun = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GunMesh"));
 
 	springArm->SetupAttachment(RootComponent);
@@ -44,10 +45,9 @@ ADPCharacter::ADPCharacter()
 	(TEXT("/Game/model/weapon/simpleGun.simpleGun"));
 	if (GUNASSET.Succeeded()) {
 		gun->SetStaticMesh(GUNASSET.Object);
+		gun->SetupAttachment(GetMesh(), TEXT("gunSocket"));
 	}
-
-	gun->SetupAttachment(GetMesh(), TEXT("gunSocket"));
-
+	
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CHARACTER
 	(TEXT("/Game/model/steve/StickManForMixamo.StickManForMixamo"));
 	if (SK_CHARACTER.Succeeded()) {
