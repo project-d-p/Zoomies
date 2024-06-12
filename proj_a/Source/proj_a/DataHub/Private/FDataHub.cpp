@@ -1,5 +1,8 @@
 #include "FDataHub.h"
 
+#include "FNetLogger.h"
+#include "WorldPartition/ContentBundle/ContentBundleLog.h"
+
 TMap<ID_TYPE, ActorPosition> FDataHub::actorPosition;
 TMap<ID_TYPE, Movement> FDataHub::EchoData;
 
@@ -7,7 +10,7 @@ TMap<ID_TYPE, Movement> FDataHub::EchoData;
 
 void FDataHub::PushActorDA(const Message& NewData)
 {
-    const ID_TYPE key = NewData.player_id().c_str();
+    const ID_TYPE key(NewData.player_id().c_str());
     if (!actorPosition.Contains(key)) {
         // 새로운 데이터 생성 알림
     }

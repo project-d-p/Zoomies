@@ -56,13 +56,14 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 		return ;
 	}
 	
-	APawn* pawn = newPlayer->GetPawn();
-	if (!pawn)
+	// Player tate
+	ADPPlayerState* player_state = Cast<ADPPlayerState>(newPlayer->PlayerState);
+	if (!player_state)
 	{
 		return;
 	}
 
-	FString name = pawn->GetName();
+	FString name = player_state->GetPlayerName();
 	FNetLogger::EditerLog(FColor::Blue, TEXT("Player name: %s"), *name);
 	std::string key(TCHAR_TO_UTF8(*name));
 	player_controllers_[key] = Cast<ADPPlayerController>(newPlayer);
@@ -113,6 +114,10 @@ void ADPGameModeBase::ProcessData(float delta_time)
 {
 	this->MergeMessages();
 	// FNetLogger::EditerLog(FColor::Red, TEXT("size of message queue: %d"), this->message_queue_.size());
+	if (this->message_queue_.empty())
+	{
+		return;
+	}
 	while (!this->message_queue_.empty())
 	{
 		Message message = this->message_queue_.front();
@@ -139,7 +144,9 @@ void ADPGameModeBase::SyncMovement()
 {
 	for (auto& pair: player_controllers_)
 	{
-		Message msg = MessageMaker::MakeMessage(pair.second);
-		listen_socket_->PushUdpFlushMessage(msg);
+		// FNetLogger::EditerLog(FColor::Green, TEXT("player name: %s"), *FString(pair.first.c_str()));
+		// UE_LOG(LogTemp, Warning, TEXT("sender name: %s"), *FString(pair.first.c_str()));
+		// Message msg = MessageMaker::MakeMessage(pair.second);
+		// listen_socket_->PushUdpFlushMessage(msg);
 	}
 }

@@ -1,6 +1,7 @@
 #include "MessageHandler.h"
 #include "FDataHub.h"
 #include "FNetLogger.h"
+#include "WorldPartition/ContentBundle/ContentBundleLog.h"
 
 FMessageHandler::FMessageHandler()
 {
@@ -14,7 +15,6 @@ FMessageHandler::FMessageHandler()
 	// PlayerPosition 메시지 처리 함수 등록
 	MessageHandlers.Add(Message::kActorPosition, FMessageDelegate::CreateLambda([](const Message& Msg)
 	{
-		// FNetLogger::GetInstance().LogInfo(TEXT("Player position update received: %s", *FString(Msg.DebugString().c_str())));
 		FDataHub::PushActorDA(Msg);
 	}));
 }
@@ -24,6 +24,7 @@ void FMessageHandler::HandleMessage(const Message& Msg)
 	const FMessageDelegate* foundDelegate = MessageHandlers.Find(Msg.message_type_case());
 	if (foundDelegate)
 	{
+		UE_LOG(LogNetwork, Warning, TEXT("Found message type: %d"), Msg.message_type_case());
 		(void)foundDelegate->ExecuteIfBound(Msg);
 	}
 	else

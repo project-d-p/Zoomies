@@ -1,20 +1,13 @@
 #include "MessageMaker.h"
 #include "DPPlayerController.h"
+#include "FNetLogger.h"
 #include "PlayerName.h"
+#include "GameFramework/PlayerState.h"
 
 Message MessageMaker::MakeMessage(const ADPPlayerController* Controller, const FVector2D& Input, const FVector& Forward, const FVector& Right, const FVector& Velocity)
 {
 	Message msg;
-	// msg.set_player_id(TCHAR_TO_UTF8(*(Controller->GetPawn()->GetName())));
-
-	// 아래의 방법으로 하게 되면 쓰레기 값이 출력됨. 메모리 반환 이슈
-	// std::string player_id("DPCharacter_1");
-	// msg.set_player_id(player_id);
-
-	// 올바른 방법
-	// TODO: 서버하고 클라이언트가 같은지 테스트 필요
-	// msg.set_player_id(TCHAR_TO_UTF8(*(Controller->GetPawn()->GetName())));
-	msg.set_player_id(PlayerName::GetNamePlayerOne());
+	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetPlayerName()));
 	Movement movement;
 	Vec3 progress_vector;
 	progress_vector.set_x(Input.X);
@@ -45,7 +38,7 @@ Message MessageMaker::MakeMessage(const ADPPlayerController* Controller, const F
 Message MessageMaker::MakeMessage(const ADPPlayerController* Controller)
 {
 	Message msg;
-	msg.set_player_id(TCHAR_TO_UTF8(*(Controller->GetPackage()->GetName())));
+	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetPlayerName()));
 	ActorPosition actor_position;
 	Vec3 position;
 	position.set_x(Controller->GetPawn()->GetActorLocation().X);

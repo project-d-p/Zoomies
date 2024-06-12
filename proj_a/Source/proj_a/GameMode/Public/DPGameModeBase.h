@@ -31,7 +31,7 @@ public:
 
 	void SendChatToAllClients(const FString& SenderName, const FString& Message);
 
-	/** Å×½ºÆ®¸¦ À§ÇØ¼­ ÀÓ½Ã·Î public¿¡ ¼±¾ğ */
+	/** í…ŒìŠ¤íŠ¸ë¥¼ ìœ„í•´ì„œ ì„ì‹œë¡œ publicì— ì„ ì–¸ */
 	UPROPERTY()
 	UScoreManagerComp* ScoreManager;
 

@@ -172,6 +172,11 @@ void ADPPlayerController::SendCompressedMovement()
 	{
 		return ;
 	}
+
+	if (PlayerState)
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("Player Name: %s"), *PlayerState->GetPlayerName());
+	}
 	
 	FNetLogger::EditerLog(FColor::Blue, TEXT("Send Movement[Client]: %f %f"), AccumulatedMovementInput.X, AccumulatedMovementInput.Y);
 	FNetLogger::EditerLog(FColor::Blue, TEXT("Send Forward[Client]: %f %f %f"), AccumulatedForwardInput.X, AccumulatedForwardInput.Y, AccumulatedForwardInput.Z);
@@ -212,7 +217,6 @@ void ADPPlayerController::OnPossess(APawn* InPawn)
 		FNetLogger::EditerLog(FColor::Red, TEXT("Add Mapping Context [On Possess]"));
 		SubSystem->AddMappingContext(defaultContext, 0);
 	}
-	// TODO: Name Should be Changed
 }
 
 void ADPPlayerController::SetupInputComponent()
@@ -417,7 +421,8 @@ void ADPPlayerController::ActionCancel(const FInputActionValue& value)
 void ADPPlayerController::UpdatePlayer()
 {
 	ActorPosition actorPosition;
-	const FString PlayerId = std::to_string(GetUniqueID()).c_str();
+
+	const FString PlayerId = this->PlayerState->GetPlayerName();
 	if (!FDataHub::actorPosition.Contains(PlayerId))
 	{
 		/** 포함되지 않았을 경우 */

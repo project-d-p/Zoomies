@@ -1,5 +1,6 @@
 #include "ClientReadTask.h"
 
+#include "FNetLogger.h"
 #include "Marshaller.h"
 #include "MessageHandler.h"
 #include "Sockets.h"
@@ -28,9 +29,12 @@ uint32 ClientReadTask::Run()
 		{
 			int32 read = 0;
 			tcp_socket_->Recv(data.GetData(), size, read);
+			TArray<uint8> parsed_line;
 			Message msg = Marshaller::DeserializeMessage(data);
-			MessageHandler.HandleMessage(msg);		
+			MessageHandler.HandleMessage(msg);
+			data.SetNumZeroed(buffer_size);
 		}
+		FPlatformProcess::Sleep(0.01f);
 	}
 	return 0;
 }
