@@ -1,5 +1,10 @@
 # Visual Studio 2015 user specific files
-.vs/
+proj_a/.vs/
+proj_a/.vsconfig
+
+# Rider user specific files
+proj_a/.idea/*
+.idea/*
 
 # Compiled Object files
 *.slo
@@ -105,3 +110,7 @@ server/server/x64
 
 # idea folder
 proj_a/.idea/*
+
+# Protobuf generated files
+*.pb.cc
+*.pb.h

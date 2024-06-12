@@ -1,11 +1,11 @@
 syntax = "proto3";
 
 import "movement.proto";
-import "player_position.proto";
+import "actor_position.proto";
 
 message Message {
   oneof message_type {
     Movement movement = 1;
-    PlayerPosition player_position = 2;
+    ActorPosition actor_position = 2;
   }
 }

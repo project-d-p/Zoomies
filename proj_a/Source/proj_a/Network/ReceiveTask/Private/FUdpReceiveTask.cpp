@@ -14,7 +14,7 @@ FUdpReceiveTask::FUdpReceiveTask(const FString Ip, int32 Port)
 	}
 	else
 	{
-		FNetLogger::GetInstance().LogError(TEXT("Failed to initialize UDP socket"));
+		FNetLogger::LogError(TEXT("Failed to initialize UDP socket"));
 	}
 }
 
@@ -35,7 +35,7 @@ bool FUdpReceiveTask::InitializeSocket(const FString Ip, int32 Port)
 	Socket = sockManager.GetUDPSocket();
 	if (!Socket && Socket->GetSocketType() == SOCKTYPE_Datagram)
 	{
-		FNetLogger::GetInstance().LogError(TEXT("Failed to get UDP socket"));
+		FNetLogger::LogError(TEXT("Failed to get UDP socket"));
 		return false;
 	}
 	FIPv4Address parseIp;
@@ -46,16 +46,16 @@ bool FUdpReceiveTask::InitializeSocket(const FString Ip, int32 Port)
 	int32 actualSize = 0;
 	if (!Socket->SetReceiveBufferSize(desireBufferSize, actualSize))
 	{
-		FNetLogger::GetInstance().LogError(TEXT("Failed to set the receive buffer size."));
+		FNetLogger::LogError(TEXT("Failed to set the receive buffer size."));
 	}
 	if (desireBufferSize != actualSize)
 	{
-		FNetLogger::GetInstance().LogInfo(TEXT("Attempted to set buffer size to %d bytes."), desireBufferSize);
-		FNetLogger::GetInstance().LogInfo(TEXT("Actual buffer size set: %d bytes."), actualSize);
+		FNetLogger::LogInfo(TEXT("Attempted to set buffer size to %d bytes."), desireBufferSize);
+		FNetLogger::LogInfo(TEXT("Actual buffer size set: %d bytes."), actualSize);
 	}
 	if (!Socket->Bind(*endPoint.ToInternetAddr()))
 	{
-		FNetLogger::GetInstance().LogError(TEXT("Failed to bind UDP socket"));
+		FNetLogger::LogError(TEXT("Failed to bind UDP socket"));
 	}
 	return true;
 }

@@ -13,10 +13,10 @@ FMessageHandler::FMessageHandler()
 	}));
 
 	// PlayerPosition 메시지 처리 함수 등록
-	MessageHandlers.Add(Message::kPlayerPosition, FMessageDelegate::CreateLambda([](const Message& Msg)
+	MessageHandlers.Add(Message::kActorPosition, FMessageDelegate::CreateLambda([](const Message& Msg)
 	{
 		// FNetLogger::GetInstance().LogInfo(TEXT("Player position update received: %s", *FString(Msg.DebugString().c_str())));
-		FDataHub::PushPlayerDA(Msg.player_position());
+		FDataHub::PushActorDA(Msg.actor_position());
 	}));
 }
 
