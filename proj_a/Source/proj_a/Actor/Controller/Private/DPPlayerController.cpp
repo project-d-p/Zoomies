@@ -8,20 +8,15 @@
 #include "DPWeaponActorComponent.h"
 #include "DPConstructionActorComponent.h"
 #include "DPGameModeBase.h"
-#include "DPInGameState.h"
 #include "DPPlayerState.h"
 #include "DPStateActorComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "NetComp.h"
 #include "ProtobufUtility.h"
 #include "movement.pb.h"
 #include "FDataHub.h"
 #include "FNetLogger.h"
 #include "FUdpSendTask.h"
 #include "MessageMaker.h"
-#include "PlayerName.h"
-#include "DSP/Chorus.h"
-#include "Settings/LevelEditorPlayNetworkEmulationSettings.h"
 #include "GameHelper.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -89,8 +84,9 @@ void ADPPlayerController::SendChatMessageToServer(const FString& Message)
 		UE_LOG(LogTemp, Warning, TEXT("ChatManager is null"));
 		return;
 	}
-	
-	FString SenderName = "";
+
+	// XXX: Change to client Steam nickname later
+	FString SenderName = "Unknown";
 	if (HasAuthority())
 	{
 		ADPGameModeBase* GM = UGameHelper::GetInGameMode(GetWorld());
@@ -260,7 +256,7 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 	// UE_LOG(LogTemp, Warning, TEXT("ia_move_y : %f"), value.Get<FVector2D>().Y);
 	const FVector2D actionValue = value.Get<FVector2D>();
 	const FRotator controlRotation = GetControlRotation();
-	const FRotator yaw(0.f, controlRotation.Yaw, 0.f);
+	// const FRotator yaw(0.f, controlRotation.Yaw, 0.f);
 
 	const FVector forwardVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
@@ -469,7 +465,7 @@ void ADPPlayerController::HandleMovement(const Movement& movement)
 	FVector rightVector = FVector(movement.right_vector().x(), movement.right_vector().y(), movement.right_vector().z());
 	FVector actionValue = FVector(movement.progess_vector().x(), movement.progess_vector().y(), movement.progess_vector().z());
 	FVector velocity = FVector(movement.velocity().x(), movement.velocity().y(), movement.velocity().z());
-	float velocitySize = movement.velocity_size();
+	// float velocitySize = movement.velocity_size();
 
 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Action: %f %f %f"), actionValue.X, actionValue.Y, actionValue.Z);
 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Forward: %f %f %f"), forwardVector.X, forwardVector.Y, forwardVector.Z);
