@@ -14,7 +14,7 @@ class PROJ_A_API ADPCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ADPCharacter();
-
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -31,6 +31,9 @@ public:
 	// FVector3f orientation;
 	// FString state;
 
+	// Locally Controlled
+	virtual bool IsLocallyControlled() const override;
+
 public:	// component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UDPHpActorComponent* hpComponent;
@@ -44,8 +47,7 @@ public:	// component
 	// gun mesh
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* gun;
-
-	// ??????? ?????
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
 	UAnimMontage* characterMontage;
 
@@ -56,7 +58,6 @@ public:	// component
 	void PlaceConstructionAnimation();
 	void DestroyConstructionAnimation();
 	void DyingAnimation();
-
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* springArm;
@@ -73,5 +74,4 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	float speed{ 0.f };
 	bool isAim{ false };
-
 };

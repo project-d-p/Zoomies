@@ -16,6 +16,8 @@
 // Sets default values
 ADPCharacter::ADPCharacter()
 {
+	bReplicates = true;
+	
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -90,7 +92,12 @@ ADPCharacter::ADPCharacter()
 	if (CHARACTER_MONTAGE.Succeeded()) {
 		characterMontage = CHARACTER_MONTAGE.Object;
 	}
+	// disable move replication : set bReplicateMovement to false
+	AActor::SetReplicatingMovement(false);
+	// bReplicateMovement
 
+	// Set Mass and Collision Profile
+	GetCharacterMovement()->Mass = 0.1f;
 }
 
 // Called when the game starts or when spawned
@@ -103,9 +110,7 @@ void ADPCharacter::BeginPlay()
 	hpComponent->IsDead = false;
 	constructionComponent->placeWall = false;
 	constructionComponent->placeturret = false;
-	
-
-
+	UE_LOG(LogTemp, Log, TEXT("is it replicaed: %d"), GetCharacterMovement()->GetIsReplicated());
 	TSubclassOf<ADPWeapon> gunClass = ADPWeaponGun::StaticClass();
 	if (weaponComponent) {
 		weaponComponent->AddWeapons(gunClass);
@@ -117,7 +122,7 @@ void ADPCharacter::BeginPlay()
 void ADPCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
 	if (GetCharacterMovement()) {
 		currentVelocity = GetCharacterMovement()->Velocity;
 		speed = currentVelocity.Size();
@@ -132,8 +137,14 @@ void ADPCharacter::Tick(float DeltaTime)
 void ADPCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
 
-
+bool ADPCharacter::IsLocallyControlled() const
+{
+	// Super::IsLocallyControlled();
+	if (HasAuthority())
+		return true;
+	return Super::IsLocallyControlled();
 }
 
 void ADPCharacter::PlayAimAnimation()
@@ -168,15 +179,12 @@ void ADPCharacter::ChangeAnimation()
 
 void ADPCharacter::PlaceConstructionAnimation()
 {
-	// �ൿ ���� �ִϸ��̼� ���
 }
 
 void ADPCharacter::DestroyConstructionAnimation()
 {
-	// �ൿ ���� �ִϸ��̼� ���
 }
 
 void ADPCharacter::DyingAnimation()
 {
-	// �ൿ ���� �ִϸ��̼� ���
 }

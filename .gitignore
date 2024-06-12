@@ -1,5 +1,10 @@
 # Visual Studio 2015 user specific files
-.vs/
+proj_a/.vs/
+proj_a/.vsconfig
+
+# Rider user specific files
+proj_a/.idea/*
+.idea/*
 
 # Compiled Object files
 *.slo
@@ -51,6 +56,15 @@ Plugins/*/Binaries/*
 proj_a/Binaries/*
 proj_a/Plugins/*/Binaries/*
 
+
+proj_a/Package/*
+
+# protobuf compiled file
+proj_a/Protobuf/Pb_file/
+
+# Third party libraries
+proj_a/ThirdParty/*
+
 # Builds
 Build/*
 
@@ -78,6 +92,8 @@ Plugins/*/Intermediate/*
 DerivedDataCache/*
 proj_a/DerivedDataCache/*
 
+# Rider Plugin
+proj_a/Plugins/Developer/RiderLink/
 
 server/server/x64
 *.exe
@@ -91,3 +107,13 @@ server/server/x64
 *.lastbuildstate
 *.suo
 *.db
+
+# DS_Store files
+.DS_Store
+
+# idea folder
+proj_a/.idea/*
+
+# Protobuf generated files
+*.pb.cc
+*.pb.h

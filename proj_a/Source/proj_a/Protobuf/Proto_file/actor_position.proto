@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+import "vector.proto";
+
+// server -> client
+message ActorPosition{
+  Vec3 position = 1;
+  Vec3 rotation = 2;
+  Vec3 Velocity = 3;
+}
+
+// 애니메이션 바로 뿌려지는가.. 안되면 보간 작업을 해야 함.

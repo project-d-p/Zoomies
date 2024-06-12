@@ -4,15 +4,18 @@
 #include "Containers/Queue.h"
 #include "Message.pb.h"
 
+/** Use the controller's unique ID */
+#define ID_TYPE FString
+
 class FDataHub
 {
 public:
 	// Player Data Map
-	static TMap<FString, PlayerPosition> PlayerPositions;
+	static TMap<ID_TYPE, ActorPosition> actorPosition;
 	// Test Data Map
-	static TMap<FString, Movement> EchoData;
+	static TMap<ID_TYPE, Movement> EchoData;
 	
-	static void PushPlayerDA(const PlayerPosition &NewData);
-	static void PushEchoDA(const Movement &NewData);
-	static void RemovePlayerDA(const FString &playerId);
+	static void PushActorDA(const Message &NewData);
+	static void PushEchoDA(const Message &NewData);
+	static void RemovePlayerDA(const ID_TYPE &playerId);
 };
