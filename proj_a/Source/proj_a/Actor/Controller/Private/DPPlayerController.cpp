@@ -15,6 +15,8 @@
 #include "FDataHub.h"
 #include "FNetLogger.h"
 #include "FUdpSendTask.h"
+#include "Kismet/GameplayStatics.h"
+
 
 DEFINE_LOG_CATEGORY(LogNetwork);
 
@@ -64,6 +66,14 @@ ADPPlayerController::ADPPlayerController()
 	(TEXT("/Game/input/ia_chat.ia_chat"));
 	if (IA_CHAT.Succeeded())
 		chatAction = IA_CHAT.Object;
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> SoundAsset
+	(TEXT("/Game/sounds/effect/character/jump_Cue.jump_Cue"));
+	if (SoundAsset.Succeeded()) {
+		jumpSound = SoundAsset.Object;
+	}
+	else
+		jumpSound = nullptr;
 }
 
 void ADPPlayerController::BeginPlay()
@@ -148,9 +158,12 @@ void ADPPlayerController::Jump(const FInputActionValue& value)
 	//UE_LOG(LogTemp, Warning, TEXT("ia_jump : %d"), value.Get<bool>());
 
 	bool actionValue = value.Get<bool>();
-	if (actionValue)
+	if (actionValue) {
 		// send jump command ( id, actionValue ) ( true = jump )
 		character->Jump();
+		UGameplayStatics::PlaySound2D(GetWorld(), jumpSound);
+	}
+
 }
 
 void ADPPlayerController::Rotate(const FInputActionValue& value)

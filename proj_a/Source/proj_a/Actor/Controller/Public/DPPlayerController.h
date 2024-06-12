@@ -62,4 +62,8 @@ private:
 	void OpenChat(const FInputActionValue& value);
 
 	void UpdatePlayer(/*DataHub result*/);
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundBase* jumpSound;
 };

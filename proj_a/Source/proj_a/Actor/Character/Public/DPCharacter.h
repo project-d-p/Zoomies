@@ -41,6 +41,10 @@ public:	// component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UDPStateActorComponent* stateComponent;
 
+	// gun mesh
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* gun;
+
 	// ??????? ?????
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
 	UAnimMontage* characterMontage;
@@ -69,4 +73,5 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	float speed{ 0.f };
 	bool isAim{ false };
+
 };

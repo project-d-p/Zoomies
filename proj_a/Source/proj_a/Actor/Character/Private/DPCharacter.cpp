@@ -30,11 +30,21 @@ ADPCharacter::ADPCharacter()
 	sceneCaptureSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SCENECAPTURESPRINGARM"));
 	sceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SCENECAPTURE"));
 
+	gun = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GunMesh"));
+
 	springArm->SetupAttachment(RootComponent);
 	camera->SetupAttachment(springArm);
 
 	sceneCaptureSpringArm->SetupAttachment(RootComponent);
 	sceneCapture->SetupAttachment(sceneCaptureSpringArm);
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> GUNASSET
+	(TEXT("/Game/model/weapon/simpleGun.simpleGun"));
+	if (GUNASSET.Succeeded()) {
+		gun->SetStaticMesh(GUNASSET.Object);
+	}
+
+	gun->SetupAttachment(GetMesh(), TEXT("gunSocket"));
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CHARACTER
 	(TEXT("/Game/model/steve/StickManForMixamo.StickManForMixamo"));
@@ -70,7 +80,7 @@ ADPCharacter::ADPCharacter()
 	
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(TEXT("/Game/animation/steve/characterAnimation.characterAnimation_C"));
+	(TEXT("/Game/animation/steve/steveAnimation.steveAnimation_C"));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}
@@ -80,6 +90,7 @@ ADPCharacter::ADPCharacter()
 	if (CHARACTER_MONTAGE.Succeeded()) {
 		characterMontage = CHARACTER_MONTAGE.Object;
 	}
+
 }
 
 // Called when the game starts or when spawned
@@ -93,6 +104,8 @@ void ADPCharacter::BeginPlay()
 	constructionComponent->placeWall = false;
 	constructionComponent->placeturret = false;
 	
+
+
 	TSubclassOf<ADPWeapon> gunClass = ADPWeaponGun::StaticClass();
 	if (weaponComponent) {
 		weaponComponent->AddWeapons(gunClass);
@@ -112,7 +125,7 @@ void ADPCharacter::Tick(float DeltaTime)
 	else
 		UE_LOG(LogTemp, Warning, TEXT("null GetCharacterMovement"));
 
-	//UE_LOG(LogTemp, Warning, TEXT("speed : %f"), speed);
+
 }
 
 // Called to bind functionality to input
