@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "MyGameInstance.h"
-#include "Kismet/GameplayStatics.h"
+#include "FNetLogger.h"
 #include "OnlineSubsystem.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "Online/OnlineSessionNames.h"
@@ -52,14 +52,7 @@ void UMyGameInstance::StartMatchMaking() {
 
 void UMyGameInstance::FindSession() {
 
-    if (GEngine)
-    {
-        GEngine->AddOnScreenDebugMessage(
-            -1,
-            15.f,
-            FColor::Cyan,
-            FString::Printf(TEXT("FINDING SESSION")));
-    }
+    FNetLogger::EditerLog(FColor::Cyan, TEXT("FINDING SESSION"));
 
     session_search_ = MakeShareable(new FOnlineSessionSearch());
     session_search_->bIsLanQuery = true;
@@ -76,26 +69,14 @@ void UMyGameInstance::FindSession() {
 void UMyGameInstance::OnFindSessionsComplete(bool bWasSuccessful) {
     match_session_->ClearOnFindSessionsCompleteDelegate_Handle(OnFindSessionsCompleteDelegateHandle);
     if (bWasSuccessful && session_search_->SearchResults.Num() > 0) {
-        if (GEngine)
-        {
-            GEngine->AddOnScreenDebugMessage(
-                -1,
-                15.f,
-                FColor::Cyan,
-                FString::Printf(TEXT("LOGME HERE JOIN")));
-        }
+        FNetLogger::EditerLog(FColor::Cyan, TEXT("LOGME HERE JOIN"));
+        
         UE_LOG(LogTemp, Log, TEXT("NUM ROOMS: %d"), session_search_->SearchResults.Num());
         this->JoinSessionGame(session_search_->SearchResults[0]);
     }
     else {
-        if (GEngine)
-        {
-            GEngine->AddOnScreenDebugMessage(
-                -1,
-                15.f,
-                FColor::Cyan,
-                FString::Printf(TEXT("LOGME HERE CREATE")));
-        }
+        FNetLogger::EditerLog(FColor::Cyan, TEXT("LOGME HERE CREATE"));
+
         this->CreateSession();
     }
 }
@@ -123,14 +104,8 @@ void UMyGameInstance::JoinLobby() {
 }
 
 void UMyGameInstance::OnCreateSessionComplete(FName sessionName, bool bWasSuccessful) {
-    if (GEngine)
-    {
-        GEngine->AddOnScreenDebugMessage(
-            -1,
-            15.f,
-            FColor::Cyan,
-            FString::Printf(TEXT("CREATING SESSION")));
-    }
+    FNetLogger::EditerLog(FColor::Cyan, TEXT("CREATING SESSION"));
+
     match_session_->ClearOnCreateSessionCompleteDelegate_Handle(OnCreateSessionCompleteDelegateHandle);
     if (bWasSuccessful) {
         UE_LOG(LogTemp, Log, TEXT("Create Session Successfully"));
@@ -154,14 +129,8 @@ void UMyGameInstance::JoinSessionGame(const FOnlineSessionSearchResult& search_r
 
 void UMyGameInstance::OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type Result) {
     match_session_->ClearOnJoinSessionCompleteDelegate_Handle(OnJoinSessionCompleteDelegateHandle);
-    if (GEngine)
-    {
-        GEngine->AddOnScreenDebugMessage(
-            -1,
-            15.f,
-            FColor::Cyan,
-            FString::Printf(TEXT("JOINED HERE")));
-    }
+    FNetLogger::EditerLog(FColor::Cyan, TEXT("JOINED HERE"));
+    
     if (Result == EOnJoinSessionCompleteResult::Success) {
         APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 

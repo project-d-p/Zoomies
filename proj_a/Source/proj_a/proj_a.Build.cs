@@ -23,7 +23,7 @@ public class proj_a : ModuleRules
 		string protocPath = "";
 		if (Target.Platform == UnrealTargetPlatform.Win64)
 		{
-			protocPath = Path.Combine(thirdPartyDir, "Win64", "Protobuf", "bin", "protoc.exe");
+			protocPath = Path.Combine(thirdPartyDir, "Win64", "Protobuf", "tools", "protobuf", "protoc.exe");
 		}
 		else if (Target.Platform == UnrealTargetPlatform.Mac)
 		{
@@ -34,23 +34,30 @@ public class proj_a : ModuleRules
 		
 		System.Console.WriteLine("Compiling .proto files...");
 		CompileProtoFiles(protocPath, protoFilesPath, generatedProtoFilesPath);
-		//
+		// XXX: 배포시에 컴파일 코드 삭제(혹은 주석 처리)
 		
 		PublicIncludePaths.AddRange(new string[] {
 			"proj_a/GameMode/Public",
+			"proj_a/GameState/Public",
 			"proj_a/Actor/Controller/Public",
 			"proj_a/Actor/Character/Public",
+			"proj_a/Actor/Character/PlayerState/Public",
 			"proj_a/Component/Public",
+			"proj_a/Component/InGame/Score/Public",
+			"proj_a/Component/InGame/Chat/Public",
+			"proj_a/Component/InGame/Timer/Public",
+			"proj_a/Component/ClientNetwork/Public",
             "proj_a/Widget/Public",
+            "proj_a/Widget/InGame/Public",
             "proj_a/DataHub/Public",
 			"proj_a/Network/Public",
 			"proj_a/Network/NetLogger/Public",
 			"proj_a/Network/ReceiveTask/Public",
 			"proj_a/Network/SendTask/Public",
-			"proj_a/Network/NetLogger/Public",
 			"proj_a/GameInstance/Public",
 			"proj_a/SteamGameManager/Public",
 			"proj_a/ServerNetworkIO/Public",
+			"proj_a/ServerMessageHandler/Public",
 			"proj_a/Lobby/Public",
 			"proj_a/Core/Public",
 			"proj_a/Utility/Public",
@@ -59,10 +66,21 @@ public class proj_a : ModuleRules
 		
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
-
-		PublicDependencyModuleNames.AddRange(new string[]
-			{ "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "Sockets", "Networking", "OnlineSubsystemSteam", "OnlineSubsystem", "OnlineSubsystemUtils" });
+		PublicDependencyModuleNames.AddRange(new string[] 
+		{ 
+			"Core",
+			"CoreUObject",
+			"Engine", 
+			"InputCore",
+			"EnhancedInput",
+			"Sockets",
+			"Networking",
+			"UMG",
+			"OnlineSubsystemSteam",
+			"OnlineSubsystem",
+			"OnlineSubsystemUtils",
+			"SlateCore",
+		});
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
 		string SteamSDKPath = Path.Combine(ModuleDirectory, "Steam");
@@ -80,18 +98,6 @@ public class proj_a : ModuleRules
 				RuntimeDependencies.Add("$(ProjectDir)/Binaries/Mac/libsteam_api.dylib", Path.Combine(SteamSDKPath,"redistributable_bin", "osx", "libsteam_api.dylib"));
 			}
 		}
-		//System.Console.WriteLine($"SteamSDKPath: {SteamSDKPath}");
-		//System.Console.WriteLine("Steam SDK path exists");
-		//System.Console.WriteLine(Path.Combine(SteamSDKPath, "public"));
-		//System.Console.WriteLine(Path.Combine(SteamSDKPath, "redistributable_bin", "win64", "steam_api64.lib"));
-		//System.Console.WriteLine($"ProjectDir: {ProjectDir}");
-        // Uncomment if you are using Slate UI
-        // PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
-
-        // Uncomment if you are using online features
-        // PrivateDependencyModuleNames.Add("OnlineSubsystem");
-
-        // To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
     }
 
 	private void SetProtobuf(string thirdPartyDir)
@@ -104,8 +110,6 @@ public class proj_a : ModuleRules
 		if (Target.Platform == UnrealTargetPlatform.Win64)
 		{
 			protobufPath = Path.Combine(wind64Path, "Protobuf");
-			abseilPath = Path.Combine(wind64Path, "abseil-cpp");
-			grpcPath = Path.Combine(wind64Path, "grpc");
 		}
 		else if (Target.Platform == UnrealTargetPlatform.Mac)
 		{
@@ -113,18 +117,29 @@ public class proj_a : ModuleRules
 			abseilPath = Path.Combine(macPath, "abseil-cpp");
 			grpcPath = Path.Combine(macPath, "grpc");
 		}
-		if (protobufPath == "" || abseilPath == "" || grpcPath == "")
-		{
-			throw new Exception("Cant find Protobuf or Abseil path or GrpcPath.");
-		}
 
-		PublicIncludePaths.Add(Path.Combine(protobufPath, "include"));
-		PublicIncludePaths.Add(Path.Combine(abseilPath, "include"));
-		PublicIncludePaths.Add(Path.Combine(grpcPath, "include"));
-		AddAllLibrariesFromPath(Path.Combine(protobufPath, "lib"));
-		AddAllLibrariesFromPath(Path.Combine(grpcPath, "lib"));
-		AddAllLibrariesFromPath(Path.Combine(abseilPath, "lib"));
-	
+		if (Target.Platform == UnrealTargetPlatform.Mac
+			&& protobufPath != ""
+			&& abseilPath != ""
+			&& grpcPath != "")
+		{
+			PublicIncludePaths.Add(Path.Combine(protobufPath, "include"));
+			PublicIncludePaths.Add(Path.Combine(abseilPath, "include"));
+			PublicIncludePaths.Add(Path.Combine(grpcPath, "include"));
+			AddAllLibrariesFromPath(Path.Combine(protobufPath, "lib"));
+			AddAllLibrariesFromPath(Path.Combine(grpcPath, "lib"));
+			AddAllLibrariesFromPath(Path.Combine(abseilPath, "lib"));
+		}
+		else if (Target.Platform == UnrealTargetPlatform.Win64
+				&& protobufPath != "")
+		{
+			PublicIncludePaths.Add(Path.Combine(protobufPath, "include"));
+			AddAllLibrariesFromPath(Path.Combine(protobufPath, "lib"));
+		}
+		else
+		{
+			throw new Exception("No Protobuf Error" + thirdPartyDir + ".");
+		}
 		PublicDefinitions.Add("GOOGLE_PROTOBUF_INTERNAL_DONATE_STEAL_INLINE");
 		PublicDefinitions.Add("PROTOBUF_ENABLE_DEBUG_LOGGING_MAY_LEAK_PII=0");
 	}

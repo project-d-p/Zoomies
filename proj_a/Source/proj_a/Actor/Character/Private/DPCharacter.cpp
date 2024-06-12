@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "DPCharacter.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "DPHpActorComponent.h"
 #include "DPConstructionActorComponent.h"
 #include "DPWeaponActorComponent.h"
@@ -16,6 +15,8 @@
 // Sets default values
 ADPCharacter::ADPCharacter()
 {
+	bReplicates = true;
+	
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -82,6 +83,10 @@ ADPCharacter::ADPCharacter()
 	}
 	// disable move replication : set bReplicateMovement to false
 	AActor::SetReplicatingMovement(false);
+	// bReplicateMovement
+
+	// Set Mass and Collision Profile
+	GetCharacterMovement()->Mass = 0.1f;
 }
 
 // Called when the game starts or when spawned
@@ -106,21 +111,27 @@ void ADPCharacter::BeginPlay()
 void ADPCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
 	if (GetCharacterMovement()) {
 		currentVelocity = GetCharacterMovement()->Velocity;
 		speed = currentVelocity.Size();
 	}
 	else
 		UE_LOG(LogTemp, Warning, TEXT("null GetCharacterMovement"));
-
-	//UE_LOG(LogTemp, Warning, TEXT("speed : %f"), speed);
 }
 
 // Called to bind functionality to input
 void ADPCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+bool ADPCharacter::IsLocallyControlled() const
+{
+	// Super::IsLocallyControlled();
+	if (HasAuthority())
+		return true;
+	return Super::IsLocallyControlled();
 }
 
 void ADPCharacter::PlayAimAnimation()
@@ -163,11 +174,4 @@ void ADPCharacter::DestroyConstructionAnimation()
 
 void ADPCharacter::DyingAnimation()
 {
-}
-
-// disable replication
-void ADPCharacter::DisableReplication()
-{
-	bReplicates = false;
-	GetCharacterMovement()->SetIsReplicated(false);
 }

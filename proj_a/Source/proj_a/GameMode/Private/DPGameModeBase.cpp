@@ -3,53 +3,70 @@
 
 #include "DPGameModeBase.h"
 #include "DPCharacter.h"
+#include "DPInGameState.h"
 #include "DPPlayerController.h"
+#include "DPPlayerState.h"
 #include "SocketManager.h"
 #include "Kismet/GameplayStatics.h"
-#include "GameFramework/Character.h"
-#include "GameFramework/CharacterMovementComponent.h"
+#include "FNetLogger.h"
+#include "MessageMaker.h"
 
 ADPGameModeBase::ADPGameModeBase()
 {
 	DefaultPawnClass = ADPCharacter::StaticClass();
 	PlayerControllerClass = ADPPlayerController::StaticClass();
+	PlayerStateClass = ADPPlayerState::StaticClass();
+	GameStateClass = ADPInGameState::StaticClass();
+
+	TimerManager = CreateDefaultSubobject<UServerTimerManager>(TEXT("TimerManager"));
+	ChatManager = CreateDefaultSubobject<UServerChatManager>(TEXT("ChatManager"));
+	ScoreManager = CreateDefaultSubobject<UScoreManagerComp>(TEXT("ScoreManager"));
+
+	PrimaryActorTick.bCanEverTick = true;
+	// PrimaryActorTick.TickInterval = 0.01f;
+	bReplicates = true;
+}
+
+void ADPGameModeBase::SendChatToAllClients(const FString& SenderName, const FString& Message)
+{
+	ChatManager->BroadcastChatMessage(SenderName, Message);
 }
 
 void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 {
 	Super::PostLogin(newPlayer);
-
-	UE_LOG(LogTemp, Log, TEXT("mainLevel PostLogin"));
-	UE_LOG(LogTemp, Log, TEXT("SESSION JOINED: %d"), GetNumPlayers());
-	TArray<AActor*> FoundCharacters;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADPCharacter::StaticClass(), FoundCharacters);
-	int32 NumberOfCharacters = FoundCharacters.Num();
-	
-	UE_LOG(LogTemp, Log, TEXT("Number of ADPCharacters in the world: %d"), NumberOfCharacters);
-	ADPCharacter* player_character = Cast<ADPCharacter>(newPlayer->GetPawn());
-	if (player_character != nullptr)
+	try
 	{
-		// if i set this to false, the character in client side was not seen.
-		// player_character->SetReplicates(false);
-		// if i set this to false, i don't know what happen. Nothings Different.
-		player_character->GetCharacterMovement()->SetIsReplicated(false);
-	}
-}
-
-void ADPGameModeBase::DisableReplicationForCharacters()
-{
-	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADPCharacter::StaticClass(), FoundActors);
-	for (AActor* actor : FoundActors)
-	{
-		UE_LOG(LogTemp, Log, TEXT("Disable replication for character."));
-		ADPCharacter* character = Cast<ADPCharacter>(actor);
-		if (character)
+		if (listen_socket_ == nullptr)
 		{
-			character->SetReplicates(false);
-			character->GetCharacterMovement()->SetIsReplicated(false);
+			listen_socket_ = new FListenSocketRunnable(b_is_game_started);
+			ADPInGameState* game_state_ = Cast<ADPInGameState>(GameState);
+			if (game_state_ != nullptr)
+				game_state_->bServerTraveled = true;
+			UE_LOG(LogTemp, Warning, TEXT("Server traveled[SERVER]"));
 		}
 	}
+	catch (std::exception& e)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to create listen socket: %hs"), UTF8_TO_TCHAR(e.what()));
+	}
+
+	if (!newPlayer)
+	{
+		return ;
+	}
+	
+	// Player tate
+	ADPPlayerState* player_state = Cast<ADPPlayerState>(newPlayer->PlayerState);
+	if (!player_state)
+	{
+		return;
+	}
+
+	FString name = player_state->GetPlayerName();
+	FNetLogger::EditerLog(FColor::Blue, TEXT("Player name: %s"), *name);
+	std::string key(TCHAR_TO_UTF8(*name));
+	player_controllers_[key] = Cast<ADPPlayerController>(newPlayer);
 }
 
 void ADPGameModeBase::StartPlay()
@@ -64,15 +81,72 @@ void ADPGameModeBase::StartPlay()
 	int32 NumberOfCharacters = FoundCharacters.Num();
 
 	UE_LOG(LogTemp, Log, TEXT("Number of ADPCharacters in the world: %d"), NumberOfCharacters);
-
 	UE_LOG(LogTemp, Log, TEXT("Number of Players in this Session: %d"), GetNumPlayers());
-	// this->DisableReplicationForCharacters();
-	// GetWorld()->GetTimerManager().SetTimer(TimerHandle_DisableReplication, this, &ADPGameModeBase::DisableReplicationForCharacters, 5.0f, false);
+
+	TimerManager->StartTimer(60.0f);
+}
+
+void ADPGameModeBase::Tick(float delta_time)
+{
+	Super::Tick(delta_time);
+	if (b_is_game_started)
+	{
+		this->ProcessData(delta_time);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Game is not started yet."));
+	}
 }
 
 void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 	UE_LOG(LogTemp, Warning, TEXT("Call end play."));
-	FSocketManager::GetInstance().Close();
+	if (listen_socket_)
+	{
+		delete listen_socket_;
+		listen_socket_ = nullptr;
+	}
+}
+
+void ADPGameModeBase::ProcessData(float delta_time)
+{
+	this->MergeMessages();
+	// FNetLogger::EditerLog(FColor::Red, TEXT("size of message queue: %d"), this->message_queue_.size());
+	if (this->message_queue_.empty())
+	{
+		return;
+	}
+	while (!this->message_queue_.empty())
+	{
+		Message message = this->message_queue_.front();
+		// Message message = this->message_queue_.top();
+		this->message_queue_.pop();
+		ADPPlayerController* controller = this->player_controllers_[message.player_id()];
+		message_handler_.HandleMessage(message)->ExecuteIfBound(controller, message);
+	}
+	this->SyncMovement();
+	listen_socket_->FlushUdpQueue();
+}
+
+void ADPGameModeBase::MergeMessages()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Merge Messages."));
+	this->listen_socket_->FillMessageQueue(this->message_queue_);
+}
+
+ADPGameModeBase::~ADPGameModeBase()
+{
+}
+
+void ADPGameModeBase::SyncMovement()
+{
+	for (auto& pair: player_controllers_)
+	{
+		// FNetLogger::EditerLog(FColor::Green, TEXT("player name: %s"), *FString(pair.first.c_str()));
+		// UE_LOG(LogTemp, Warning, TEXT("sender name: %s"), *FString(pair.first.c_str()));
+		// Message msg = MessageMaker::MakeMessage(pair.second);
+		// listen_socket_->PushUdpFlushMessage(msg);
+	}
 }

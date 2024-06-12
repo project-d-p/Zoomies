@@ -40,10 +40,6 @@ private:
 	FOnCreateSessionComplete OnCreateSessionCompleteEvent;
 	TSharedPtr<FOnlineSessionSettings> session_settings_;
 
-	// for handling steam sockets
-	// HSteamListenSocket listen_socket_;
-	// socket for local testing
-	
 	IOnlineSubsystem* online_subsystem_;
 	IOnlineSessionPtr match_session_;
 	FString desired_session_name_;
