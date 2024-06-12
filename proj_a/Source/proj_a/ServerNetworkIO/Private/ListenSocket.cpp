@@ -17,7 +17,7 @@ FListenSocketRunnable::FListenSocketRunnable(bool& bis_game_started)
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Failed to create listen socket."));
-		throw std::exception("Failed to create listen socket.");
+		throw std::runtime_error("Failed to create listen socket.");
 	}
 }
 
