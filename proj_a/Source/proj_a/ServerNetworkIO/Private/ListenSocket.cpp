@@ -4,6 +4,7 @@
 #include "SocketSubsystem.h"
 #include "Interfaces/IPv4/IPv4Address.h"
 #include "FUdpFlush.h"
+#include "FClientHandler.h"
 #include <exception>
 
 FListenSocketRunnable::FListenSocketRunnable(bool& bis_game_started)
