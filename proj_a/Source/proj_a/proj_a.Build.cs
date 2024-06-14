@@ -77,12 +77,11 @@ public class proj_a : ModuleRules
 			"Sockets",
 			"Networking",
 			"UMG",
-			"OnlineSubsystemSteam",
 			"OnlineSubsystem",
 			"OnlineSubsystemUtils",
-			"SlateCore",
+			"OnlineSubsystemSteam",
+			"SlateCore"
 		});
-		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
 		string SteamSDKPath = Path.Combine(ModuleDirectory, "Steam");
 		if (Directory.Exists(SteamSDKPath))

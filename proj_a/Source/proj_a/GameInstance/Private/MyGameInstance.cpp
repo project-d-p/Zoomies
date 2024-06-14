@@ -6,11 +6,13 @@
 #include "Interfaces/OnlineSessionInterface.h"
 #include "Online/OnlineSessionNames.h"
 #include "OnlineSessionSettings.h"
+// #include "isteamnetworkingutils.h"
 
 void UMyGameInstance::Init() {
 	Super::Init();
 
     online_subsystem_ = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
+    // online_subsystem_ = IOnlineSubsystem::Get();
     if (online_subsystem_)
     {
         match_session_ = online_subsystem_->GetSessionInterface();
@@ -46,6 +48,7 @@ void UMyGameInstance::Init() {
         }
     }
     this->desired_session_name_ = "zoomies_lobby";
+    SteamNetworkingUtils()->InitRelayNetworkAccess();
 }
 
 void UMyGameInstance::StartMatchMaking() {

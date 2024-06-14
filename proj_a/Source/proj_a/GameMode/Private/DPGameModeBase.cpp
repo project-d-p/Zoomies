@@ -9,7 +9,9 @@
 #include "SocketManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "FNetLogger.h"
+#include "isteamnetworkingsockets.h"
 #include "MessageMaker.h"
+// #include "steam_api_flat.h"
 
 ADPGameModeBase::ADPGameModeBase()
 {
@@ -37,13 +39,20 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 	Super::PostLogin(newPlayer);
 	try
 	{
-		if (listen_socket_ == nullptr)
+		// if (listen_socket_ == nullptr)
+		// {
+		// 	listen_socket_ = new FListenSocketRunnable(b_is_game_started);
+		// 	ADPInGameState* game_state_ = Cast<ADPInGameState>(GameState);
+		// 	if (game_state_ != nullptr)
+		// 		game_state_->bServerTraveled = true;
+		// }
+		if (steam_listen_socket_ == nullptr)
 		{
-			listen_socket_ = new FListenSocketRunnable(b_is_game_started);
+			steam_listen_socket_ = new SteamNetworkingSocket();
 			ADPInGameState* game_state_ = Cast<ADPInGameState>(GameState);
 			if (game_state_ != nullptr)
 				game_state_->bServerTraveled = true;
-			UE_LOG(LogTemp, Warning, TEXT("Server traveled[SERVER]"));
+			FNetLogger::EditerLog(FColor::Cyan, TEXT("Server traveled[SERVER]"));
 		}
 	}
 	catch (std::exception& e)
@@ -89,7 +98,7 @@ void ADPGameModeBase::StartPlay()
 void ADPGameModeBase::Tick(float delta_time)
 {
 	Super::Tick(delta_time);
-	if (b_is_game_started)
+	if (steam_listen_socket_->IsGameStarted())
 	{
 		this->ProcessData(delta_time);
 	}
@@ -103,16 +112,16 @@ void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 	UE_LOG(LogTemp, Warning, TEXT("Call end play."));
-	if (listen_socket_)
-	{
-		delete listen_socket_;
-		listen_socket_ = nullptr;
-	}
+	// if (listen_socket_)
+	// {
+	// 	delete listen_socket_;
+	// 	listen_socket_ = nullptr;
+	// }
 }
 
 void ADPGameModeBase::ProcessData(float delta_time)
 {
-	this->MergeMessages();
+	message_queue_ = steam_listen_socket_->GetReadBuffer();
 	// FNetLogger::EditerLog(FColor::Red, TEXT("size of message queue: %d"), this->message_queue_.size());
 	if (this->message_queue_.empty())
 	{
@@ -127,14 +136,13 @@ void ADPGameModeBase::ProcessData(float delta_time)
 		message_handler_.HandleMessage(message)->ExecuteIfBound(controller, message);
 	}
 	this->SyncMovement();
-	listen_socket_->FlushUdpQueue();
 }
 
-void ADPGameModeBase::MergeMessages()
-{
-	UE_LOG(LogTemp, Warning, TEXT("Merge Messages."));
-	this->listen_socket_->FillMessageQueue(this->message_queue_);
-}
+// void ADPGameModeBase::MergeMessages()
+// {
+// 	UE_LOG(LogTemp, Warning, TEXT("Merge Messages."));
+// 	// this->listen_socket_->FillMessageQueue(this->message_queue_);
+// }
 
 ADPGameModeBase::~ADPGameModeBase()
 {

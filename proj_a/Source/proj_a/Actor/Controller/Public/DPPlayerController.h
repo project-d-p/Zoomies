@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "InputActionValue.h"
 #include "ChatManager.h"
+#include "ClientSocket.h"
 #include "message.pb.h"
 #include "DoubleBuffer.h"
 #include "DPMySocket.h"
@@ -25,8 +26,8 @@ public:
 	void ReceiveChatMessage(const FString& SenderName, const FString& Message);
 	void InitChatManager(UChatUI* ChatUI);
 
-	void CreateSocket();
-	void Connect(FString ip, uint32 port);
+	// void CreateSocket();
+	void Connect();
 	void RunTask();
 
 	void HandleMovement(const Movement& movement);
@@ -65,7 +66,7 @@ private:
 	UChatManager* ChatManager = nullptr;
 
 	UPROPERTY()
-	UMySocket *Socket;
+	UClientSocket* Socket = nullptr;
 
 	FTimerHandle MovementTimerHandle;
 	FTimerHandle SynchronizeHandle;

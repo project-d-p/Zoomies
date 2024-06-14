@@ -66,7 +66,7 @@ ADPPlayerController::ADPPlayerController()
 		cancelAction = IA_CANCEL.Object;
 	
 	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
-	Socket = CreateDefaultSubobject<UMySocket>(TEXT("MySocket"));
+	Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
 
 	static ConstructorHelpers::FObjectFinder<USoundBase> SoundAsset
 	(TEXT("/Game/sounds/effect/character/jump_Cue.jump_Cue"));
@@ -123,21 +123,21 @@ UPlayerScoreComp* ADPPlayerController::GetScoreManagerComponent() const
 	return Cast<ADPPlayerState>(PlayerState)->GetPlayerScoreComp();
 }
 
-void ADPPlayerController::CreateSocket()
-{
-	this->Socket->CreateSocket();
-}
+// void ADPPlayerController::CreateSocket()
+// {
+// 	this->Socket->CreateSocket();
+// }
 
-void ADPPlayerController::Connect(FString ip, uint32 port)
+void ADPPlayerController::Connect()
 {
-	this->Socket->Connect(ip, port);
+	// this->Socket->Connect(ip, port);
+	this->Socket->Connect("127.0.0.1", 4242);
 }
 
 void ADPPlayerController::RunTask()
 {
 	this->Socket->RunTask();
 }
-
 
 void ADPPlayerController::BeginPlay()
 {
@@ -283,7 +283,7 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 
 	FVector Velocity = character->GetCharacterMovement()->Velocity;
 	Message message = MessageMaker::MakeMessage(this, actionValue, forwardVector, rightVector, Velocity);
-	Socket->SendPacket(message);
+	Socket->AsyncSendPacket(message);
 	
 	character->AddMovementInput(forwardVector, actionValue.X);
 	character->AddMovementInput(rightVector, actionValue.Y);
