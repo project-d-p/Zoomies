@@ -6,6 +6,7 @@
 #include "GameHelper.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
+#include "proj_a/Component/InGame/Score/Types/ScoreTypes.h"
 
 void UMyUserWidget::NativeConstruct()
 {
@@ -26,7 +27,7 @@ void UMyUserWidget::OnScoreBT1Clicked()
 	ADPGameModeBase* GM = UGameHelper::GetInGameMode(GetWorld());
 	if (GM)
 	{
-		GM->ScoreManager->IncreasePlayerScore(GetWorld()->GetFirstPlayerController(), 10);
+		GM->ScoreManager->IncreasePlayerScore(GetWorld()->GetFirstPlayerController(), { EAnimal::ANIMAL_DEER, EAnimal::ANIMAL_COW });
 	}
 }
 
@@ -46,6 +47,7 @@ void UMyUserWidget::OnScoreBT2Clicked()
 			}
 			++ControllerIndex;
 		}
-		GM->ScoreManager->IncreasePlayerScore(SecondPlayerController, 10);
+		//Text EAnimalS Array
+		GM->ScoreManager->IncreasePlayerScore(SecondPlayerController, { EAnimal::ANIMAL_DEER, EAnimal::ANIMAL_COW });
 	}
 }
