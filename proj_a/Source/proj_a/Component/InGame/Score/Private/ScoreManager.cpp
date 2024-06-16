@@ -14,7 +14,7 @@ void UScoreManagerComp::BeginPlay()
 	Super::BeginPlay();
 }
 
-void UScoreManagerComp::IncreasePlayerScore(APlayerController* PlayerController, const TArray<EAnimal>& Animals)a
+void UScoreManagerComp::IncreasePlayerScore(APlayerController* PlayerController, const TArray<EAnimal>& Animals)
 {
 	if (PlayerController == nullptr) return;
 

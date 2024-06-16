@@ -9,6 +9,7 @@
 #include "message.pb.h"
 #include "DoubleBuffer.h"
 #include "DPMySocket.h"
+#include "proj_a/Component/InGame/Score/PrivateScoreManager.h"
 #include "DPPlayerController.generated.h"
 
 class UPlayerScoreComp;
@@ -32,6 +33,7 @@ public:
 	void HandleMovement(const Movement& movement);
 	
 	UPlayerScoreComp* GetScoreManagerComponent() const;
+	UPrivateScoreManager* GetPrivateScoreManagerComponent() const;
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -42,6 +44,9 @@ private:
 	class ADPCharacter* character;
 	class UDPStateActorComponent* state;
 	class UDPConstructionActorComponent* construction;
+	
+	UPROPERTY()
+	UPrivateScoreManager* PrivateScoreManager;
 
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputMappingContext* defaultContext;

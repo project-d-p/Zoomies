@@ -29,6 +29,12 @@ void UMyUserWidget::OnScoreBT1Clicked()
 	{
 		GM->ScoreManager->IncreasePlayerScore(GetWorld()->GetFirstPlayerController(), { EAnimal::ANIMAL_DEER, EAnimal::ANIMAL_COW });
 	}
+
+	ADPPlayerController* PC = Cast<ADPPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (PC)
+	{
+		PC->GetPrivateScoreManagerComponent()->IncreasePrivatePlayerScore(EPlayerJob::JOB_HUNTER,{ EAnimal::ANIMAL_DEER, EAnimal::ANIMAL_COW });
+	}
 }
 
 void UMyUserWidget::OnScoreBT2Clicked()
