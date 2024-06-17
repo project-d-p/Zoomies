@@ -39,13 +39,6 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 	Super::PostLogin(newPlayer);
 	try
 	{
-		// if (listen_socket_ == nullptr)
-		// {
-		// 	listen_socket_ = new FListenSocketRunnable(b_is_game_started);
-		// 	ADPInGameState* game_state_ = Cast<ADPInGameState>(GameState);
-		// 	if (game_state_ != nullptr)
-		// 		game_state_->bServerTraveled = true;
-		// }
 		if (steam_listen_socket_ == nullptr)
 		{
 			steam_listen_socket_ = new SteamNetworkingSocket();
@@ -65,7 +58,7 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 		return ;
 	}
 	
-	// Player tate
+	// Player state
 	ADPPlayerState* player_state = Cast<ADPPlayerState>(newPlayer->PlayerState);
 	if (!player_state)
 	{
@@ -98,6 +91,10 @@ void ADPGameModeBase::StartPlay()
 void ADPGameModeBase::Tick(float delta_time)
 {
 	Super::Tick(delta_time);
+	if (steam_listen_socket_ == nullptr)
+	{
+		return;
+	}
 	if (steam_listen_socket_->IsGameStarted())
 	{
 		this->ProcessData(delta_time);

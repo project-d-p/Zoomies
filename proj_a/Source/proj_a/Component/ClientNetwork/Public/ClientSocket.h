@@ -19,6 +19,7 @@ public:
 private:
 	void HandleRecieveMessages();
 	void HandleSendMessages();
+	SteamNetworkingConfigValue_t opt_;
 	SteamNetworkingIdentity server_identity_;
 	int virtual_port;
 	HSteamNetConnection connection_;

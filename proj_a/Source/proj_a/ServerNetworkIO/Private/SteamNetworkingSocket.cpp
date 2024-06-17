@@ -14,7 +14,12 @@ SteamNetworkingSocket::SteamNetworkingSocket()
 	// steam_listen_socket_ = SteamNetworkingSockets()->CreateListenSocketP2P(n_local_virtual_port, 0, &opt);
 	local_address_.Clear();
 	local_address_.m_port = 4242;
-	steam_listen_socket_ = SteamNetworkingSockets()->CreateListenSocketIP(local_address_, 0, nullptr);
+
+	opt_.m_eValue = k_ESteamNetworkingConfig_IP_AllowWithoutAuth;
+	opt_.m_eDataType = k_ESteamNetworkingConfig_Int32;
+	opt_.m_val.m_int32 = 1;
+	
+	steam_listen_socket_ = SteamNetworkingSockets()->CreateListenSocketIP(local_address_, 1, &opt_);
 	if (steam_listen_socket_ == k_HSteamListenSocket_Invalid)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Failed to create listen socket."));
@@ -45,19 +50,37 @@ void SteamNetworkingSocket::RecieveMessages()
 	const int n_max_message = 10;
 	SteamNetworkingMessage_t* pp_message[n_max_message];
 	int n_messages = SteamNetworkingSockets()->ReceiveMessagesOnPollGroup(poll_group_, pp_message, n_max_message);
+	if (n_messages == 0)
+	{
+		return ;
+	}
+	TArray<uint8> data;
+	data.Reserve(1024);
 
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Recieved %d messages"), n_messages);
+	
 	for (int i = 0; i < n_messages; ++i)
 	{
+		if (pp_message[i] == nullptr)
+			continue;
 		// TODO: Handle message
-		char* msg = static_cast<char*>(const_cast<void*>(pp_message[i]->GetData()));
-		const int size = pp_message[i]->GetSize();
+
+		data.Reset();
 		
-		TArray<uint8> data(reinterpret_cast<uint8*>(msg), size);
-		Message ret_msg = Marshaller::DeserializeMessage(data);
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("Recieved Message: %s"), *FString(ret_msg.DebugString().c_str()));
-		pp_message[i]->Release();
-		recieve_buffer_.Push(ret_msg);
-		data.SetNumZeroed(data.Num());
+		const uint8* msg = static_cast<const uint8*>(pp_message[i]->GetData());
+		int32 size = pp_message[i]->m_cbSize;
+
+		FNetLogger::EditerLog(FColor::Red, TEXT("Recieved Message Size: %d"), size);
+	
+		data.Append(msg, size);
+
+		try {
+			Message ret_msg = Marshaller::DeserializeMessage(data);
+			pp_message[i]->Release();
+			recieve_buffer_.Push(ret_msg);
+		} catch (const std::exception& e) {
+			FNetLogger::EditerLog(FColor::Red, TEXT("Failed to deserialize message: %s"), *FString(e.what()));
+		}
 	}
 }
 
@@ -113,7 +136,8 @@ void SteamNetworkingSocket::OnSteamNetConnectionStatusChanged(SteamNetConnection
 		}
 		break ;
 	case k_ESteamNetworkingConnectionState_ClosedByPeer:
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("Closed By Peer"));
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Closed By Peer: %s"), UTF8_TO_TCHAR(info->m_info.m_szEndDebug));
+		UE_LOG(LogTemp, Error, TEXT("Connection closed by peer. Reason: %d, Info: %hs"), info->m_info.m_eEndReason, UTF8_TO_TCHAR(info->m_info.m_szEndDebug));
 	case k_ESteamNetworkingConnectionState_ProblemDetectedLocally:
 		FNetLogger::EditerLog(FColor::Cyan, TEXT("Client Disconnected"));
 		SteamNetworkingSockets()->CloseConnection(info->m_hConn, 0, nullptr, false);

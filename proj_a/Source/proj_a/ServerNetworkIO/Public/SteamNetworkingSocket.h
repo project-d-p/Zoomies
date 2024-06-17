@@ -10,7 +10,6 @@
 #include <queue>
 #include <utility>
 #include <vector>
-
 #include "FNetLogger.h"
 #include "isteamnetworkingsockets.h"
 #include "isteamnetworkingutils.h"
@@ -38,7 +37,7 @@ private:
 private:
 	enum { MAX_CLIENTS = 1 };
 	int n_local_virtual_port = 0;
-	SteamNetworkingConfigValue_t opt;
+	SteamNetworkingConfigValue_t opt_;
 	HSteamListenSocket steam_listen_socket_;
 	HSteamNetPollGroup poll_group_;
 	DoubleBuffer recieve_buffer_;

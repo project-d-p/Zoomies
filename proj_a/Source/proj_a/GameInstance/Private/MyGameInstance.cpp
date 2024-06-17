@@ -44,7 +44,7 @@ void UMyGameInstance::Init() {
         }
         else
         {
-            UE_LOG(LogTemp, Log, TEXT("Failed to load steam_appid.txt"));
+            // UE_LOG(LogTemp, Log, TEXT("Failed to load steam_appid.txt"));
         }
     }
     this->desired_session_name_ = "zoomies_lobby";

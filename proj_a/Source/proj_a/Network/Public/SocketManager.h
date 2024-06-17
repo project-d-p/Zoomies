@@ -6,7 +6,7 @@
 #include "UObject/Object.h"
 #include "FBaseSendTask.h"
 #include "FUdpReceiveTask.h"
-#include "SocketSubsystem.h"
+// #include "SocketSubsystem.h"
 
 // XXX: 해당 클래스의 종속성 관리가 굉장히 엉망인 상태인데, 추후 참조를 값으로 변경하여 종속성을 관리하도록 변경.
 class PROJ_A_API FSocketManager
