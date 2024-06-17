@@ -6,14 +6,12 @@
 #include "ScoreManager.h"
 #include "ServerChatManager.h"
 #include "GameFramework/GameModeBase.h"
-#include "ListenSocket.h"
 #include <queue>
 #include "message.pb.h"
 #include "ServerMessageHandler.h"
-#include "MessageQueueFilter.h"
 #include "DPPlayerController.h"
 #include "ServerTimerManager.h"
-#include "DPInGameState.h"
+#include "SteamNetworkingSocket.h"
 #include "DPGameModeBase.generated.h"
 
 /**
@@ -50,13 +48,16 @@ private:
 	// Implementations
 	void SyncMovement();
 	void ProcessData(float delta_time);
-	void MergeMessages();
+	// void MergeMessages();
 	
 private:
 	// Member variables
 	enum { NUM_OF_MAX_CLIENTS = 2 };
-	FListenSocketRunnable* listen_socket_ = nullptr;
-	bool b_is_game_started = false;
+	// FListenSocketRunnable* listen_socket_ = nullptr;
+
+	SteamNetworkingSocket* steam_listen_socket_ = nullptr;
+	// HSteamListenSocket steam_listen_socket_;
+	
 	float time_accumulator_ = 0.0f;
 	FMessageQueue_T message_queue_;
 	std::map<std::string, ADPPlayerController*> player_controllers_;

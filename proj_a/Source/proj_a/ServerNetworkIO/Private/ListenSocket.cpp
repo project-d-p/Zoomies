@@ -1,7 +1,6 @@
 
 #include "ListenSocket.h"
 #include "Networking.h"
-#include "SocketSubsystem.h"
 #include "Interfaces/IPv4/IPv4Address.h"
 #include "FUdpFlush.h"
 #include <exception>
@@ -17,7 +16,7 @@ FListenSocketRunnable::FListenSocketRunnable(bool& bis_game_started)
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Failed to create listen socket."));
-		throw std::exception("Failed to create listen socket.");
+		throw std::runtime_error("Failed to create listen socket.");
 	}
 }
 

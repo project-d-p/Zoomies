@@ -73,6 +73,6 @@ DoubleBuffer& DoubleBuffer::operator=(DoubleBuffer&& other) noexcept
 
 std::queue<Message> DoubleBuffer::GetReadBuffer()
 {
-	std::lock_guard<std::mutex> lock(mutex_);
+	// std::lock_guard<std::mutex> lock(mutex_);
 	return *ptr_[READ];
 }

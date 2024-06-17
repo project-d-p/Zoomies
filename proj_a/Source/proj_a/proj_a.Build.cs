@@ -43,6 +43,7 @@ public class proj_a : ModuleRules
 			"proj_a/Actor/Character/Public",
 			"proj_a/Actor/Character/PlayerState/Public",
 			"proj_a/Component/Public",
+			"proj_a/Component/AnimNotify/Public",
 			"proj_a/Component/InGame/Score/Public",
 			"proj_a/Component/InGame/Chat/Public",
 			"proj_a/Component/InGame/Timer/Public",
@@ -76,12 +77,11 @@ public class proj_a : ModuleRules
 			"Sockets",
 			"Networking",
 			"UMG",
-			"OnlineSubsystemSteam",
 			"OnlineSubsystem",
 			"OnlineSubsystemUtils",
-			"SlateCore",
+			"OnlineSubsystemSteam",
+			"SlateCore"
 		});
-		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
 		string SteamSDKPath = Path.Combine(ModuleDirectory, "Steam");
 		if (Directory.Exists(SteamSDKPath))

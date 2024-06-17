@@ -8,21 +8,18 @@
 #include "DPWeaponActorComponent.h"
 #include "DPConstructionActorComponent.h"
 #include "DPGameModeBase.h"
-#include "DPInGameState.h"
 #include "DPPlayerState.h"
 #include "DPStateActorComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "NetComp.h"
 #include "ProtobufUtility.h"
 #include "movement.pb.h"
 #include "FDataHub.h"
 #include "FNetLogger.h"
 #include "FUdpSendTask.h"
 #include "MessageMaker.h"
-#include "PlayerName.h"
-#include "DSP/Chorus.h"
-#include "Settings/LevelEditorPlayNetworkEmulationSettings.h"
 #include "GameHelper.h"
+#include "Kismet/GameplayStatics.h"
+
 
 DEFINE_LOG_CATEGORY(LogNetwork);
 
@@ -69,7 +66,15 @@ ADPPlayerController::ADPPlayerController()
 		cancelAction = IA_CANCEL.Object;
 	
 	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
-	Socket = CreateDefaultSubobject<UMySocket>(TEXT("MySocket"));
+	Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> SoundAsset
+	(TEXT("/Game/sounds/effect/character/jump_Cue.jump_Cue"));
+	if (SoundAsset.Succeeded()) {
+		jumpSound = SoundAsset.Object;
+	}
+	else
+		jumpSound = nullptr;
 }
 
 void ADPPlayerController::SendChatMessageToServer(const FString& Message)
@@ -79,8 +84,9 @@ void ADPPlayerController::SendChatMessageToServer(const FString& Message)
 		UE_LOG(LogTemp, Warning, TEXT("ChatManager is null"));
 		return;
 	}
-	
-	FString SenderName = "";
+
+	// XXX: Change to client Steam nickname later
+	FString SenderName = "Unknown";
 	if (HasAuthority())
 	{
 		ADPGameModeBase* GM = UGameHelper::GetInGameMode(GetWorld());
@@ -117,14 +123,15 @@ UPlayerScoreComp* ADPPlayerController::GetScoreManagerComponent() const
 	return Cast<ADPPlayerState>(PlayerState)->GetPlayerScoreComp();
 }
 
-void ADPPlayerController::CreateSocket()
-{
-	this->Socket->CreateSocket();
-}
+// void ADPPlayerController::CreateSocket()
+// {
+// 	this->Socket->CreateSocket();
+// }
 
-void ADPPlayerController::Connect(FString ip, uint32 port)
+void ADPPlayerController::Connect()
 {
-	this->Socket->Connect(ip, port);
+	// this->Socket->Connect(ip, port);
+	this->Socket->Connect("127.0.0.1", 4242);
 }
 
 void ADPPlayerController::RunTask()
@@ -249,7 +256,7 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 	// UE_LOG(LogTemp, Warning, TEXT("ia_move_y : %f"), value.Get<FVector2D>().Y);
 	const FVector2D actionValue = value.Get<FVector2D>();
 	const FRotator controlRotation = GetControlRotation();
-	const FRotator yaw(0.f, controlRotation.Yaw, 0.f);
+	// const FRotator yaw(0.f, controlRotation.Yaw, 0.f);
 
 	const FVector forwardVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
@@ -276,7 +283,7 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 
 	FVector Velocity = character->GetCharacterMovement()->Velocity;
 	Message message = MessageMaker::MakeMessage(this, actionValue, forwardVector, rightVector, Velocity);
-	Socket->SendPacket(message);
+	Socket->AsyncSendPacket(message);
 	
 	character->AddMovementInput(forwardVector, actionValue.X);
 	character->AddMovementInput(rightVector, actionValue.Y);
@@ -292,9 +299,11 @@ void ADPPlayerController::Jump(const FInputActionValue& value)
 	//UE_LOG(LogTemp, Warning, TEXT("ia_jump : %d"), value.Get<bool>());
 
 	bool actionValue = value.Get<bool>();
-	if (actionValue)
+	if (actionValue) {
 		// send jump command ( id, actionValue ) ( true = jump )
 		character->Jump();
+		UGameplayStatics::PlaySound2D(GetWorld(), jumpSound);
+	}
 }
 
 void ADPPlayerController::Rotate(const FInputActionValue& value)
@@ -323,43 +332,43 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 			character->weaponComponent->Attack();
 		}
 	}
-	if ("WALL" == state->equipmentState) {
-		//if (character->isAim) {
-			character->GetCharacterMovement()->DisableMovement();
-			construction->MakeWall({ 0, 0, 0 }, { 0, 0, 0 });
-			character->constructionComponent->placeWall = true;
-			// ´ÙÀ½ Æ½¿¡ false·Î ¹Ù²Þ
-			auto resetPlaceWall = [this]() {
-				character->constructionComponent->placeWall = false;
-			};
-			GetWorld()->GetTimerManager().SetTimerForNextTick(resetPlaceWall);
-
-			FTimerHandle waitTimer;
-			GetWorld()->GetTimerManager().SetTimer(waitTimer, FTimerDelegate::CreateLambda([&]() {
-				UE_LOG(LogTemp, Warning, TEXT("wall delay 1.63"));
-				character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);	// movement disable -> enable
-				GetWorldTimerManager().ClearTimer(waitTimer);
-			}), 1.63f, false);
-		//}
-	}
-	if ("TURRET" == state->equipmentState) {
-		if (character->isAim) {
-			character->GetCharacterMovement()->DisableMovement();
-			character->constructionComponent->placeturret = true;
-
-			auto resetPlaceTurret = [this]() {
-				character->constructionComponent->placeturret = false;
-			};
-			GetWorld()->GetTimerManager().SetTimerForNextTick(resetPlaceTurret);
-
-			FTimerHandle waitTimer;
-			GetWorld()->GetTimerManager().SetTimer(waitTimer, FTimerDelegate::CreateLambda([&]() {
-				UE_LOG(LogTemp, Warning, TEXT("turret delay 1.63"));
-				character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-				GetWorldTimerManager().ClearTimer(waitTimer);
-			}), 1.63f, false);
-		}
-	}
+	// if ("WALL" == state->equipmentState) {
+	// 	//if (character->isAim) {
+	// 		character->GetCharacterMovement()->DisableMovement();
+	// 		construction->MakeWall({ 0, 0, 0 }, { 0, 0, 0 });
+	// 		character->constructionComponent->placeWall = true;
+	// 		// ´ÙÀ½ Æ½¿¡ false·Î ¹Ù²Þ
+	// 		auto resetPlaceWall = [this]() {
+	// 			character->constructionComponent->placeWall = false;
+	// 		};
+	// 		GetWorld()->GetTimerManager().SetTimerForNextTick(resetPlaceWall);
+	//
+	// 		FTimerHandle waitTimer;
+	// 		GetWorld()->GetTimerManager().SetTimer(waitTimer, FTimerDelegate::CreateLambda([&]() {
+	// 			UE_LOG(LogTemp, Warning, TEXT("wall delay 1.63"));
+	// 			character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);	// movement disable -> enable
+	// 			GetWorldTimerManager().ClearTimer(waitTimer);
+	// 		}), 1.63f, false);
+	// 	//}
+	// }
+	// if ("TURRET" == state->equipmentState) {
+	// 	if (character->isAim) {
+	// 		character->GetCharacterMovement()->DisableMovement();
+	// 		character->constructionComponent->placeturret = true;
+	//
+	// 		auto resetPlaceTurret = [this]() {
+	// 			character->constructionComponent->placeturret = false;
+	// 		};
+	// 		GetWorld()->GetTimerManager().SetTimerForNextTick(resetPlaceTurret);
+	//
+	// 		FTimerHandle waitTimer;
+	// 		GetWorld()->GetTimerManager().SetTimer(waitTimer, FTimerDelegate::CreateLambda([&]() {
+	// 			UE_LOG(LogTemp, Warning, TEXT("turret delay 1.63"));
+	// 			character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	// 			GetWorldTimerManager().ClearTimer(waitTimer);
+	// 		}), 1.63f, false);
+	// 	}
+	// }
 }
 
 void ADPPlayerController::AdditionalSetting(const FInputActionValue& value)
@@ -456,7 +465,7 @@ void ADPPlayerController::HandleMovement(const Movement& movement)
 	FVector rightVector = FVector(movement.right_vector().x(), movement.right_vector().y(), movement.right_vector().z());
 	FVector actionValue = FVector(movement.progess_vector().x(), movement.progess_vector().y(), movement.progess_vector().z());
 	FVector velocity = FVector(movement.velocity().x(), movement.velocity().y(), movement.velocity().z());
-	float velocitySize = movement.velocity_size();
+	// float velocitySize = movement.velocity_size();
 
 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Action: %f %f %f"), actionValue.X, actionValue.Y, actionValue.Z);
 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Forward: %f %f %f"), forwardVector.X, forwardVector.Y, forwardVector.Z);
