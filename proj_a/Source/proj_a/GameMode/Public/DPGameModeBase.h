@@ -28,6 +28,7 @@ public:
 	typedef std::queue<Message> FMessageQueue_T;
 	// Sets default values for this character's properties
 	ADPGameModeBase();
+	void SpawnAndPossessAI();
 
 	void SendChatToAllClients(const FString& SenderName, const FString& Message);
 

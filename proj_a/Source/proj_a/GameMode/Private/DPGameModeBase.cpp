@@ -2,6 +2,9 @@
 
 
 #include "DPGameModeBase.h"
+
+#include "BaseMonsterAIController.h"
+#include "BaseMonsterCharacter.h"
 #include "DPCharacter.h"
 #include "DPInGameState.h"
 #include "DPPlayerController.h"
@@ -9,6 +12,7 @@
 #include "SocketManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "FNetLogger.h"
+#include "MammothCharacter.h"
 #include "MessageMaker.h"
 
 ADPGameModeBase::ADPGameModeBase()
@@ -84,7 +88,48 @@ void ADPGameModeBase::StartPlay()
 	UE_LOG(LogTemp, Log, TEXT("Number of Players in this Session: %d"), GetNumPlayers());
 
 	TimerManager->StartTimer(60.0f);
+
+	// 테스트
+	SpawnAndPossessAI();
 }
+
+void ADPGameModeBase::SpawnAndPossessAI()
+{
+	FVector SpawnLocation = FVector(1500.0f, 0.0f, 300.0f);
+	FRotator SpawnRotation = FRotator::ZeroRotator;
+
+	// 테스트용 디폴트 StaticClass 사용
+	FActorSpawnParameters SpawnParameters;
+
+	SpawnParameters.SpawnCollisionHandlingOverride =
+		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	AMammothCharacter* SpawnedAICharacter =
+		GetWorld()->SpawnActor<AMammothCharacter>(
+			AMammothCharacter::StaticClass(),
+			SpawnLocation,
+			SpawnRotation,
+			SpawnParameters);
+
+	if (SpawnedAICharacter)
+	{
+		ABaseMonsterAIController* AIController =
+			GetWorld()->SpawnActor<ABaseMonsterAIController>(ABaseMonsterAIController::StaticClass());
+		if (AIController)
+		{
+			AIController->Possess(SpawnedAICharacter);
+		}
+		else
+		{
+			FNetLogger::LogError(TEXT("Failed to possess AI character - AIController is nullptr"));
+		}
+	}
+	else
+	{
+		FNetLogger::LogError(TEXT("Failed to spawn AI character - SpawnedAICharacter is nullptr"));
+	}
+}
+
 
 void ADPGameModeBase::Tick(float delta_time)
 {

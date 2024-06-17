@@ -180,14 +180,14 @@ void ADPPlayerController::SendCompressedMovement()
 		return ;
 	}
 
-	if (PlayerState)
-	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("Player Name: %s"), *PlayerState->GetPlayerName());
-	}
-	
-	FNetLogger::EditerLog(FColor::Blue, TEXT("Send Movement[Client]: %f %f"), AccumulatedMovementInput.X, AccumulatedMovementInput.Y);
-	FNetLogger::EditerLog(FColor::Blue, TEXT("Send Forward[Client]: %f %f %f"), AccumulatedForwardInput.X, AccumulatedForwardInput.Y, AccumulatedForwardInput.Z);
-	FNetLogger::EditerLog(FColor::Blue, TEXT("Send Right[Client]: %f %f %f"), AccumulatedRightInput.X, AccumulatedRightInput.Y, AccumulatedRightInput.Z);
+	// if (PlayerState)
+	// {
+	// 	FNetLogger::EditerLog(FColor::Red, TEXT("Player Name: %s"), *PlayerState->GetPlayerName());
+	// }
+	//
+	// FNetLogger::EditerLog(FColor::Blue, TEXT("Send Movement[Client]: %f %f"), AccumulatedMovementInput.X, AccumulatedMovementInput.Y);
+	// FNetLogger::EditerLog(FColor::Blue, TEXT("Send Forward[Client]: %f %f %f"), AccumulatedForwardInput.X, AccumulatedForwardInput.Y, AccumulatedForwardInput.Z);
+	// FNetLogger::EditerLog(FColor::Blue, TEXT("Send Right[Client]: %f %f %f"), AccumulatedRightInput.X, AccumulatedRightInput.Y, AccumulatedRightInput.Z);
 	// Send Server
 	// Message message = MessageMaker::MakeMessage(this, AccumulatedMovementInput, AccumulatedForwardInput, AccumulatedRightInput);
 	// Socket->SendPacket(message);
@@ -263,7 +263,7 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 	if (HasAuthority())
 	{
 		// 해당 부분에서 서버로 이동 명령을 보내야 하나?
-		FNetLogger::EditerLog(FColor::Blue, TEXT("Send Movement[Server]: %f %f"), actionValue.X, actionValue.Y);
+		// FNetLogger::EditerLog(FColor::Blue, TEXT("Send Movement[Server]: %f %f"), actionValue.X, actionValue.Y);
 	}
 	else
 	{
@@ -274,12 +274,12 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 		// FNetLogger::EditerLog(FColor::Blue, TEXT("Send Movement[Client]: %f %f"), actionValue.X, actionValue.Y);
 	}
 
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("actionValue: %f %f"), actionValue.X, actionValue.Y);
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("forwardVector: %f %f %f"), forwardVector.X, forwardVector.Y, forwardVector.Z);
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("rightVector: %f %f %f"), rightVector.X, rightVector.Y, rightVector.Z);
+	// FNetLogger::EditerLog(FColor::Cyan, TEXT("actionValue: %f %f"), actionValue.X, actionValue.Y);
+	// FNetLogger::EditerLog(FColor::Cyan, TEXT("forwardVector: %f %f %f"), forwardVector.X, forwardVector.Y, forwardVector.Z);
+	// FNetLogger::EditerLog(FColor::Cyan, TEXT("rightVector: %f %f %f"), rightVector.X, rightVector.Y, rightVector.Z);
 
 	MovementCount++;
-	FNetLogger::EditerLog(FColor::Red, TEXT("MovementCount: %d"), MovementCount);
+	// FNetLogger::EditerLog(FColor::Red, TEXT("MovementCount: %d"), MovementCount);
 
 	FVector Velocity = character->GetCharacterMovement()->Velocity;
 	Message message = MessageMaker::MakeMessage(this, actionValue, forwardVector, rightVector, Velocity);
@@ -288,8 +288,8 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 	character->AddMovementInput(forwardVector, actionValue.X);
 	character->AddMovementInput(rightVector, actionValue.Y);
 
-	FNetLogger::EditerLog(FColor::Emerald, TEXT("Character Velocity Size: %f"), character->GetCharacterMovement()->Velocity.Size());
-	FNetLogger::EditerLog(FColor::Emerald, TEXT("Character Velocity: %f %f %f"), character->GetCharacterMovement()->Velocity.X, character->GetCharacterMovement()->Velocity.Y, character->GetCharacterMovement()->Velocity.Z);
+	// FNetLogger::EditerLog(FColor::Emerald, TEXT("Character Velocity Size: %f"), character->GetCharacterMovement()->Velocity.Size());
+	// FNetLogger::EditerLog(FColor::Emerald, TEXT("Character Velocity: %f %f %f"), character->GetCharacterMovement()->Velocity.X, character->GetCharacterMovement()->Velocity.Y, character->GetCharacterMovement()->Velocity.Z);
 	
 	// character->speed = character->GetCharacterMovement()->Velocity.Size();
 }
@@ -467,9 +467,9 @@ void ADPPlayerController::HandleMovement(const Movement& movement)
 	FVector velocity = FVector(movement.velocity().x(), movement.velocity().y(), movement.velocity().z());
 	// float velocitySize = movement.velocity_size();
 
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Action: %f %f %f"), actionValue.X, actionValue.Y, actionValue.Z);
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Forward: %f %f %f"), forwardVector.X, forwardVector.Y, forwardVector.Z);
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Right: %f %f %f"), rightVector.X, rightVector.Y, rightVector.Z);
+	// FNetLogger::EditerLog(FColor::Cyan, TEXT("Action: %f %f %f"), actionValue.X, actionValue.Y, actionValue.Z);
+	// FNetLogger::EditerLog(FColor::Cyan, TEXT("Forward: %f %f %f"), forwardVector.X, forwardVector.Y, forwardVector.Z);
+	// FNetLogger::EditerLog(FColor::Cyan, TEXT("Right: %f %f %f"), rightVector.X, rightVector.Y, rightVector.Z);
 
 	if (!character)
 	{
@@ -480,10 +480,10 @@ void ADPPlayerController::HandleMovement(const Movement& movement)
 	character->GetCharacterMovement()->Velocity = velocity;
 	
 	ServerReceivedMovementCount++;
-	FNetLogger::EditerLog(FColor::Red, TEXT("ServerReceivedMovementCount: %d"), ServerReceivedMovementCount);
+	// FNetLogger::EditerLog(FColor::Red, TEXT("ServerReceivedMovementCount: %d"), ServerReceivedMovementCount);
 	
 	character->AddMovementInput(forwardVector, actionValue.X);
 	character->AddMovementInput(rightVector, actionValue.Y);
-	FNetLogger::EditerLog(FColor::Emerald, TEXT("Character Velocity Size: %f"), character->GetCharacterMovement()->Velocity.Size());
-	FNetLogger::EditerLog(FColor::Emerald, TEXT("Character Velocity: %f %f %f"), character->GetCharacterMovement()->Velocity.X, character->GetCharacterMovement()->Velocity.Y, character->GetCharacterMovement()->Velocity.Z);
+	// FNetLogger::EditerLog(FColor::Emerald, TEXT("Character Velocity Size: %f"), character->GetCharacterMovement()->Velocity.Size());
+	// FNetLogger::EditerLog(FColor::Emerald, TEXT("Character Velocity: %f %f %f"), character->GetCharacterMovement()->Velocity.X, character->GetCharacterMovement()->Velocity.Y, character->GetCharacterMovement()->Velocity.Z);
 }
