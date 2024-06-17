@@ -13,7 +13,17 @@ class PROJ_A_API AGM_MatchingLobby : public AGameModeBase
 public:
 	AGM_MatchingLobby();
 	virtual void PostLogin(APlayerController* NewPlayer) override;
+	virtual void Logout(AController* Exiting) override;
+	virtual void BeginPlay() override;
 	void CheckReadyToStart();
+	void FindAndStoreLobbyPlatforms();
+	void CheckLobbyReady();
+	
+	TArray<APlayerController*> PCs;
 private:
 	void StartGame_t() const;
+protected:
+	UClass* LobbyPlatformClass;
+	TArray<AActor*> LobbyPlatforms;
+	bool bIsLobbyPlatformReady = false;
 };
