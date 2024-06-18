@@ -61,7 +61,6 @@ void UAISightComponent::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors
 	
 	if (NearestActor)
 	{
-		FNetLogger::EditerLog(FColor::Blue, TEXT("Nearest Actor: %s"), *NearestActor->GetName());
 		OnEnemyDetected.Broadcast(NearestActor);
 
 		if (AAIController* AIController = Cast<AAIController>(GetOwner()))

@@ -1,30 +1,28 @@
 #include "BaseMonsterCharacter.h"
 
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 ABaseMonsterCharacter::ABaseMonsterCharacter()
 {
     bReplicates = true;
     PrimaryActorTick.bCanEverTick = true;
+
+	GetCapsuleComponent()->SetCapsuleRadius(0.f, false);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(10.f, false);
 	
-    static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH(TEXT("/Game/model/animals/mammoth/sm_mammoth.sm_mammoth"));
-    if (SK_MAMMOTH.Succeeded()) {
-        GetMesh()->SetSkeletalMesh(SK_MAMMOTH.Object);
-    }
-
-	GetMesh()->SetCollisionProfileName(TEXT("CharacterMesh"));
+	GetMesh()->SetCollisionProfileName(TEXT("MonsterMesh"));
 	GetMesh()->BodyInstance.SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	GetMesh()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
-
+	GetMesh()->SetCollisionResponseToAllChannels(ECR_Block);
+	
 	GetMesh()->SetupAttachment(RootComponent);
-    GetMesh()->SetRelativeScale3D(FVector(3.00f, 3.00f, 3.00f));
-    GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -90.f), FRotator(0.f, 0.f, 0.f));
+    GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, 0.f, 0.f));
 
     GetCharacterMovement()->bOrientRotationToMovement = true;
     bUseControllerRotationYaw = false;
-
+	
+	/* XXX: comment for testing purposes. Restore after creating a UDP structure later. */
     // SetReplicatingMovement(false);
-    // GetCharacterMovement()->Mass = 0.1f;
 }
 
 void ABaseMonsterCharacter::BeginPlay()

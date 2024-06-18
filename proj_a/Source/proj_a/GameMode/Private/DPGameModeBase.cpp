@@ -12,6 +12,7 @@
 #include "SocketManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "FNetLogger.h"
+#include "FoxCharacter.h"
 #include "MammothCharacter.h"
 #include "MessageMaker.h"
 
@@ -25,6 +26,7 @@ ADPGameModeBase::ADPGameModeBase()
 	TimerManager = CreateDefaultSubobject<UServerTimerManager>(TEXT("TimerManager"));
 	ChatManager = CreateDefaultSubobject<UServerChatManager>(TEXT("ChatManager"));
 	ScoreManager = CreateDefaultSubobject<UScoreManagerComp>(TEXT("ScoreManager"));
+	MonsterFactory = CreateDefaultSubobject<UMonsterFactory>(TEXT("MonsterFactory"));
 
 	PrimaryActorTick.bCanEverTick = true;
 	// PrimaryActorTick.TickInterval = 0.01f;
@@ -89,47 +91,17 @@ void ADPGameModeBase::StartPlay()
 
 	TimerManager->StartTimer(60.0f);
 
-	// 테스트
+	// For Test Method
 	SpawnAndPossessAI();
 }
 
 void ADPGameModeBase::SpawnAndPossessAI()
 {
-	FVector SpawnLocation = FVector(1500.0f, 0.0f, 300.0f);
-	FRotator SpawnRotation = FRotator::ZeroRotator;
-
-	// 테스트용 디폴트 StaticClass 사용
-	FActorSpawnParameters SpawnParameters;
-
-	SpawnParameters.SpawnCollisionHandlingOverride =
-		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	AMammothCharacter* SpawnedAICharacter =
-		GetWorld()->SpawnActor<AMammothCharacter>(
-			AMammothCharacter::StaticClass(),
-			SpawnLocation,
-			SpawnRotation,
-			SpawnParameters);
-
-	if (SpawnedAICharacter)
-	{
-		ABaseMonsterAIController* AIController =
-			GetWorld()->SpawnActor<ABaseMonsterAIController>(ABaseMonsterAIController::StaticClass());
-		if (AIController)
-		{
-			AIController->Possess(SpawnedAICharacter);
-		}
-		else
-		{
-			FNetLogger::LogError(TEXT("Failed to possess AI character - AIController is nullptr"));
-		}
-	}
-	else
-	{
-		FNetLogger::LogError(TEXT("Failed to spawn AI character - SpawnedAICharacter is nullptr"));
-	}
+	MonsterFactory->SpawnMonster(
+		AMammothCharacter::StaticClass(), FVector(1500.0f, 0.0f, 300.0f));
+	MonsterFactory->SpawnMonster(
+		AFoxCharacter::StaticClass(), FVector(1000.0f, 0.0f, 300.0f));
 }
-
 
 void ADPGameModeBase::Tick(float delta_time)
 {

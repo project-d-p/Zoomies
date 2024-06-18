@@ -10,10 +10,9 @@
 #include <queue>
 #include "message.pb.h"
 #include "ServerMessageHandler.h"
-#include "MessageQueueFilter.h"
 #include "DPPlayerController.h"
 #include "ServerTimerManager.h"
-#include "DPInGameState.h"
+#include "MonsterFactory.h"
 #include "DPGameModeBase.generated.h"
 
 /**
@@ -64,9 +63,10 @@ private:
 	ServerMessageHandler message_handler_;
 	
 private:
-	// Time Manager
 	UPROPERTY()
 	UServerTimerManager* TimerManager;
 	UPROPERTY()
 	UServerChatManager* ChatManager;
+	UPROPERTY()
+	UMonsterFactory* MonsterFactory;
 };

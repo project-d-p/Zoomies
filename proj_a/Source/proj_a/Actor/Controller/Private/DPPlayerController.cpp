@@ -18,6 +18,7 @@
 #include "FUdpSendTask.h"
 #include "MessageMaker.h"
 #include "GameHelper.h"
+#include "Chaos/SpatialAccelerationCollection.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -284,7 +285,6 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 	FVector Velocity = character->GetCharacterMovement()->Velocity;
 	Message message = MessageMaker::MakeMessage(this, actionValue, forwardVector, rightVector, Velocity);
 	Socket->SendPacket(message);
-	
 	character->AddMovementInput(forwardVector, actionValue.X);
 	character->AddMovementInput(rightVector, actionValue.Y);
 
