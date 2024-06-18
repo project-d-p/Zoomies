@@ -15,6 +15,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "MatchingLobby")
 	void ToggleReadyState();
+	APlayerController *PC = this; 
 protected:
 	virtual void BeginPlay() override;
 private:

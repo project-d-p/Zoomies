@@ -17,7 +17,8 @@ public:
 	virtual void BeginPlay() override;
 	void CheckReadyToStart();
 	void FindAndStoreLobbyPlatforms();
-	void CheckLobbyReady();
+	void CheckLobbyPlatformReady();
+	void UpdatePlayerOnPlatform();
 	
 	TArray<APlayerController*> PCs;
 private:
