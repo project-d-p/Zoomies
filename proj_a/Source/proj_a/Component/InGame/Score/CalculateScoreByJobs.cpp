@@ -4,17 +4,26 @@ UCalculateScoreByJobs::UCalculateScoreByJobs()
 {
 }
 
-int UCalculateScoreByJobs::CalculateScoreByJobs(EPlayerJob Job, const TArray<EAnimal>& animals)
+FScoreData UCalculateScoreByJobs::CalculateScoreByJobs(EPlayerJob Job, const TArray<EAnimal>& animals)
 {
-	int score = 0;
+	FScoreData score = {0, 0, 1};
 	
 	switch (Job)
 	{
-		case EPlayerJob::JOB_FARMER:
-			score += CalculateFarmer(animals);
+		case EPlayerJob::JOB_ARCHAEOLOGIST:
+			score = CalculateArchaeologist(animals);
 			break;
-		case EPlayerJob::JOB_HUNTER:
-			score += CalculateHunter(animals);
+		case EPlayerJob::JOB_POACHER
+			score = CalculatePoacher(animals);
+			break;
+		case EPlayerJob::JOB_RINGMASTER:
+			score = CalculateRingmaster(animals);
+			break;
+		case EPlayerJob::JOB_TERRORIST:
+			score = CalculateTerrorist(animals);
+			break;
+		case EPlayerJob::JOB_ENVIRONMENTALIST:
+			score = CalculateEnvironmentalist(animals);
 			break;
 		default:
 			break;
@@ -22,35 +31,50 @@ int UCalculateScoreByJobs::CalculateScoreByJobs(EPlayerJob Job, const TArray<EAn
 	
 	return score;
 }
-
-int UCalculateScoreByJobs::CalculateHunter(const TArray<EAnimal>& animals)
+FScoreData UCalculateScoreByJobs::CalculateArchaeologist( const TArray<EAnimal>& animals)
 {
-	int score = 0;
-	
-	for (EAnimal animal : animals)
+	FScoreData score = {0, 0, 1};
+	//iterate animals
+	for (const EAnimal& animal: animals)
 	{
-		score += 1;
-		if (animal == EAnimal::ANIMAL_DEER)
-		{
-			score += 10;
-		}
+		
 	}
+	return score;
+}
+
+FScoreData UCalculateScoreByJobs::CalculatePoacher( const TArray<EAnimal>& animals);
+{
+	FScoreData score = {0, 0, 1};
 	
 	return score;
 }
 
-int UCalculateScoreByJobs::CalculateFarmer(const TArray<EAnimal>& animals)
+FScoreData UCalculateScoreByJobs::CalculateRingmaster( const TArray<EAnimal>& animals);
 {
-	int score = 0;
-	
-	for (EAnimal animal : animals)
+	FScoreData score = {0, 0, 1};
+	return score;
+}
+
+FScoreData UCalculateScoreByJobs::CalculateTerrorist( const TArray<EAnimal>& animals);
+{
+	FScoreData score = {0, 0, 1};
+	return score;
+}
+
+FScoreData UCalculateScoreByJobs::CalculateEnvironmentalist( const TArray<EAnimal>& animals);
+{
+	FScoreData score = {0, 0, 1};
+	return score;
+}
+
+bool UCalculateScoreByJobs::AnimalCombinationCheck ( const TArray<EAnimal>& animals, const TArray<EAnimal>& combination)
+{
+	for (const EAnimal& animal: combination)
 	{
-		score += 1;
-		if (animal == EAnimal::ANIMAL_COW)
+		if (!animals.Contains(animal))
 		{
-			score += 10;
+			return false;
 		}
 	}
-	
-	return score;
+	return true;	
 }
