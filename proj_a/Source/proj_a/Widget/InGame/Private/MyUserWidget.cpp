@@ -27,13 +27,13 @@ void UMyUserWidget::OnScoreBT1Clicked()
 	ADPGameModeBase* GM = UGameHelper::GetInGameMode(GetWorld());
 	if (GM)
 	{
-		GM->ScoreManager->IncreasePlayerScore(GetWorld()->GetFirstPlayerController(), { EAnimal::ANIMAL_DEER, EAnimal::ANIMAL_COW });
+		GM->ScoreManager->IncreasePlayerScore(GetWorld()->GetFirstPlayerController(), { EAnimal::ANIMAL_WHALE, EAnimal::ANIMAL_ELEPHANT, EAnimal::ANIMAL_MAMMOTH});
 	}
 
 	ADPPlayerController* PC = Cast<ADPPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (PC)
 	{
-		PC->GetPrivateScoreManagerComponent()->IncreasePrivatePlayerScore(EPlayerJob::JOB_HUNTER,{ EAnimal::ANIMAL_DEER, EAnimal::ANIMAL_COW });
+		PC->GetPrivateScoreManagerComponent()->IncreasePrivatePlayerScore(EPlayerJob::JOB_ARCHAEOLOGIST,{ EAnimal::ANIMAL_WHALE, EAnimal::ANIMAL_ELEPHANT, EAnimal::ANIMAL_MAMMOTH});
 	}
 }
 
@@ -54,6 +54,6 @@ void UMyUserWidget::OnScoreBT2Clicked()
 			++ControllerIndex;
 		}
 		//Text EAnimalS Array
-		GM->ScoreManager->IncreasePlayerScore(SecondPlayerController, { EAnimal::ANIMAL_DEER, EAnimal::ANIMAL_COW });
+		GM->ScoreManager->IncreasePlayerScore(SecondPlayerController, { EAnimal::ANIMAL_WHALE, EAnimal::ANIMAL_ELEPHANT, EAnimal::ANIMAL_MAMMOTH});
 	}
 }
