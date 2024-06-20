@@ -3,9 +3,9 @@
 
 ServerMessageHandler::ServerMessageHandler()
 {
-	message_handlers_[Message::kMovement] = FServerMessageDelegate::CreateLambda([](ADPPlayerController* player_controller, const Message& msg)
+	message_handlers_[Message::kMovement] = FServerMessageDelegate::CreateLambda([](ADPPlayerController* player_controller, const Message& msg, const float& delta)
 	{
-		player_controller->HandleMovement(msg.movement());
+		player_controller->HandleMovement(msg.movement(), delta);
 	});
 }
 

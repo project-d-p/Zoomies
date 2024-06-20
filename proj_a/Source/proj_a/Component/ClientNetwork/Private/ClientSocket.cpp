@@ -110,7 +110,6 @@ void UClientSocket::HandleSendMessages()
 	{
 		Message msg = send_buffer.front();
 		TArray<uint8> data = Marshaller::SerializeMessage(msg);
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("Size of message: %d"), data.Num());
 		SteamNetworkingSockets()->SendMessageToConnection(connection_, data.GetData(), data.Num(), k_nSteamNetworkingSend_Unreliable, nullptr);
 		send_buffer.pop();
 		data.SetNumZeroed(data.Num());

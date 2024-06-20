@@ -19,6 +19,7 @@
 #include "MessageMaker.h"
 #include "GameHelper.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 DEFINE_LOG_CATEGORY(LogNetwork);
@@ -196,6 +197,30 @@ void ADPPlayerController::SendCompressedMovement()
 	AccumulatedRightInput = FVector::ZeroVector;
 }
 
+void ADPPlayerController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (!HasAuthority())
+	{
+		// if (PlayerState == nullptr)
+		// {
+		// 	return ;
+		// }
+		// FNetLogger::EditerLog(FColor::Red, TEXT("Tick: %f"), DeltaSeconds);
+		//
+		// FRotator Rotation = character->GetControlRotation();
+		// // FVector Velocity = character->GetCharacterMovement()->Velocity;
+		// FVector Velocity = character->GetCharacterMovement()->GetLastUpdateVelocity();
+		// Message message = MessageMaker::MakeMovementMessage(this, TODO, Rotation, Velocity);
+		// Socket->AsyncSendPacket(message);
+		
+	}
+	else
+	{
+	}
+}
+
 void ADPPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
@@ -230,22 +255,22 @@ void ADPPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	// enhanced input component Ä³½ºÆÃÇÏ°í ¹ÙÀÎµù
+	// enhanced input component Ä³ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½Îµï¿½
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent)) {
-		// ÇÃ·¹ÀÌ¾î ÀÌµ¿ ( w, a, d, s )
+		// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½Ìµï¿½ ( w, a, d, s )
 		EnhancedInputComponent->BindAction(moveAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Move);
-		// ÇÃ·¹ÀÌ¾î Á¡ÇÁ ( space )
+		// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½ ( space )
 		EnhancedInputComponent->BindAction(jumpAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Jump);
-		// ½ÃÁ¡ º¯È¯ ( ¸¶¿ì½º È¸Àü )
+		// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯ ( ï¿½ï¿½ï¿½ì½º È¸ï¿½ï¿½ )
 		EnhancedInputComponent->BindAction(rotateAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Rotate);
-		//	Çàµ¿, ÃÑ ¹ß»ç/º® ¼³Ä¡/ÅÍ·¿ ¼³Ä¡ ( ¸¶¿ì½º ÁÂÅ¬¸¯ )
+		//	ï¿½àµ¿, ï¿½ï¿½ ï¿½ß»ï¿½/ï¿½ï¿½ ï¿½ï¿½Ä¡/ï¿½Í·ï¿½ ï¿½ï¿½Ä¡ ( ï¿½ï¿½ï¿½ì½º ï¿½ï¿½Å¬ï¿½ï¿½ )
 		EnhancedInputComponent->BindAction(activeAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Active);
-		//	º¯°æ, ¹«±â º¯°æ/º® È¸Àü ( ¸¶¿ì½º ½ºÅ©·Ñ )
+		//	ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ È¸ï¿½ï¿½ ( ï¿½ï¿½ï¿½ì½º ï¿½ï¿½Å©ï¿½ï¿½ )
 		EnhancedInputComponent->BindAction(additionalSettingAction, ETriggerEvent::Triggered, this, &ADPPlayerController::AdditionalSetting);
-		//	¿¡ÀÓ ( ¸¶¿ì½º ¿ìÅ¬¸¯ )
+		//	ï¿½ï¿½ï¿½ï¿½ ( ï¿½ï¿½ï¿½ì½º ï¿½ï¿½Å¬ï¿½ï¿½ )
 		EnhancedInputComponent->BindAction(aimAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Aim);	// 	key down
 		EnhancedInputComponent->BindAction(aimAction, ETriggerEvent::Completed, this, &ADPPlayerController::AimReleased);
-		//	Ãë¼Ò, Ã¤ÆÃ ²ô±â ( esc - UE ¿¡µðÅÍ¿¡¼­ ±âº» ´ÜÃàÅ° º¯°æ ÇÊ¿ä )
+		//	ï¿½ï¿½ï¿½, Ã¤ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ( esc - UE ï¿½ï¿½ï¿½ï¿½ï¿½Í¿ï¿½ï¿½ï¿½ ï¿½âº» ï¿½ï¿½ï¿½ï¿½Å° ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ )
 		EnhancedInputComponent->BindAction(cancelAction, ETriggerEvent::Triggered, this, &ADPPlayerController::ActionCancel);
 	}
 }
@@ -260,38 +285,13 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 
 	const FVector forwardVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
-	if (HasAuthority())
-	{
-		// ÇØ´ç ºÎºÐ¿¡¼­ ¼­¹ö·Î ÀÌµ¿ ¸í·ÉÀ» º¸³»¾ß ÇÏ³ª?
-		FNetLogger::EditerLog(FColor::Blue, TEXT("Send Movement[Server]: %f %f"), actionValue.X, actionValue.Y);
-	}
-	else
-	{
-		AccumulatedForwardInput = forwardVector;
-		AccumulatedRightInput = rightVector;
-		AccumulatedMovementInput += actionValue;
-		// Å¬¶óÀÌ¾ðÆ®¸é º¸³»¾ßÇÔ
-		// FNetLogger::EditerLog(FColor::Blue, TEXT("Send Movement[Client]: %f %f"), actionValue.X, actionValue.Y);
-	}
 
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("actionValue: %f %f"), actionValue.X, actionValue.Y);
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("forwardVector: %f %f %f"), forwardVector.X, forwardVector.Y, forwardVector.Z);
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("rightVector: %f %f %f"), rightVector.X, rightVector.Y, rightVector.Z);
-
-	MovementCount++;
-	FNetLogger::EditerLog(FColor::Red, TEXT("MovementCount: %d"), MovementCount);
-
-	FVector Velocity = character->GetCharacterMovement()->Velocity;
-	Message message = MessageMaker::MakeMessage(this, actionValue, forwardVector, rightVector, Velocity);
+	FVector velocity = character->GetCharacterMovement()->Velocity;
+	Message message = MessageMaker::MakeMovementMessage(this, actionValue, controlRotation, velocity);
 	Socket->AsyncSendPacket(message);
-	
+
 	character->AddMovementInput(forwardVector, actionValue.X);
 	character->AddMovementInput(rightVector, actionValue.Y);
-
-	FNetLogger::EditerLog(FColor::Emerald, TEXT("Character Velocity Size: %f"), character->GetCharacterMovement()->Velocity.Size());
-	FNetLogger::EditerLog(FColor::Emerald, TEXT("Character Velocity: %f %f %f"), character->GetCharacterMovement()->Velocity.X, character->GetCharacterMovement()->Velocity.Y, character->GetCharacterMovement()->Velocity.Z);
-	
-	// character->speed = character->GetCharacterMovement()->Velocity.Size();
 }
 
 void ADPPlayerController::Jump(const FInputActionValue& value)
@@ -316,7 +316,7 @@ void ADPPlayerController::Rotate(const FInputActionValue& value)
 	// send rotate command ( id, actionValue )
 	character->AddControllerYawInput(actionValue.X);
 	character->AddControllerPitchInput(actionValue.Y);
-	FUdpSendTask::ProtoData.set_allocated_progess_vector(ProtobufUtility::ConvertToFVecToVec3(character->GetControlRotation().Vector()));
+	// FUdpSendTask::ProtoData.set_allocated_progess_vector(ProtobufUtility::ConvertToFVecToVec3(character->GetControlRotation().Vector()));
 }
 
 void ADPPlayerController::Active(const FInputActionValue& value)
@@ -337,7 +337,7 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 	// 		character->GetCharacterMovement()->DisableMovement();
 	// 		construction->MakeWall({ 0, 0, 0 }, { 0, 0, 0 });
 	// 		character->constructionComponent->placeWall = true;
-	// 		// ´ÙÀ½ Æ½¿¡ false·Î ¹Ù²Þ
+	// 		// ï¿½ï¿½ï¿½ï¿½ Æ½ï¿½ï¿½ falseï¿½ï¿½ ï¿½Ù²ï¿½
 	// 		auto resetPlaceWall = [this]() {
 	// 			character->constructionComponent->placeWall = false;
 	// 		};
@@ -394,11 +394,11 @@ void ADPPlayerController::Aim(const FInputActionValue& value)
 	}
 	if ("WALL" == state->equipmentState) {
 		character->isAim = true;
-		// ¹Ù¶óº¸´Â ¹æÇâ Ã»»çÁø -> ÀÌ¶§ scroll½Ã wallÈ¸ÀüµÇ°Ô	// idAim = true -> active µÇ¸é ¼³Ä¡
+		// ï¿½Ù¶óº¸´ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã»ï¿½ï¿½ï¿½ï¿½ -> ï¿½Ì¶ï¿½ scrollï¿½ï¿½ wallÈ¸ï¿½ï¿½ï¿½Ç°ï¿½	// idAim = true -> active ï¿½Ç¸ï¿½ ï¿½ï¿½Ä¡
 	}
 	if ("TURRET" == state->equipmentState) {
 		character->isAim = true;
-		// ¹Ù¶óº¸´Â ¹æÇâ Ã»»çÁø
+		// ï¿½Ù¶óº¸´ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã»ï¿½ï¿½ï¿½ï¿½
 	}
 }
 
@@ -414,11 +414,11 @@ void ADPPlayerController::AimReleased(const FInputActionValue& value)
 	}
 	if ("WALL" == state->equipmentState) {
 		character->isAim = false;
-		// Ã»»çÁø Á¦°Å
+		// Ã»ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	}
 	if ("TURRET" == state->equipmentState) {
 		character->isAim = false;
-		// Ã»»çÁø Á¦°Å
+		// Ã»ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	}
 }
 
@@ -429,61 +429,82 @@ void ADPPlayerController::ActionCancel(const FInputActionValue& value)
 
 void ADPPlayerController::UpdatePlayer()
 {
-	ActorPosition actorPosition;
-
 	const FString PlayerId = this->PlayerState->GetPlayerName();
+	FNetLogger::EditerLog(FColor::Green, TEXT("Update Player: %s"), *PlayerId);
 	if (!FDataHub::actorPosition.Contains(PlayerId))
 	{
-		/** Æ÷ÇÔµÇÁö ¾Ê¾ÒÀ» °æ¿ì */
-		// UE_LOG(LogNetwork, Warning, TEXT("Player 1 data not found"));
+		FNetLogger::EditerLog(FColor::Red, TEXT("Player %s is not in actorPosition"), *PlayerId);
 		return;
 	}
-	actorPosition = FDataHub::actorPosition[PlayerId];
-	// if (actorPosition.Position.IsSet())
+	ActorPosition actorPosition = FDataHub::actorPosition[PlayerId];
+	FVector position = FVector(actorPosition.position().x(), actorPosition.position().y(), actorPosition.position().z());
+	FVector velocity = FVector(actorPosition.velocity().x(), actorPosition.velocity().y(), actorPosition.velocity().z());
+	FVector current_position = character->GetActorLocation();
+	FVector curren_velocity = character->GetCharacterMovement()->Velocity;
+	if (this->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		float significantDifference = 100.0f;
+		float distance = FVector::Dist(position, current_position);
+
+		if (distance > significantDifference)
+		{
+			FNetLogger::EditerLog(FColor::Red, TEXT("Player %s is too far away from server"), *PlayerId);
+			character->SetActorLocation(position);
+			character->GetCharacterMovement()->Velocity = velocity;
+		}
+	}
+	// else
 	// {
-	// 	FVector NewLocation = actorPosition.Position.GetValue();
-	// 	AActor* ControlledActor = GetPawn();
+	// 	FVector UnitVector = velocity.GetSafeNormal();
+	// 	FVector LookAtTarget = current_position + UnitVector;
+	// 	FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(current_position, LookAtTarget);
+	// 	
+	// 	FRotator FinalRotation = FRotator(0, NewRotation.Yaw, 0);
+	// 		
+	// 	character->SetActorRotation(FinalRotation);
 	//
-	// 	if (ControlledActor)
-	// 	{
-	// 		ControlledActor->SetActorLocation(NewLocation);
-	// 	}
+	// 	FVector interpolated_position = FMath::VInterpTo(current_position, position, GetWorld()->GetDeltaSeconds(), 10.0f);
+	// 	FVector interpolated_velocity = FMath::VInterpTo(curren_velocity, velocity, GetWorld()->GetDeltaSeconds(), 10.0f);
+	// 	
+	// 	character->SetActorLocation(interpolated_position);
+	// 	character->GetCharacterMovement()->Velocity = interpolated_velocity;
 	// }
 }
 
 /*
  * 1. Handler Player Movement in Server (W, A, S, D) - Move Function with Movement Message
  */
-void ADPPlayerController::HandleMovement(const Movement& movement)
+void ADPPlayerController::HandleMovement(const Movement& movement, const float& server_delta)
 {
-	if (!movement.has_progess_vector())
-	{
-		return ;
-	}
-	
-	FVector forwardVector = FVector(movement.forward_vector().x(), movement.forward_vector().y(), movement.forward_vector().z());
-	FVector rightVector = FVector(movement.right_vector().x(), movement.right_vector().y(), movement.right_vector().z());
-	FVector actionValue = FVector(movement.progess_vector().x(), movement.progess_vector().y(), movement.progess_vector().z());
 	FVector velocity = FVector(movement.velocity().x(), movement.velocity().y(), movement.velocity().z());
-	// float velocitySize = movement.velocity_size();
-
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Action: %f %f %f"), actionValue.X, actionValue.Y, actionValue.Z);
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Forward: %f %f %f"), forwardVector.X, forwardVector.Y, forwardVector.Z);
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Right: %f %f %f"), rightVector.X, rightVector.Y, rightVector.Z);
-
+	FRotator rotation = FRotator(movement.rotation().x(), movement.rotation().y(), movement.rotation().z());
+	FVector2d action = FVector2d(movement.action().x(), movement.action().y());
+	float delta = movement.delta_time();
+	
 	if (!character)
 	{
 		FNetLogger::EditerLog(FColor::Red, TEXT("Character is null in HandleMovement"));
 		return ;
 	}
-
+	
 	character->GetCharacterMovement()->Velocity = velocity;
+	// character->speed = velocity.Size();
 	
-	ServerReceivedMovementCount++;
-	FNetLogger::EditerLog(FColor::Red, TEXT("ServerReceivedMovementCount: %d"), ServerReceivedMovementCount);
+	// FVector CurrentLocation = character->GetActorLocation();
+	// FVector NewLocation = character->GetActorLocation() + (velocity * delta);
+	// character->SetActorLocation(NewLocation);
+
+	// FVector UnitVector = velocity.GetSafeNormal();
+	// FVector LookAtTarget = CurrentLocation + UnitVector;
+	// FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(CurrentLocation, LookAtTarget);
+	//
+	// FRotator FinalRotation = FRotator(0, NewRotation.Yaw, 0);
+	// 	
+	// character->SetActorRotation(FinalRotation);
 	
-	character->AddMovementInput(forwardVector, actionValue.X);
-	character->AddMovementInput(rightVector, actionValue.Y);
-	FNetLogger::EditerLog(FColor::Emerald, TEXT("Character Velocity Size: %f"), character->GetCharacterMovement()->Velocity.Size());
-	FNetLogger::EditerLog(FColor::Emerald, TEXT("Character Velocity: %f %f %f"), character->GetCharacterMovement()->Velocity.X, character->GetCharacterMovement()->Velocity.Y, character->GetCharacterMovement()->Velocity.Z);
+	const FVector forwardVector = FRotationMatrix(rotation).GetUnitAxis(EAxis::X);
+	const FVector rightVector = FRotationMatrix(rotation).GetUnitAxis(EAxis::Y);
+
+	character->AddMovementInput(forwardVector, action.X * delta / server_delta);
+	character->AddMovementInput(rightVector, action.Y * delta / server_delta);
 }

@@ -24,6 +24,7 @@ public:
 	virtual ~SteamNetworkingSocket() override;
 	std::queue<Message> GetReadBuffer();
 	bool IsGameStarted() const;
+	void PushUdpFlushMessage(Message& msg);
 	// void OnSteamNetConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t* info);
 	
 	STEAM_CALLBACK(SteamNetworkingSocket, OnSteamNetConnectionStatusChanged, SteamNetConnectionStatusChangedCallback_t);

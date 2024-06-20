@@ -5,10 +5,8 @@ import "vector.proto";
 // client->Server
 
 message Movement {
-  //Vec3 orientation = 2; // 플레이어의 바라보는 방향
-  Vec3 progess_vector = 1; // 플레이어의 입력 키 바인딩
-  Vec3 forward_vector = 2; // 진행 방향
-  Vec3 right_vector = 3; // 오른쪽 방향
-  Vec3 velocity = 4; // 속도
-  float velocity_size = 5; // 속도 크기
+  Vec3 velocity = 1; // 속도
+  Vec3 action = 2;
+  Vec3 rotation = 3;
+  float delta_time = 4;
 }

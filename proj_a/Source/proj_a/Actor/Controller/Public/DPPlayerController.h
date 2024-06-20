@@ -30,7 +30,7 @@ public:
 	void Connect();
 	void RunTask();
 
-	void HandleMovement(const Movement& movement);
+	void HandleMovement(const Movement& movement, const float& server_delta);
 	
 	UPlayerScoreComp* GetScoreManagerComponent() const;
 protected:
@@ -80,7 +80,7 @@ private:
 
 	void SendCompressedMovement();
 	
-	// virtual void Tick(float DeltaSeconds) override;
+	virtual void Tick(float DeltaSeconds) override;
 	
 	void Move(const FInputActionValue& value);
 	void Jump(const FInputActionValue& value);
@@ -91,7 +91,7 @@ private:
 	void AimReleased(const FInputActionValue& value);
 	void ActionCancel(const FInputActionValue& value);
 
-	void UpdatePlayer(/*DataHub result*/);
+	void UpdatePlayer();
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")

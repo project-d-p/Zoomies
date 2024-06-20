@@ -6,6 +6,6 @@
 class MessageMaker
 {
 public:
-	static Message MakeMessage(const ADPPlayerController* Controller, const FVector2D& Input, const FVector& Forward, const FVector& Right, const FVector& Velocity);
-	static Message MakeMessage(const ADPPlayerController* Controller);
+	static Message MakeMovementMessage(const ADPPlayerController* Controller, const FVector2d& ActionValue, const FRotator& Rotation, const FVector& Velocity);
+	static Message MakePositionMessage(const ADPPlayerController* Controller);
 };

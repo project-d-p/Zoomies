@@ -56,24 +56,15 @@ void SteamNetworkingSocket::RecieveMessages()
 	}
 	TArray<uint8> data;
 	data.Reserve(1024);
-
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Recieved %d messages"), n_messages);
 	
 	for (int i = 0; i < n_messages; ++i)
 	{
 		if (pp_message[i] == nullptr)
 			continue;
-		// TODO: Handle message
-
 		data.Reset();
-		
 		const uint8* msg = static_cast<const uint8*>(pp_message[i]->GetData());
 		int32 size = pp_message[i]->m_cbSize;
-
-		FNetLogger::EditerLog(FColor::Red, TEXT("Recieved Message Size: %d"), size);
-	
 		data.Append(msg, size);
-
 		try {
 			Message ret_msg = Marshaller::DeserializeMessage(data);
 			pp_message[i]->Release();
@@ -150,5 +141,10 @@ void SteamNetworkingSocket::OnSteamNetConnectionStatusChanged(SteamNetConnection
 bool SteamNetworkingSocket::IsGameStarted() const
 {
 	return b_is_game_stated;
+}
+
+void SteamNetworkingSocket::PushUdpFlushMessage(Message& msg)
+{
+	send_buffer_.Push(msg);
 }
 

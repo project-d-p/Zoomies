@@ -4,14 +4,18 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "DPHpActorComponent.h"
 #include "DPConstructionActorComponent.h"
+#include "DPPlayerState.h"
 #include "DPWeaponActorComponent.h"
 #include "DPStateActorComponent.h"
 #include "DPWeaponGun.h"
+#include "FDataHub.h"
+#include "FNetLogger.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PlayerState.h"
 
 // Sets default values
 ADPCharacter::ADPCharacter()
@@ -76,10 +80,9 @@ ADPCharacter::ADPCharacter()
 	sceneCaptureSpringArm->bDoCollisionTest = false;
 	sceneCapture->ProjectionType = ECameraProjectionMode::Type::Orthographic;
 	sceneCapture->OrthoWidth = 1024.0f;
-	
+
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
-	
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
 	(TEXT("/Game/animation/steve/steveAnimation.steveAnimation_C"));
@@ -116,6 +119,7 @@ void ADPCharacter::BeginPlay()
 		weaponComponent->AddWeapons(gunClass);
 		weaponComponent->Equip(gunClass);
 	}
+	bUseControllerRotationYaw = false;
 }
 
 // Called every frame
@@ -124,13 +128,54 @@ void ADPCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	if (GetCharacterMovement()) {
+		// TODO : remote role이 simulation이 아닌 경우에 모두 호출.
+		// if (GetLocalRole() == ROLE_AutonomousProxy)
+		// {
 		currentVelocity = GetCharacterMovement()->Velocity;
 		speed = currentVelocity.Size();
+		// }
 	}
 	else
 		UE_LOG(LogTemp, Warning, TEXT("null GetCharacterMovement"));
 
+	if (this->GetLocalRole() == ROLE_SimulatedProxy)
+	{
+		ADPPlayerState* player_state = Cast<ADPPlayerState>(GetPlayerState());
+		if (player_state == nullptr)
+		{
+			return;
+		}
+		const FString PlayerId = player_state->GetPlayerName();
+		if (!FDataHub::actorPosition.Contains(PlayerId))
+		{
+			return;
+		}
+		ActorPosition actorPosition = FDataHub::actorPosition[PlayerId];
+		FVector position = FVector(actorPosition.position().x(), actorPosition.position().y(), actorPosition.position().z());
+		FVector velocity = FVector(actorPosition.velocity().x(), actorPosition.velocity().y(), actorPosition.velocity().z());
+		
+		if (velocity == FVector(0, 0, 0))
+		{
+			GetCharacterMovement()->Velocity = FVector(0, 0, 0);
+			return ;
+		}
+		FVector current_position = GetActorLocation();
+		FVector curren_velocity = GetCharacterMovement()->Velocity;
+		
+		FVector UnitVector = velocity.GetSafeNormal();
+		FVector LookAtTarget = current_position + UnitVector;
+		FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(current_position, LookAtTarget);
+		
+		FRotator FinalRotation = FRotator(0, NewRotation.Yaw, 0);
+			
+		SetActorRotation(FinalRotation);
 
+		FVector interpolated_position = FMath::VInterpTo(current_position, position, GetWorld()->GetDeltaSeconds(), 10.0f);
+		FVector interpolated_velocity = FMath::VInterpTo(curren_velocity, velocity, GetWorld()->GetDeltaSeconds(), 10.0f);
+		
+		SetActorLocation(interpolated_position);
+		GetCharacterMovement()->Velocity = interpolated_velocity;
+	}
 }
 
 // Called to bind functionality to input

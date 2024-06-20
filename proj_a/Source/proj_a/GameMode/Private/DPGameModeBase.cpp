@@ -64,10 +64,15 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 	{
 		return;
 	}
-
 	FString name = player_state->GetPlayerName();
 	FNetLogger::EditerLog(FColor::Blue, TEXT("Player name: %s"), *name);
 	std::string key(TCHAR_TO_UTF8(*name));
+	if (player_controllers_.find(key) != player_controllers_.end())
+	{
+		player_state->SetPlayerName(name + "1");
+		FNetLogger::EditerLog(FColor::Red, TEXT("Player name: %s"), *player_state->GetPlayerName());
+		key = std::string(TCHAR_TO_UTF8(*player_state->GetPlayerName()));
+	}
 	player_controllers_[key] = Cast<ADPPlayerController>(newPlayer);
 }
 
@@ -120,17 +125,17 @@ void ADPGameModeBase::ProcessData(float delta_time)
 {
 	message_queue_ = steam_listen_socket_->GetReadBuffer();
 	// FNetLogger::EditerLog(FColor::Red, TEXT("size of message queue: %d"), this->message_queue_.size());
-	if (this->message_queue_.empty())
-	{
-		return;
-	}
+	// if (this->message_queue_.empty())
+	// {
+	// 	return;
+	// }
 	while (!this->message_queue_.empty())
 	{
 		Message message = this->message_queue_.front();
 		// Message message = this->message_queue_.top();
 		this->message_queue_.pop();
 		ADPPlayerController* controller = this->player_controllers_[message.player_id()];
-		message_handler_.HandleMessage(message)->ExecuteIfBound(controller, message);
+		message_handler_.HandleMessage(message)->ExecuteIfBound(controller, message, delta_time);
 	}
 	this->SyncMovement();
 }
@@ -149,9 +154,7 @@ void ADPGameModeBase::SyncMovement()
 {
 	for (auto& pair: player_controllers_)
 	{
-		// FNetLogger::EditerLog(FColor::Green, TEXT("player name: %s"), *FString(pair.first.c_str()));
-		// UE_LOG(LogTemp, Warning, TEXT("sender name: %s"), *FString(pair.first.c_str()));
-		// Message msg = MessageMaker::MakeMessage(pair.second);
-		// listen_socket_->PushUdpFlushMessage(msg);
+		Message msg = MessageMaker::MakePositionMessage(pair.second);
+		steam_listen_socket_->PushUdpFlushMessage(msg);
 	}
 }
