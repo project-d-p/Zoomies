@@ -12,8 +12,12 @@ class PROJ_A_API UCalculateScoreByJobs : public UActorComponent
 
 public:
 	UCalculateScoreByJobs();
-	static int CalculateScoreByJobs(EPlayerJob Job, const TArray<EAnimal>& animals);
+	static FScoreData CalculateScoreByJobs(EPlayerJob Job, const TArray<EAnimal>& animals);
 private:
-	static int CalculateHunter( const TArray<EAnimal>& animals);
-	static int CalculateFarmer( const TArray<EAnimal>& animals);
+	static FScoreData CalculateArchaeologist( const TArray<EAnimal>& animals);
+	static FScoreData CalculatePoacher( const TArray<EAnimal>& animals);
+	static FScoreData CalculateRingmaster( const TArray<EAnimal>& animals);
+	static FScoreData CalculateTerrorist( const TArray<EAnimal>& animals);
+	static FScoreData CalculateEnvironmentalist( const TArray<EAnimal>& animals);
+	static bool AnimalCombinationCheck ( const TArray<EAnimal>& animals, const TArray<EAnimal>& combination);
 };
