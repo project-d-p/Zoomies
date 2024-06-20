@@ -15,7 +15,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "MatchingLobby")
 	void ToggleReadyState();
-	APlayerController *PC = this; 
+	void SetCineCameraView();
 protected:
 	virtual void BeginPlay() override;
 private:

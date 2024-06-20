@@ -82,7 +82,7 @@ public class proj_a : ModuleRules
 			"OnlineSubsystemUtils",
 			"SlateCore",
 		});
-		PrivateDependencyModuleNames.AddRange(new string[] {  });
+		PrivateDependencyModuleNames.AddRange(new string[] { "CinematicCamera" });
 
 		string SteamSDKPath = Path.Combine(ModuleDirectory, "Steam");
 		if (Directory.Exists(SteamSDKPath))

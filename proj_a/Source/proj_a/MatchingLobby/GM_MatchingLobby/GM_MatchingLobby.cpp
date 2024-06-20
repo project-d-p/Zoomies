@@ -10,13 +10,7 @@ AGM_MatchingLobby::AGM_MatchingLobby() {
 	// PlayerControllerClass = ADPPlayerController::StaticClass();
 	GameStateClass = AGS_MatchingLobby::StaticClass();
 	PlayerControllerClass = APC_MatchingLobby::StaticClass();
-	DefaultPawnClass = ADPCharacter::StaticClass();
-
-	static ConstructorHelpers::FClassFinder<AActor> ClassFinder(TEXT("Class'/Game/etc/Lobby/LobbyPlatform.LobbyPlatform_C'"));
-	if (ClassFinder.Succeeded())
-	{
-		LobbyPlatformClass = ClassFinder.Class;
-	}
+	DefaultPawnClass = nullptr; 
 }
 
 void AGM_MatchingLobby::PostLogin(APlayerController* NewPlayer) {
@@ -28,7 +22,12 @@ void AGM_MatchingLobby::PostLogin(APlayerController* NewPlayer) {
 		GS->HostPlayerIndex = NewPlayer->PlayerState->GetPlayerId();
 	}
 	PCs.Add(NewPlayer);
-	UpdatePlayerOnPlatform();
+	APC_MatchingLobby* PC = Cast<APC_MatchingLobby>(NewPlayer);
+	if (PC)
+	{
+		PC->SetCineCameraView();
+	}
+	CheckAndUpdateLobbyPlatform();
 }
 
 void AGM_MatchingLobby::Logout(AController* Exiting) {
@@ -38,7 +37,7 @@ void AGM_MatchingLobby::Logout(AController* Exiting) {
 	{
 		PCs.Remove(ExitingPlayer);
 	}
-	UpdatePlayerOnPlatform();
+	CheckAndUpdateLobbyPlatform();
 }
 
 void AGM_MatchingLobby::BeginPlay() {
@@ -69,111 +68,121 @@ void AGM_MatchingLobby::StartGame_t() const
 void AGM_MatchingLobby::FindAndStoreLobbyPlatforms()
 {
 	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), LobbyPlatformClass, FoundActors);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ALobbyPlatform::StaticClass(), FoundActors);
 
-	LobbyPlatforms.Init(nullptr, 4);
+	LobbyPlatforms.Init(nullptr, 2);
 
 	for (AActor* Actor : FoundActors)
 	{
 		if (Actor->Tags.Num() > 0)
 		{
 			FString Tag = Actor->Tags[0].ToString();
-			
 			int32 Index = FCString::Atoi(Tag.GetCharArray().GetData());
 	
 			if (Index >= 0 && Index < LobbyPlatforms.Num())
 			{
-				LobbyPlatforms[Index] = Actor;
-				if (APC_MatchingLobby* PCActor = Cast<APC_MatchingLobby>(Actor))
-				{
-					// PC 변수가 있는지 확인하고 출력
-					if (PCActor->PC != nullptr)
-						UE_LOG(LogTemp, Warning, TEXT("PC: %s"), PCActor->PC);
-				}
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Invalid index for LobbyPlatforms array"));
-				return ;
+				LobbyPlatforms[Index] = Cast<ALobbyPlatform>(Actor);
 			}
 		}
 	}
 	bIsLobbyPlatformReady = true;
 }
 
-void AGM_MatchingLobby::CheckLobbyPlatformReady()
+
+void AGM_MatchingLobby::CheckAndUpdateLobbyPlatform()
 {
 	if (!bIsLobbyPlatformReady)
 	{
-		FTimerHandle UnusedHandle;
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, TEXT("Timer Called"));
+		}
 		GetWorldTimerManager().SetTimer(
 			UnusedHandle,
-			this, &AGM_MatchingLobby::CheckLobbyPlatformReady,
+			this, &AGM_MatchingLobby::CheckAndUpdateLobbyPlatform,
 			0.01f,
-			false);
+			true);
 	}
 	else
 	{
-		//log on screen platform ready
+		// Clear the timer when the lobby platforms are ready
+		GetWorldTimerManager().ClearTimer(UnusedHandle);
+
+		// Log on screen platform ready
 		if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Lobby Platforms are ready"));
 		}
+
+		UpdatePlayerOnPlatform();
 	}
 }
 
 void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 {
-	CheckLobbyPlatformReady();
 	for (int32 i = 0; i < PCs.Num(); i++)
 	{
 		bool bIsPlayerOnPlatform = false;
 		if (LobbyPlatforms.IsValidIndex(i))
 		{
-			APC_MatchingLobby* PC = Cast<APC_MatchingLobby>(PCs[i]);
-			if (PC)
+			for (int32 j = 0; j < LobbyPlatforms.Num(); j++)
 			{
-				//loop LobbyPlatforms
-				for (int32 j = 0; j < LobbyPlatforms.Num(); j++)
+				if (LobbyPlatforms[j]->PC != nullptr)
 				{
-					APC_MatchingLobby * platformPC = Cast<APC_MatchingLobby>(LobbyPlatforms[j]);
-					if (platformPC->PC == PC->PC)
+					if (PCs[i] == LobbyPlatforms[j]->PC)
 					{
 						bIsPlayerOnPlatform = true;
-						break;
-					}
-					else
-					{
-						//log on screen about each PC value
 						if (GEngine)
 						{
-							GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("PC: %s"), *PC->PC->GetName()));
-							if (platformPC == nullptr)
-							{
-								GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("platformPC is Null")));
-							}
+							GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Player is on platform"));
 						}
+						break;
 					}
-				}
-				if (!bIsPlayerOnPlatform)
-				{
-					//log on screed about player not on platform
-					if (GEngine)
-					{
-						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Player not on platform"));
-					}
-					// for (int32 j = 0; j < LobbyPlatforms.Num();j++)
-					// {
-					// 	APC_MatchingLobby * platformPC = Cast<APC_MatchingLobby>(LobbyPlatforms[j]);
-					// 	// if platformPC is not vaild
-					// 	if (platformPC == nullptr)
-					// 	{
-					// 		platformPC->PC = PC->PC;
-					// 		break;
-					// 	}
-					// }
 				}
 			}
 		}
+		else
+		{
+			if (GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("LobbyPlatforms is not valid index"));
+			}
+		}
+
+		if (!bIsPlayerOnPlatform)
+		{
+			for (int32 j = 0; j < LobbyPlatforms.Num(); j++)
+			{
+				if (LobbyPlatforms[j]->PC == nullptr)
+				{
+					LobbyPlatforms[j]->SpawnCharacter(PCs[i]);
+					break;
+				}
+				else
+				{
+					if (GEngine)
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Platform is occupied"));
+				}
+			}
+		}
+	}
+
+	for (int32 i = 0; i < LobbyPlatforms.Num(); i++)
+	{
+		if (!LobbyPlatforms[i])
+		{
+			UE_LOG(LogTemp, Warning, TEXT("LobbyPlatforms[%d] is null."), i);
+			continue;
+		}
+
+		if (LobbyPlatforms[i]->PC && !PCs.Contains(LobbyPlatforms[i]->PC))
+		{
+			LobbyPlatforms[i]->Clear_Platform();
+		}
+	}
+	//logging on screen successful update
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Players updated on platforms"));
 	}
 }

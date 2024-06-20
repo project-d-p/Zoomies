@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "proj_a/Actor/Lobby/LobbyPlatform.h"
 #include "GM_MatchingLobby.generated.h"
 
 UCLASS()
@@ -17,14 +18,14 @@ public:
 	virtual void BeginPlay() override;
 	void CheckReadyToStart();
 	void FindAndStoreLobbyPlatforms();
-	void CheckLobbyPlatformReady();
+	void CheckAndUpdateLobbyPlatform();
 	void UpdatePlayerOnPlatform();
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<APlayerController*> PCs;
+	FTimerHandle UnusedHandle;
 private:
 	void StartGame_t() const;
 protected:
-	UClass* LobbyPlatformClass;
-	TArray<AActor*> LobbyPlatforms;
+	TArray<ALobbyPlatform*> LobbyPlatforms;
 	bool bIsLobbyPlatformReady = false;
 };
