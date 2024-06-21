@@ -9,7 +9,7 @@ void UGI_Zoomies::Init()
 	Super::Init();
 
 	// Get the online subsystem
-	online_subsystem_ = IOnlineSubsystem::Get();
+	online_subsystem_ = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
 	if (online_subsystem_)
 	{
 		session_interface_ = online_subsystem_->GetSessionInterface();

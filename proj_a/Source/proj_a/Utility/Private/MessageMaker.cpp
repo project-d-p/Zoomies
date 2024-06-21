@@ -1,7 +1,10 @@
 #include "MessageMaker.h"
+
+#include "DPCharacter.h"
 #include "DPPlayerController.h"
 #include "FNetLogger.h"
 #include "PlayerName.h"
+#include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/PlayerState.h"
 
 Message MessageMaker::MakeMovementMessage(const ADPPlayerController* Controller, const FVector2d& ActionValue, const FRotator& Rotation, const FVector& Velocity)
@@ -67,6 +70,19 @@ Message MessageMaker::MakePositionMessage(const ADPPlayerController* Controller)
 	velocity.set_y(Controller->GetPawn()->GetVelocity().Y);
 	velocity.set_z(Controller->GetPawn()->GetVelocity().Z);
 	*actor_position.mutable_velocity() = velocity;
+	ADPCharacter* character = Cast<ADPCharacter>(Controller->GetPawn());
+	switch (character->GetCharacterMovement()->MovementMode)
+	{
+	case EMovementMode::MOVE_Walking:
+		actor_position.set_state(State::STATE_Walking);
+		break;
+	case EMovementMode::MOVE_Falling:
+		actor_position.set_state(State::STATE_Falling);
+		break;
+	default:
+		actor_position.set_state(State::STATE_None);
+		break;
+	}
 	*msg.mutable_actor_position() = actor_position;
 	return msg;
 }

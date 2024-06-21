@@ -10,7 +10,6 @@
 #include "Serialization/BulkDataRegistry.h"
 
 UCharacterPositionSync::UCharacterPositionSync()
-	: b_is_jumping_(false)
 {
 }
 
@@ -20,70 +19,31 @@ UCharacterPositionSync::~UCharacterPositionSync()
 
 void UCharacterPositionSync::SyncWithServer(ADPCharacter* character)
 {
-	if (character->GetCharacterMovement()->IsJumpAllowed())
-	{
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("Allow Jumping."));
-	}
-	// character->GetCharacterMovement()->DoJump(true);
-	character->GetCharacterMovement()->AddImpulse(FVector(0, 0, 1000));
-	return ;
-	// player_state_ = Cast<ADPPlayerState>(character->GetPlayerState());
-	// if (player_state_ == nullptr)
-	// {
-	// 	return;
-	// }
-	//
-	// const FString PlayerId = player_state_->GetPlayerName();
-	// if (!FDataHub::actorPosition.Contains(PlayerId) && !FDataHub::jumpData.Contains(PlayerId))
-	// {
-	// 	return;
-	// }
-	// actor_position_ = FDataHub::actorPosition[PlayerId];
-	//
-	// if (FDataHub::jumpData.Contains(PlayerId))
-	// {
-	// 	last_jump_time = GetWorld()->GetTimeSeconds();
-	// 	b_is_jumping_ = true;
-	// 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Jumping."));
-	// 	jump_ = FDataHub::jumpData[PlayerId];
-	// 	FDataHub::jumpData.Remove(PlayerId);
-	// 	SyncJump(character);
-	// }
-	// else if (b_is_jumping_ && GetWorld()->GetTimeSeconds() - last_jump_time < 0.5f)
-	// {
-	// 	return ;
-	// }
-	// else if (character->GetMovementComponent()->IsFalling())
-	// {
-	// 	return;
-	// }
-	// else
-	// {
-	// 	b_is_jumping_ = false;
-	// 	SyncOrientation(character);
-	// 	SyncPosition(character);
-	// }
-}
-
-void UCharacterPositionSync::SyncMyself(ADPCharacter* character)
-{
-	if (character->CanJump())
-	{
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("OWN Jumping."));
-	}
-	else
-	{
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("OWN Not Jumping."));
-	}
 	player_state_ = Cast<ADPPlayerState>(character->GetPlayerState());
-	const FString PlayerId = player_state_->GetPlayerName();
-	
-	if (character->GetMovementComponent()->IsFalling())
+	if (player_state_ == nullptr)
 	{
 		return;
 	}
 	
-	if (!FDataHub::actorPosition.Contains(PlayerId))
+	const FString PlayerId = player_state_->GetPlayerName();
+	if (!FDataHub::actorPosition.Contains(PlayerId) && !FDataHub::jumpData.Contains(PlayerId))
+	{
+		return;
+	}
+	actor_position_ = FDataHub::actorPosition[PlayerId];
+
+	this->SetState(character);
+	
+	SyncOrientation(character);
+	SyncPosition(character);
+}
+
+void UCharacterPositionSync::SyncMyself(ADPCharacter* character)
+{
+	player_state_ = Cast<ADPPlayerState>(character->GetPlayerState());
+	const FString PlayerId = player_state_->GetPlayerName();
+	
+	if (character->GetMovementComponent()->IsFalling())
 	{
 		return;
 	}
@@ -95,7 +55,7 @@ void UCharacterPositionSync::SyncMyself(ADPCharacter* character)
 	FVector current_position = character->GetActorLocation();
 	FVector curren_velocity = character->GetCharacterMovement()->Velocity;
 	
-	float significantDifference = 100.0f;
+	float significantDifference = 50.0f;
 	float distance = FVector::Dist(position, current_position);
 	
 	if (distance > significantDifference)
@@ -105,16 +65,27 @@ void UCharacterPositionSync::SyncMyself(ADPCharacter* character)
 	}
 }
 
+void UCharacterPositionSync::SetState(ADPCharacter* character)
+{
+	State state = actor_position_.state();
+	switch (state)
+	{
+	case State::STATE_Walking:
+		character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		break;
+	case State::STATE_Falling:
+		character->GetCharacterMovement()->SetMovementMode(MOVE_Falling);
+		break;
+	default:
+		character->GetCharacterMovement()->SetMovementMode(MOVE_None);
+		break;
+	}
+}
+
 void UCharacterPositionSync::SyncPosition(ADPCharacter* character)
 {
 	FVector position = FVector(actor_position_.position().x(), actor_position_.position().y(), actor_position_.position().z());
 	FVector velocity = FVector(actor_position_.velocity().x(), actor_position_.velocity().y(), actor_position_.velocity().z());
-	
-	// if (velocity == FVector(0, 0, 0))
-	// {
-	// 	character->GetCharacterMovement()->Velocity = FVector(0, 0, 0);
-	// 	return ;
-	// }
 	
 	FVector current_position = character->GetActorLocation();
 	FVector curren_velocity = character->GetCharacterMovement()->Velocity;
@@ -130,7 +101,7 @@ void UCharacterPositionSync::SyncOrientation(ADPCharacter* character)
 {
 	FVector velocity = FVector(actor_position_.velocity().x(), actor_position_.velocity().y(), actor_position_.velocity().z());
 
-	if (velocity == FVector(0, 0, 0))
+	if (velocity.X == 0.0f && velocity.Y == 0.0f)
 	{
 		return ;
 	}

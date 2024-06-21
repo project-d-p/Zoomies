@@ -22,13 +22,13 @@ public:
 	void SyncMyself(ADPCharacter* AdpCharacter);
 
 private:
+	void SetState(ADPCharacter* character);
 	void SyncPosition(ADPCharacter* character);
 	void SyncOrientation(ADPCharacter* character);
 	void SyncJump(ADPCharacter* character);
 
+	
 	ADPPlayerState* player_state_ = nullptr;
 	ActorPosition actor_position_;
 	Jump jump_;
-	bool b_is_jumping_;
-	double last_jump_time;
 };
