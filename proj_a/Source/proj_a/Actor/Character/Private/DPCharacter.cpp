@@ -78,6 +78,7 @@ ADPCharacter::ADPCharacter()
 	sceneCapture->ProjectionType = ECameraProjectionMode::Type::Orthographic;
 	sceneCapture->OrthoWidth = 1024.0f;
 	
+	GetMesh()->SetSimulatePhysics(true);
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
 	

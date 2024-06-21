@@ -1,5 +1,6 @@
 #include "BaseMonsterCharacter.h"
 
+#include "FNetLogger.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -11,18 +12,22 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
 	GetCapsuleComponent()->SetCapsuleRadius(0.f, false);
 	GetCapsuleComponent()->SetCapsuleHalfHeight(10.f, false);
 	
-	GetMesh()->SetCollisionProfileName(TEXT("MonsterMesh"));
-	GetMesh()->BodyInstance.SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetMesh()->SetCollisionProfileName(UCollisionProfile::BlockAllDynamic_ProfileName);
+	GetMesh()->SetGenerateOverlapEvents(true);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	GetMesh()->SetCollisionResponseToAllChannels(ECR_Block);
 	
-	GetMesh()->SetupAttachment(RootComponent);
-    GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, 0.f, 0.f));
-
     GetCharacterMovement()->bOrientRotationToMovement = true;
     bUseControllerRotationYaw = false;
 	
 	/* XXX: comment for testing purposes. Restore after creating a UDP structure later. */
     // SetReplicatingMovement(false);
+}
+
+void ABaseMonsterCharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	FNetLogger::EditerLog(FColor::Green, TEXT("OnBeginOverlap"));
 }
 
 void ABaseMonsterCharacter::BeginPlay()

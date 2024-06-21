@@ -98,9 +98,9 @@ void ADPGameModeBase::StartPlay()
 void ADPGameModeBase::SpawnAndPossessAI()
 {
 	MonsterFactory->SpawnMonster(
-		AMammothCharacter::StaticClass(), FVector(1500.0f, 0.0f, 300.0f));
-	MonsterFactory->SpawnMonster(
-		AFoxCharacter::StaticClass(), FVector(1000.0f, 0.0f, 300.0f));
+		AMammothCharacter::StaticClass(), FVector(1500.0f, 0.0f, 600.0f));
+	// MonsterFactory->SpawnMonster(
+	// 	AFoxCharacter::StaticClass(), FVector(1000.0f, 0.0f, 600.0f));
 }
 
 void ADPGameModeBase::Tick(float delta_time)
