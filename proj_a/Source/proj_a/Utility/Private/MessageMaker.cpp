@@ -7,6 +7,14 @@
 Message MessageMaker::MakeMovementMessage(const ADPPlayerController* Controller, const FVector2d& ActionValue, const FRotator& Rotation, const FVector& Velocity)
 {
 	Message msg;
+	if (Controller == nullptr)
+	{
+		return msg;
+	}
+	if (Controller->PlayerState == nullptr)
+	{
+		return msg;
+	}
 	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetPlayerName()));
 	Movement movement;
 	Vec3 velocity;
@@ -34,6 +42,14 @@ Message MessageMaker::MakeMovementMessage(const ADPPlayerController* Controller,
 Message MessageMaker::MakePositionMessage(const ADPPlayerController* Controller)
 {
 	Message msg;
+	if (Controller == nullptr)
+	{
+		return msg;
+	}
+	if (Controller->PlayerState == nullptr)
+	{
+		return msg;
+	}
 	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetPlayerName()));
 	ActorPosition actor_position;
 	Vec3 position;
@@ -52,5 +68,24 @@ Message MessageMaker::MakePositionMessage(const ADPPlayerController* Controller)
 	velocity.set_z(Controller->GetPawn()->GetVelocity().Z);
 	*actor_position.mutable_velocity() = velocity;
 	*msg.mutable_actor_position() = actor_position;
+	return msg;
+}
+
+Message MessageMaker::MakeJumpMessage(ADPPlayerController* Controller)
+{
+	Message msg;
+	if (Controller == nullptr)
+	{
+		return msg;
+	}
+	if (Controller->PlayerState == nullptr)
+	{
+		return msg;
+	}
+
+	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetPlayerName()));
+	Jump jump;
+	jump.set_jump_event(1);
+	*msg.mutable_jump() = jump;
 	return msg;
 }

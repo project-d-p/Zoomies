@@ -7,6 +7,11 @@ ServerMessageHandler::ServerMessageHandler()
 	{
 		player_controller->HandleMovement(msg.movement(), delta);
 	});
+
+	message_handlers_[Message::kJump] = FServerMessageDelegate::CreateLambda([](ADPPlayerController* player_controller, const Message& msg, const float& /*delta*/)
+	{
+		player_controller->HandleJump(msg.jump());
+	});
 }
 
 FServerMessageDelegate* ServerMessageHandler::HandleMessage(const Message& Msg)

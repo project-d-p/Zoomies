@@ -31,8 +31,11 @@ public:
 	void RunTask();
 
 	void HandleMovement(const Movement& movement, const float& server_delta);
+	void HandleJump(const Jump& Jump);
 	
 	UPlayerScoreComp* GetScoreManagerComponent() const;
+	bool IsJumping();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -69,7 +72,6 @@ private:
 	UClientSocket* Socket = nullptr;
 
 	FTimerHandle MovementTimerHandle;
-	FTimerHandle SynchronizeHandle;
 
 	FVector2D AccumulatedMovementInput;
 	FVector AccumulatedForwardInput;
@@ -77,6 +79,7 @@ private:
 
 	int32 MovementCount = 0;
 	int32 ServerReceivedMovementCount = 0;
+	int32 JumpCount = 0;
 
 	void SendCompressedMovement();
 	
@@ -91,7 +94,7 @@ private:
 	void AimReleased(const FInputActionValue& value);
 	void ActionCancel(const FInputActionValue& value);
 
-	void UpdatePlayer();
+	// void UpdatePlayer();
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")

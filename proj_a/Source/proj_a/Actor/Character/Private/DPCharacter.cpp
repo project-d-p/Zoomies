@@ -13,6 +13,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "DSP/LFO.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerState.h"
@@ -95,6 +96,9 @@ ADPCharacter::ADPCharacter()
 	if (CHARACTER_MONTAGE.Succeeded()) {
 		characterMontage = CHARACTER_MONTAGE.Object;
 	}
+
+	syncer = CreateDefaultSubobject<UCharacterPositionSync>(TEXT("My Syncer"));
+	
 	// disable move replication : set bReplicateMovement to false
 	AActor::SetReplicatingMovement(false);
 	// bReplicateMovement
@@ -102,6 +106,7 @@ ADPCharacter::ADPCharacter()
 	// Set Mass and Collision Profile
 	GetCharacterMovement()->Mass = 0.1f;
 }
+
 
 // Called when the game starts or when spawned
 void ADPCharacter::BeginPlay()
@@ -120,6 +125,20 @@ void ADPCharacter::BeginPlay()
 		weaponComponent->Equip(gunClass);
 	}
 	bUseControllerRotationYaw = false;
+
+	if (GetLocalRole() == ROLE_AutonomousProxy)
+		GetWorldTimerManager().SetTimer(SynchronizeHandle, this, &ADPCharacter::SyncOwn, 5.00f, true);
+}
+
+// bool ADPCharacter::CanJumpInternal_Implementation() const
+// {
+// 	// return Super::CanJumpInternal_Implementation();
+// 	return true;
+// }
+
+void ADPCharacter::SyncOwn()
+{
+	syncer->SyncMyself(this);
 }
 
 // Called every frame
@@ -128,53 +147,15 @@ void ADPCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	if (GetCharacterMovement()) {
-		// TODO : remote role이 simulation이 아닌 경우에 모두 호출.
-		// if (GetLocalRole() == ROLE_AutonomousProxy)
-		// {
 		currentVelocity = GetCharacterMovement()->Velocity;
 		speed = currentVelocity.Size();
-		// }
 	}
 	else
 		UE_LOG(LogTemp, Warning, TEXT("null GetCharacterMovement"));
 
 	if (this->GetLocalRole() == ROLE_SimulatedProxy)
 	{
-		ADPPlayerState* player_state = Cast<ADPPlayerState>(GetPlayerState());
-		if (player_state == nullptr)
-		{
-			return;
-		}
-		const FString PlayerId = player_state->GetPlayerName();
-		if (!FDataHub::actorPosition.Contains(PlayerId))
-		{
-			return;
-		}
-		ActorPosition actorPosition = FDataHub::actorPosition[PlayerId];
-		FVector position = FVector(actorPosition.position().x(), actorPosition.position().y(), actorPosition.position().z());
-		FVector velocity = FVector(actorPosition.velocity().x(), actorPosition.velocity().y(), actorPosition.velocity().z());
-		
-		if (velocity == FVector(0, 0, 0))
-		{
-			GetCharacterMovement()->Velocity = FVector(0, 0, 0);
-			return ;
-		}
-		FVector current_position = GetActorLocation();
-		FVector curren_velocity = GetCharacterMovement()->Velocity;
-		
-		FVector UnitVector = velocity.GetSafeNormal();
-		FVector LookAtTarget = current_position + UnitVector;
-		FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(current_position, LookAtTarget);
-		
-		FRotator FinalRotation = FRotator(0, NewRotation.Yaw, 0);
-			
-		SetActorRotation(FinalRotation);
-
-		FVector interpolated_position = FMath::VInterpTo(current_position, position, GetWorld()->GetDeltaSeconds(), 10.0f);
-		FVector interpolated_velocity = FMath::VInterpTo(curren_velocity, velocity, GetWorld()->GetDeltaSeconds(), 10.0f);
-		
-		SetActorLocation(interpolated_position);
-		GetCharacterMovement()->Velocity = interpolated_velocity;
+		syncer->SyncWithServer(this);
 	}
 }
 

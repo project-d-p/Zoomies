@@ -47,6 +47,7 @@ public:
 private:
 	// Implementations
 	void SyncMovement();
+	void SyncJump();
 	void ProcessData(float delta_time);
 	// void MergeMessages();
 	

@@ -137,6 +137,7 @@ void ADPGameModeBase::ProcessData(float delta_time)
 		ADPPlayerController* controller = this->player_controllers_[message.player_id()];
 		message_handler_.HandleMessage(message)->ExecuteIfBound(controller, message, delta_time);
 	}
+	this->SyncJump();
 	this->SyncMovement();
 }
 
@@ -156,5 +157,18 @@ void ADPGameModeBase::SyncMovement()
 	{
 		Message msg = MessageMaker::MakePositionMessage(pair.second);
 		steam_listen_socket_->PushUdpFlushMessage(msg);
+	}
+}
+
+void ADPGameModeBase::SyncJump()
+{
+	for (auto& pair: player_controllers_)
+	{
+		if (pair.second->IsJumping())
+		{
+			FNetLogger::EditerLog(FColor::Green, TEXT("Player is jumping."));
+			Message msg = MessageMaker::MakeJumpMessage(pair.second);
+			steam_listen_socket_->PushUdpFlushMessage(msg);
+		}
 	}
 }

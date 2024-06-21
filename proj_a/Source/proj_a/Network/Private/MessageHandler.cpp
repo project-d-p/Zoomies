@@ -17,6 +17,12 @@ FMessageHandler::FMessageHandler()
 	{
 		FDataHub::PushActorDA(Msg);
 	}));
+
+	// Jump 메시지 처리 함수 등록
+	MessageHandlers.Add(Message::kJump, FMessageDelegate::CreateLambda([](const Message& Msg)
+	{
+		FDataHub::PushJumpDA(Msg);
+	}));
 }
 
 void FMessageHandler::HandleMessage(const Message& Msg)

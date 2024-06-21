@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "movement.proto";
+import "jump.proto";
 import "actor_position.proto";
 
 message Message {
@@ -8,6 +9,7 @@ message Message {
   oneof message_type {
     Movement movement = 2;
     ActorPosition actor_position = 3;
+    Jump jump = 4;
   }
-  string timestamp = 4;
+  string timestamp = 5;
 }

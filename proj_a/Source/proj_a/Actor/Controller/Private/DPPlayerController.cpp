@@ -124,6 +124,16 @@ UPlayerScoreComp* ADPPlayerController::GetScoreManagerComponent() const
 	return Cast<ADPPlayerState>(PlayerState)->GetPlayerScoreComp();
 }
 
+bool ADPPlayerController::IsJumping()
+{
+	if (JumpCount > 0)
+	{
+		JumpCount -= 1;
+		return true;
+	}
+	return false;
+}
+
 // void ADPPlayerController::CreateSocket()
 // {
 // 	this->Socket->CreateSocket();
@@ -163,10 +173,6 @@ void ADPPlayerController::BeginPlay()
 	}
 	
 	GetWorldTimerManager().SetTimer(MovementTimerHandle, this, &ADPPlayerController::SendCompressedMovement, 0.01f, true);
-	if (!HasAuthority())
-	{
-		GetWorldTimerManager().SetTimer(SynchronizeHandle, this, &ADPPlayerController::UpdatePlayer, 5.00f, true);
-	}
 }
 
 
@@ -200,25 +206,6 @@ void ADPPlayerController::SendCompressedMovement()
 void ADPPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-	if (!HasAuthority())
-	{
-		// if (PlayerState == nullptr)
-		// {
-		// 	return ;
-		// }
-		// FNetLogger::EditerLog(FColor::Red, TEXT("Tick: %f"), DeltaSeconds);
-		//
-		// FRotator Rotation = character->GetControlRotation();
-		// // FVector Velocity = character->GetCharacterMovement()->Velocity;
-		// FVector Velocity = character->GetCharacterMovement()->GetLastUpdateVelocity();
-		// Message message = MessageMaker::MakeMovementMessage(this, TODO, Rotation, Velocity);
-		// Socket->AsyncSendPacket(message);
-		
-	}
-	else
-	{
-	}
 }
 
 void ADPPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -286,9 +273,12 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 	const FVector forwardVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
 
-	FVector velocity = character->GetCharacterMovement()->Velocity;
-	Message message = MessageMaker::MakeMovementMessage(this, actionValue, controlRotation, velocity);
-	Socket->AsyncSendPacket(message);
+	if (!HasAuthority())
+	{
+		FVector velocity = character->GetCharacterMovement()->Velocity;
+		Message message = MessageMaker::MakeMovementMessage(this, actionValue, controlRotation, velocity);
+		Socket->AsyncSendPacket(message);
+	}
 
 	character->AddMovementInput(forwardVector, actionValue.X);
 	character->AddMovementInput(rightVector, actionValue.Y);
@@ -299,24 +289,27 @@ void ADPPlayerController::Jump(const FInputActionValue& value)
 	//UE_LOG(LogTemp, Warning, TEXT("ia_jump : %d"), value.Get<bool>());
 
 	bool actionValue = value.Get<bool>();
-	if (actionValue) {
+	if (!actionValue) {
 		// send jump command ( id, actionValue ) ( true = jump )
-		character->Jump();
-		UGameplayStatics::PlaySound2D(GetWorld(), jumpSound);
+		return ;
 	}
+
+	Message msg = MessageMaker::MakeJumpMessage(this);
+	if (!HasAuthority())
+	{
+		Socket->AsyncSendPacket(msg);
+	}
+	this->JumpCount += 1;
+	character->Jump();
+	UGameplayStatics::PlaySound2D(GetWorld(), jumpSound);
 }
 
 void ADPPlayerController::Rotate(const FInputActionValue& value)
 {
-	// UE_LOG(LogTemp, Warning, TEXT("ia_rotate_x : %f"), value.Get<FVector2D>().X);
-	// UE_LOG(LogTemp, Warning, TEXT("ia_rotate_y : %f"), value.Get<FVector2D>().Y);
-
 	FVector2D actionValue = value.Get<FVector2D>();
 
-	// send rotate command ( id, actionValue )
 	character->AddControllerYawInput(actionValue.X);
 	character->AddControllerPitchInput(actionValue.Y);
-	// FUdpSendTask::ProtoData.set_allocated_progess_vector(ProtobufUtility::ConvertToFVecToVec3(character->GetControlRotation().Vector()));
 }
 
 void ADPPlayerController::Active(const FInputActionValue& value)
@@ -374,8 +367,6 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 void ADPPlayerController::AdditionalSetting(const FInputActionValue& value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("AdditionalSetting"));
-	// Scroll Up : 1, Scroll Down : -1
-	// UE_LOG(LogTemp, Warning, TEXT("->	ia_rotate_x : %f"), value.Get<FVector2D>().X);
 
 	int stateValue = static_cast<int>(value.Get<FVector2D>().X);
 	character->ChangeAnimation();
@@ -394,11 +385,9 @@ void ADPPlayerController::Aim(const FInputActionValue& value)
 	}
 	if ("WALL" == state->equipmentState) {
 		character->isAim = true;
-		// �ٶ󺸴� ���� û���� -> �̶� scroll�� wallȸ���ǰ�	// idAim = true -> active �Ǹ� ��ġ
 	}
 	if ("TURRET" == state->equipmentState) {
 		character->isAim = true;
-		// �ٶ󺸴� ���� û����
 	}
 }
 
@@ -414,11 +403,9 @@ void ADPPlayerController::AimReleased(const FInputActionValue& value)
 	}
 	if ("WALL" == state->equipmentState) {
 		character->isAim = false;
-		// û���� ����
 	}
 	if ("TURRET" == state->equipmentState) {
 		character->isAim = false;
-		// û���� ����
 	}
 }
 
@@ -427,49 +414,33 @@ void ADPPlayerController::ActionCancel(const FInputActionValue& value)
 	UE_LOG(LogTemp, Warning, TEXT("ActionCancel"));
 }
 
-void ADPPlayerController::UpdatePlayer()
-{
-	const FString PlayerId = this->PlayerState->GetPlayerName();
-	FNetLogger::EditerLog(FColor::Green, TEXT("Update Player: %s"), *PlayerId);
-	if (!FDataHub::actorPosition.Contains(PlayerId))
-	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("Player %s is not in actorPosition"), *PlayerId);
-		return;
-	}
-	ActorPosition actorPosition = FDataHub::actorPosition[PlayerId];
-	FVector position = FVector(actorPosition.position().x(), actorPosition.position().y(), actorPosition.position().z());
-	FVector velocity = FVector(actorPosition.velocity().x(), actorPosition.velocity().y(), actorPosition.velocity().z());
-	FVector current_position = character->GetActorLocation();
-	FVector curren_velocity = character->GetCharacterMovement()->Velocity;
-	if (this->GetLocalRole() == ROLE_AutonomousProxy)
-	{
-		float significantDifference = 100.0f;
-		float distance = FVector::Dist(position, current_position);
-
-		if (distance > significantDifference)
-		{
-			FNetLogger::EditerLog(FColor::Red, TEXT("Player %s is too far away from server"), *PlayerId);
-			character->SetActorLocation(position);
-			character->GetCharacterMovement()->Velocity = velocity;
-		}
-	}
-	// else
-	// {
-	// 	FVector UnitVector = velocity.GetSafeNormal();
-	// 	FVector LookAtTarget = current_position + UnitVector;
-	// 	FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(current_position, LookAtTarget);
-	// 	
-	// 	FRotator FinalRotation = FRotator(0, NewRotation.Yaw, 0);
-	// 		
-	// 	character->SetActorRotation(FinalRotation);
-	//
-	// 	FVector interpolated_position = FMath::VInterpTo(current_position, position, GetWorld()->GetDeltaSeconds(), 10.0f);
-	// 	FVector interpolated_velocity = FMath::VInterpTo(curren_velocity, velocity, GetWorld()->GetDeltaSeconds(), 10.0f);
-	// 	
-	// 	character->SetActorLocation(interpolated_position);
-	// 	character->GetCharacterMovement()->Velocity = interpolated_velocity;
-	// }
-}
+// void ADPPlayerController::UpdatePlayer()
+// {
+// 	const FString PlayerId = this->PlayerState->GetPlayerName();
+// 	FNetLogger::EditerLog(FColor::Green, TEXT("Update Player: %s"), *PlayerId);
+// 	if (!FDataHub::actorPosition.Contains(PlayerId))
+// 	{
+// 		FNetLogger::EditerLog(FColor::Red, TEXT("Player %s is not in actorPosition"), *PlayerId);
+// 		return;
+// 	}
+// 	ActorPosition actorPosition = FDataHub::actorPosition[PlayerId];
+// 	FVector position = FVector(actorPosition.position().x(), actorPosition.position().y(), actorPosition.position().z());
+// 	FVector velocity = FVector(actorPosition.velocity().x(), actorPosition.velocity().y(), actorPosition.velocity().z());
+// 	FVector current_position = character->GetActorLocation();
+// 	FVector curren_velocity = character->GetCharacterMovement()->Velocity;
+// 	if (this->GetLocalRole() == ROLE_AutonomousProxy)
+// 	{
+// 		float significantDifference = 100.0f;
+// 		float distance = FVector::Dist(position, current_position);
+//
+// 		if (distance > significantDifference)
+// 		{
+// 			FNetLogger::EditerLog(FColor::Red, TEXT("Player %s is too far away from server"), *PlayerId);
+// 			character->SetActorLocation(position);
+// 			character->GetCharacterMovement()->Velocity = velocity;
+// 		}
+// 	}
+// }
 
 /*
  * 1. Handler Player Movement in Server (W, A, S, D) - Move Function with Movement Message
@@ -488,23 +459,22 @@ void ADPPlayerController::HandleMovement(const Movement& movement, const float& 
 	}
 	
 	character->GetCharacterMovement()->Velocity = velocity;
-	// character->speed = velocity.Size();
-	
-	// FVector CurrentLocation = character->GetActorLocation();
-	// FVector NewLocation = character->GetActorLocation() + (velocity * delta);
-	// character->SetActorLocation(NewLocation);
-
-	// FVector UnitVector = velocity.GetSafeNormal();
-	// FVector LookAtTarget = CurrentLocation + UnitVector;
-	// FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(CurrentLocation, LookAtTarget);
-	//
-	// FRotator FinalRotation = FRotator(0, NewRotation.Yaw, 0);
-	// 	
-	// character->SetActorRotation(FinalRotation);
 	
 	const FVector forwardVector = FRotationMatrix(rotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(rotation).GetUnitAxis(EAxis::Y);
 
 	character->AddMovementInput(forwardVector, action.X * delta / server_delta);
 	character->AddMovementInput(rightVector, action.Y * delta / server_delta);
+}
+
+void ADPPlayerController::HandleJump(const ::Jump& Jump)
+{
+	if (!character)
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("Character is null in HandleMovement"));
+		return ;
+	}
+	character->Jump();
+	this->JumpCount += 1;
+	UGameplayStatics::PlaySound2D(GetWorld(), jumpSound);
 }
