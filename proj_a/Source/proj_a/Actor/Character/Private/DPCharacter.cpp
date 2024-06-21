@@ -130,12 +130,6 @@ void ADPCharacter::BeginPlay()
 		GetWorldTimerManager().SetTimer(SynchronizeHandle, this, &ADPCharacter::SyncOwn, 5.00f, true);
 }
 
-// bool ADPCharacter::CanJumpInternal_Implementation() const
-// {
-// 	// return Super::CanJumpInternal_Implementation();
-// 	return true;
-// }
-
 void ADPCharacter::SyncOwn()
 {
 	syncer->SyncMyself(this);
