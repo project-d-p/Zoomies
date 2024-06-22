@@ -1,0 +1,1 @@
+#define MAX_USERS 4

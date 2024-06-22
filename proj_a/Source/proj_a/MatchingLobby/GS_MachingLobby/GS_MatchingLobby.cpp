@@ -6,7 +6,7 @@
 
 AGS_MatchingLobby::AGS_MatchingLobby() {
 	// Set Players Num. need to be Set
-	ReadyPlayers.SetNum(2, false);
+	ReadyPlayers.SetNum(MAX_USERS, false);
 	BestHostPlayer = nullptr;
 	LowestAveragePing = 202406071806.0f;
 	HostPlayerIndex = -1;

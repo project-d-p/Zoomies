@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "proj_a/Actor/Lobby/LobbyPlatform.h"
+#include "../TYEP_MatchingLobby.h"
 #include "GM_MatchingLobby.generated.h"
 
 UCLASS()
@@ -22,10 +23,10 @@ public:
 	void UpdatePlayerOnPlatform();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<APlayerController*> PCs;
+	TArray<ALobbyPlatform*> LobbyPlatforms;
 	FTimerHandle UnusedHandle;
 private:
 	void StartGame_t() const;
 protected:
-	TArray<ALobbyPlatform*> LobbyPlatforms;
 	bool bIsLobbyPlatformReady = false;
 };

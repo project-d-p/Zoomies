@@ -7,7 +7,6 @@
 #include "Kismet/GameplayStatics.h"
 
 AGM_MatchingLobby::AGM_MatchingLobby() {
-	// PlayerControllerClass = ADPPlayerController::StaticClass();
 	GameStateClass = AGS_MatchingLobby::StaticClass();
 	PlayerControllerClass = APC_MatchingLobby::StaticClass();
 	DefaultPawnClass = nullptr; 
@@ -15,28 +14,34 @@ AGM_MatchingLobby::AGM_MatchingLobby() {
 
 void AGM_MatchingLobby::PostLogin(APlayerController* NewPlayer) {
 	Super::PostLogin(NewPlayer);
+	//Set the host player index
 	AGS_MatchingLobby* GS = GetGameState<AGS_MatchingLobby>();
-
 	if (GS->HostPlayerIndex == -1)
 	{
 		GS->HostPlayerIndex = NewPlayer->PlayerState->GetPlayerId();
+		
 	}
+	//Add the player to the list of players
 	PCs.Add(NewPlayer);
+	//Set the camera view for the player
 	APC_MatchingLobby* PC = Cast<APC_MatchingLobby>(NewPlayer);
 	if (PC)
 	{
 		PC->SetCineCameraView();
 	}
+	//Update the lobby platform
 	CheckAndUpdateLobbyPlatform();
 }
 
 void AGM_MatchingLobby::Logout(AController* Exiting) {
 	Super::Logout(Exiting);
-	
+
+	//Remove the player from the list of players
 	if (APlayerController* ExitingPlayer = Cast<APlayerController>(Exiting))
 	{
 		PCs.Remove(ExitingPlayer);
 	}
+	//Update the lobby platform
 	CheckAndUpdateLobbyPlatform();
 }
 
@@ -50,7 +55,7 @@ void AGM_MatchingLobby::CheckReadyToStart()
 	if (HasAuthority())
 	{
 		AGS_MatchingLobby* GS = GetGameState<AGS_MatchingLobby>();
-		if (GS && GS->AreAllPlayersReady() && GetNumPlayers() >= 2)
+		if (GS && GS->AreAllPlayersReady() && GetNumPlayers() >= MAX_USERS)
 		{
 			StartGame_t();
 		}
@@ -70,7 +75,7 @@ void AGM_MatchingLobby::FindAndStoreLobbyPlatforms()
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ALobbyPlatform::StaticClass(), FoundActors);
 
-	LobbyPlatforms.Init(nullptr, 2);
+	LobbyPlatforms.Init(nullptr, MAX_USERS);
 
 	for (AActor* Actor : FoundActors)
 	{

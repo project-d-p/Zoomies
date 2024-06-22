@@ -16,8 +16,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "MatchingLobby")
 	void ToggleReadyState();
 	void SetCineCameraView();
+
+	UPROPERTY(BlueprintReadWrite, Category = "MatchingLobbyInfo")
+	bool bIsReady = false;
+	UPROPERTY(BlueprintReadWrite, Category = "MatchingLobbyInfo")
+	FString UserName = "DefaultName";
 protected:
 	virtual void BeginPlay() override;
 private:
-	bool bIsReady = false;
 };
