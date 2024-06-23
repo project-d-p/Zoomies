@@ -8,6 +8,7 @@
 #include "ChatManager.h"
 #include "ClientSocket.h"
 #include "message.pb.h"
+#include "SteamNetworkingSocket.h"
 #include "DoubleBuffer.h"
 #include "DPMySocket.h"
 #include "DPPlayerController.generated.h"
@@ -29,13 +30,14 @@ public:
 	// void CreateSocket();
 	void Connect();
 	void RunTask();
-
+	
 	void HandleMovement(const Movement& movement, const float& server_delta);
 	void HandleJump(const Jump& Jump);
+	void HandleFire(const Message& fire);
+	void SimulateGunFire(SteamNetworkingSocket* steam_socket);
 	
 	UPlayerScoreComp* GetScoreManagerComponent() const;
-	bool IsJumping();
-
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -71,17 +73,16 @@ private:
 	UPROPERTY()
 	UClientSocket* Socket = nullptr;
 
-	FTimerHandle MovementTimerHandle;
+	// FTimerHandle MovementTimerHandle;
 
-	FVector2D AccumulatedMovementInput;
-	FVector AccumulatedForwardInput;
-	FVector AccumulatedRightInput;
+	// FVector2D AccumulatedMovementInput;
+	// FVector AccumulatedForwardInput;
+	// FVector AccumulatedRightInput;
 
-	int32 MovementCount = 0;
-	int32 ServerReceivedMovementCount = 0;
-	int32 JumpCount = 0;
-
-	void SendCompressedMovement();
+	int gun_fire_count_ = 0;
+	std::queue<Message> gun_queue_;
+	
+	// void SendCompressedMovement();
 	
 	virtual void Tick(float DeltaSeconds) override;
 	

@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "actor_position.pb.h"
 #include "DPPlayerState.h"
+#include "gunfire.pb.h"
 #include "jump.pb.h"
 #include "CharacterPositionSync.generated.h"
 /**
@@ -19,16 +20,21 @@ public:
 	UCharacterPositionSync();
 	virtual ~UCharacterPositionSync() override;
 	void SyncWithServer(ADPCharacter* character);
-	void SyncMyself(ADPCharacter* AdpCharacter);
+	void SyncMyself(ADPCharacter* character);
+	void SyncGunFire(ADPCharacter* character);
 
 private:
+	void PlayAimAnimation(ADPCharacter* character);
 	void SetState(ADPCharacter* character);
 	void SyncPosition(ADPCharacter* character);
+	void SyncOrientationWithVelocity(ADPCharacter* Character);
+	void SyncOrientationWithRotation(ADPCharacter* Character);
 	void SyncOrientation(ADPCharacter* character);
 	void SyncJump(ADPCharacter* character);
 
 	
 	ADPPlayerState* player_state_ = nullptr;
 	ActorPosition actor_position_;
+	Gunfire gunfire_;
 	Jump jump_;
 };

@@ -114,38 +114,26 @@ void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 	UE_LOG(LogTemp, Warning, TEXT("Call end play."));
-	// if (listen_socket_)
-	// {
-	// 	delete listen_socket_;
-	// 	listen_socket_ = nullptr;
-	// }
+	if (steam_listen_socket_)
+	{
+		delete steam_listen_socket_;
+		steam_listen_socket_ = nullptr;
+	}
 }
 
 void ADPGameModeBase::ProcessData(float delta_time)
 {
 	message_queue_ = steam_listen_socket_->GetReadBuffer();
-	// FNetLogger::EditerLog(FColor::Red, TEXT("size of message queue: %d"), this->message_queue_.size());
-	// if (this->message_queue_.empty())
-	// {
-	// 	return;
-	// }
 	while (!this->message_queue_.empty())
 	{
 		Message message = this->message_queue_.front();
-		// Message message = this->message_queue_.top();
 		this->message_queue_.pop();
 		ADPPlayerController* controller = this->player_controllers_[message.player_id()];
 		message_handler_.HandleMessage(message)->ExecuteIfBound(controller, message, delta_time);
 	}
-	this->SyncJump();
+	this->SimulateGunFire();
 	this->SyncMovement();
 }
-
-// void ADPGameModeBase::MergeMessages()
-// {
-// 	UE_LOG(LogTemp, Warning, TEXT("Merge Messages."));
-// 	// this->listen_socket_->FillMessageQueue(this->message_queue_);
-// }
 
 ADPGameModeBase::~ADPGameModeBase()
 {
@@ -160,15 +148,12 @@ void ADPGameModeBase::SyncMovement()
 	}
 }
 
-void ADPGameModeBase::SyncJump()
+void ADPGameModeBase::SimulateGunFire()
 {
 	for (auto& pair: player_controllers_)
 	{
-		if (pair.second->IsJumping())
-		{
-			FNetLogger::EditerLog(FColor::Green, TEXT("Player is jumping."));
-			Message msg = MessageMaker::MakeJumpMessage(pair.second);
-			steam_listen_socket_->PushUdpFlushMessage(msg);
-		}
+		ADPPlayerController* controller = pair.second;
+		ADPCharacter* character = Cast<ADPCharacter>(controller->GetPawn());
+		controller->SimulateGunFire(steam_listen_socket_);
 	}
 }

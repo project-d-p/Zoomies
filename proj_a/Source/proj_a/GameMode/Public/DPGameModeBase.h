@@ -47,9 +47,8 @@ public:
 private:
 	// Implementations
 	void SyncMovement();
-	void SyncJump();
+	void SimulateGunFire();
 	void ProcessData(float delta_time);
-	// void MergeMessages();
 	
 private:
 	// Member variables
@@ -60,6 +59,7 @@ private:
 	// HSteamListenSocket steam_listen_socket_;
 	
 	float time_accumulator_ = 0.0f;
+	int gun_fire_ = 0;
 	FMessageQueue_T message_queue_;
 	std::map<std::string, ADPPlayerController*> player_controllers_;
 	ServerMessageHandler message_handler_;

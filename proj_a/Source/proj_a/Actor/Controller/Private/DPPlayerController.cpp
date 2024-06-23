@@ -124,16 +124,6 @@ UPlayerScoreComp* ADPPlayerController::GetScoreManagerComponent() const
 	return Cast<ADPPlayerState>(PlayerState)->GetPlayerScoreComp();
 }
 
-bool ADPPlayerController::IsJumping()
-{
-	if (JumpCount > 0)
-	{
-		JumpCount -= 1;
-		return true;
-	}
-	return false;
-}
-
 // void ADPPlayerController::CreateSocket()
 // {
 // 	this->Socket->CreateSocket();
@@ -172,36 +162,36 @@ void ADPPlayerController::BeginPlay()
 		SubSystem->AddMappingContext(defaultContext, 0);
 	}
 	
-	GetWorldTimerManager().SetTimer(MovementTimerHandle, this, &ADPPlayerController::SendCompressedMovement, 0.01f, true);
+	// GetWorldTimerManager().SetTimer(MovementTimerHandle, this, &ADPPlayerController::SendCompressedMovement, 0.01f, true);
 }
 
 
-void ADPPlayerController::SendCompressedMovement()
-{
-	if (HasAuthority())
-	{
-		return ;
-	}
-	if (AccumulatedMovementInput.IsNearlyZero())
-	{
-		return ;
-	}
-
-	if (PlayerState)
-	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("Player Name: %s"), *PlayerState->GetPlayerName());
-	}
-	
-	FNetLogger::EditerLog(FColor::Blue, TEXT("Send Movement[Client]: %f %f"), AccumulatedMovementInput.X, AccumulatedMovementInput.Y);
-	FNetLogger::EditerLog(FColor::Blue, TEXT("Send Forward[Client]: %f %f %f"), AccumulatedForwardInput.X, AccumulatedForwardInput.Y, AccumulatedForwardInput.Z);
-	FNetLogger::EditerLog(FColor::Blue, TEXT("Send Right[Client]: %f %f %f"), AccumulatedRightInput.X, AccumulatedRightInput.Y, AccumulatedRightInput.Z);
-	// Send Server
-	// Message message = MessageMaker::MakeMessage(this, AccumulatedMovementInput, AccumulatedForwardInput, AccumulatedRightInput);
-	// Socket->SendPacket(message);
-	AccumulatedMovementInput = FVector2D::ZeroVector;
-	AccumulatedForwardInput = FVector::ZeroVector;
-	AccumulatedRightInput = FVector::ZeroVector;
-}
+// void ADPPlayerController::SendCompressedMovement()
+// {
+// 	if (HasAuthority())
+// 	{
+// 		return ;
+// 	}
+// 	if (AccumulatedMovementInput.IsNearlyZero())
+// 	{
+// 		return ;
+// 	}
+//
+// 	if (PlayerState)
+// 	{
+// 		FNetLogger::EditerLog(FColor::Red, TEXT("Player Name: %s"), *PlayerState->GetPlayerName());
+// 	}
+// 	
+// 	FNetLogger::EditerLog(FColor::Blue, TEXT("Send Movement[Client]: %f %f"), AccumulatedMovementInput.X, AccumulatedMovementInput.Y);
+// 	FNetLogger::EditerLog(FColor::Blue, TEXT("Send Forward[Client]: %f %f %f"), AccumulatedForwardInput.X, AccumulatedForwardInput.Y, AccumulatedForwardInput.Z);
+// 	FNetLogger::EditerLog(FColor::Blue, TEXT("Send Right[Client]: %f %f %f"), AccumulatedRightInput.X, AccumulatedRightInput.Y, AccumulatedRightInput.Z);
+// 	// Send Server
+// 	// Message message = MessageMaker::MakeMessage(this, AccumulatedMovementInput, AccumulatedForwardInput, AccumulatedRightInput);
+// 	// Socket->SendPacket(message);
+// 	AccumulatedMovementInput = FVector2D::ZeroVector;
+// 	AccumulatedForwardInput = FVector::ZeroVector;
+// 	AccumulatedRightInput = FVector::ZeroVector;
+// }
 
 void ADPPlayerController::Tick(float DeltaSeconds)
 {
@@ -217,20 +207,16 @@ void ADPPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
-	FNetLogger::EditerLog(FColor::Red, TEXT("OnPossess"));
-	
 	character = Cast<ADPCharacter>(GetPawn());
 
 	if (!character)
 	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("Character is null in OnPossess"));
-		UE_LOG(LogTemp, Warning, TEXT("character null"));
 		return;
 	}
 	
 	state = Cast<UDPStateActorComponent>(character->GetComponentByClass(UDPStateActorComponent::StaticClass()));
 	construction = Cast<UDPConstructionActorComponent>(character->GetComponentByClass(UDPConstructionActorComponent::StaticClass()));
-
+	// state->equipmentState = "GUN";
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		FNetLogger::EditerLog(FColor::Red, TEXT("Add Mapping Context [On Possess]"));
@@ -264,11 +250,8 @@ void ADPPlayerController::SetupInputComponent()
 
 void ADPPlayerController::Move(const FInputActionValue& value)
 {
-	// UE_LOG(LogTemp, Warning, TEXT("ia_move_x : %f"), value.Get<FVector2D>().X);
-	// UE_LOG(LogTemp, Warning, TEXT("ia_move_y : %f"), value.Get<FVector2D>().Y);
 	const FVector2D actionValue = value.Get<FVector2D>();
 	const FRotator controlRotation = GetControlRotation();
-	// const FRotator yaw(0.f, controlRotation.Yaw, 0.f);
 
 	const FVector forwardVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
@@ -279,7 +262,6 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 		Message message = MessageMaker::MakeMovementMessage(this, actionValue, controlRotation, velocity);
 		Socket->AsyncSendPacket(message);
 	}
-
 	character->AddMovementInput(forwardVector, actionValue.X);
 	character->AddMovementInput(rightVector, actionValue.Y);
 }
@@ -290,7 +272,6 @@ void ADPPlayerController::Jump(const FInputActionValue& value)
 
 	bool actionValue = value.Get<bool>();
 	if (!actionValue) {
-		// send jump command ( id, actionValue ) ( true = jump )
 		return ;
 	}
 
@@ -299,7 +280,6 @@ void ADPPlayerController::Jump(const FInputActionValue& value)
 	{
 		Socket->AsyncSendPacket(msg);
 	}
-	this->JumpCount += 1;
 	character->Jump();
 	UGameplayStatics::PlaySound2D(GetWorld(), jumpSound);
 }
@@ -316,13 +296,30 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Active"));
 
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Active with %s"), *state->equipmentState);
 	if ("NONE" == state->equipmentState) {
 
 	}
 	if ("GUN" == state->equipmentState) {
-		if (character->isAim) {
-			character->PlayFireAnimation();
-			character->weaponComponent->Attack();
+		if (!character->isAim) {
+			return ;
+		}
+		FHitResult hit_result;
+		character->PlayFireAnimation();
+		Message msg = MessageMaker::MakeFireMessage(this, GetControlRotation());
+		if (!HasAuthority())
+		{
+			Socket->AsyncSendPacket(msg);
+		}
+		else
+		{
+			this->gun_fire_count_ += 1;
+			this->gun_queue_.push(msg);
+		}
+		if (character->weaponComponent->Attack(this, hit_result))
+		{
+			// Success Only Effect;
+			FNetLogger::EditerLog(FColor::Cyan, TEXT("Attack Success[Only Effect]"));
 		}
 	}
 	// if ("WALL" == state->equipmentState) {
@@ -370,7 +367,7 @@ void ADPPlayerController::AdditionalSetting(const FInputActionValue& value)
 
 	int stateValue = static_cast<int>(value.Get<FVector2D>().X);
 	character->ChangeAnimation();
-	character->stateComponent->ChangeEquipmentState(stateValue);
+	// character->stateComponent->ChangeEquipmentState(stateValue);
 }
 
 void ADPPlayerController::Aim(const FInputActionValue& value)
@@ -414,34 +411,6 @@ void ADPPlayerController::ActionCancel(const FInputActionValue& value)
 	UE_LOG(LogTemp, Warning, TEXT("ActionCancel"));
 }
 
-// void ADPPlayerController::UpdatePlayer()
-// {
-// 	const FString PlayerId = this->PlayerState->GetPlayerName();
-// 	FNetLogger::EditerLog(FColor::Green, TEXT("Update Player: %s"), *PlayerId);
-// 	if (!FDataHub::actorPosition.Contains(PlayerId))
-// 	{
-// 		FNetLogger::EditerLog(FColor::Red, TEXT("Player %s is not in actorPosition"), *PlayerId);
-// 		return;
-// 	}
-// 	ActorPosition actorPosition = FDataHub::actorPosition[PlayerId];
-// 	FVector position = FVector(actorPosition.position().x(), actorPosition.position().y(), actorPosition.position().z());
-// 	FVector velocity = FVector(actorPosition.velocity().x(), actorPosition.velocity().y(), actorPosition.velocity().z());
-// 	FVector current_position = character->GetActorLocation();
-// 	FVector curren_velocity = character->GetCharacterMovement()->Velocity;
-// 	if (this->GetLocalRole() == ROLE_AutonomousProxy)
-// 	{
-// 		float significantDifference = 100.0f;
-// 		float distance = FVector::Dist(position, current_position);
-//
-// 		if (distance > significantDifference)
-// 		{
-// 			FNetLogger::EditerLog(FColor::Red, TEXT("Player %s is too far away from server"), *PlayerId);
-// 			character->SetActorLocation(position);
-// 			character->GetCharacterMovement()->Velocity = velocity;
-// 		}
-// 	}
-// }
-
 /*
  * 1. Handler Player Movement in Server (W, A, S, D) - Move Function with Movement Message
  */
@@ -450,6 +419,7 @@ void ADPPlayerController::HandleMovement(const Movement& movement, const float& 
 	FVector velocity = FVector(movement.velocity().x(), movement.velocity().y(), movement.velocity().z());
 	FRotator rotation = FRotator(movement.rotation().x(), movement.rotation().y(), movement.rotation().z());
 	FVector2d action = FVector2d(movement.action().x(), movement.action().y());
+	
 	float delta = movement.delta_time();
 	
 	if (!character)
@@ -465,6 +435,18 @@ void ADPPlayerController::HandleMovement(const Movement& movement, const float& 
 
 	character->AddMovementInput(forwardVector, action.X * delta / server_delta);
 	character->AddMovementInput(rightVector, action.Y * delta / server_delta);
+	AimState aimState = movement.aim_state();
+	switch (aimState)
+	{
+	case AimState::AIM_STATE_ACTIVE:
+		character->PlayAimAnimation();
+		break;
+	case AimState::AIM_STATE_RELEASE:
+		character->StopAimAnimation();
+		break;
+	default:
+		break;
+	}
 }
 
 void ADPPlayerController::HandleJump(const ::Jump& Jump)
@@ -475,6 +457,33 @@ void ADPPlayerController::HandleJump(const ::Jump& Jump)
 		return ;
 	}
 	character->Jump();
-	this->JumpCount += 1;
 	UGameplayStatics::PlaySound2D(GetWorld(), jumpSound);
+}
+
+void ADPPlayerController::HandleFire(const Message& fire)
+{
+	this->gun_fire_count_ += 1;
+	this->gun_queue_.push(fire);
+}
+
+void ADPPlayerController::SimulateGunFire(SteamNetworkingSocket* steam_socket)
+{
+	if (gun_fire_count_ == 0)
+	{
+		return ;
+	}
+	while (!gun_queue_.empty())
+	{
+		Message fire = gun_queue_.front();
+		gun_queue_.pop();
+		FHitResult hit_result;
+		this->character->PlayFireAnimation();
+		if (character->weaponComponent->SimulateAttack(this, hit_result, fire))
+		{
+			// Logic for Hit Success && Damage && Score
+			FNetLogger::EditerLog(FColor::Cyan, TEXT("Player %s Attack Success[Simulate]"), *PlayerState->GetPlayerName());
+		}
+		steam_socket->PushUdpFlushMessage(fire);
+		gun_fire_count_ -= 1;
+	}
 }

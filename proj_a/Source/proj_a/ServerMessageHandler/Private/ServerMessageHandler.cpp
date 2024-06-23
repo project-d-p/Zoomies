@@ -12,6 +12,11 @@ ServerMessageHandler::ServerMessageHandler()
 	{
 		player_controller->HandleJump(msg.jump());
 	});
+
+	message_handlers_[Message::kGunfire] = FServerMessageDelegate::CreateLambda([](ADPPlayerController* player_controller, const Message& msg, const float& /*delta*/)
+	{
+		player_controller->HandleFire(msg);
+	});
 }
 
 FServerMessageDelegate* ServerMessageHandler::HandleMessage(const Message& Msg)

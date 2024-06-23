@@ -12,6 +12,7 @@
 #include "FNetLogger.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "DSP/LFO.h"
 #include "Engine/TextureRenderTarget2D.h"
@@ -105,6 +106,19 @@ ADPCharacter::ADPCharacter()
 
 	// Set Mass and Collision Profile
 	GetCharacterMovement()->Mass = 0.1f;
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
+	/*
+	 * 겹치게 만드는 요소
+	 * 즉, 충돌해도 보이는 것은 뚫고 지나가지만 충돌 이벤트는 발생됨.
+	 */
+	// GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	
+	// GetCapsuleComponent()->SetSimulatePhysics(true);
+	// GetCapsuleComponent()->SetNotifyRigidBodyCollision(true);
 }
 
 
@@ -150,6 +164,7 @@ void ADPCharacter::Tick(float DeltaTime)
 	if (this->GetLocalRole() == ROLE_SimulatedProxy)
 	{
 		syncer->SyncWithServer(this);
+		syncer->SyncGunFire(this);
 	}
 }
 

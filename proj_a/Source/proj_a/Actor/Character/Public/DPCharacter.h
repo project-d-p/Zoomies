@@ -81,4 +81,5 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	float speed{ 0.f };
 	bool isAim{ false };
+	bool lastAim{ false };
 };

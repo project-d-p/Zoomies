@@ -23,6 +23,11 @@ FMessageHandler::FMessageHandler()
 	{
 		FDataHub::PushJumpDA(Msg);
 	}));
+
+	MessageHandlers.Add(Message::kGunfire, FMessageDelegate::CreateLambda([](const Message& Msg)
+	{
+		FDataHub::PushGunfireDA(Msg);
+	}));
 }
 
 void FMessageHandler::HandleMessage(const Message& Msg)

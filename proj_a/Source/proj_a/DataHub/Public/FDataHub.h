@@ -16,9 +16,12 @@ public:
 	static TMap<ID_TYPE, Movement> EchoData;
 
 	static TMap<ID_TYPE, Jump> jumpData;
+
+	static TMap<ID_TYPE, Gunfire> gunfireData;
 	
 	static void PushActorDA(const Message &NewData);
 	static void PushEchoDA(const Message &NewData);
 	static void PushJumpDA(const Message &NewData);
 	static void RemovePlayerDA(const ID_TYPE &playerId);
+	static void PushGunfireDA(const Message& Msg);
 };

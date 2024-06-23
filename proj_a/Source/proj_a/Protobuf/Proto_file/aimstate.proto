@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+enum AimState {
+  AIM_STATE_NONE = 0;
+  AIM_STATE_ACTIVE = 1;
+  AIM_STATE_RELEASE = 2;
+}
+
+// 조준하게 되면 IsAim = true, 조준을 뗄 때 IsAim = false
+// 이전 상태가 조준 x && 현재 상태가 조준 o => AIM_STATE_ACTIVE
+// 이전 상태가 조준 o && 현재 상태가 조준 x => AIM_STATE_RELEASE
+// 이전 상태가 조준 x && 현재 상태가 조준 x => AIM_STATE_NONE

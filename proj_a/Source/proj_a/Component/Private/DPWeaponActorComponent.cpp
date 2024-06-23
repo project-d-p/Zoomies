@@ -2,6 +2,11 @@
 
 
 #include "DPWeaponActorComponent.h"
+
+#include "DPPlayerController.h"
+#include "FNetLogger.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/PawnMovementComponent.h"
 //#include "DPWeapon.h"
 
 // Sets default values for this component's properties
@@ -30,6 +35,13 @@ void UDPWeaponActorComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	// ...
 }
 
+bool UDPWeaponActorComponent::SimulateAttackByClient(ADPCharacter* Character, FHitResult& HitResult, const Gunfire& Gunfire)
+{
+	if (currentWeapon)
+		return currentWeapon->SimulateAttackByClient(Character, HitResult, Gunfire);
+	return false;
+}
+
 void UDPWeaponActorComponent::AddWeapons(TSubclassOf<ADPWeapon> weaponClass)
 {
 	if (weaponClass) {
@@ -50,10 +62,17 @@ void UDPWeaponActorComponent::Equip(TSubclassOf<ADPWeapon> weaponClass)
 	}
 }
 
-void UDPWeaponActorComponent::Attack()
+bool UDPWeaponActorComponent::Attack(ADPPlayerController* controller, FHitResult& result)
 {
 	if (currentWeapon)
-		currentWeapon->Attack();	UE_LOG(LogTemp, Warning, TEXT("attack weaponActorComponent"));
-	UE_LOG(LogTemp, Warning, TEXT("current weapon : %s"), *currentWeapon->GetName());
+		return currentWeapon->Attack(controller, result);
+	return false;
+}
+
+bool UDPWeaponActorComponent::SimulateAttack(ADPPlayerController* controller, FHitResult& result, Message message)
+{
+	if (currentWeapon)
+		return currentWeapon->SimulateAttack(controller, result, message);
+	return false;
 }
 
