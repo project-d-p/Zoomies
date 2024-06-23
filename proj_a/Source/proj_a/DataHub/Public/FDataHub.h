@@ -14,14 +14,14 @@ public:
 	static TMap<ID_TYPE, ActorPosition> actorPosition;
 	// Test Data Map
 	static TMap<ID_TYPE, Movement> EchoData;
-
 	static TMap<ID_TYPE, Jump> jumpData;
-
 	static TMap<ID_TYPE, Gunfire> gunfireData;
+	static TMap<ID_TYPE, AimState> aimStateData;
 	
 	static void PushActorDA(const Message &NewData);
 	static void PushEchoDA(const Message &NewData);
 	static void PushJumpDA(const Message &NewData);
 	static void RemovePlayerDA(const ID_TYPE &playerId);
 	static void PushGunfireDA(const Message& Msg);
+	static void PushAimStateDA(const Message& Msg);
 };

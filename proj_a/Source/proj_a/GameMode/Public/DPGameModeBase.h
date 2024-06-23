@@ -48,6 +48,7 @@ private:
 	// Implementations
 	void SyncMovement();
 	void SimulateGunFire();
+	void SyncHostAiming();
 	void ProcessData(float delta_time);
 	
 private:

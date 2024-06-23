@@ -124,6 +124,7 @@ UPlayerScoreComp* ADPPlayerController::GetScoreManagerComponent() const
 	return Cast<ADPPlayerState>(PlayerState)->GetPlayerScoreComp();
 }
 
+
 // void ADPPlayerController::CreateSocket()
 // {
 // 	this->Socket->CreateSocket();
@@ -264,6 +265,12 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 	}
 	character->AddMovementInput(forwardVector, actionValue.X);
 	character->AddMovementInput(rightVector, actionValue.Y);
+
+	if (character->isAim)
+	{
+		FRotator newRotation = FRotator(0, controlRotation.Yaw, 0);
+		character->SetActorRotation(newRotation);
+	}
 }
 
 void ADPPlayerController::Jump(const FInputActionValue& value)
@@ -378,6 +385,20 @@ void ADPPlayerController::Aim(const FInputActionValue& value)
 		
 	}
 	if ("GUN" == state->equipmentState) {
+		if (!character->isAim) {
+			Message msg = MessageMaker::MakeAimMessage(this, !character->isAim);
+			if (!HasAuthority())
+			{
+				Socket->AsyncSendPacket(msg);
+			}
+			else
+			{
+				aim_queue_.push(!character->isAim);
+			}
+			FRotator rotation = GetControlRotation();
+			FRotator newRotation = FRotator(0, rotation.Yaw, 0);
+			character->SetActorRotation(newRotation);
+		}
 		character->PlayAimAnimation();
 	}
 	if ("WALL" == state->equipmentState) {
@@ -396,6 +417,15 @@ void ADPPlayerController::AimReleased(const FInputActionValue& value)
 
 	}
 	if ("GUN" == state->equipmentState) {
+		Message msg = MessageMaker::MakeAimMessage(this, !character->isAim);
+		if (!HasAuthority())
+		{
+			Socket->AsyncSendPacket(msg);
+		}
+		else
+		{
+			aim_queue_.push(!character->isAim);
+		}
 		character->StopAimAnimation();
 	}
 	if ("WALL" == state->equipmentState) {
@@ -435,17 +465,11 @@ void ADPPlayerController::HandleMovement(const Movement& movement, const float& 
 
 	character->AddMovementInput(forwardVector, action.X * delta / server_delta);
 	character->AddMovementInput(rightVector, action.Y * delta / server_delta);
-	AimState aimState = movement.aim_state();
-	switch (aimState)
+
+	if (character->isAim)
 	{
-	case AimState::AIM_STATE_ACTIVE:
-		character->PlayAimAnimation();
-		break;
-	case AimState::AIM_STATE_RELEASE:
-		character->StopAimAnimation();
-		break;
-	default:
-		break;
+		FRotator newRotation = FRotator(0, rotation.Yaw, 0);
+		character->SetActorRotation(newRotation);
 	}
 }
 
@@ -485,5 +509,22 @@ void ADPPlayerController::SimulateGunFire(SteamNetworkingSocket* steam_socket)
 		}
 		steam_socket->PushUdpFlushMessage(fire);
 		gun_fire_count_ -= 1;
+	}
+}
+
+void ADPPlayerController::HandleAim(const AimState& AimState)
+{
+	if (!character)
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("Character is null in HandleAim"));
+		return ;
+	}
+	if (AimState.aim_state() == AimState::AIM_STATE_ACTIVE)
+	{
+		character->PlayAimAnimation();
+	}
+	else
+	{
+		character->StopAimAnimation();
 	}
 }

@@ -36,27 +36,9 @@ Message MessageMaker::MakeMovementMessage(const ADPPlayerController* Controller,
 	rotation.set_y(Rotation.Yaw);
 	rotation.set_z(Rotation.Roll);
 	*movement.mutable_rotation() = rotation;
-	// Vec3 rotation;
-
-	ADPCharacter* character = Cast<ADPCharacter>(Controller->GetPawn());
-	if (character->lastAim == false && character->isAim == true)
-	{
-		movement.set_aim_state(AimState::AIM_STATE_ACTIVE);
-		character->lastAim = true;
-	}
-	else if (character->lastAim == true && character->isAim == false)
-	{
-		movement.set_aim_state(AimState::AIM_STATE_ACTIVE);
-		character->lastAim = false;
-	}
-	else
-	{
-		movement.set_aim_state(AimState::AIM_STATE_NONE);
-	}
 	float delta = Controller->GetWorld()->GetDeltaSeconds();
 	movement.set_delta_time(delta);
 	*msg.mutable_movement() = movement;
-	// msg.set_timestamp();
 	return msg;
 }
 
@@ -83,6 +65,11 @@ Message MessageMaker::MakePositionMessage(const ADPPlayerController* Controller)
 	rotation.set_y(Controller->GetPawn()->GetActorRotation().Yaw);
 	rotation.set_z(Controller->GetPawn()->GetActorRotation().Roll);
 	*actor_position.mutable_rotation() = rotation;
+	Vec3 control_rotation;
+	control_rotation.set_x(Controller->GetControlRotation().Pitch);
+	control_rotation.set_y(Controller->GetControlRotation().Yaw);
+	control_rotation.set_z(Controller->GetControlRotation().Roll);
+	*actor_position.mutable_control_rotation() = control_rotation;
 	Vec3 velocity;
 	velocity.set_x(Controller->GetPawn()->GetVelocity().X);
 	velocity.set_y(Controller->GetPawn()->GetVelocity().Y);
@@ -100,21 +87,6 @@ Message MessageMaker::MakePositionMessage(const ADPPlayerController* Controller)
 	default:
 		actor_position.set_state(State::STATE_None);
 		break;
-	}
-
-	if (character->lastAim == false && character->isAim == true)
-	{
-		actor_position.set_aim_state(AimState::AIM_STATE_ACTIVE);
-		character->lastAim = true;
-	}
-	else if (character->lastAim == true && character->isAim == false)
-	{
-		actor_position.set_aim_state(AimState::AIM_STATE_ACTIVE);
-		character->lastAim = false;
-	}
-	else
-	{
-		actor_position.set_aim_state(AimState::AIM_STATE_NONE);
 	}
 	*msg.mutable_actor_position() = actor_position;
 	return msg;
@@ -165,5 +137,23 @@ Message MessageMaker::MakeFireMessage(ADPPlayerController* Controller,  const FR
 	*gunfire.mutable_direction() = direction;
 	gunfire.set_target(TCHAR_TO_UTF8(*Target));
 	*msg.mutable_gunfire() = gunfire;
+	return msg;
+}
+
+Message MessageMaker::MakeAimMessage(ADPPlayerController* controller, bool bAim)
+{
+	Message msg;
+	if (controller == nullptr)
+	{
+		return msg;
+	}
+	if (controller->PlayerState == nullptr)
+	{
+		return msg;
+	}
+	msg.set_player_id(TCHAR_TO_UTF8(*controller->PlayerState->GetPlayerName()));
+	AimState aim_state;
+	aim_state.set_aim_state(bAim ? AimState::AIM_STATE_ACTIVE : AimState::AIM_STATE_RELEASE);
+	*msg.mutable_aim_state() = aim_state;
 	return msg;
 }

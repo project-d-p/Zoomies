@@ -131,6 +131,7 @@ void ADPGameModeBase::ProcessData(float delta_time)
 		ADPPlayerController* controller = this->player_controllers_[message.player_id()];
 		message_handler_.HandleMessage(message)->ExecuteIfBound(controller, message, delta_time);
 	}
+	this->SyncHostAiming();
 	this->SimulateGunFire();
 	this->SyncMovement();
 }
@@ -155,5 +156,21 @@ void ADPGameModeBase::SimulateGunFire()
 		ADPPlayerController* controller = pair.second;
 		ADPCharacter* character = Cast<ADPCharacter>(controller->GetPawn());
 		controller->SimulateGunFire(steam_listen_socket_);
+	}
+}
+
+void ADPGameModeBase::SyncHostAiming()
+{
+	ADPPlayerController* host_controller = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (!host_controller)
+	{
+		return ;
+	}
+	while (!host_controller->aim_queue_.empty())
+	{
+		bool aim_state = host_controller->aim_queue_.front();
+		host_controller->aim_queue_.pop();
+		Message msg = MessageMaker::MakeAimMessage(host_controller, aim_state);
+		steam_listen_socket_->PushUdpFlushMessage(msg);
 	}
 }

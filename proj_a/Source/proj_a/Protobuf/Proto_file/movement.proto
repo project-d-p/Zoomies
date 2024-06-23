@@ -1,7 +1,6 @@
 syntax = "proto3";
 
 import "vector.proto";
-import "aimstate.proto";
 
 // client->Server
 
@@ -9,6 +8,5 @@ message Movement {
   Vec3 velocity = 1; // 속도
   Vec3 action = 2;
   Vec3 rotation = 3;
-  AimState aim_state = 4;
   float delta_time = 5;
 }

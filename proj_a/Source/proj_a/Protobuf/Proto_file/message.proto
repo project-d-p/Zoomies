@@ -3,6 +3,7 @@ syntax = "proto3";
 import "movement.proto";
 import "jump.proto";
 import "gunfire.proto";
+import "aimstate.proto";
 import "actor_position.proto";
 
 message Message {
@@ -12,6 +13,7 @@ message Message {
     ActorPosition actor_position = 3;
     Jump jump = 4;
     Gunfire gunfire = 5;
+    AimState aim_state = 6;
   }
-  string timestamp = 6;
+  string timestamp = 7;
 }

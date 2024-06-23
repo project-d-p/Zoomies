@@ -27,12 +27,11 @@ private:
 	void PlayAimAnimation(ADPCharacter* character);
 	void SetState(ADPCharacter* character);
 	void SyncPosition(ADPCharacter* character);
-	void SyncOrientationWithVelocity(ADPCharacter* Character);
 	void SyncOrientationWithRotation(ADPCharacter* Character);
+	void SyncOrientationWithController(ADPCharacter* Character);
 	void SyncOrientation(ADPCharacter* character);
 	void SyncJump(ADPCharacter* character);
 
-	
 	ADPPlayerState* player_state_ = nullptr;
 	ActorPosition actor_position_;
 	Gunfire gunfire_;

@@ -1,9 +1,11 @@
 syntax = "proto3";
 
-enum AimState {
-  AIM_STATE_NONE = 0;
-  AIM_STATE_ACTIVE = 1;
-  AIM_STATE_RELEASE = 2;
+message AimState {
+  enum State {
+    AIM_STATE_ACTIVE = 0;
+    AIM_STATE_RELEASE = 1;
+  }
+  State aim_state = 2;
 }
 
 // 조준하게 되면 IsAim = true, 조준을 뗄 때 IsAim = false

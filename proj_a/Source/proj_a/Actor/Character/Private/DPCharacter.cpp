@@ -186,6 +186,7 @@ void ADPCharacter::PlayAimAnimation()
 {
 	if (characterMontage && !isAim ) {
 		isAim = true;
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("PlayAimAnimation"));
 		PlayAnimMontage(characterMontage, 1.f, "aim");	UE_LOG(LogTemp, Warning, TEXT("PlayAimAnimation"));
 	}
 }

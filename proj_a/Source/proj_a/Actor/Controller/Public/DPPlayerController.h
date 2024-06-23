@@ -34,10 +34,11 @@ public:
 	void HandleMovement(const Movement& movement, const float& server_delta);
 	void HandleJump(const Jump& Jump);
 	void HandleFire(const Message& fire);
+	void HandleAim(const AimState& AimState);
 	void SimulateGunFire(SteamNetworkingSocket* steam_socket);
 	
 	UPlayerScoreComp* GetScoreManagerComponent() const;
-	
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -73,16 +74,9 @@ private:
 	UPROPERTY()
 	UClientSocket* Socket = nullptr;
 
-	// FTimerHandle MovementTimerHandle;
-
-	// FVector2D AccumulatedMovementInput;
-	// FVector AccumulatedForwardInput;
-	// FVector AccumulatedRightInput;
-
 	int gun_fire_count_ = 0;
 	std::queue<Message> gun_queue_;
-	
-	// void SendCompressedMovement();
+
 	
 	virtual void Tick(float DeltaSeconds) override;
 	
@@ -100,4 +94,5 @@ private:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	USoundBase* jumpSound;
+	std::queue<bool> aim_queue_;
 };

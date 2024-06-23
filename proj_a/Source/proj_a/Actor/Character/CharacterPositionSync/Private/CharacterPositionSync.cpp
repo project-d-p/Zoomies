@@ -18,16 +18,30 @@ UCharacterPositionSync::~UCharacterPositionSync()
 {
 }
 
-void UCharacterPositionSync::PlayAimAnimation(ADPCharacter* Character)
+void UCharacterPositionSync::PlayAimAnimation(ADPCharacter* character)
 {
-	AimState aim_state = actor_position_.aim_state();
-	if (aim_state == AimState::AIM_STATE_ACTIVE)
+	player_state_ = Cast<ADPPlayerState>(character->GetPlayerState());
+	if (player_state_ == nullptr)
 	{
-		Character->PlayAimAnimation();
+		return;
 	}
-	else
+	const FString PlayerId = player_state_->GetPlayerName();
+	if (!FDataHub::aimStateData.Contains(PlayerId))
 	{
-		Character->StopAimAnimation();
+		return;
+	}
+	AimState aim_state = FDataHub::aimStateData[PlayerId];
+	FDataHub::aimStateData.Remove(PlayerId);
+	switch (aim_state.aim_state())
+	{
+	case AimState::AIM_STATE_ACTIVE:
+		character->PlayAimAnimation();
+		break;
+	case AimState::AIM_STATE_RELEASE:
+		character->StopAimAnimation();
+		break;
+	default:
+		break;
 	}
 }
 
@@ -40,13 +54,15 @@ void UCharacterPositionSync::SyncWithServer(ADPCharacter* character)
 	}
 	
 	const FString PlayerId = player_state_->GetPlayerName();
-	if (!FDataHub::actorPosition.Contains(PlayerId) && !FDataHub::jumpData.Contains(PlayerId))
+	if (!FDataHub::actorPosition.Contains(PlayerId) && !FDataHub::jumpData.Contains(PlayerId)
+		&& !FDataHub::gunfireData.Contains(PlayerId) && !FDataHub::aimStateData.Contains(PlayerId))
 	{
 		return;
 	}
 	actor_position_ = FDataHub::actorPosition[PlayerId];
 
 	this->SetState(character);
+
 	this->PlayAimAnimation(character);
 
 	SyncOrientation(character);
@@ -98,7 +114,7 @@ void UCharacterPositionSync::SyncGunFire(ADPCharacter* character)
 	
 	if (character->weaponComponent->SimulateAttackByClient(character, hit_result, gunfire_))
 	{
-		
+		// hit success but not to do anything.
 	}
 }
 
@@ -134,30 +150,32 @@ void UCharacterPositionSync::SyncPosition(ADPCharacter* character)
 	character->GetCharacterMovement()->Velocity = interpolated_velocity;
 }
 
-void UCharacterPositionSync::SyncOrientationWithVelocity(ADPCharacter* character)
-{
-	FVector velocity = FVector(actor_position_.velocity().x(), actor_position_.velocity().y(), actor_position_.velocity().z());
-
-	if (velocity.X == 0.0f && velocity.Y == 0.0f)
-	{
-		return ;
-	}
-	
-	FVector current_position = character->GetActorLocation();
-	
-	FVector UnitVector = velocity.GetSafeNormal();
-	FVector LookAtTarget = current_position + UnitVector;
-	FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(current_position, LookAtTarget);
-	
-	FRotator FinalRotation = FRotator(0, NewRotation.Yaw, 0);
-		
-	character->SetActorRotation(FinalRotation);
-}
-
 void UCharacterPositionSync::SyncOrientationWithRotation(ADPCharacter* character)
 {
+	// FVector velocity = FVector(actor_position_.velocity().x(), actor_position_.velocity().y(), actor_position_.velocity().z());
+	//
+	// if (velocity.X == 0.0f && velocity.Y == 0.0f)
+	// {
+	// 	return ;
+	// }
+	//
+	// FVector current_position = character->GetActorLocation();
+	//
+	// FVector UnitVector = velocity.GetSafeNormal();
+	// FVector LookAtTarget = current_position + UnitVector;
+	// FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(current_position, LookAtTarget);
+	//
+	// FRotator FinalRotation = FRotator(0, NewRotation.Yaw, 0);
+
 	FRotator rotation = FRotator(actor_position_.rotation().x(), actor_position_.rotation().y(), actor_position_.rotation().z());
 	FRotator final_rotation = FRotator(0, rotation.Yaw, 0);
+	character->SetActorRotation(final_rotation);
+}
+
+void UCharacterPositionSync::SyncOrientationWithController(ADPCharacter* character)
+{
+	FRotator control_rotation = FRotator(actor_position_.control_rotation().x(), actor_position_.control_rotation().y(), actor_position_.control_rotation().z());
+	FRotator final_rotation = FRotator(0, control_rotation.Yaw, 0);
 	character->SetActorRotation(final_rotation);
 }
 
@@ -165,11 +183,11 @@ void UCharacterPositionSync::SyncOrientation(ADPCharacter* character)
 {
 	if (character->isAim == true)
 	{
-		this->SyncOrientationWithRotation(character);
+		this->SyncOrientationWithController(character);
 	}
 	else
 	{
-		this->SyncOrientationWithVelocity(character);
+		this->SyncOrientationWithRotation(character);
 	}
 }
 

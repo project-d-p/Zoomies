@@ -17,6 +17,11 @@ ServerMessageHandler::ServerMessageHandler()
 	{
 		player_controller->HandleFire(msg);
 	});
+
+	message_handlers_[Message::kAimState] = FServerMessageDelegate::CreateLambda([](ADPPlayerController* player_controller, const Message& msg, const float& /*delta*/)
+	{
+		player_controller->HandleAim(msg.aim_state());
+	});
 }
 
 FServerMessageDelegate* ServerMessageHandler::HandleMessage(const Message& Msg)

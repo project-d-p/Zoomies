@@ -28,6 +28,11 @@ FMessageHandler::FMessageHandler()
 	{
 		FDataHub::PushGunfireDA(Msg);
 	}));
+
+	MessageHandlers.Add(Message::kAimState, FMessageDelegate::CreateLambda([](const Message& Msg)
+	{
+		FDataHub::PushAimStateDA(Msg);
+	}));
 }
 
 void FMessageHandler::HandleMessage(const Message& Msg)

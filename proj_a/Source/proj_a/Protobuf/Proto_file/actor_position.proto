@@ -2,15 +2,14 @@ syntax = "proto3";
 
 import "vector.proto";
 import "state.proto";
-import "aimstate.proto";
 
 // server -> client
 message ActorPosition{
   Vec3 position = 1;
   Vec3 rotation = 2;
-  Vec3 velocity = 3;
-  State state = 4;
-  AimState aim_state = 5;
+  Vec3 control_rotation = 3;
+  Vec3 velocity = 4;
+  State state = 5;
 }
 
 // 애니메이션 바로 뿌려지는가.. 안되면 보간 작업을 해야 함.

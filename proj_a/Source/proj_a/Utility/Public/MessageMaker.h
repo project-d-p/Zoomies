@@ -10,4 +10,5 @@ public:
 	static Message MakePositionMessage(const ADPPlayerController* Controller);
 	static Message MakeJumpMessage(ADPPlayerController* AdpPlayerController);
 	static Message MakeFireMessage(ADPPlayerController* Controller, const FRotator& Rotation, const FString& Target = "none");
+	static Message MakeAimMessage(ADPPlayerController* controller, bool bAim);
 };
