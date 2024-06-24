@@ -35,6 +35,7 @@ public:	// component
 	UAnimMontage* characterMontage;
 
 	void StopAimAnimation();
+	void UpdateLobbyInfo();
 	
 private:
 

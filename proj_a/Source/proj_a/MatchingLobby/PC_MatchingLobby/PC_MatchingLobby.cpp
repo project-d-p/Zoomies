@@ -27,6 +27,11 @@ void APC_MatchingLobby::ToggleReadyState()
 	ServerSetReady(bIsReady);
 }
 
+bool APC_MatchingLobby::GetIsReady()
+{
+	return bIsReady;
+}
+
 void APC_MatchingLobby::BeginPlay()
 {
 	Super::BeginPlay();

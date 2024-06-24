@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameStateBase.h"
+#include "proj_a/MatchingLobby/TYPE_MatchingLobby/TYPE_MatchingLobby.h"
 #include "GS_MatchingLobby.generated.h"
 
 UCLASS()
@@ -14,6 +15,8 @@ public:
 	// Replicated variable & function
 	UPROPERTY(ReplicatedUsing = OnRep_ReadyPlayers)
 	TArray<bool> ReadyPlayers;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_LobbyInfo)
+	TArray<FLobbyInfo> LobbyInfos;
 	int32 HostPlayerIndex;
 
 	// Find the fastest player
@@ -32,6 +35,8 @@ public:
 	// Set the player ready
 	UFUNCTION()
 	void OnRep_ReadyPlayers();
+	UFUNCTION()
+	void OnRep_LobbyInfo();
 	void SetPlayerReady(int32 PlayerIndex, bool bIsReady);
 
 	UFUNCTION(BlueprintCallable, Category = "GameState")

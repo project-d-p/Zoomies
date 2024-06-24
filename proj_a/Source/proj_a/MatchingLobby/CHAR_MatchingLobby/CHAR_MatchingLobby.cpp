@@ -65,6 +65,7 @@ ACHAR_MatchingLobby::ACHAR_MatchingLobby()
 	{
 		LobbyInfoWidgetComponent->SetWidgetClass(WidgetClass.Class);
 	}
+	LobbyInfoWidgetComponent->SetVisibility(true);
 	LobbyInfoWidgetComponent->SetWidgetSpace( EWidgetSpace::World);
 	LobbyInfoWidgetComponent->SetupAttachment(GetMesh());
 	LobbyInfoWidgetComponent->SetRelativeLocation(FVector(0, 0, 620));
@@ -97,4 +98,9 @@ void ACHAR_MatchingLobby::StopAimAnimation()
 		isAim = false;
 		StopAnimMontage(characterMontage); UE_LOG(LogTemp, Warning, TEXT("StopAimAnimation"));
 	}
+}
+
+void ACHAR_MatchingLobby::UpdateLobbyInfo()
+{
+	
 }

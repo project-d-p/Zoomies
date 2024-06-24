@@ -7,6 +7,7 @@
 AGS_MatchingLobby::AGS_MatchingLobby() {
 	// Set Players Num. need to be Set
 	ReadyPlayers.SetNum(MAX_USERS, false);
+	LobbyInfos.SetNum(MAX_USERS, false);
 	BestHostPlayer = nullptr;
 	LowestAveragePing = 202406071806.0f;
 	HostPlayerIndex = -1;
@@ -17,12 +18,21 @@ void AGS_MatchingLobby::OnRep_ReadyPlayers()
 	//ReadypPlayers array has been replicated
 }
 
+void AGS_MatchingLobby::OnRep_LobbyInfo()
+{
+	//need to Call Update Function on MatchLobby
+}
+
+
 void AGS_MatchingLobby::SetPlayerReady(int32 PlayerIndex, bool bIsReady)
 {
 	int32 PlayerOrder = PlayerIndex - HostPlayerIndex;
 	if (PlayerOrder >= 0 && PlayerOrder < ReadyPlayers.Num())
 	{
 		ReadyPlayers[PlayerOrder] = bIsReady;
+		LobbyInfos[PlayerOrder].bIsReady = bIsReady;
+		LobbyInfos[PlayerOrder].PS = Cast<APS_MatchingLobby>(GetWorld()->GetFirstPlayerController()->PlayerState);
+		LobbyInfos[PlayerOrder].PC = Cast<APC_MatchingLobby>(GetWorld()->GetFirstPlayerController());
 	}
 	// logging
 	if (GEngine)
@@ -48,6 +58,7 @@ void AGS_MatchingLobby::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AGS_MatchingLobby, ReadyPlayers);
+	DOREPLIFETIME(AGS_MatchingLobby, LobbyInfos);
 	DOREPLIFETIME(AGS_MatchingLobby, LowestAveragePing);
 	DOREPLIFETIME(AGS_MatchingLobby, BestHostPlayer);
 }

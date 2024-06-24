@@ -21,6 +21,8 @@ public:
 	bool bIsReady = false;
 	UPROPERTY(BlueprintReadWrite, Category = "MatchingLobbyInfo")
 	FString UserName = "DefaultName";
+
+	bool GetIsReady();
 protected:
 	virtual void BeginPlay() override;
 private:
