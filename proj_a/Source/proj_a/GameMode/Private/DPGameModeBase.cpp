@@ -15,6 +15,9 @@
 #include "FNetLogger.h"
 #include "isteamnetworkingsockets.h"
 #include "MessageMaker.h"
+#include "OctopusCharacter.h"
+#include "SlothCharacter.h"
+#include "StarFishCharacter.h"
 
 ADPGameModeBase::ADPGameModeBase()
 {
@@ -120,12 +123,8 @@ void ADPGameModeBase::StartPlay()
 
 void ADPGameModeBase::SpawnAndPossessAI()
 {
-	MonsterFactory->SpawnMonster(
-		AOctopusCharacter::StaticClass(), FVector(1500.f, 0.f, 600.f));
-	MonsterFactory->SpawnMonster(
-		ASlothCharacter::StaticClass(), FVector(1000.f, 0.f, 600.f));
-	MonsterFactory->SpawnMonster(
-		AStarFishCharacter::StaticClass(), FVector(500.f, 0.f, 600.f));
+	MonsterFactory->RandomMonsterSpawn(
+		FVector(-1500.f, 0.f, 600.f));
 }
 
 void ADPGameModeBase::Tick(float delta_time)

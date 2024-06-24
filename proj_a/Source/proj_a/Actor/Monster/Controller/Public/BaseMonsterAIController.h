@@ -14,10 +14,18 @@ public:
 
 	UFUNCTION()
 	UAISightComponent* GetAISightComponent() const;
+	
+	void MoveToTargetLocation();
+
 private:
 	UPROPERTY()
 	UAISightComponent* AISightComponent = nullptr;
+	
 protected:
+	UFUNCTION()
+	virtual void BeginPlay() override;
+	UFUNCTION()
+	virtual void Tick(float DeltaSeconds) override;
 	// virtual void OnPossess(APawn* InPawn) override;
 	// virtual void OnUnPossess() override;
 };
