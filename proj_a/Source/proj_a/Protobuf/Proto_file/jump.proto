@@ -1,0 +1,5 @@
+syntax = "proto3";
+
+message Jump {
+  uint32 jump_event = 1;
+}

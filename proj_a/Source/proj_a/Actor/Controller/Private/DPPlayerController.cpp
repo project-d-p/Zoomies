@@ -18,8 +18,8 @@
 #include "FUdpSendTask.h"
 #include "MessageMaker.h"
 #include "GameHelper.h"
-#include "Chaos/SpatialAccelerationCollection.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 DEFINE_LOG_CATEGORY(LogNetwork);
@@ -67,7 +67,7 @@ ADPPlayerController::ADPPlayerController()
 		cancelAction = IA_CANCEL.Object;
 	
 	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
-	Socket = CreateDefaultSubobject<UMySocket>(TEXT("MySocket"));
+	Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
 
 	static ConstructorHelpers::FObjectFinder<USoundBase> SoundAsset
 	(TEXT("/Game/sounds/effect/character/jump_Cue.jump_Cue"));
@@ -124,21 +124,34 @@ UPlayerScoreComp* ADPPlayerController::GetScoreManagerComponent() const
 	return Cast<ADPPlayerState>(PlayerState)->GetPlayerScoreComp();
 }
 
-void ADPPlayerController::CreateSocket()
+void ADPPlayerController::ReleaseMemory()
 {
-	this->Socket->CreateSocket();
+	if (Socket)
+	{
+		Socket->DestoryInstance();
+		Socket->DestroyComponent();
+	}
+	if (ChatManager)
+	{
+		ChatManager->DestroyComponent();
+	}
 }
 
-void ADPPlayerController::Connect(FString ip, uint32 port)
+// void ADPPlayerController::CreateSocket()
+// {
+// 	this->Socket->CreateSocket();
+// }
+
+void ADPPlayerController::Connect()
 {
-	this->Socket->Connect(ip, port);
+	// this->Socket->Connect(ip, port);
+	this->Socket->Connect("127.0.0.1", 4242);
 }
 
 void ADPPlayerController::RunTask()
 {
 	this->Socket->RunTask();
 }
-
 
 void ADPPlayerController::BeginPlay()
 {
@@ -162,39 +175,40 @@ void ADPPlayerController::BeginPlay()
 		SubSystem->AddMappingContext(defaultContext, 0);
 	}
 	
-	GetWorldTimerManager().SetTimer(MovementTimerHandle, this, &ADPPlayerController::SendCompressedMovement, 0.01f, true);
-	if (!HasAuthority())
-	{
-		GetWorldTimerManager().SetTimer(SynchronizeHandle, this, &ADPPlayerController::UpdatePlayer, 5.00f, true);
-	}
+	// GetWorldTimerManager().SetTimer(MovementTimerHandle, this, &ADPPlayerController::SendCompressedMovement, 0.01f, true);
 }
 
 
-void ADPPlayerController::SendCompressedMovement()
-{
-	if (HasAuthority())
-	{
-		return ;
-	}
-	if (AccumulatedMovementInput.IsNearlyZero())
-	{
-		return ;
-	}
+// void ADPPlayerController::SendCompressedMovement()
+// {
+// 	if (HasAuthority())
+// 	{
+// 		return ;
+// 	}
+// 	if (AccumulatedMovementInput.IsNearlyZero())
+// 	{
+// 		return ;
+// 	}
+//
+// 	if (PlayerState)
+// 	{
+// 		FNetLogger::EditerLog(FColor::Red, TEXT("Player Name: %s"), *PlayerState->GetPlayerName());
+// 	}
+// 	
+// 	FNetLogger::EditerLog(FColor::Blue, TEXT("Send Movement[Client]: %f %f"), AccumulatedMovementInput.X, AccumulatedMovementInput.Y);
+// 	FNetLogger::EditerLog(FColor::Blue, TEXT("Send Forward[Client]: %f %f %f"), AccumulatedForwardInput.X, AccumulatedForwardInput.Y, AccumulatedForwardInput.Z);
+// 	FNetLogger::EditerLog(FColor::Blue, TEXT("Send Right[Client]: %f %f %f"), AccumulatedRightInput.X, AccumulatedRightInput.Y, AccumulatedRightInput.Z);
+// 	// Send Server
+// 	// Message message = MessageMaker::MakeMessage(this, AccumulatedMovementInput, AccumulatedForwardInput, AccumulatedRightInput);
+// 	// Socket->SendPacket(message);
+// 	AccumulatedMovementInput = FVector2D::ZeroVector;
+// 	AccumulatedForwardInput = FVector::ZeroVector;
+// 	AccumulatedRightInput = FVector::ZeroVector;
+// }
 
-	// if (PlayerState)
-	// {
-	// 	FNetLogger::EditerLog(FColor::Red, TEXT("Player Name: %s"), *PlayerState->GetPlayerName());
-	// }
-	//
-	// FNetLogger::EditerLog(FColor::Blue, TEXT("Send Movement[Client]: %f %f"), AccumulatedMovementInput.X, AccumulatedMovementInput.Y);
-	// FNetLogger::EditerLog(FColor::Blue, TEXT("Send Forward[Client]: %f %f %f"), AccumulatedForwardInput.X, AccumulatedForwardInput.Y, AccumulatedForwardInput.Z);
-	// FNetLogger::EditerLog(FColor::Blue, TEXT("Send Right[Client]: %f %f %f"), AccumulatedRightInput.X, AccumulatedRightInput.Y, AccumulatedRightInput.Z);
-	// Send Server
-	// Message message = MessageMaker::MakeMessage(this, AccumulatedMovementInput, AccumulatedForwardInput, AccumulatedRightInput);
-	// Socket->SendPacket(message);
-	AccumulatedMovementInput = FVector2D::ZeroVector;
-	AccumulatedForwardInput = FVector::ZeroVector;
-	AccumulatedRightInput = FVector::ZeroVector;
+void ADPPlayerController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
 }
 
 void ADPPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -206,20 +220,16 @@ void ADPPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
-	FNetLogger::EditerLog(FColor::Red, TEXT("OnPossess"));
-	
 	character = Cast<ADPCharacter>(GetPawn());
 
 	if (!character)
 	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("Character is null in OnPossess"));
-		UE_LOG(LogTemp, Warning, TEXT("character null"));
 		return;
 	}
 	
 	state = Cast<UDPStateActorComponent>(character->GetComponentByClass(UDPStateActorComponent::StaticClass()));
 	construction = Cast<UDPConstructionActorComponent>(character->GetComponentByClass(UDPConstructionActorComponent::StaticClass()));
-
+	// state->equipmentState = "GUN";
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		FNetLogger::EditerLog(FColor::Red, TEXT("Add Mapping Context [On Possess]"));
@@ -253,45 +263,26 @@ void ADPPlayerController::SetupInputComponent()
 
 void ADPPlayerController::Move(const FInputActionValue& value)
 {
-	// UE_LOG(LogTemp, Warning, TEXT("ia_move_x : %f"), value.Get<FVector2D>().X);
-	// UE_LOG(LogTemp, Warning, TEXT("ia_move_y : %f"), value.Get<FVector2D>().Y);
 	const FVector2D actionValue = value.Get<FVector2D>();
 	const FRotator controlRotation = GetControlRotation();
-	// const FRotator yaw(0.f, controlRotation.Yaw, 0.f);
 
 	const FVector forwardVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
-	if (HasAuthority())
+
+	if (!HasAuthority())
 	{
-		// 해당 부분에서 서버로 이동 명령을 보내야 하나?
-		// FNetLogger::EditerLog(FColor::Blue, TEXT("Send Movement[Server]: %f %f"), actionValue.X, actionValue.Y);
+		FVector velocity = character->GetCharacterMovement()->Velocity;
+		Message message = MessageMaker::MakeMovementMessage(this, actionValue, controlRotation, velocity);
+		Socket->AsyncSendPacket(message);
 	}
-	else
-	{
-		AccumulatedForwardInput = forwardVector;
-		AccumulatedRightInput = rightVector;
-		AccumulatedMovementInput += actionValue;
-		// 클라이언트면 보내야함
-		// FNetLogger::EditerLog(FColor::Blue, TEXT("Send Movement[Client]: %f %f"), actionValue.X, actionValue.Y);
-	}
-
-	// FNetLogger::EditerLog(FColor::Cyan, TEXT("actionValue: %f %f"), actionValue.X, actionValue.Y);
-	// FNetLogger::EditerLog(FColor::Cyan, TEXT("forwardVector: %f %f %f"), forwardVector.X, forwardVector.Y, forwardVector.Z);
-	// FNetLogger::EditerLog(FColor::Cyan, TEXT("rightVector: %f %f %f"), rightVector.X, rightVector.Y, rightVector.Z);
-
-	MovementCount++;
-	// FNetLogger::EditerLog(FColor::Red, TEXT("MovementCount: %d"), MovementCount);
-
-	FVector Velocity = character->GetCharacterMovement()->Velocity;
-	Message message = MessageMaker::MakeMessage(this, actionValue, forwardVector, rightVector, Velocity);
-	Socket->SendPacket(message);
 	character->AddMovementInput(forwardVector, actionValue.X);
 	character->AddMovementInput(rightVector, actionValue.Y);
 
-	// FNetLogger::EditerLog(FColor::Emerald, TEXT("Character Velocity Size: %f"), character->GetCharacterMovement()->Velocity.Size());
-	// FNetLogger::EditerLog(FColor::Emerald, TEXT("Character Velocity: %f %f %f"), character->GetCharacterMovement()->Velocity.X, character->GetCharacterMovement()->Velocity.Y, character->GetCharacterMovement()->Velocity.Z);
-	
-	// character->speed = character->GetCharacterMovement()->Velocity.Size();
+	if (character->isAim)
+	{
+		FRotator newRotation = FRotator(0, controlRotation.Yaw, 0);
+		character->SetActorRotation(newRotation);
+	}
 }
 
 void ADPPlayerController::Jump(const FInputActionValue& value)
@@ -299,37 +290,61 @@ void ADPPlayerController::Jump(const FInputActionValue& value)
 	//UE_LOG(LogTemp, Warning, TEXT("ia_jump : %d"), value.Get<bool>());
 
 	bool actionValue = value.Get<bool>();
-	if (actionValue) {
-		// send jump command ( id, actionValue ) ( true = jump )
-		character->Jump();
-		UGameplayStatics::PlaySound2D(GetWorld(), jumpSound);
+	if (!actionValue) {
+		return ;
 	}
+
+	Message msg = MessageMaker::MakeJumpMessage(this);
+	if (!HasAuthority())
+	{
+		Socket->AsyncSendPacket(msg);
+	}
+	character->Jump();
+	UGameplayStatics::PlaySound2D(GetWorld(), jumpSound);
 }
 
 void ADPPlayerController::Rotate(const FInputActionValue& value)
 {
-	// UE_LOG(LogTemp, Warning, TEXT("ia_rotate_x : %f"), value.Get<FVector2D>().X);
-	// UE_LOG(LogTemp, Warning, TEXT("ia_rotate_y : %f"), value.Get<FVector2D>().Y);
-
 	FVector2D actionValue = value.Get<FVector2D>();
 
-	// send rotate command ( id, actionValue )
 	character->AddControllerYawInput(actionValue.X);
 	character->AddControllerPitchInput(actionValue.Y);
-	FUdpSendTask::ProtoData.set_allocated_progess_vector(ProtobufUtility::ConvertToFVecToVec3(character->GetControlRotation().Vector()));
+	if (character->isAim)
+	{
+		FRotator rotation = GetControlRotation();
+		FRotator newRotation = FRotator(0, rotation.Yaw, 0);
+		character->SetActorRotation(newRotation);
+	}
 }
 
 void ADPPlayerController::Active(const FInputActionValue& value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Active"));
 
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Active with %s"), *state->equipmentState);
 	if ("NONE" == state->equipmentState) {
 
 	}
 	if ("GUN" == state->equipmentState) {
-		if (character->isAim) {
-			character->PlayFireAnimation();
-			character->weaponComponent->Attack();
+		if (!character->isAim) {
+			return ;
+		}
+		FHitResult hit_result;
+		character->PlayFireAnimation();
+		Message msg = MessageMaker::MakeFireMessage(this, GetControlRotation());
+		if (!HasAuthority())
+		{
+			Socket->AsyncSendPacket(msg);
+		}
+		else
+		{
+			this->gun_fire_count_ += 1;
+			this->gun_queue_.push(msg);
+		}
+		if (character->weaponComponent->Attack(this, hit_result))
+		{
+			// Success Only Effect;
+			FNetLogger::EditerLog(FColor::Cyan, TEXT("Attack Success[Only Effect]"));
 		}
 	}
 	// if ("WALL" == state->equipmentState) {
@@ -374,12 +389,10 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 void ADPPlayerController::AdditionalSetting(const FInputActionValue& value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("AdditionalSetting"));
-	// Scroll Up : 1, Scroll Down : -1
-	// UE_LOG(LogTemp, Warning, TEXT("->	ia_rotate_x : %f"), value.Get<FVector2D>().X);
 
 	int stateValue = static_cast<int>(value.Get<FVector2D>().X);
 	character->ChangeAnimation();
-	character->stateComponent->ChangeEquipmentState(stateValue);
+	// character->stateComponent->ChangeEquipmentState(stateValue);
 }
 
 void ADPPlayerController::Aim(const FInputActionValue& value)
@@ -390,15 +403,27 @@ void ADPPlayerController::Aim(const FInputActionValue& value)
 		
 	}
 	if ("GUN" == state->equipmentState) {
+		if (!character->isAim) {
+			Message msg = MessageMaker::MakeAimMessage(this, !character->isAim);
+			if (!HasAuthority())
+			{
+				Socket->AsyncSendPacket(msg);
+			}
+			else
+			{
+				aim_queue_.push(!character->isAim);
+			}
+			FRotator rotation = GetControlRotation();
+			FRotator newRotation = FRotator(0, rotation.Yaw, 0);
+			character->SetActorRotation(newRotation);
+		}
 		character->PlayAimAnimation();
 	}
 	if ("WALL" == state->equipmentState) {
 		character->isAim = true;
-		// 바라보는 방향 청사진 -> 이때 scroll시 wall회전되게	// idAim = true -> active 되면 설치
 	}
 	if ("TURRET" == state->equipmentState) {
 		character->isAim = true;
-		// 바라보는 방향 청사진
 	}
 }
 
@@ -410,15 +435,22 @@ void ADPPlayerController::AimReleased(const FInputActionValue& value)
 
 	}
 	if ("GUN" == state->equipmentState) {
+		Message msg = MessageMaker::MakeAimMessage(this, !character->isAim);
+		if (!HasAuthority())
+		{
+			Socket->AsyncSendPacket(msg);
+		}
+		else
+		{
+			aim_queue_.push(!character->isAim);
+		}
 		character->StopAimAnimation();
 	}
 	if ("WALL" == state->equipmentState) {
 		character->isAim = false;
-		// 청사진 제거
 	}
 	if ("TURRET" == state->equipmentState) {
 		character->isAim = false;
-		// 청사진 제거
 	}
 }
 
@@ -427,63 +459,92 @@ void ADPPlayerController::ActionCancel(const FInputActionValue& value)
 	UE_LOG(LogTemp, Warning, TEXT("ActionCancel"));
 }
 
-void ADPPlayerController::UpdatePlayer()
-{
-	ActorPosition actorPosition;
-
-	const FString PlayerId = this->PlayerState->GetPlayerName();
-	if (!FDataHub::actorPosition.Contains(PlayerId))
-	{
-		/** 포함되지 않았을 경우 */
-		// UE_LOG(LogNetwork, Warning, TEXT("Player 1 data not found"));
-		return;
-	}
-	actorPosition = FDataHub::actorPosition[PlayerId];
-	// if (actorPosition.Position.IsSet())
-	// {
-	// 	FVector NewLocation = actorPosition.Position.GetValue();
-	// 	AActor* ControlledActor = GetPawn();
-	//
-	// 	if (ControlledActor)
-	// 	{
-	// 		ControlledActor->SetActorLocation(NewLocation);
-	// 	}
-	// }
-}
-
 /*
  * 1. Handler Player Movement in Server (W, A, S, D) - Move Function with Movement Message
  */
-void ADPPlayerController::HandleMovement(const Movement& movement)
+void ADPPlayerController::HandleMovement(const Movement& movement, const float& server_delta)
 {
-	if (!movement.has_progess_vector())
-	{
-		return ;
-	}
-	
-	FVector forwardVector = FVector(movement.forward_vector().x(), movement.forward_vector().y(), movement.forward_vector().z());
-	FVector rightVector = FVector(movement.right_vector().x(), movement.right_vector().y(), movement.right_vector().z());
-	FVector actionValue = FVector(movement.progess_vector().x(), movement.progess_vector().y(), movement.progess_vector().z());
 	FVector velocity = FVector(movement.velocity().x(), movement.velocity().y(), movement.velocity().z());
-	// float velocitySize = movement.velocity_size();
-
-	// FNetLogger::EditerLog(FColor::Cyan, TEXT("Action: %f %f %f"), actionValue.X, actionValue.Y, actionValue.Z);
-	// FNetLogger::EditerLog(FColor::Cyan, TEXT("Forward: %f %f %f"), forwardVector.X, forwardVector.Y, forwardVector.Z);
-	// FNetLogger::EditerLog(FColor::Cyan, TEXT("Right: %f %f %f"), rightVector.X, rightVector.Y, rightVector.Z);
-
+	FRotator rotation = FRotator(movement.rotation().x(), movement.rotation().y(), movement.rotation().z());
+	FVector2d action = FVector2d(movement.action().x(), movement.action().y());
+	
+	float delta = movement.delta_time();
+	
 	if (!character)
 	{
 		FNetLogger::EditerLog(FColor::Red, TEXT("Character is null in HandleMovement"));
 		return ;
 	}
-
+	
 	character->GetCharacterMovement()->Velocity = velocity;
 	
-	ServerReceivedMovementCount++;
-	// FNetLogger::EditerLog(FColor::Red, TEXT("ServerReceivedMovementCount: %d"), ServerReceivedMovementCount);
-	
-	character->AddMovementInput(forwardVector, actionValue.X);
-	character->AddMovementInput(rightVector, actionValue.Y);
-	// FNetLogger::EditerLog(FColor::Emerald, TEXT("Character Velocity Size: %f"), character->GetCharacterMovement()->Velocity.Size());
-	// FNetLogger::EditerLog(FColor::Emerald, TEXT("Character Velocity: %f %f %f"), character->GetCharacterMovement()->Velocity.X, character->GetCharacterMovement()->Velocity.Y, character->GetCharacterMovement()->Velocity.Z);
+	const FVector forwardVector = FRotationMatrix(rotation).GetUnitAxis(EAxis::X);
+	const FVector rightVector = FRotationMatrix(rotation).GetUnitAxis(EAxis::Y);
+
+	// character->AddMovementInput(forwardVector, action.X * delta / server_delta);
+	// character->AddMovementInput(rightVector, action.Y * delta / server_delta);
+	character->AddMovementInput(forwardVector, action.X);
+	character->AddMovementInput(rightVector, action.Y);
+
+	if (character->isAim)
+	{
+		FRotator newRotation = FRotator(0, rotation.Yaw, 0);
+		character->SetActorRotation(newRotation);
+	}
+}
+
+void ADPPlayerController::HandleJump(const ::Jump& Jump)
+{
+	if (!character)
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("Character is null in HandleMovement"));
+		return ;
+	}
+	character->Jump();
+	UGameplayStatics::PlaySound2D(GetWorld(), jumpSound);
+}
+
+void ADPPlayerController::HandleFire(const Message& fire)
+{
+	this->gun_fire_count_ += 1;
+	this->gun_queue_.push(fire);
+}
+
+void ADPPlayerController::SimulateGunFire(SteamNetworkingSocket* steam_socket)
+{
+	if (gun_fire_count_ == 0)
+	{
+		return ;
+	}
+	while (!gun_queue_.empty())
+	{
+		Message fire = gun_queue_.front();
+		gun_queue_.pop();
+		FHitResult hit_result;
+		this->character->PlayFireAnimation();
+		if (character->weaponComponent->SimulateAttack(this, hit_result, fire))
+		{
+			// Logic for Hit Success && Damage && Score
+			FNetLogger::EditerLog(FColor::Cyan, TEXT("Player %s Attack Success[Simulate]"), *PlayerState->GetPlayerName());
+		}
+		steam_socket->PushUdpFlushMessage(fire);
+		gun_fire_count_ -= 1;
+	}
+}
+
+void ADPPlayerController::HandleAim(const AimState& AimState)
+{
+	if (!character)
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("Character is null in HandleAim"));
+		return ;
+	}
+	if (AimState.aim_state() == AimState::AIM_STATE_ACTIVE)
+	{
+		character->PlayAimAnimation();
+	}
+	else
+	{
+		character->StopAimAnimation();
+	}
 }

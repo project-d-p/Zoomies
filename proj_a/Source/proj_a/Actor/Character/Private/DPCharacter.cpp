@@ -4,21 +4,26 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "DPHpActorComponent.h"
 #include "DPConstructionActorComponent.h"
+#include "DPPlayerState.h"
 #include "DPWeaponActorComponent.h"
 #include "DPStateActorComponent.h"
 #include "DPWeaponGun.h"
+#include "FDataHub.h"
+#include "FNetLogger.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "DSP/LFO.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PlayerState.h"
 
 // Sets default values
 ADPCharacter::ADPCharacter()
 {
 	bReplicates = true;
-
+	
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -77,11 +82,9 @@ ADPCharacter::ADPCharacter()
 	sceneCaptureSpringArm->bDoCollisionTest = false;
 	sceneCapture->ProjectionType = ECameraProjectionMode::Type::Orthographic;
 	sceneCapture->OrthoWidth = 1024.0f;
-	
-	GetMesh()->SetSimulatePhysics(true);
+
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
-	
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
 	(TEXT("/Game/animation/steve/steveAnimation.steveAnimation_C"));
@@ -94,12 +97,28 @@ ADPCharacter::ADPCharacter()
 	if (CHARACTER_MONTAGE.Succeeded()) {
 		characterMontage = CHARACTER_MONTAGE.Object;
 	}
+
+	syncer = CreateDefaultSubobject<UCharacterPositionSync>(TEXT("My Syncer"));
+	
 	// disable move replication : set bReplicateMovement to false
 	AActor::SetReplicatingMovement(false);
 	// bReplicateMovement
 
 	// Set Mass and Collision Profile
 	GetCharacterMovement()->Mass = 0.1f;
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
+	/*
+	 * 겹치게 만드는 요소
+	 * 즉, 충돌해도 보이는 것은 뚫고 지나가지만 충돌 이벤트는 발생됨.
+	 */
+	// GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	
+	// GetCapsuleComponent()->SetSimulatePhysics(true);
+	// GetCapsuleComponent()->SetNotifyRigidBodyCollision(true);
 }
 
 // Called when the game starts or when spawned
@@ -118,6 +137,15 @@ void ADPCharacter::BeginPlay()
 		weaponComponent->AddWeapons(gunClass);
 		weaponComponent->Equip(gunClass);
 	}
+	bUseControllerRotationYaw = false;
+
+	if (GetLocalRole() == ROLE_AutonomousProxy)
+		GetWorldTimerManager().SetTimer(SynchronizeHandle, this, &ADPCharacter::SyncOwn, 5.00f, true);
+}
+
+void ADPCharacter::SyncOwn()
+{
+	syncer->SyncMyself(this);
 }
 
 // Called every frame
@@ -132,7 +160,11 @@ void ADPCharacter::Tick(float DeltaTime)
 	else
 		UE_LOG(LogTemp, Warning, TEXT("null GetCharacterMovement"));
 
-
+	if (this->GetLocalRole() == ROLE_SimulatedProxy)
+	{
+		syncer->SyncWithServer(this);
+		syncer->SyncGunFire(this);
+	}
 }
 
 // Called to bind functionality to input

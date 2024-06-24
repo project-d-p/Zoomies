@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CharacterPositionSync.h"
+#include "DPPlayerController.h"
 #include "DPWeapon.h"
 #include "Components/ActorComponent.h"
 #include "DPWeaponActorComponent.generated.h"
@@ -24,6 +26,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	bool SimulateAttackByClient(ADPCharacter* Character, FHitResult& HitResult, const Gunfire& Gunfire);
+	bool SimulateAttack(ADPPlayerController* controller, FHitResult& result, Message message);
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Weapon")
@@ -36,5 +40,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void Equip(TSubclassOf<ADPWeapon> weaponClass);
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	void Attack();
+	bool Attack(ADPPlayerController* controller, FHitResult& result);
+
 };
