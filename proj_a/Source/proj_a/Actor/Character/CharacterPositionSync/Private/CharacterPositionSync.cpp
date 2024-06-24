@@ -92,7 +92,8 @@ void UCharacterPositionSync::SyncMyself(ADPCharacter* character)
 	if (distance > significantDifference)
 	{
 		FNetLogger::EditerLog(FColor::Red, TEXT("Distance is too far, Syncing position."));
-		this->SyncPosition(character);
+		// this->SyncPosition(character);
+		character->SetActorLocation(position);
 	}
 }
 

@@ -311,6 +311,12 @@ void ADPPlayerController::Rotate(const FInputActionValue& value)
 
 	character->AddControllerYawInput(actionValue.X);
 	character->AddControllerPitchInput(actionValue.Y);
+	if (character->isAim)
+	{
+		FRotator rotation = GetControlRotation();
+		FRotator newRotation = FRotator(0, rotation.Yaw, 0);
+		character->SetActorRotation(newRotation);
+	}
 }
 
 void ADPPlayerController::Active(const FInputActionValue& value)
@@ -477,8 +483,10 @@ void ADPPlayerController::HandleMovement(const Movement& movement, const float& 
 	const FVector forwardVector = FRotationMatrix(rotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(rotation).GetUnitAxis(EAxis::Y);
 
-	character->AddMovementInput(forwardVector, action.X * delta / server_delta);
-	character->AddMovementInput(rightVector, action.Y * delta / server_delta);
+	// character->AddMovementInput(forwardVector, action.X * delta / server_delta);
+	// character->AddMovementInput(rightVector, action.Y * delta / server_delta);
+	character->AddMovementInput(forwardVector, action.X);
+	character->AddMovementInput(rightVector, action.Y);
 
 	if (character->isAim)
 	{
