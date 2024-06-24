@@ -35,6 +35,7 @@ public:
 
 	// Called when the game starts or when spawned
 	virtual void PostLogin(APlayerController* newPlayer) override;
+	virtual void Logout(AController* Exiting) override;
 	virtual void StartPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 

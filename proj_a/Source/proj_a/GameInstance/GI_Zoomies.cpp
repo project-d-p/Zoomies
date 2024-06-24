@@ -1,8 +1,32 @@
 #include "GI_Zoomies.h"
+
+#include "DPPlayerController.h"
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
 #include "steam_api.h"
+#include "Kismet/GameplayStatics.h"
 #include "Online/OnlineSessionNames.h"
+
+void UGI_Zoomies::OnHostDisconnected()
+{
+	if (ADPPlayerController* PC = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController()))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Destroying PlayerController"));
+		PC->ReleaseMemory();
+		PC->Destroy();
+	}
+	UGameplayStatics::OpenLevel(GetWorld(), FName("lobbyLevel?closed"));
+}
+
+void UGI_Zoomies::HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type Arg,
+                                       const FString& String)
+{
+	if (Arg == ENetworkFailure::ConnectionLost || Arg == ENetworkFailure::ConnectionTimeout)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Network failure In HandleNetworkFailure: %s"), *String);
+		OnHostDisconnected();
+	}
+}
 
 void UGI_Zoomies::Init()
 {
@@ -23,6 +47,9 @@ void UGI_Zoomies::Init()
 			Log,
 			TEXT("Current Online Subsystem: %s"),
 			*online_subsystem_->GetSubsystemName().ToString());
+		
+		dh_on_destroy_complete = session_interface_->AddOnDestroySessionCompleteDelegate_Handle(
+				FOnDestroySessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onDestroySessionComplete));
 	}
 
 	// Initialize Steam API
@@ -38,6 +65,11 @@ void UGI_Zoomies::Init()
 	else
 	{
 		UE_LOG(LogTemp, Log, TEXT("STEAM INIT FAILED"));
+	}
+
+	if (GEngine)
+	{
+		GEngine->OnNetworkFailure().AddUObject(this, &UGI_Zoomies::HandleNetworkFailure);
 	}
 }
 
@@ -195,5 +227,15 @@ void UGI_Zoomies::onJoinComplete(FName session_name, EOnJoinSessionCompleteResul
 		{
 			UE_LOG(LogTemp, Error, TEXT("Failed to get travel URL"));
 		}
+	}
+}
+
+void UGI_Zoomies::onDestroySessionComplete(FName session_name, bool bWasSuccessful)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Session %s was destroyed. Success: %s"), *session_name.ToString(), bWasSuccessful ? TEXT("true") : TEXT("false"))
+	
+	if (bWasSuccessful)
+	{
+		OnHostDisconnected();
 	}
 }

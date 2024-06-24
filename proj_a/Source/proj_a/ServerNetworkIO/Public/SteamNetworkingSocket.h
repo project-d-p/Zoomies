@@ -34,6 +34,7 @@ protected:
 private:
 	void RecieveMessages();
 	void FlushSendMessages();
+	void Stop();
 
 private:
 	enum { MAX_CLIENTS = 1 };
@@ -47,6 +48,7 @@ private:
 	FRunnableThread* this_thread_ = nullptr;
 	bool b_is_game_stated = false;
 	int num_clients_ = 0;
+	bool bStop = false;
 	
 	SteamNetworkingIPAddr local_address_;
 };

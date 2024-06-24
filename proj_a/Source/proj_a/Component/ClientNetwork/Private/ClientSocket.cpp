@@ -50,26 +50,61 @@ void UClientSocket::AsyncSendPacket(const Message& msg)
 
 uint32 UClientSocket::Run()
 {
-	while (true)
+	while (!bStop)
 	{
-		// SteamAPI_RunCallbacks();
+		SteamAPI_RunCallbacks();
+		if (connection_ == k_HSteamNetConnection_Invalid)
+		{
+			return 0;
+		}
 		this->HandleRecieveMessages();
 		this->HandleSendMessages();
+		FPlatformProcess::Sleep(0.01f); // 작은 딜레이 추가
 	}
+	return 0;
 }
 
-UClientSocket::~UClientSocket()
+void UClientSocket::Stop()
 {
+	bStop = true;
+}
+
+void UClientSocket::DestoryInstance()
+{
+	Stop();
 	if (this_thread_)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Client Socket Thread is being destroyed"));
 		this_thread_->Kill(true);
+		this_thread_->WaitForCompletion();
 		delete this_thread_;
 		this_thread_ = nullptr;
 	}
 	if (connection_ != k_HSteamNetConnection_Invalid)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Closing Connection"));
 		SteamNetworkingSockets()->CloseConnection(connection_, 0, nullptr, false);
 	}
+	UE_LOG(LogTemp, Warning, TEXT("Client Socket is being destroyed itself"));
+}
+
+UClientSocket::~UClientSocket()
+{
+	this->UClientSocket::Stop();
+	if (this_thread_)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Client Socket Thread is being destroyed"));
+		this_thread_->Kill(true);
+		this_thread_->WaitForCompletion();
+		delete this_thread_;
+		this_thread_ = nullptr;
+	}
+	if (connection_ != k_HSteamNetConnection_Invalid)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Closing Connection"));
+		SteamNetworkingSockets()->CloseConnection(connection_, 0, nullptr, false);
+	}
+	UE_LOG(LogTemp, Warning, TEXT("Client Socket is being destroyed"));
 }
 
 void UClientSocket::HandleRecieveMessages()
@@ -113,5 +148,25 @@ void UClientSocket::HandleSendMessages()
 		SteamNetworkingSockets()->SendMessageToConnection(connection_, data.GetData(), data.Num(), k_nSteamNetworkingSend_Unreliable, nullptr);
 		send_buffer.pop();
 		data.SetNumZeroed(data.Num());
+	}
+}
+
+void UClientSocket::OnSteamNetConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t* info)
+{
+	switch (info->m_info.m_eState)
+	{
+	case k_ESteamNetworkingConnectionState_Connecting:
+		break ;
+	case k_ESteamNetworkingConnectionState_Connected:
+		break ;
+	case k_ESteamNetworkingConnectionState_ClosedByPeer:
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Closed By Peer: %s"), UTF8_TO_TCHAR(info->m_info.m_szEndDebug));
+		UE_LOG(LogTemp, Error, TEXT("Connection closed by peer. Reason: %d, Info: %hs"), info->m_info.m_eEndReason, UTF8_TO_TCHAR(info->m_info.m_szEndDebug));
+	case k_ESteamNetworkingConnectionState_ProblemDetectedLocally:
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Client Disconnected"));
+		SteamNetworkingSockets()->CloseConnection(connection_, 0, nullptr, false);
+		break ;
+	default:
+		break;
 	}
 }

@@ -40,11 +40,11 @@ void FMessageHandler::HandleMessage(const Message& Msg)
 	const FMessageDelegate* foundDelegate = MessageHandlers.Find(Msg.message_type_case());
 	if (foundDelegate)
 	{
-		UE_LOG(LogNetwork, Warning, TEXT("Found message type: %d"), Msg.message_type_case());
+		// UE_LOG(LogNetwork, Warning, TEXT("Found message type: %d"), Msg.message_type_case());
 		(void)foundDelegate->ExecuteIfBound(Msg);
 	}
 	else
 	{
-		UE_LOG(LogNetwork, Warning, TEXT("Unknown message type received: %s"), *FString(Msg.DebugString().c_str()));
+		// UE_LOG(LogNetwork, Warning, TEXT("Unknown message type received: %s"), *FString(Msg.DebugString().c_str()));
 	}
 }

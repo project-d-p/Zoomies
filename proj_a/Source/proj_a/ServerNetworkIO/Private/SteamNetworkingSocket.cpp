@@ -31,18 +31,36 @@ SteamNetworkingSocket::SteamNetworkingSocket()
 
 SteamNetworkingSocket::~SteamNetworkingSocket()
 {
-	SteamNetworkingSockets()->DestroyPollGroup(poll_group_);
-	SteamNetworkingSockets()->CloseListenSocket(steam_listen_socket_);
+	this->SteamNetworkingSocket::Stop();
+	if (this_thread_ != nullptr)
+	{
+		this_thread_->Kill(true);
+		this_thread_->WaitForCompletion();
+		delete this_thread_;
+		this_thread_ = nullptr;
+	}
+	for (auto& conn : steam_connections_)
+	{
+		SteamNetworkingSockets()->CloseConnection(conn, 0, nullptr, false);
+	}
+	if (steam_listen_socket_ != k_HSteamListenSocket_Invalid)
+	{
+		SteamNetworkingSockets()->CloseListenSocket(steam_listen_socket_);
+	}
+	if (poll_group_ != k_HSteamNetPollGroup_Invalid)
+		SteamNetworkingSockets()->DestroyPollGroup(poll_group_);
 }
 
 uint32 SteamNetworkingSocket::Run()
 {
-	while (true)
+	while (!bStop)
 	{
 		SteamAPI_RunCallbacks();
 		this->RecieveMessages();
 		this->FlushSendMessages();
+		FPlatformProcess::Sleep(0.01);
 	}
+	return 0;
 }
 
 void SteamNetworkingSocket::RecieveMessages()
@@ -90,6 +108,11 @@ void SteamNetworkingSocket::FlushSendMessages()
 		send_buffer.pop();
 		data.SetNumZeroed(data.Num());
 	}
+}
+
+void SteamNetworkingSocket::Stop()
+{
+	bStop = true;
 }
 
 std::queue<Message> SteamNetworkingSocket::GetReadBuffer()

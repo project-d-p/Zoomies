@@ -13,6 +13,8 @@ class PROJ_A_API UGI_Zoomies : public UGameInstance
 {
 	GENERATED_BODY()
 public:
+	void OnHostDisconnected();
+	void HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type Arg, const FString& String);
 	virtual void Init() override;
 
 	// Matching starting function
@@ -39,4 +41,6 @@ private:
 	void onCreateComplete(FName session_name, bool bWasSuccessful);
 	FDelegateHandle dh_on_create_complete;
 	FOnCreateSessionComplete on_create_complete_event;
+	void onDestroySessionComplete(FName session_name, bool bWasSuccessful);
+	FDelegateHandle dh_on_destroy_complete;
 };

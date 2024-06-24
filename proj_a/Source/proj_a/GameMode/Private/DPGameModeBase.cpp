@@ -76,6 +76,25 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 	player_controllers_[key] = Cast<ADPPlayerController>(newPlayer);
 }
 
+void ADPGameModeBase::Logout(AController* Exiting)
+{
+	Super::Logout(Exiting);
+	if (!Exiting)
+	{
+		return ;
+	}
+	ADPPlayerController* controller = Cast<ADPPlayerController>(Exiting);
+	if (!controller)
+	{
+		return ;
+	}
+	std::string key(TCHAR_TO_UTF8(*controller->PlayerState->GetPlayerName()));
+	if (player_controllers_.find(key) != player_controllers_.end())
+	{
+		player_controllers_.erase(key);
+	}
+}
+
 void ADPGameModeBase::StartPlay()
 {
 	Super::StartPlay();

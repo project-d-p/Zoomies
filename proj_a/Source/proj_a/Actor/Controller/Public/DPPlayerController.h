@@ -38,6 +38,7 @@ public:
 	void SimulateGunFire(SteamNetworkingSocket* steam_socket);
 	
 	UPlayerScoreComp* GetScoreManagerComponent() const;
+	void ReleaseMemory();
 
 protected:
 	virtual void BeginPlay() override;

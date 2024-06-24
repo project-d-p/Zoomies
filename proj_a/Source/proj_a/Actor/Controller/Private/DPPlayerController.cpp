@@ -124,6 +124,20 @@ UPlayerScoreComp* ADPPlayerController::GetScoreManagerComponent() const
 	return Cast<ADPPlayerState>(PlayerState)->GetPlayerScoreComp();
 }
 
+void ADPPlayerController::ReleaseMemory()
+{
+	if (Socket)
+	{
+		Socket->DestoryInstance();
+		UE_LOG(LogTemp, Warning, TEXT("Release Memory"));
+		Socket->DestroyComponent();
+		UE_LOG(LogTemp, Warning, TEXT("Destroy Socket"));
+	}
+	if (ChatManager)
+	{
+		ChatManager->DestroyComponent();
+	}
+}
 
 // void ADPPlayerController::CreateSocket()
 // {
