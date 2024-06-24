@@ -6,7 +6,9 @@
 #include "GameFramework/PlayerController.h"
 #include "InputActionValue.h"
 #include "ChatManager.h"
+#include "ClientSocket.h"
 #include "message.pb.h"
+#include "SteamNetworkingSocket.h"
 #include "DoubleBuffer.h"
 #include "DPMySocket.h"
 #include "DPPlayerController.generated.h"
@@ -25,13 +27,19 @@ public:
 	void ReceiveChatMessage(const FString& SenderName, const FString& Message);
 	void InitChatManager(UChatUI* ChatUI);
 
-	void CreateSocket();
-	void Connect(FString ip, uint32 port);
+	// void CreateSocket();
+	void Connect();
 	void RunTask();
-
-	void HandleMovement(const Movement& movement);
+	
+	void HandleMovement(const Movement& movement, const float& server_delta);
+	void HandleJump(const Jump& Jump);
+	void HandleFire(const Message& fire);
+	void HandleAim(const AimState& AimState);
+	void SimulateGunFire(SteamNetworkingSocket* steam_socket);
 	
 	UPlayerScoreComp* GetScoreManagerComponent() const;
+	void ReleaseMemory();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -65,21 +73,12 @@ private:
 	UChatManager* ChatManager = nullptr;
 
 	UPROPERTY()
-	UMySocket *Socket;
+	UClientSocket* Socket = nullptr;
 
-	FTimerHandle MovementTimerHandle;
-	FTimerHandle SynchronizeHandle;
+	int gun_fire_count_ = 0;
+	std::queue<Message> gun_queue_;
 
-	FVector2D AccumulatedMovementInput;
-	FVector AccumulatedForwardInput;
-	FVector AccumulatedRightInput;
-
-	int32 MovementCount = 0;
-	int32 ServerReceivedMovementCount = 0;
-
-	void SendCompressedMovement();
-	
-	// virtual void Tick(float DeltaSeconds) override;
+	virtual void Tick(float DeltaSeconds) override;
 	
 	void Move(const FInputActionValue& value);
 	void Jump(const FInputActionValue& value);
@@ -90,9 +89,10 @@ private:
 	void AimReleased(const FInputActionValue& value);
 	void ActionCancel(const FInputActionValue& value);
 
-	void UpdatePlayer(/*DataHub result*/);
+	// void UpdatePlayer();
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	USoundBase* jumpSound;
+	std::queue<bool> aim_queue_;
 };

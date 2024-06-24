@@ -1,8 +1,7 @@
 syntax = "proto3";
 
 enum State {
-  STATE_UNSPECIFIED = 0;
-  STATE_STAND = 1;
-  STATE_RUN = 2;
-  STATE_SIT = 3;
+  STATE_None = 0;
+  STATE_Walking = 1;
+  STATE_Falling = 2;
 }

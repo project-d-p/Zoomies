@@ -38,11 +38,7 @@ void ADPInGameState::OnRep_ServerTraveled() const
 {
 	UE_LOG(LogTemp, Log, TEXT("Server traveled[CLIENT]"));
 	FNetLogger::EditerLog(FColor::Green, TEXT("Server traveled[CLIENT]"));
-	// Client¡Æ¢® ¨ù??? ¢¯?¡Æ? ¡Æ¢®¢¥??
-	// FSocketManager::GetInstance().Connect("127.0.0.1", 4242);
-	// FSocketManager::GetInstance().RunTask();
 	ADPPlayerController* my_controller = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
-	my_controller->CreateSocket();
-	my_controller->Connect("127.0.0.1", 4242);
+	my_controller->Connect();
 	my_controller->RunTask();
 }

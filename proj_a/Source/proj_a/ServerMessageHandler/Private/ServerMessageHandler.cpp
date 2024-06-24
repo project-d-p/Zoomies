@@ -3,9 +3,24 @@
 
 ServerMessageHandler::ServerMessageHandler()
 {
-	message_handlers_[Message::kMovement] = FServerMessageDelegate::CreateLambda([](ADPPlayerController* player_controller, const Message& msg)
+	message_handlers_[Message::kMovement] = FServerMessageDelegate::CreateLambda([](ADPPlayerController* player_controller, const Message& msg, const float& delta)
 	{
-		player_controller->HandleMovement(msg.movement());
+		player_controller->HandleMovement(msg.movement(), delta);
+	});
+
+	message_handlers_[Message::kJump] = FServerMessageDelegate::CreateLambda([](ADPPlayerController* player_controller, const Message& msg, const float& /*delta*/)
+	{
+		player_controller->HandleJump(msg.jump());
+	});
+
+	message_handlers_[Message::kGunfire] = FServerMessageDelegate::CreateLambda([](ADPPlayerController* player_controller, const Message& msg, const float& /*delta*/)
+	{
+		player_controller->HandleFire(msg);
+	});
+
+	message_handlers_[Message::kAimState] = FServerMessageDelegate::CreateLambda([](ADPPlayerController* player_controller, const Message& msg, const float& /*delta*/)
+	{
+		player_controller->HandleAim(msg.aim_state());
 	});
 }
 

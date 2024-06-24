@@ -73,9 +73,9 @@ uint32 FUdpSendTask::Run()
 		}
 
 		Vec3* InputProgressData = ProtobufUtility::ConvertToFVecToVec3(FVector(TotalData, 0));
-		ProtoData.set_allocated_progess_vector(InputProgressData);
+		// ProtoData.set_allocated_progess_vector(InputProgressData);
 		// ProtoData.set_player_id("player1");
-		ProtoData.set_allocated_progess_vector(InputProgressData);
+		// ProtoData.set_allocated_progess_vector(InputProgressData);
 		// ProtoData.set_allocated_rotation();
 		// ProtoData.set_timestamp("4242");
 
