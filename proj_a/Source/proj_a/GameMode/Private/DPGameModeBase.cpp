@@ -5,6 +5,7 @@
 
 #include "BaseMonsterAIController.h"
 #include "BaseMonsterCharacter.h"
+#include "CrabCharacter.h"
 #include "DPCharacter.h"
 #include "DPInGameState.h"
 #include "DPPlayerController.h"
@@ -13,8 +14,12 @@
 #include "Kismet/GameplayStatics.h"
 #include "FNetLogger.h"
 #include "FoxCharacter.h"
+#include "LobstarCharacter.h"
 #include "MammothCharacter.h"
 #include "MessageMaker.h"
+#include "OctopusCharacter.h"
+#include "SlothCharacter.h"
+#include "StarFishCharacter.h"
 
 ADPGameModeBase::ADPGameModeBase()
 {
@@ -98,7 +103,11 @@ void ADPGameModeBase::StartPlay()
 void ADPGameModeBase::SpawnAndPossessAI()
 {
 	MonsterFactory->SpawnMonster(
-		AMammothCharacter::StaticClass(), FVector(1500.0f, 0.0f, 600.0f));
+		AOctopusCharacter::StaticClass(), FVector(1500.f, 0.f, 600.f));
+	MonsterFactory->SpawnMonster(
+		ASlothCharacter::StaticClass(), FVector(1000.f, 0.f, 600.f));
+	MonsterFactory->SpawnMonster(
+		AStarFishCharacter::StaticClass(), FVector(500.f, 0.f, 600.f));
 	// MonsterFactory->SpawnMonster(
 	// 	AFoxCharacter::StaticClass(), FVector(1000.0f, 0.0f, 600.0f));
 }

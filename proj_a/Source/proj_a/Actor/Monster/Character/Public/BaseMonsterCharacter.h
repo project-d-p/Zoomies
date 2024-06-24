@@ -22,9 +22,6 @@ private:
 	float MoveSpeed;
 	
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
-	UAnimMontage* characterMontage;
-	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void BeginPlay() override;
 };

@@ -1,11 +1,12 @@
-#include "MammothCharacter.h"
+#include "RabbitCharacter.h"
 
 #include "Components/CapsuleComponent.h"
 
-AMammothCharacter::AMammothCharacter()
+ARabbitCharacter::ARabbitCharacter()
 {
 	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH(TEXT("/Game/model/animals/mammoth/sm_mammoth.sm_mammoth"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH
+	(TEXT("/Game/model/animals/rabbit/low_poly_rabbit.low_poly_rabbit"));
 	if (SK_MAMMOTH.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_MAMMOTH.Object);
 	}
@@ -13,17 +14,17 @@ AMammothCharacter::AMammothCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(TEXT("/Game/animation/animals/mammothAnimation.mammothAnimation_C"));
+	(TEXT("/Game/animation/animals/rabbitAnimation.rabbitAnimation_C"));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}
 
 	/** Set the Capsule size */
-	GetCapsuleComponent()->SetCapsuleRadius(60.f);
-	GetCapsuleComponent()->SetCapsuleHalfHeight(180.f);
+	GetCapsuleComponent()->SetCapsuleRadius(90.f);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(90.f);
 	
 	/** Set the model size and adjust position */
-	GetMesh()->SetRelativeScale3D(FVector(3.00f, 3.00f, 3.00f));
+	GetMesh()->SetRelativeScale3D(FVector(1.f, 1.f, 1.f));
 	GetMesh()->SetRelativeLocationAndRotation(
-		FVector(0.f, 0.f, -172.f), FRotator(0.f, -90.f, 0.f));
+		FVector(0.f, 0.f, -87.f), FRotator(0.f, 90.f, 0.f));
 }

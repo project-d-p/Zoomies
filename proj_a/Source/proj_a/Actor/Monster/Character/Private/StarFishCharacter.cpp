@@ -1,11 +1,12 @@
-#include "MammothCharacter.h"
+#include "StarFishCharacter.h"
 
 #include "Components/CapsuleComponent.h"
 
-AMammothCharacter::AMammothCharacter()
+AStarFishCharacter::AStarFishCharacter()
 {
 	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH(TEXT("/Game/model/animals/mammoth/sm_mammoth.sm_mammoth"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH
+	(TEXT("/Game/model/animals/starFish/star_fish.star_fish"));
 	if (SK_MAMMOTH.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_MAMMOTH.Object);
 	}
@@ -13,17 +14,17 @@ AMammothCharacter::AMammothCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(TEXT("/Game/animation/animals/mammothAnimation.mammothAnimation_C"));
+	(TEXT("/Game/animation/animals/starFishAnimation.starFishAnimation_C"));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}
 
 	/** Set the Capsule size */
-	GetCapsuleComponent()->SetCapsuleRadius(60.f);
-	GetCapsuleComponent()->SetCapsuleHalfHeight(180.f);
+	GetCapsuleComponent()->SetCapsuleRadius(32.f);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(32.f);
 	
 	/** Set the model size and adjust position */
-	GetMesh()->SetRelativeScale3D(FVector(3.00f, 3.00f, 3.00f));
+	GetMesh()->SetRelativeScale3D(FVector(2.f, 2.f, 2.f));
 	GetMesh()->SetRelativeLocationAndRotation(
-		FVector(0.f, 0.f, -172.f), FRotator(0.f, -90.f, 0.f));
+		FVector(0.f, 0.f, -28.f), FRotator(0.f, -90.f, 0.f));
 }

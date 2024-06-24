@@ -1,18 +1,15 @@
 #include "BaseMonsterCharacter.h"
 
 #include "FNetLogger.h"
-#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 ABaseMonsterCharacter::ABaseMonsterCharacter()
 {
     bReplicates = true;
     PrimaryActorTick.bCanEverTick = true;
-
-	GetCapsuleComponent()->SetCapsuleRadius(0.f, false);
-	GetCapsuleComponent()->SetCapsuleHalfHeight(10.f, false);
 	
 	GetMesh()->SetCollisionProfileName(UCollisionProfile::BlockAllDynamic_ProfileName);
+	GetMesh()->SetupAttachment(RootComponent);
 	GetMesh()->SetGenerateOverlapEvents(true);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	GetMesh()->SetCollisionResponseToAllChannels(ECR_Block);
