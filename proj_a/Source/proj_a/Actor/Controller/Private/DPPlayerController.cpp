@@ -19,6 +19,7 @@
 #include "MessageMaker.h"
 #include "GameHelper.h"
 #include "Kismet/GameplayStatics.h"
+#include "state.pb.h"
 #include "Kismet/KismetMathLibrary.h"
 
 
@@ -209,6 +210,21 @@ void ADPPlayerController::BeginPlay()
 void ADPPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	if (HasAuthority())
+	{
+		return ;
+	}
+	if (PlayerState == nullptr)
+	{
+		return ;
+	}
+	if (character == nullptr)
+	{
+		return ;
+	}
+	Message msg = MessageMaker::MakePositionMessage(this);
+	Socket->AsyncSendPacket(msg);
 }
 
 void ADPPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -269,12 +285,13 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 	const FVector forwardVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
 
-	if (!HasAuthority())
-	{
-		FVector velocity = character->GetCharacterMovement()->Velocity;
-		Message message = MessageMaker::MakeMovementMessage(this, actionValue, controlRotation, velocity);
-		Socket->AsyncSendPacket(message);
-	}
+	// if (!HasAuthority())
+	// {
+	// 	FVector velocity = character->GetCharacterMovement()->Velocity;
+	// 	Message message = MessageMaker::MakeMovementMessage(this, actionValue, controlRotation, velocity);
+	// 	Socket->AsyncSendPacket(message);
+	// }
+	
 	character->AddMovementInput(forwardVector, actionValue.X);
 	character->AddMovementInput(rightVector, actionValue.Y);
 
@@ -295,10 +312,10 @@ void ADPPlayerController::Jump(const FInputActionValue& value)
 	}
 
 	Message msg = MessageMaker::MakeJumpMessage(this);
-	if (!HasAuthority())
-	{
-		Socket->AsyncSendPacket(msg);
-	}
+	// if (!HasAuthority())
+	// {
+	// 	Socket->AsyncSendPacket(msg);
+	// }
 	character->Jump();
 	UGameplayStatics::PlaySound2D(GetWorld(), jumpSound);
 }
@@ -548,3 +565,64 @@ void ADPPlayerController::HandleAim(const AimState& AimState)
 		character->StopAimAnimation();
 	}
 }
+
+void ADPPlayerController::HandlePosition(const ActorPosition& ActorPosition)
+{
+	if (!character)
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("Character is null in HandleAim"));
+		return ;
+	}
+	SetState(ActorPosition);
+	SetRotation(ActorPosition);
+	SetPosition(ActorPosition);
+}
+
+void ADPPlayerController::SetRotation(const ActorPosition& ActorPosition)
+{
+	if (character->isAim == true)
+	{
+		FRotator control_rotation = FRotator(ActorPosition.control_rotation().x(), ActorPosition.control_rotation().y(), ActorPosition.control_rotation().z());
+		FRotator final_rotation = FRotator(0, control_rotation.Yaw, 0);
+		character->SetActorRotation(final_rotation);
+	}
+	else
+	{
+		FRotator rotation = FRotator(ActorPosition.rotation().x(), ActorPosition.rotation().y(), ActorPosition.rotation().z());
+		FRotator newRotation = FRotator(0, rotation.Yaw, 0);
+		character->SetActorRotation(newRotation);
+	}
+}
+
+void ADPPlayerController::SetPosition(const ActorPosition& ActorPosition)
+{
+	FVector position = FVector(ActorPosition.position().x(), ActorPosition.position().y(), ActorPosition.position().z());
+	FVector velocity = FVector(ActorPosition.velocity().x(), ActorPosition.velocity().y(), ActorPosition.velocity().z());
+
+	FVector current_position = character->GetActorLocation();
+	FVector current_velocity = character->GetCharacterMovement()->Velocity;
+	
+	FVector interpolated_position = FMath::VInterpTo(current_position, position, GetWorld()->GetDeltaSeconds(), 10.0f);
+	FVector interpolated_velocity = FMath::VInterpTo(current_velocity, velocity, GetWorld()->GetDeltaSeconds(), 10.0f);
+	
+	character->SetActorLocation(interpolated_position);
+	character->GetCharacterMovement()->Velocity = interpolated_velocity;
+}
+
+void ADPPlayerController::SetState(const ActorPosition& ActorPosition)
+{
+	State state_ = ActorPosition.state();
+	switch (state_)
+	{
+	case State::STATE_Walking:
+		character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		break;
+	case State::STATE_Falling:
+		character->GetCharacterMovement()->SetMovementMode(MOVE_Falling);
+		break;
+	default:
+		character->GetCharacterMovement()->SetMovementMode(MOVE_None);
+		break;
+	}
+}
+

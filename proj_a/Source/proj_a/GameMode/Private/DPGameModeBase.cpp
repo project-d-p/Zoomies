@@ -163,7 +163,7 @@ void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void ADPGameModeBase::ProcessData(float delta_time)
 {
 	message_queue_ = steam_listen_socket_->GetReadBuffer();
-	this->SpawnMonsters();
+	// this->SpawnMonsters();
 	while (!this->message_queue_.empty())
 	{
 		Message message = this->message_queue_.front();

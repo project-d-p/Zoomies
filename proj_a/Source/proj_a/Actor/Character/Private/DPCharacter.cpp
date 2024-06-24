@@ -139,14 +139,14 @@ void ADPCharacter::BeginPlay()
 	}
 	bUseControllerRotationYaw = false;
 
-	if (GetLocalRole() == ROLE_AutonomousProxy)
-		GetWorldTimerManager().SetTimer(SynchronizeHandle, this, &ADPCharacter::SyncOwn, 0.2f, true);
+	// if (GetLocalRole() == ROLE_AutonomousProxy)
+	// 	GetWorldTimerManager().SetTimer(SynchronizeHandle, this, &ADPCharacter::SyncOwn, 0.2f, true);
 }
 
-void ADPCharacter::SyncOwn()
-{
-	syncer->SyncMyself(this);
-}
+// void ADPCharacter::SyncOwn()
+// {
+// 	syncer->SyncMyself(this);
+// }
 
 // Called every frame
 void ADPCharacter::Tick(float DeltaTime)
@@ -164,10 +164,6 @@ void ADPCharacter::Tick(float DeltaTime)
 		syncer->SyncWithServer(this);
 		syncer->SyncGunFire(this);
 	}
-	// if (this->GetLocalRole() == ROLE_AutonomousProxy)
-	// {
-	// 	syncer->SyncMyself(this);
-	// }
 }
 
 // Called to bind functionality to input
@@ -179,8 +175,8 @@ void ADPCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 bool ADPCharacter::IsLocallyControlled() const
 {
 	// Super::IsLocallyControlled();
-	if (HasAuthority())
-		return true;
+	// if (HasAuthority())
+	// 	return true;
 	return Super::IsLocallyControlled();
 }
 

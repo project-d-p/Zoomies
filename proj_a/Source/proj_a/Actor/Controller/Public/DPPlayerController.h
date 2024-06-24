@@ -30,11 +30,13 @@ public:
 	// void CreateSocket();
 	void Connect();
 	void RunTask();
-	
+
+	// Server Handling Message
 	void HandleMovement(const Movement& movement, const float& server_delta);
 	void HandleJump(const Jump& Jump);
 	void HandleFire(const Message& fire);
 	void HandleAim(const AimState& AimState);
+	void HandlePosition(const ActorPosition& ActorPosition);
 	void SimulateGunFire(SteamNetworkingSocket* steam_socket);
 	
 	UPlayerScoreComp* GetScoreManagerComponent() const;
@@ -88,6 +90,9 @@ private:
 	void Aim(const FInputActionValue& value);
 	void AimReleased(const FInputActionValue& value);
 	void ActionCancel(const FInputActionValue& value);
+	void SetRotation(const ActorPosition& ActorPosition);
+	void SetPosition(const ActorPosition& ActorPosition);
+	void SetState(const ActorPosition& ActorPosition);
 
 	// void UpdatePlayer();
 

@@ -18,7 +18,7 @@ public:
 	ADPCharacter();
 	
 protected:
-	void SyncOwn();
+	// void SyncOwn();
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -61,6 +61,7 @@ public:	// component
 	void PlaceConstructionAnimation();
 	void DestroyConstructionAnimation();
 	void DyingAnimation();
+	
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* springArm;
@@ -75,7 +76,7 @@ private:
 	UPROPERTY()
 	UCharacterPositionSync* syncer = nullptr;
 
-	FTimerHandle SynchronizeHandle;
+	// FTimerHandle SynchronizeHandle;
 public:
 	FVector currentVelocity{ 0.f, 0.f, 0.f };
 	UPROPERTY(BlueprintReadWrite)
