@@ -45,11 +45,11 @@ struct FScoreData
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadWrite, Category = "Score")
-	int baseScore;
+	int baseScore = 0;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Score")
-	float addMulScore;
+	float addMulScore = 0;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Score")
-	float mulMulScore;
+	float mulMulScore = 1;
 };
