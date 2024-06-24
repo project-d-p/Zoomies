@@ -153,21 +153,6 @@ void UCharacterPositionSync::SyncPosition(ADPCharacter* character)
 
 void UCharacterPositionSync::SyncOrientationWithRotation(ADPCharacter* character)
 {
-	// FVector velocity = FVector(actor_position_.velocity().x(), actor_position_.velocity().y(), actor_position_.velocity().z());
-	//
-	// if (velocity.X == 0.0f && velocity.Y == 0.0f)
-	// {
-	// 	return ;
-	// }
-	//
-	// FVector current_position = character->GetActorLocation();
-	//
-	// FVector UnitVector = velocity.GetSafeNormal();
-	// FVector LookAtTarget = current_position + UnitVector;
-	// FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(current_position, LookAtTarget);
-	//
-	// FRotator FinalRotation = FRotator(0, NewRotation.Yaw, 0);
-
 	FRotator rotation = FRotator(actor_position_.rotation().x(), actor_position_.rotation().y(), actor_position_.rotation().z());
 	FRotator final_rotation = FRotator(0, rotation.Yaw, 0);
 	character->SetActorRotation(final_rotation);
