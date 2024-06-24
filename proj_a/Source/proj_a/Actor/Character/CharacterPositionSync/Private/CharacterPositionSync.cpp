@@ -72,12 +72,12 @@ void UCharacterPositionSync::SyncWithServer(ADPCharacter* character)
 void UCharacterPositionSync::SyncMyself(ADPCharacter* character)
 {
 	player_state_ = Cast<ADPPlayerState>(character->GetPlayerState());
-	const FString PlayerId = player_state_->GetPlayerName();
-	
-	if (character->GetMovementComponent()->IsFalling())
+	if (player_state_ == nullptr)
 	{
 		return;
 	}
+	const FString PlayerId = player_state_->GetPlayerName();
+	
 	actor_position_ = FDataHub::actorPosition[PlayerId];
 	
 	FVector position = FVector(actor_position_.position().x(), actor_position_.position().y(), actor_position_.position().z());
@@ -86,14 +86,14 @@ void UCharacterPositionSync::SyncMyself(ADPCharacter* character)
 	FVector current_position = character->GetActorLocation();
 	FVector curren_velocity = character->GetCharacterMovement()->Velocity;
 	
-	float significantDifference = 50.0f;
+	float significantDifference = 100.0f;
 	float distance = FVector::Dist(position, current_position);
 	
 	if (distance > significantDifference)
 	{
 		FNetLogger::EditerLog(FColor::Red, TEXT("Distance is too far, Syncing position."));
-		// this->SyncPosition(character);
-		character->SetActorLocation(position);
+		this->SyncPosition(character);
+		// character->SetActorLocation(position);
 	}
 }
 

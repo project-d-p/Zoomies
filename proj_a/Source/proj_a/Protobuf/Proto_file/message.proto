@@ -5,6 +5,7 @@ import "jump.proto";
 import "gunfire.proto";
 import "aimstate.proto";
 import "actor_position.proto";
+import "monster_position.proto";
 
 message Message {
   string player_id = 1;
@@ -14,6 +15,7 @@ message Message {
     Jump jump = 4;
     Gunfire gunfire = 5;
     AimState aim_state = 6;
+    MonsterPositionList monster_position = 7;
   }
-  string timestamp = 7;
+  string timestamp = 8;
 }

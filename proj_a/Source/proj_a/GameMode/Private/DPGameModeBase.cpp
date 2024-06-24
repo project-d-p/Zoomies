@@ -15,6 +15,9 @@
 #include "FNetLogger.h"
 #include "isteamnetworkingsockets.h"
 #include "MessageMaker.h"
+#include "OctopusCharacter.h"
+#include "SlothCharacter.h"
+#include "StarFishCharacter.h"
 
 ADPGameModeBase::ADPGameModeBase()
 {
@@ -29,6 +32,7 @@ ADPGameModeBase::ADPGameModeBase()
 	MonsterFactory = CreateDefaultSubobject<UMonsterFactory>(TEXT("MonsterFactory"));
 
 	PrimaryActorTick.bCanEverTick = true;
+	monster_controllers_.resize(NUM_OF_MAX_MONSTERS, nullptr);
 	// PrimaryActorTick.TickInterval = 0.01f;
 	bReplicates = true;
 }
@@ -159,6 +163,7 @@ void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void ADPGameModeBase::ProcessData(float delta_time)
 {
 	message_queue_ = steam_listen_socket_->GetReadBuffer();
+	this->SpawnMonsters();
 	while (!this->message_queue_.empty())
 	{
 		Message message = this->message_queue_.front();
@@ -169,6 +174,20 @@ void ADPGameModeBase::ProcessData(float delta_time)
 	this->SyncHostAiming();
 	this->SimulateGunFire();
 	this->SyncMovement();
+	this->SyncMonsterMovement();
+}
+
+void ADPGameModeBase::SpawnMonsters()
+{
+	for (int i = 0; i < NUM_OF_MAX_MONSTERS; i++)
+	{
+		if (monster_controllers_[i] == nullptr)
+		{
+			// Random Spawn
+			monster_controllers_[i] = MonsterFactory->SpawnMonster(
+				ACrabCharacter::StaticClass(), FVector(0.f, 0.f, 600.f));
+		}
+	}
 }
 
 ADPGameModeBase::~ADPGameModeBase()
@@ -208,4 +227,21 @@ void ADPGameModeBase::SyncHostAiming()
 		Message msg = MessageMaker::MakeAimMessage(host_controller, aim_state);
 		steam_listen_socket_->PushUdpFlushMessage(msg);
 	}
+}
+
+void ADPGameModeBase::SyncMonsterMovement()
+{
+	MonsterPositionList msg_list;
+	for (int i = 0; i < NUM_OF_MAX_MONSTERS; i++)
+	{
+		if (monster_controllers_[i] == nullptr)
+		{
+			continue;
+		}
+		MonsterPosition msg = MessageMaker::MakeMonsterPositionMessage(monster_controllers_[i]);
+		msg_list.add_monster_positions()->CopyFrom(msg);
+	}
+	Message msg;
+	*msg.mutable_monster_position() = msg_list;
+	steam_listen_socket_->PushUdpFlushMessage(msg);
 }

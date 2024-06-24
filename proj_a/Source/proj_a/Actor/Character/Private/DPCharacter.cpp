@@ -140,7 +140,7 @@ void ADPCharacter::BeginPlay()
 	bUseControllerRotationYaw = false;
 
 	if (GetLocalRole() == ROLE_AutonomousProxy)
-		GetWorldTimerManager().SetTimer(SynchronizeHandle, this, &ADPCharacter::SyncOwn, 5.00f, true);
+		GetWorldTimerManager().SetTimer(SynchronizeHandle, this, &ADPCharacter::SyncOwn, 0.2f, true);
 }
 
 void ADPCharacter::SyncOwn()
@@ -159,12 +159,15 @@ void ADPCharacter::Tick(float DeltaTime)
 	}
 	else
 		UE_LOG(LogTemp, Warning, TEXT("null GetCharacterMovement"));
-
 	if (this->GetLocalRole() == ROLE_SimulatedProxy)
 	{
 		syncer->SyncWithServer(this);
 		syncer->SyncGunFire(this);
 	}
+	// if (this->GetLocalRole() == ROLE_AutonomousProxy)
+	// {
+	// 	syncer->SyncMyself(this);
+	// }
 }
 
 // Called to bind functionality to input

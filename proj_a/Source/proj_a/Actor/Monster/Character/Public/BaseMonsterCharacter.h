@@ -24,4 +24,6 @@ private:
 protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void BeginPlay() override;
+	void SyncPosition();
+	virtual void Tick(float DeltaTime) override;
 };

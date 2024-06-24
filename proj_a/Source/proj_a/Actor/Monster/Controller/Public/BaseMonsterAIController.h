@@ -14,10 +14,12 @@ public:
 
 	UFUNCTION()
 	UAISightComponent* GetAISightComponent() const;
+
 private:
 	UPROPERTY()
 	UAISightComponent* AISightComponent = nullptr;
 protected:
+	virtual void BeginPlay() override;
 	// virtual void OnPossess(APawn* InPawn) override;
 	// virtual void OnUnPossess() override;
 };

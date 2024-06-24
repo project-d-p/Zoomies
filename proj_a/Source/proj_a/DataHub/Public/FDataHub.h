@@ -17,6 +17,7 @@ public:
 	static TMap<ID_TYPE, Jump> jumpData;
 	static TMap<ID_TYPE, Gunfire> gunfireData;
 	static TMap<ID_TYPE, AimState> aimStateData;
+	static TMap<ID_TYPE, MonsterPosition> monsterData;
 	
 	static void PushActorDA(const Message &NewData);
 	static void PushEchoDA(const Message &NewData);
@@ -24,4 +25,5 @@ public:
 	static void RemovePlayerDA(const ID_TYPE &playerId);
 	static void PushGunfireDA(const Message& Msg);
 	static void PushAimStateDA(const Message& Msg);
+	static void PushMonsterDA(const Message& Msg);
 };

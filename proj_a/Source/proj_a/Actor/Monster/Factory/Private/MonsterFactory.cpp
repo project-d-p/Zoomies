@@ -5,13 +5,13 @@
 #include "FNetLogger.h"
 #include "GameFramework/Actor.h"
 
-void UMonsterFactory::SpawnMonster(UClass* MonsterClass, const FVector& Location)
+ABaseMonsterAIController* UMonsterFactory::SpawnMonster(UClass* MonsterClass, const FVector& Location)
 {
 	UWorld* World = GetWorld();
 	if (!World || !MonsterClass || !MonsterClass->IsChildOf(ABaseMonsterCharacter::StaticClass()))
 	{
 		FNetLogger::LogError(TEXT("Invalid parameters or class not derived from ABaseMonsterCharacter"));
-		return;
+		return nullptr;
 	}
 	
 	ABaseMonsterAIController* AIController = Cast<ABaseMonsterAIController>(
@@ -19,7 +19,7 @@ void UMonsterFactory::SpawnMonster(UClass* MonsterClass, const FVector& Location
 	if (AIController == nullptr)
 	{
 		FNetLogger::LogError(TEXT("Failed to spawn AI controller"));
-		return;
+		return nullptr;
 	}
 	
 	ABaseMonsterCharacter* SpawnedMonster = Cast<ABaseMonsterCharacter>(
@@ -28,7 +28,8 @@ void UMonsterFactory::SpawnMonster(UClass* MonsterClass, const FVector& Location
 	{
 		FNetLogger::LogError(TEXT("Failed to spawn monster character"));
 		AIController->Destroy();
-		return;
+		return nullptr;
 	}
 	AIController->Possess(SpawnedMonster);
+	return AIController;
 }

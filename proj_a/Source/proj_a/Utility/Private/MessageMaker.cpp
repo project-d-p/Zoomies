@@ -157,3 +157,31 @@ Message MessageMaker::MakeAimMessage(ADPPlayerController* controller, bool bAim)
 	*msg.mutable_aim_state() = aim_state;
 	return msg;
 }
+
+MonsterPosition MessageMaker::MakeMonsterPositionMessage(ABaseMonsterAIController* Monster_Controller)
+{
+	MonsterPosition msg;
+	if (Monster_Controller == nullptr)
+	{
+		return msg;
+	}
+	if (Monster_Controller->PlayerState == nullptr)
+	{
+		return msg;
+	}
+	msg.set_monster_id(std::to_string(Monster_Controller->PlayerState->GetPlayerId()));
+	Vec2 position;
+	position.set_x(Monster_Controller->GetPawn()->GetActorLocation().X);
+	position.set_y(Monster_Controller->GetPawn()->GetActorLocation().Y);
+	*msg.mutable_position() = position;
+	Vec2 rotation;
+	rotation.set_x(Monster_Controller->GetPawn()->GetActorRotation().Pitch);
+	rotation.set_y(Monster_Controller->GetPawn()->GetActorRotation().Yaw);
+	*msg.mutable_rotation() = rotation;
+	Vec2 velocity;
+	FVector velocity_ = Monster_Controller->GetPawn()->GetMovementComponent()->Velocity;
+	velocity.set_x(velocity_.X);
+	velocity.set_y(velocity_.Y);
+	*msg.mutable_velocity() = velocity;
+	return msg;
+}

@@ -1,5 +1,8 @@
 #pragma once
 
+#include <vector>
+
+#include "BaseMonsterAIController.h"
 #include "message.pb.h"
 #include "DPPlayerController.h"
 
@@ -11,4 +14,5 @@ public:
 	static Message MakeJumpMessage(ADPPlayerController* AdpPlayerController);
 	static Message MakeFireMessage(ADPPlayerController* Controller, const FRotator& Rotation, const FString& Target = "none");
 	static Message MakeAimMessage(ADPPlayerController* controller, bool bAim);
+	static MonsterPosition MakeMonsterPositionMessage(ABaseMonsterAIController* Monster_Controller);
 };
