@@ -41,17 +41,26 @@ private:
     UPROPERTY(VisibleAnywhere)
     USkeletalMeshComponent* foxComponent;
     UPROPERTY(VisibleAnywhere)
-    class UArrowComponent* foxArrowComponent;
+    USkeletalMeshComponent* giraffeComponent;
+
+
     UPROPERTY(VisibleAnywhere)
-    UAudioComponent* foxAudioComponent;
+    class UArrowComponent* arrowComponent;
+
+    //UPROPERTY(VisibleAnywhere)
+    //UAudioComponent* foxAudioComponent;
+
     UPROPERTY(EditAnywhere, Category = "Animation")
     UAnimSequence* foxAnim;
+    UPROPERTY(EditAnywhere, Category = "Animation")
+    UAnimSequence* giraffeAnim;
+
     UPROPERTY(VisibleAnywhere)
     class UBoxComponent* boxComponent;
 
     FVector foxForwardLocation;
     FVector initialLocation;
-    void CheckReach(/*USkeletalMeshComponent* mesh*/);
+    void CheckReach();
 
     TArray<FAnimalData> animalComponents;
 };

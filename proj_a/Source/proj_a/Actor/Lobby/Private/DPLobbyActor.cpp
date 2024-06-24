@@ -32,34 +32,65 @@ ADPLobbyActor::ADPLobbyActor()
         foxComponent->AnimationData.SavedPlayRate = 3.5f;
     }
 
-    foxArrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("arrowComponent"));
-    foxArrowComponent->SetupAttachment(foxComponent);
-    foxArrowComponent->SetRelativeLocation(FVector(0.f, 400.f, 0.f));
-    foxArrowComponent->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
-    foxArrowComponent->SetRelativeScale3D(FVector(2.5f, 2.5f, 2.5f));
+    arrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("arrowComponent"));
+    arrowComponent->SetupAttachment(foxComponent);
+    arrowComponent->SetRelativeLocation(FVector(0.f, 400.f, 0.f));
+    arrowComponent->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
+    arrowComponent->SetRelativeScale3D(FVector(2.5f, 2.5f, 2.5f));
 
-    foxAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("audioComponent"));
-    foxAudioComponent->SetupAttachment(foxComponent);
+    //foxAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("audioComponent"));
+    //foxAudioComponent->SetupAttachment(foxComponent);
 
-    static ConstructorHelpers::FObjectFinder<USoundCue> SoundCue
-    (TEXT("/Game/sounds/background/background_ingame_Cue.background_ingame_Cue"));
-    if (SoundCue.Succeeded()) {
-        foxAudioComponent->SetSound(SoundCue.Object);
-        foxAudioComponent->Play();
-    }
+    //static ConstructorHelpers::FObjectFinder<USoundCue> SoundCue
+    //(TEXT("/Game/sounds/background/background_ingame_Cue.background_ingame_Cue"));
+    //if (SoundCue.Succeeded()) {
+    //    foxAudioComponent->SetSound(SoundCue.Object);
+    //    foxAudioComponent->Play();
+    //}
 
-    static ConstructorHelpers::FObjectFinder<USoundAttenuation> AttenuationSettings
-    (TEXT("/Game/sounds/dp_animalSoundAttenuation.dp_animalSoundAttenuation"));
-    if (AttenuationSettings.Succeeded()) {
-        foxAudioComponent->AttenuationSettings = AttenuationSettings.Object;
-    }
+    //static ConstructorHelpers::FObjectFinder<USoundAttenuation> AttenuationSettings
+    //(TEXT("/Game/sounds/dp_animalSoundAttenuation.dp_animalSoundAttenuation"));
+    //if (AttenuationSettings.Succeeded()) {
+    //    foxAudioComponent->AttenuationSettings = AttenuationSettings.Object;
+    //}
 
     FAnimalData foxData;
     foxData.meshComponent = foxComponent;
-    foxData.offset = FVector(foxArrowComponent->GetForwardVector().Y, 
-        foxArrowComponent->GetForwardVector().X, 
-        foxArrowComponent->GetForwardVector().Z) * 20;
+    foxData.offset = FVector(arrowComponent->GetForwardVector().Y,
+        arrowComponent->GetForwardVector().X,
+        arrowComponent->GetForwardVector().Z) * 20;
     animalComponents.Add(foxData);
+
+    /* -------------------------- giraffe ---------------------------- */
+    giraffeComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("giraffeComponent"));
+
+    static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_GIRAFFEMESH
+    (TEXT("/Game/model/animals/giraffe/giraffe-lowpoly.giraffe-lowpoly"));
+    if (SK_GIRAFFEMESH.Succeeded()) {
+        giraffeComponent->SetSkeletalMesh(SK_GIRAFFEMESH.Object);
+        //giraffeComponent->SetRelativeScale3D(FVector(0.2f, 0.2f, 0.2f));
+        giraffeComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+    }
+
+    giraffeComponent->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+    static ConstructorHelpers::FObjectFinder<UAnimSequence> GIRAFFEANIMATION
+    (TEXT("/Game/model/animals/giraffe/Run.Run"));
+    if (GIRAFFEANIMATION.Succeeded()) {
+        giraffeAnim = GIRAFFEANIMATION.Object;
+        giraffeComponent->AnimationData.AnimToPlay = giraffeAnim;
+        //giraffeComponent->AnimationData.SavedPlayRate = 1.f;
+    }
+
+    FAnimalData giraffeData;
+    giraffeData.meshComponent = giraffeComponent;
+    giraffeData.offset = FVector(arrowComponent->GetForwardVector().Y,
+        arrowComponent->GetForwardVector().X,
+        arrowComponent->GetForwardVector().Z) * 10;
+    animalComponents.Add(giraffeData);
+
+
+
+
 
     boxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("boxComponent"));
     boxComponent->SetupAttachment(RootComponent);
@@ -93,7 +124,9 @@ void ADPLobbyActor::CheckReach()
     for (auto& animal : animalComponents) {
         if (animal.meshComponent && animal.meshComponent->GetRelativeLocation().Y > boxComponent->GetRelativeLocation().Y) {
             FVector newLocation = initialLocation;
-            newLocation.X = FMath::RandRange(-1000.f, 500.f);
+            newLocation.X = FMath::RandRange(-2000.f, 10.f);
+            if (giraffeComponent == animal.meshComponent)
+                newLocation.Z = 0.f;
             animal.meshComponent->SetRelativeLocation(newLocation);
         }
     }

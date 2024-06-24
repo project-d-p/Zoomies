@@ -57,7 +57,8 @@ ADPCharacter::ADPCharacter()
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -90.f), FRotator(0.f, 270.f, 0.f));
 	GetMesh()->SetRelativeScale3D(FVector(0.35f, 0.35f, 0.35f));
 
-	springArm->TargetArmLength = 700.0f;
+	springArm->TargetArmLength = 500.0f;
+	springArm->SetRelativeLocation(FVector(0.f, 0.f, 110.f));
 	//springArm->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
 	springArm->bUsePawnControlRotation = true;
 
