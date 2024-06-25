@@ -2,6 +2,7 @@
 
 #include "DPPlayerController.h"
 #include "PlayerScoreComp.h"
+#include "proj_a/Component/InGame/Score/Types/ScoreTypes.h"
 
 UScoreManagerComp::UScoreManagerComp()
 {
@@ -13,7 +14,7 @@ void UScoreManagerComp::BeginPlay()
 	Super::BeginPlay();
 }
 
-void UScoreManagerComp::IncreasePlayerScore(APlayerController* PlayerController, int32 ScoreAmount)
+void UScoreManagerComp::IncreasePlayerScore(APlayerController* PlayerController, const TArray<EAnimal>& Animals)
 {
 	if (PlayerController == nullptr) return;
 
@@ -24,7 +25,7 @@ void UScoreManagerComp::IncreasePlayerScore(APlayerController* PlayerController,
 	if (SM == nullptr) return;
 	
 	int32 CurrentScore = SM->PlayerScores;
-	SM->PlayerScores = CurrentScore + ScoreAmount;
+	SM->PlayerScores = CurrentScore + Animals.Num();
 
 	SM->OnRep_PlayerScores();
 }

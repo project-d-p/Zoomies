@@ -32,7 +32,7 @@ public class proj_a : ModuleRules
 		string protoFilesPath = Path.Combine(ModuleDirectory, "Protobuf", "Proto_file");
 		string generatedProtoFilesPath = Path.Combine(ModuleDirectory, "Protobuf", "Pb_File");
 		
-		System.Console.WriteLine("Compiling .proto files...");
+		// System.Console.WriteLine("Compiling .proto files...");
 		CompileProtoFiles(protocPath, protoFilesPath, generatedProtoFilesPath);
 		// XXX: 배포시에 컴파일 코드 삭제(혹은 주석 처리)
 		
@@ -41,7 +41,12 @@ public class proj_a : ModuleRules
 			"proj_a/GameState/Public",
 			"proj_a/Actor/Controller/Public",
 			"proj_a/Actor/Character/Public",
+			"proj_a/Actor/Character/CharacterPositionSync/Public",
 			"proj_a/Actor/Character/PlayerState/Public",
+			"proj_a/Actor/Monster/Character/Public",
+			"proj_a/Actor/Monster/Controller/Public",
+			"proj_a/Actor/Monster/PlayerState/Public",
+			"proj_a/Actor/Monster/Factory/Public",
 			"proj_a/Actor/Lobby/Public",
 			"proj_a/Component/Public",
 			"proj_a/Component/AnimNotify/Public",
@@ -78,12 +83,13 @@ public class proj_a : ModuleRules
 			"Sockets",
 			"Networking",
 			"UMG",
-			"OnlineSubsystemSteam",
 			"OnlineSubsystem",
 			"OnlineSubsystemUtils",
+			"OnlineSubsystemSteam",
 			"SlateCore",
+			"AIModule",
+			"NavigationSystem",
 		});
-		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
 		string SteamSDKPath = Path.Combine(ModuleDirectory, "Steam");
 		if (Directory.Exists(SteamSDKPath))

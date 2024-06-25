@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DPPlayerController.h"
 #include "GameFramework/Actor.h"
 #include "DPWeapon.generated.h"
 
@@ -22,11 +23,13 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	virtual bool SimulateAttack(ADPPlayerController* Controller, FHitResult& Result, const Message& Message);
+	virtual bool SimulateAttackByClient(ADPCharacter* Character, FHitResult& HitResult, const Gunfire& Gunfire);
 
 	class ADPCharacter* character;
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	virtual void Attack();
+	virtual bool Attack(ADPPlayerController* controller, FHitResult& result);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	int maxBullet{};

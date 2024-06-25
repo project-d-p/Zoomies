@@ -29,5 +29,5 @@ void ADPPlayerState::BeginPlay()
 // 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 //
 // 	// DOREPLIFETIME(ADPPlayerState, PlayerScoreComp);
-// 	DOREPLIFETIME(ADPPlayerState, PlayerUniqueID);
+// 	DOREPLIFETIME(ADPPlayerState, APlayerState::PlayerName);
 // }

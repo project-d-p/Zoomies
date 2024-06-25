@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "CharacterPositionSync.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "DPCharacter.generated.h"
 
 UCLASS()
@@ -16,6 +18,7 @@ public:
 	ADPCharacter();
 	
 protected:
+	void SyncOwn();
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -69,6 +72,10 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class  USceneCaptureComponent2D* sceneCapture;
 
+	UPROPERTY()
+	UCharacterPositionSync* syncer = nullptr;
+
+	FTimerHandle SynchronizeHandle;
 public:
 	FVector currentVelocity{ 0.f, 0.f, 0.f };
 	UPROPERTY(BlueprintReadWrite)

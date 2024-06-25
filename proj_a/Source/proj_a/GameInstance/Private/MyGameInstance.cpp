@@ -6,11 +6,13 @@
 #include "Interfaces/OnlineSessionInterface.h"
 #include "Online/OnlineSessionNames.h"
 #include "OnlineSessionSettings.h"
+// #include "isteamnetworkingutils.h"
 
 void UMyGameInstance::Init() {
 	Super::Init();
 
-    online_subsystem_ = IOnlineSubsystem::Get();
+    online_subsystem_ = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
+    // online_subsystem_ = IOnlineSubsystem::Get();
     if (online_subsystem_)
     {
         match_session_ = online_subsystem_->GetSessionInterface();
@@ -20,6 +22,7 @@ void UMyGameInstance::Init() {
         }
         FName SubsystemName = online_subsystem_->GetSubsystemName();
         UE_LOG(LogTemp, Log, TEXT("Current Online Subsystem: %s"), *SubsystemName.ToString());
+        FNetLogger::EditerLog(FColor::Cyan, TEXT("Online Subsystem: %s"), *SubsystemName.ToString());
     }
 
     if (SteamAPI_Init())
@@ -27,6 +30,7 @@ void UMyGameInstance::Init() {
         CSteamID steamID = SteamUser()->GetSteamID();
         FString steamUsername = UTF8_TO_TCHAR(SteamFriends()->GetPersonaName());
         UE_LOG(LogTemp, Log, TEXT("Steam ID: %llu, Username: %s"), steamID.ConvertToUint64(), *steamUsername);
+        FNetLogger::EditerLog(FColor::Cyan, TEXT("Steam ID: %llu, Username: %s"), steamID.ConvertToUint64(), *steamUsername);
     }
     else
     {
@@ -40,10 +44,11 @@ void UMyGameInstance::Init() {
         }
         else
         {
-            UE_LOG(LogTemp, Log, TEXT("Failed to load steam_appid.txt"));
+            // UE_LOG(LogTemp, Log, TEXT("Failed to load steam_appid.txt"));
         }
     }
     this->desired_session_name_ = "zoomies_lobby";
+    SteamNetworkingUtils()->InitRelayNetworkAccess();
 }
 
 void UMyGameInstance::StartMatchMaking() {
