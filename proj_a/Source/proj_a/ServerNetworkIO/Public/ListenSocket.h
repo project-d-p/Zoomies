@@ -7,6 +7,7 @@
 #include "FClientHandler.h"
 #include "DoubleBuffer.h"
 #include "message.pb.h"
+#include "FUdpFlush.h"
 #include "MessageQueueFilter.h"
 #include "FUdpFlush.h"
 #include <queue>

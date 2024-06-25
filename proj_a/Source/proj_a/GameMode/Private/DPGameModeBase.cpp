@@ -15,6 +15,9 @@
 #include "FNetLogger.h"
 #include "isteamnetworkingsockets.h"
 #include "MessageMaker.h"
+#include "OctopusCharacter.h"
+#include "SlothCharacter.h"
+#include "StarFishCharacter.h"
 
 ADPGameModeBase::ADPGameModeBase()
 {

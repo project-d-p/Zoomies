@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "TimerUI.h"
 #include "ScoreUI.h"
+#include "../../../Component/InGame/Score/ScoreUiPrivate.h"
 #include "DPIngameWidget.generated.h"
 
 /**
@@ -22,12 +23,16 @@ protected:
 	UTimerUI* TimerUI = nullptr;
 	UPROPERTY()
 	UScoreUI* ScoreUI = nullptr;
+	UPROPERTY()
+	UScoreUiPrivate* ScoreUI_Private = nullptr;
 	
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* Time_Text;
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* score_Text;
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* score_Text_Private;
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* player1Score_Text;
 	UPROPERTY(meta = (BindWidget))

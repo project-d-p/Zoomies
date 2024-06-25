@@ -7,6 +7,7 @@
 #include "FNetLogger.h"
 #include "PlayerScoreComp.h"
 #include "Components/TextBlock.h"
+#include "../../../Component/InGame/Score/ScoreUiPrivate.h"
 #include "GameFramework/PlayerState.h"
 
 void UDPIngameWidget::NativeConstruct()
@@ -32,5 +33,14 @@ void UDPIngameWidget::NativeConstruct()
 		ScoreUiInitializer.Player2ScoreText = player2Score_Text;
 		ScoreUiInitializer.Player3ScoreText = player3Score_Text;
 		ScoreUI->InitScoreUi(ScoreUiInitializer);
+	}
+
+	ScoreUI_Private = NewObject<UScoreUiPrivate>(this);
+	if (ScoreUI_Private)
+	{
+		FPrivateScoreUiInitializer PrivateScoreUiInitializer;
+		PrivateScoreUiInitializer.InWorld = GetWorld();
+		PrivateScoreUiInitializer.ScoreTextPrivate = score_Text_Private;
+		ScoreUI_Private->InitScoreUiPrivate(PrivateScoreUiInitializer);
 	}
 }

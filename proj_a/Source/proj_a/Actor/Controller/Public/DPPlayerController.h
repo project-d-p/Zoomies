@@ -11,6 +11,7 @@
 #include "SteamNetworkingSocket.h"
 #include "DoubleBuffer.h"
 #include "DPMySocket.h"
+#include "proj_a/Component/InGame/Score/PrivateScoreManager.h"
 #include "DPPlayerController.generated.h"
 
 class UPlayerScoreComp;
@@ -38,8 +39,9 @@ public:
 	void SimulateGunFire(SteamNetworkingSocket* steam_socket);
 	
 	UPlayerScoreComp* GetScoreManagerComponent() const;
+	UPrivateScoreManager* GetPrivateScoreManagerComponent() const;
+	
 	void ReleaseMemory();
-
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -50,6 +52,9 @@ private:
 	class ADPCharacter* character;
 	class UDPStateActorComponent* state;
 	class UDPConstructionActorComponent* construction;
+	
+	UPROPERTY()
+	UPrivateScoreManager* PrivateScoreManager;
 
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputMappingContext* defaultContext;
