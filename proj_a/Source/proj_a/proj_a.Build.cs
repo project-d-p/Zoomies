@@ -33,7 +33,7 @@ public class proj_a : ModuleRules
 		string generatedProtoFilesPath = Path.Combine(ModuleDirectory, "Protobuf", "Pb_File");
 		
 		// System.Console.WriteLine("Compiling .proto files...");
-		// CompileProtoFiles(protocPath, protoFilesPath, generatedProtoFilesPath);
+		CompileProtoFiles(protocPath, protoFilesPath, generatedProtoFilesPath);
 		// XXX: 배포시에 컴파일 코드 삭제(혹은 주석 처리)
 		
 		PublicIncludePaths.AddRange(new string[] {
