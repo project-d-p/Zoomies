@@ -2,6 +2,8 @@
 
 
 #include "DPWeapon.h"
+
+#include "DPPlayerController.h"
 //#include "DPCharacter.h"
 
 // Sets default values
@@ -26,8 +28,19 @@ void ADPWeapon::Tick(float DeltaTime)
 
 }
 
-void ADPWeapon::Attack()
+bool ADPWeapon::SimulateAttack(ADPPlayerController* Controller, FHitResult& Result, const Message& Message)
+{
+	return false;
+}
+
+bool ADPWeapon::SimulateAttackByClient(ADPCharacter* Character, FHitResult& HitResult, const Gunfire& Gunfire)
+{
+	return false;
+}
+
+bool ADPWeapon::Attack(ADPPlayerController* controller, FHitResult& result)
 {
 	UE_LOG(LogTemp, Warning, TEXT("attack weapon"));
+	return false;
 }
 

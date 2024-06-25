@@ -17,5 +17,7 @@ class PROJ_A_API ADPWeaponGun : public ADPWeapon
 public:
 	ADPWeaponGun();
 
-	virtual void Attack() override;
+	virtual bool Attack(ADPPlayerController* controller, FHitResult& result) override;
+	virtual bool SimulateAttack(ADPPlayerController* Controller, FHitResult& Result, const Message& Message);
+	virtual bool SimulateAttackByClient(ADPCharacter* Character, FHitResult& HitResult, const Gunfire& Gunfire);
 };

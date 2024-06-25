@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+import "vector.proto";
+
+message Gunfire {
+  uint32 gunfire_event = 1;
+  Vec3 position = 2;
+  Vec3 direction = 3;
+  string target = 4;
+}
