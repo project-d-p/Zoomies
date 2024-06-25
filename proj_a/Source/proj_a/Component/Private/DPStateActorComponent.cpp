@@ -17,6 +17,7 @@ void UDPStateActorComponent::BeginPlay()
 	Super::BeginPlay();
 
 	characterState = "IDLE";
+	equipmentState = "GUN";
 }
 
 

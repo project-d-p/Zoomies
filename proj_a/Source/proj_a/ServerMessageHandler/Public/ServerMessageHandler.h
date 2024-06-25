@@ -7,7 +7,7 @@
 
 class ADPPlayerController;
 
-DECLARE_DELEGATE_TwoParams(FServerMessageDelegate, ADPPlayerController*, const Message&);
+DECLARE_DELEGATE_ThreeParams(FServerMessageDelegate, ADPPlayerController*, const Message&, const float&);
 
 class ServerMessageHandler
 {

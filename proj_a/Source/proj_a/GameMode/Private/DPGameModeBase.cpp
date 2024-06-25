@@ -2,6 +2,10 @@
 
 
 #include "DPGameModeBase.h"
+
+#include "BaseMonsterAIController.h"
+#include "BaseMonsterCharacter.h"
+#include "CrabCharacter.h"
 #include "DPCharacter.h"
 #include "DPInGameState.h"
 #include "DPPlayerController.h"
@@ -9,7 +13,11 @@
 #include "SocketManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "FNetLogger.h"
+#include "isteamnetworkingsockets.h"
 #include "MessageMaker.h"
+#include "OctopusCharacter.h"
+#include "SlothCharacter.h"
+#include "StarFishCharacter.h"
 
 ADPGameModeBase::ADPGameModeBase()
 {
@@ -21,6 +29,7 @@ ADPGameModeBase::ADPGameModeBase()
 	TimerManager = CreateDefaultSubobject<UServerTimerManager>(TEXT("TimerManager"));
 	ChatManager = CreateDefaultSubobject<UServerChatManager>(TEXT("ChatManager"));
 	ScoreManager = CreateDefaultSubobject<UScoreManagerComp>(TEXT("ScoreManager"));
+	MonsterFactory = CreateDefaultSubobject<UMonsterFactory>(TEXT("MonsterFactory"));
 
 	PrimaryActorTick.bCanEverTick = true;
 	// PrimaryActorTick.TickInterval = 0.01f;
@@ -37,13 +46,12 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 	Super::PostLogin(newPlayer);
 	try
 	{
-		if (listen_socket_ == nullptr)
+		if (steam_listen_socket_ == nullptr)
 		{
-			listen_socket_ = new FListenSocketRunnable(b_is_game_started);
+			steam_listen_socket_ = new SteamNetworkingSocket();
 			ADPInGameState* game_state_ = Cast<ADPInGameState>(GameState);
 			if (game_state_ != nullptr)
 				game_state_->bServerTraveled = true;
-			UE_LOG(LogTemp, Warning, TEXT("Server traveled[SERVER]"));
 		}
 	}
 	catch (std::exception& e)
@@ -56,17 +64,41 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 		return ;
 	}
 	
-	// Player tate
+	// Player state
 	ADPPlayerState* player_state = Cast<ADPPlayerState>(newPlayer->PlayerState);
 	if (!player_state)
 	{
 		return;
 	}
-
 	FString name = player_state->GetPlayerName();
 	FNetLogger::EditerLog(FColor::Blue, TEXT("Player name: %s"), *name);
 	std::string key(TCHAR_TO_UTF8(*name));
+	if (player_controllers_.find(key) != player_controllers_.end())
+	{
+		player_state->SetPlayerName(name + "1");
+		FNetLogger::EditerLog(FColor::Red, TEXT("Player name: %s"), *player_state->GetPlayerName());
+		key = std::string(TCHAR_TO_UTF8(*player_state->GetPlayerName()));
+	}
 	player_controllers_[key] = Cast<ADPPlayerController>(newPlayer);
+}
+
+void ADPGameModeBase::Logout(AController* Exiting)
+{
+	Super::Logout(Exiting);
+	if (!Exiting)
+	{
+		return ;
+	}
+	ADPPlayerController* controller = Cast<ADPPlayerController>(Exiting);
+	if (!controller)
+	{
+		return ;
+	}
+	std::string key(TCHAR_TO_UTF8(*controller->PlayerState->GetPlayerName()));
+	if (player_controllers_.find(key) != player_controllers_.end())
+	{
+		player_controllers_.erase(key);
+	}
 }
 
 void ADPGameModeBase::StartPlay()
@@ -84,12 +116,29 @@ void ADPGameModeBase::StartPlay()
 	UE_LOG(LogTemp, Log, TEXT("Number of Players in this Session: %d"), GetNumPlayers());
 
 	TimerManager->StartTimer(60.0f);
+
+	// For Test Method
+	SpawnAndPossessAI();
+}
+
+void ADPGameModeBase::SpawnAndPossessAI()
+{
+	MonsterFactory->SpawnMonster(
+		AOctopusCharacter::StaticClass(), FVector(1500.f, 0.f, 600.f));
+	MonsterFactory->SpawnMonster(
+		ASlothCharacter::StaticClass(), FVector(1000.f, 0.f, 600.f));
+	MonsterFactory->SpawnMonster(
+		AStarFishCharacter::StaticClass(), FVector(500.f, 0.f, 600.f));
 }
 
 void ADPGameModeBase::Tick(float delta_time)
 {
 	Super::Tick(delta_time);
-	if (b_is_game_started)
+	if (steam_listen_socket_ == nullptr)
+	{
+		return;
+	}
+	if (steam_listen_socket_->IsGameStarted())
 	{
 		this->ProcessData(delta_time);
 	}
@@ -103,37 +152,26 @@ void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 	UE_LOG(LogTemp, Warning, TEXT("Call end play."));
-	if (listen_socket_)
+	if (steam_listen_socket_)
 	{
-		delete listen_socket_;
-		listen_socket_ = nullptr;
+		delete steam_listen_socket_;
+		steam_listen_socket_ = nullptr;
 	}
 }
 
 void ADPGameModeBase::ProcessData(float delta_time)
 {
-	this->MergeMessages();
-	// FNetLogger::EditerLog(FColor::Red, TEXT("size of message queue: %d"), this->message_queue_.size());
-	if (this->message_queue_.empty())
-	{
-		return;
-	}
+	message_queue_ = steam_listen_socket_->GetReadBuffer();
 	while (!this->message_queue_.empty())
 	{
 		Message message = this->message_queue_.front();
-		// Message message = this->message_queue_.top();
 		this->message_queue_.pop();
 		ADPPlayerController* controller = this->player_controllers_[message.player_id()];
-		message_handler_.HandleMessage(message)->ExecuteIfBound(controller, message);
+		message_handler_.HandleMessage(message)->ExecuteIfBound(controller, message, delta_time);
 	}
+	this->SyncHostAiming();
+	this->SimulateGunFire();
 	this->SyncMovement();
-	listen_socket_->FlushUdpQueue();
-}
-
-void ADPGameModeBase::MergeMessages()
-{
-	UE_LOG(LogTemp, Warning, TEXT("Merge Messages."));
-	this->listen_socket_->FillMessageQueue(this->message_queue_);
 }
 
 ADPGameModeBase::~ADPGameModeBase()
@@ -144,9 +182,33 @@ void ADPGameModeBase::SyncMovement()
 {
 	for (auto& pair: player_controllers_)
 	{
-		// FNetLogger::EditerLog(FColor::Green, TEXT("player name: %s"), *FString(pair.first.c_str()));
-		// UE_LOG(LogTemp, Warning, TEXT("sender name: %s"), *FString(pair.first.c_str()));
-		// Message msg = MessageMaker::MakeMessage(pair.second);
-		// listen_socket_->PushUdpFlushMessage(msg);
+		Message msg = MessageMaker::MakePositionMessage(pair.second);
+		steam_listen_socket_->PushUdpFlushMessage(msg);
+	}
+}
+
+void ADPGameModeBase::SimulateGunFire()
+{
+	for (auto& pair: player_controllers_)
+	{
+		ADPPlayerController* controller = pair.second;
+		ADPCharacter* character = Cast<ADPCharacter>(controller->GetPawn());
+		controller->SimulateGunFire(steam_listen_socket_);
+	}
+}
+
+void ADPGameModeBase::SyncHostAiming()
+{
+	ADPPlayerController* host_controller = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (!host_controller)
+	{
+		return ;
+	}
+	while (!host_controller->aim_queue_.empty())
+	{
+		bool aim_state = host_controller->aim_queue_.front();
+		host_controller->aim_queue_.pop();
+		Message msg = MessageMaker::MakeAimMessage(host_controller, aim_state);
+		steam_listen_socket_->PushUdpFlushMessage(msg);
 	}
 }
