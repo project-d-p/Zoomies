@@ -7,6 +7,22 @@
 void UGI_Zoomies::Init()
 {
 	Super::Init();
+	
+	// Initialize Steam API
+	if (SteamAPI_Init())
+	{
+		CSteamID steam_id = SteamUser()->GetSteamID();
+		FString steam_username = UTF8_TO_TCHAR(SteamFriends()->GetPersonaName());
+		if (steam_id.IsValid() && !steam_username.IsEmpty())
+		{
+			UE_LOG(LogTemp, Log, TEXT("Steam ID: %llu, Username: %s"), steam_id.ConvertToUint64(), *steam_username);
+		}
+		// SteamNetworkingUtils()->InitRelayNetworkAccess();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("STEAM INIT FAILED"));
+	}
 
 	// Get the online subsystem
 	online_subsystem_ = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
@@ -24,20 +40,9 @@ void UGI_Zoomies::Init()
 			TEXT("Current Online Subsystem: %s"),
 			*online_subsystem_->GetSubsystemName().ToString());
 	}
-
-	// Initialize Steam API
-	if (SteamAPI_Init())
-	{
-		CSteamID steam_id = SteamUser()->GetSteamID();
-		FString steam_username = UTF8_TO_TCHAR(SteamFriends()->GetPersonaName());
-		if (steam_id.IsValid() && !steam_username.IsEmpty())
-		{
-			UE_LOG(LogTemp, Log, TEXT("Steam ID: %llu, Username: %s"), steam_id.ConvertToUint64(), *steam_username);
-		}
-	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("STEAM INIT FAILED"));
+		UE_LOG(LogTemp, Error, TEXT("Failed to get online subsystem"));
 	}
 }
 
