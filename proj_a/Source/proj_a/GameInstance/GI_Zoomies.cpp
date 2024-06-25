@@ -70,6 +70,7 @@ void UGI_Zoomies::Init()
 	{
 		GEngine->OnNetworkFailure().AddUObject(this, &UGI_Zoomies::HandleNetworkFailure);
 	}
+	SteamNetworkingUtils()->InitRelayNetworkAccess();
 }
 
 // matching session Functions

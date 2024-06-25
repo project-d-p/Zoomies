@@ -280,7 +280,7 @@ void ADPPlayerController::SetupInputComponent()
 		//	취소, 채팅 끄기 ( esc - UE 에디터에서 기본 단축키 변경 필요 )
 		EnhancedInputComponent->BindAction(cancelAction, ETriggerEvent::Triggered, this, &ADPPlayerController::ActionCancel);
 		// 포획 (f)
-		EnhancedInputComponent->BindAction(catchAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Catch);
+		EnhancedInputComponent->BindAction(catchAction, ETriggerEvent::Started, this, &ADPPlayerController::Catch);
 	}
 }
 
@@ -498,7 +498,21 @@ void ADPPlayerController::Catch(const FInputActionValue& value)
 	// RPC로 해당 정보가 동기화가 됨에 따라서 클라이언트는 해당 정보를 바탕으로 렌더링을 할 수 있음.
 	// 이 때, 해당 몬스터의 객체는 사라지지만, 해당 몬스터의 정보는 서버에 남아있어야함.
 	// 왜냐하면, 클라이언트가 잡은 몬스터의 정보를 가지고 있어야함.
+
+	// HitScan을 Util Component로 만들어서 어떤 걸로 할거냐로 지정하게 해야 할듯.
 	
+	FString target;
+	// FHitResult hit_result;
+	
+	Message msg = MessageMaker::MakeCatchMessage(this, target);
+	if (!HasAuthority())
+	{
+		Socket->AsyncSendPacket(msg);
+	}
+	else
+	{
+		catch_queue_.push(msg);
+	}
 }
 
 /*
