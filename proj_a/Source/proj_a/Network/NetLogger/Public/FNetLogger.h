@@ -3,6 +3,9 @@
 DECLARE_LOG_CATEGORY_EXTERN(LogNetwork, Log, All);
 extern DEFINE_LOG_CATEGORY(LogNetwork);
 
+DECLARE_LOG_CATEGORY_EXTERN(Monster, Log, All);
+extern DEFINE_LOG_CATEGORY(Monster);
+
 class FNetLogger {
 public:
 	static void LogError(const TCHAR* format, ...) {
