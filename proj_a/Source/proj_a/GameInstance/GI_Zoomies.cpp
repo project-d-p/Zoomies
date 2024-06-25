@@ -47,7 +47,6 @@ void UGI_Zoomies::Init()
 			Log,
 			TEXT("Current Online Subsystem: %s"),
 			*online_subsystem_->GetSubsystemName().ToString());
-		
 		dh_on_destroy_complete = session_interface_->AddOnDestroySessionCompleteDelegate_Handle(
 				FOnDestroySessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onDestroySessionComplete));
 	}

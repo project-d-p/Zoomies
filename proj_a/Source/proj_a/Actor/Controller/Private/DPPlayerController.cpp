@@ -66,6 +66,11 @@ ADPPlayerController::ADPPlayerController()
 	(TEXT("/Game/input/ia_cancel.ia_cancel"));
 	if (IA_CANCEL.Succeeded())
 		cancelAction = IA_CANCEL.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_CATCH
+	(TEXT("/Game/input/ia_catch.ia_catch"));
+	if (IA_CATCH.Succeeded())
+		catchAction = IA_CATCH.Object;
 	
 	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
 	Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
@@ -274,6 +279,8 @@ void ADPPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(aimAction, ETriggerEvent::Completed, this, &ADPPlayerController::AimReleased);
 		//	취소, 채팅 끄기 ( esc - UE 에디터에서 기본 단축키 변경 필요 )
 		EnhancedInputComponent->BindAction(cancelAction, ETriggerEvent::Triggered, this, &ADPPlayerController::ActionCancel);
+		// 포획 (f)
+		EnhancedInputComponent->BindAction(catchAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Catch);
 	}
 }
 
@@ -474,6 +481,24 @@ void ADPPlayerController::AimReleased(const FInputActionValue& value)
 void ADPPlayerController::ActionCancel(const FInputActionValue& value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("ActionCancel"));
+}
+
+void ADPPlayerController::Catch(const FInputActionValue& value)
+{
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Catch"));
+
+	// 마우스 에임으로 잡냐 마냐를 판단해야함.
+	// why? 해당 버튼을 눌렀을 때, 범위로 판단하게 되면 범위 내에 있는 모든 오브젝트를 잡게 되기 때문.
+	// 그러나 마우스 에임으로 잡을 때는 에임이 가리키는 오브젝트만 잡게됨.
+	// 그럼 유저로 하여금 본인이 해당 몬스터를 가리키고 있다라는 것을 알려줄 무언가가 필요함.
+	// 에임을 가져다 대면 몬스터가 빛나거나, 몬스터의 테두리가 빛나거나, 몬스터를 포획할거냐는 UI가 뜨게 해야 할듯.
+	
+	// 잡은 정보는 PlayerState에 업데이트가 되어서, RPC로 해당 정보를 동기화해야함.
+	// 그리고 해당 몬스터의 객체는 서버에서 사라짐.
+	// RPC로 해당 정보가 동기화가 됨에 따라서 클라이언트는 해당 정보를 바탕으로 렌더링을 할 수 있음.
+	// 이 때, 해당 몬스터의 객체는 사라지지만, 해당 몬스터의 정보는 서버에 남아있어야함.
+	// 왜냐하면, 클라이언트가 잡은 몬스터의 정보를 가지고 있어야함.
+	
 }
 
 /*

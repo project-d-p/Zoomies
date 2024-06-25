@@ -70,6 +70,8 @@ private:
 	class UInputAction* aimAction;
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* cancelAction;
+	UPROPERTY(VisibleAnywhere, Category = Input)
+	class UInputAction* catchAction;
 
 	UPROPERTY()
 	UChatManager* ChatManager = nullptr;
@@ -79,7 +81,8 @@ private:
 
 	int gun_fire_count_ = 0;
 	std::queue<Message> gun_queue_;
-
+	std::queue<Message> catch_queue_;
+	
 	virtual void Tick(float DeltaSeconds) override;
 	
 	void Move(const FInputActionValue& value);
@@ -90,6 +93,8 @@ private:
 	void Aim(const FInputActionValue& value);
 	void AimReleased(const FInputActionValue& value);
 	void ActionCancel(const FInputActionValue& value);
+	void Catch(const FInputActionValue& value);
+	
 	void SetRotation(const ActorPosition& ActorPosition);
 	void SetPosition(const ActorPosition& ActorPosition);
 	void SetState(const ActorPosition& ActorPosition);
