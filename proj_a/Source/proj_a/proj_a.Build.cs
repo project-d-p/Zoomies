@@ -89,6 +89,7 @@ public class proj_a : ModuleRules
 			"SlateCore",
 			"AIModule",
 			"NavigationSystem",
+			"Niagara"
 		});
 
 		string SteamSDKPath = Path.Combine(ModuleDirectory, "Steam");

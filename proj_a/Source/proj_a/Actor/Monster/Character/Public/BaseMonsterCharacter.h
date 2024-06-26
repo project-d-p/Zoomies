@@ -17,10 +17,15 @@ public:
 	UFUNCTION()
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	UPROPERTY(VisibleAnywhere)
+	class UArrowComponent* arrowSparkle;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "effects")
+	class UNiagaraSystem* sparkleEffect;
+
 private:
 	float MaxHp = 100.f;
 	float MoveSpeed;
-	
+
 protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void BeginPlay() override;
