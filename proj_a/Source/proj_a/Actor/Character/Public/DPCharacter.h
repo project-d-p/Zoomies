@@ -29,11 +29,6 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	// FString playerID;
-	// FVector3f pos;
-	// FVector3f orientation;
-	// FString state;
-
 	// Locally Controlled
 	virtual bool IsLocallyControlled() const override;
 
@@ -53,6 +48,9 @@ public:	// component
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
 	UAnimMontage* characterMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
+	UMaterialInstanceDynamic* dynamicMaterialInstance;
 
 	void PlayAimAnimation();
 	void StopAimAnimation();

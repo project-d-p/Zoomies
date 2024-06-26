@@ -128,6 +128,16 @@ void ADPCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (GetMesh()) {
+		UMaterialInterface* Material = GetMesh()->GetMaterial(0);
+		if (Material) {
+			dynamicMaterialInstance = UMaterialInstanceDynamic::Create(Material, this);
+			GetMesh()->SetMaterial(0, dynamicMaterialInstance);
+		}
+	}
+	if (dynamicMaterialInstance)
+		dynamicMaterialInstance->SetVectorParameterValue(FName("color"), FVector4(0.f, 0.f, 1.f, 1.f));
+
 	stateComponent->currentEquipmentState = 0;
 	hpComponent->Hp = 100.f;
 	hpComponent->IsDead = false;
