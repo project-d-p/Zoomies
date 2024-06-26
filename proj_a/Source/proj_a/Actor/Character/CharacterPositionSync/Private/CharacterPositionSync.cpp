@@ -113,7 +113,7 @@ void UCharacterPositionSync::SyncGunFire(ADPCharacter* character)
 	FDataHub::gunfireData.Remove(PlayerId);
 	FHitResult hit_result;
 	
-	if (character->weaponComponent->SimulateAttackByClient(character, hit_result, gunfire_))
+	if (character->weaponComponent->SimulateAttack(character, hit_result, gunfire_))
 	{
 		// hit success but not to do anything.
 	}

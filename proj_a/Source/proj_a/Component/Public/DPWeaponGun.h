@@ -13,11 +13,14 @@ UCLASS()
 class PROJ_A_API ADPWeaponGun : public ADPWeapon
 {
 	GENERATED_BODY()
-
+	
 public:
 	ADPWeaponGun();
 
-	virtual bool Attack(ADPPlayerController* controller, FHitResult& result) override;
-	virtual bool SimulateAttack(ADPPlayerController* Controller, FHitResult& Result, const Message& Message);
-	virtual bool SimulateAttackByClient(ADPCharacter* Character, FHitResult& HitResult, const Gunfire& Gunfire);
+	virtual bool Attack(ADPPlayerController* character, FHitResult& result) override;
+	virtual bool SimulateAttack(ADPCharacter* character, FHitResult& result, const Gunfire& gunfire) override;
+	
+protected:
+	UPROPERTY()
+	UHitScan* hitScan;
 };

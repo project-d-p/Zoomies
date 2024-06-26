@@ -216,6 +216,7 @@ void ADPPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	
 	if (HasAuthority())
 	{
 		return ;
@@ -501,10 +502,9 @@ void ADPPlayerController::Catch(const FInputActionValue& value)
 
 	// HitScan을 Util Component로 만들어서 어떤 걸로 할거냐로 지정하게 해야 할듯.
 	
-	FString target;
-	// FHitResult hit_result;
+	FHitResult hit_result;
 	
-	Message msg = MessageMaker::MakeCatchMessage(this, target);
+	Message msg = MessageMaker::MakeCatchMessage(this, hit_result);
 	if (!HasAuthority())
 	{
 		Socket->AsyncSendPacket(msg);
@@ -578,7 +578,7 @@ void ADPPlayerController::SimulateGunFire(SteamNetworkingSocket* steam_socket)
 		gun_queue_.pop();
 		FHitResult hit_result;
 		this->character->PlayFireAnimation();
-		if (character->weaponComponent->SimulateAttack(this, hit_result, fire))
+		if (character->weaponComponent->SimulateAttack(character, hit_result, fire.gunfire()))
 		{
 			// Logic for Hit Success && Damage && Score
 			FNetLogger::EditerLog(FColor::Cyan, TEXT("Player %s Attack Success[Simulate]"), *PlayerState->GetPlayerName());

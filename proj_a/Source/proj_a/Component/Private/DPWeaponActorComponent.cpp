@@ -35,10 +35,10 @@ void UDPWeaponActorComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	// ...
 }
 
-bool UDPWeaponActorComponent::SimulateAttackByClient(ADPCharacter* Character, FHitResult& HitResult, const Gunfire& Gunfire)
+bool UDPWeaponActorComponent::SimulateAttack(ADPCharacter* character, FHitResult& result, const Gunfire& gunfire)
 {
 	if (currentWeapon)
-		return currentWeapon->SimulateAttackByClient(Character, HitResult, Gunfire);
+		return currentWeapon->SimulateAttack(character, result, gunfire);
 	return false;
 }
 
@@ -68,11 +68,3 @@ bool UDPWeaponActorComponent::Attack(ADPPlayerController* controller, FHitResult
 		return currentWeapon->Attack(controller, result);
 	return false;
 }
-
-bool UDPWeaponActorComponent::SimulateAttack(ADPPlayerController* controller, FHitResult& result, Message message)
-{
-	if (currentWeapon)
-		return currentWeapon->SimulateAttack(controller, result, message);
-	return false;
-}
-

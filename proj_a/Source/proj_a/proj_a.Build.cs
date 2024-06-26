@@ -51,6 +51,7 @@ public class proj_a : ModuleRules
 			"proj_a/Component/AnimNotify/Public",
 			"proj_a/Component/InGame/Score/Public",
 			"proj_a/Component/InGame/Chat/Public",
+			"proj_a/Component/InGame/HitDetection/Public",
 			"proj_a/Component/InGame/Timer/Public",
 			"proj_a/Component/ClientNetwork/Public",
             "proj_a/Widget/Public",

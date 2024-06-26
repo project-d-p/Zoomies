@@ -186,7 +186,7 @@ MonsterPosition MessageMaker::MakeMonsterPositionMessage(ABaseMonsterAIControlle
 	return msg;
 }
 
-Message MessageMaker::MakeCatchMessage(ADPPlayerController* AdpPlayerController)
+Message MessageMaker::MakeCatchMessage(ADPPlayerController* AdpPlayerController, const FHitResult& HitResult)
 {
 	Message msg;
 	if (AdpPlayerController == nullptr)

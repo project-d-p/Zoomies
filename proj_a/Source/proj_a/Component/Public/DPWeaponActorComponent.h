@@ -26,9 +26,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	bool SimulateAttackByClient(ADPCharacter* Character, FHitResult& HitResult, const Gunfire& Gunfire);
-	bool SimulateAttack(ADPPlayerController* controller, FHitResult& result, Message message);
 
+	bool SimulateAttack(ADPCharacter* character, FHitResult& result, const Gunfire& gunfire);
 public:
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	TArray<ADPWeapon*> weapons;
