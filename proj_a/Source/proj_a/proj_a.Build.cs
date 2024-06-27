@@ -47,6 +47,7 @@ public class proj_a : ModuleRules
 			"proj_a/Actor/Monster/Controller/Public",
 			"proj_a/Actor/Monster/PlayerState/Public",
 			"proj_a/Actor/Monster/Factory/Public",
+			"proj_a/Actor/Lobby/Public",
 			"proj_a/Component/Public",
 			"proj_a/Component/AnimNotify/Public",
 			"proj_a/Component/InGame/Score/Public",
