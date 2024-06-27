@@ -111,7 +111,7 @@ Message MessageMaker::MakeJumpMessage(ADPPlayerController* Controller)
 	return msg;
 }
 
-Message MessageMaker::MakeFireMessage(ADPPlayerController* Controller,  const FRotator& Rotation, const FString& Target)
+Message MessageMaker::MakeFireMessage(ADPPlayerController* Controller, const FVector Position ,const FRotator& Rotation)
 {
 	Message msg;
 	if (Controller == nullptr)
@@ -126,16 +126,15 @@ Message MessageMaker::MakeFireMessage(ADPPlayerController* Controller,  const FR
 	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetPlayerName()));
 	Gunfire gunfire;
 	Vec3 position;
-	position.set_x(Controller->GetPawn()->GetActorLocation().X);
-	position.set_y(Controller->GetPawn()->GetActorLocation().Y);
-	position.set_z(Controller->GetPawn()->GetActorLocation().Z);
+	position.set_x(Position.X);
+	position.set_y(Position.Y);
+	position.set_z(Position.Z);
 	*gunfire.mutable_position() = position;
 	Vec3 direction;
 	direction.set_x(Rotation.Pitch);
 	direction.set_y(Rotation.Yaw);
 	direction.set_z(Rotation.Roll);
 	*gunfire.mutable_direction() = direction;
-	gunfire.set_target(TCHAR_TO_UTF8(*Target));
 	*msg.mutable_gunfire() = gunfire;
 	return msg;
 }

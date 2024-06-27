@@ -6,6 +6,7 @@
 #include "DPPlayerController.h"
 #include "GameFramework/Actor.h"
 #include "HitScan.h"
+#include "message.pb.h"
 #include "DPWeapon.generated.h"
 
 UCLASS()
@@ -26,7 +27,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	virtual bool Attack(ADPPlayerController* controller, FHitResult& result);
+	virtual bool Attack(ADPPlayerController* controller, FHitResult& result, FRotator& info);
+	
 	virtual bool SimulateAttack(ADPCharacter* character, FHitResult& result, const Gunfire& gunfire);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")

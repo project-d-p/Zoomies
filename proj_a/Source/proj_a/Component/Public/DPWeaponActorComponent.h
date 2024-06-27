@@ -7,6 +7,7 @@
 #include "DPPlayerController.h"
 #include "DPWeapon.h"
 #include "Components/ActorComponent.h"
+#include "message.pb.h"
 #include "DPWeaponActorComponent.generated.h"
 
 
@@ -39,6 +40,5 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void Equip(TSubclassOf<ADPWeapon> weaponClass);
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	bool Attack(ADPPlayerController* controller, FHitResult& result);
-
+	bool Attack(ADPPlayerController* controller, FHitResult& result, FRotator& info);
 };

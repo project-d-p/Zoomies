@@ -79,11 +79,15 @@ private:
 	UPROPERTY()
 	UClientSocket* Socket = nullptr;
 
+	UPROPERTY()
+	class UHitScan* CatchRay = nullptr;
+
 	int gun_fire_count_ = 0;
 	std::queue<Message> gun_queue_;
 	std::queue<Message> catch_queue_;
-	
+
 	virtual void Tick(float DeltaSeconds) override;
+	bool IsCatchable(FHitResult& hit_result);
 	
 	void Move(const FInputActionValue& value);
 	void Jump(const FInputActionValue& value);

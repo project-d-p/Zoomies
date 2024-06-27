@@ -20,6 +20,7 @@
 #include "GameHelper.h"
 #include "Kismet/GameplayStatics.h"
 #include "state.pb.h"
+#include "HitScan.h"
 #include "Kismet/KismetMathLibrary.h"
 
 
@@ -74,6 +75,7 @@ ADPPlayerController::ADPPlayerController()
 	
 	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
 	Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
+	CatchRay = CreateDefaultSubobject<UHitScan>(TEXT("Catch Ray"));
 
 	static ConstructorHelpers::FObjectFinder<USoundBase> SoundAsset
 	(TEXT("/Game/sounds/effect/character/jump_Cue.jump_Cue"));
@@ -216,11 +218,6 @@ void ADPPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	
-	if (HasAuthority())
-	{
-		return ;
-	}
 	if (PlayerState == nullptr)
 	{
 		return ;
@@ -229,8 +226,29 @@ void ADPPlayerController::Tick(float DeltaSeconds)
 	{
 		return ;
 	}
+	if (character->IsLocallyControlled())
+	{
+		FHitResult hit_result;
+		if (this->IsCatchable(hit_result))
+		{
+			FNetLogger::EditerLog(FColor::Cyan, TEXT("Catchable"));
+		}
+	}
+	if (HasAuthority())
+	{
+		return ;
+	}
 	Message msg = MessageMaker::MakePositionMessage(this);
 	Socket->AsyncSendPacket(msg);
+}
+
+bool ADPPlayerController::IsCatchable(FHitResult& hit_result)
+{
+	if (CatchRay->HitDetect(character, character->GetActorLocation(), this->GetControlRotation(), 300.0f, hit_result))
+	{
+		return true;
+	}
+	return false;
 }
 
 void ADPPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -342,6 +360,7 @@ void ADPPlayerController::Rotate(const FInputActionValue& value)
 	}
 }
 
+// TODO: 총 쏘는 로직 수정 필요
 void ADPPlayerController::Active(const FInputActionValue& value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Active"));
@@ -356,7 +375,15 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 		}
 		FHitResult hit_result;
 		character->PlayFireAnimation();
-		Message msg = MessageMaker::MakeFireMessage(this, GetControlRotation());
+		// 최종 발사 위치와, 방향을 알아야 함.
+		FRotator final_direction;
+		if (character->weaponComponent->Attack(this, hit_result, final_direction))
+		{
+			// Success Only Effect;
+			FNetLogger::EditerLog(FColor::Cyan, TEXT("Attack Success[Only Effect]"));
+		}
+		FVector position = character->GetActorLocation();
+		Message msg = MessageMaker::MakeFireMessage(this, position, final_direction);
 		if (!HasAuthority())
 		{
 			Socket->AsyncSendPacket(msg);
@@ -365,11 +392,6 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 		{
 			this->gun_fire_count_ += 1;
 			this->gun_queue_.push(msg);
-		}
-		if (character->weaponComponent->Attack(this, hit_result))
-		{
-			// Success Only Effect;
-			FNetLogger::EditerLog(FColor::Cyan, TEXT("Attack Success[Only Effect]"));
 		}
 	}
 	// if ("WALL" == state->equipmentState) {

@@ -10,7 +10,7 @@ class UHitScan : public UActorComponent
 {
 	GENERATED_BODY()
 public:
-	bool HitDetect(const ADPCharacter* controller, const FVector& start, const FRotator& direction, const float& distance, FHitResult&
+	bool HitDetect(const ADPCharacter* character, const FVector& start, const FRotator& direction, const float& distance, FHitResult&
 	               result);
 	virtual ~UHitScan() override;
 };

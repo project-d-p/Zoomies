@@ -62,9 +62,9 @@ void UDPWeaponActorComponent::Equip(TSubclassOf<ADPWeapon> weaponClass)
 	}
 }
 
-bool UDPWeaponActorComponent::Attack(ADPPlayerController* controller, FHitResult& result)
+bool UDPWeaponActorComponent::Attack(ADPPlayerController* controller, FHitResult& result, FRotator& info)
 {
 	if (currentWeapon)
-		return currentWeapon->Attack(controller, result);
+		return currentWeapon->Attack(controller, result, info);
 	return false;
 }

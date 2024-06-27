@@ -7,6 +7,7 @@
 #include "DPPlayerController.h"
 #include "FNetLogger.h"
 #include "HitScan.h"
+#include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "EntitySystem/MovieSceneEntitySystemTypes.h"
 #include "GameFramework/Character.h"
@@ -17,11 +18,25 @@ ADPWeaponGun::ADPWeaponGun()
 	hitScan = CreateDefaultSubobject<UHitScan>(TEXT("HitScan"));
 }
 
-bool ADPWeaponGun::Attack(ADPPlayerController* controller, FHitResult& result)
+bool ADPWeaponGun::Attack(ADPPlayerController* controller, FHitResult& result, FRotator& info)
 {
-	const FVector start = controller->GetCharacter()->GetActorLocation();
+	const FVector start_aim_pos = controller->GetCharacter()->FindComponentByClass<UCameraComponent>()->GetComponentLocation();
 	const FRotator aim_direction = controller->GetControlRotation();
-	return hitScan->HitDetect(Cast<ADPCharacter>(controller->GetCharacter()), start, aim_direction, 100000000.f, result);
+
+	FVector impact_point;
+	if (hitScan->HitDetect(Cast<ADPCharacter>(controller->GetCharacter()), start_aim_pos, aim_direction, 100000000.f, result))
+	{
+		impact_point = result.ImpactPoint;
+	}
+	else
+	{
+		impact_point = start_aim_pos + aim_direction.Vector() * 100000000.f;
+	}
+	FVector muzzle_direction = impact_point - controller->GetCharacter()->GetActorLocation();
+	FVector normalized_muzzle_direction = muzzle_direction.GetSafeNormal();
+	info = normalized_muzzle_direction.Rotation();
+	const FVector muzzle_location = controller->GetCharacter()->GetActorLocation();
+	return hitScan->HitDetect(Cast<ADPCharacter>(controller->GetCharacter()), muzzle_location, normalized_muzzle_direction.Rotation(), 100000000.f, result);
 }
 
 bool ADPWeaponGun::SimulateAttack(ADPCharacter* character, FHitResult& result, const Gunfire& gunfire)

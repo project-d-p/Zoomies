@@ -28,7 +28,7 @@ void ADPWeapon::Tick(float DeltaTime)
 
 }
 
-bool ADPWeapon::Attack(ADPPlayerController* controller, FHitResult& result)
+bool ADPWeapon::Attack(ADPPlayerController* controller, FHitResult& result, FRotator& info)
 {
 	UE_LOG(LogTemp, Warning, TEXT("attack weapon"));
 	return false;
