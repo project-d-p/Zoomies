@@ -100,15 +100,11 @@ void AGM_MatchingLobby::CheckAndUpdateLobbyPlatform()
 {
 	if (!bIsLobbyPlatformReady)
 	{
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, TEXT("Timer Called"));
-		}
 		GetWorldTimerManager().SetTimer(
 			UnusedHandle,
 			this, &AGM_MatchingLobby::CheckAndUpdateLobbyPlatform,
 			0.01f,
-			true);
+			false);
 	}
 	else
 	{

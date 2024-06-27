@@ -15,19 +15,19 @@ struct FLobbyInfo
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadWrite, Category = "LobbyInfo")
-	bool bIsReady;
+	bool bIsReady = false;
 
 	UPROPERTY(BlueprintReadWrite, Category = "LobbyInfo")
-	FString Name;
+	FString Name = "test";
 
 	UPROPERTY(BlueprintReadWrite, Category = "LobbyInfo")
-	int64 Avatar;
+	int64 Avatar = 1;
 	
 	UPROPERTY(BlueprintReadWrite, Category = "LobbyInfo")
-	APC_MatchingLobby *PC;
+	APC_MatchingLobby *PC = nullptr;
 	
 	UPROPERTY(BlueprintReadWrite, Category = "LobbyInfo")
-	APS_MatchingLobby *PS;
+	APS_MatchingLobby *PS = nullptr;
 };
 
 UCLASS()

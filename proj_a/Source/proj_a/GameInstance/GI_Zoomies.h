@@ -43,4 +43,13 @@ private:
 	FOnCreateSessionComplete on_create_complete_event;
 	void onDestroySessionComplete(FName session_name, bool bWasSuccessful);
 	FDelegateHandle dh_on_destroy_complete;
+
+	int count = 0;
+	int max_count = 5;
+	bool is_steamAPI_init = false;
+	bool is_online_session_steam_init =false;
+	FTimerHandle UnusedHandle;
+	void CheckSteamInit();
+	void InitSteamAPI();
+	void InitOnlineSubsystemSteam();
 };
