@@ -19,9 +19,6 @@ struct FLobbyInfo
 
 	UPROPERTY(BlueprintReadWrite, Category = "LobbyInfo")
 	FString Name = "test";
-
-	UPROPERTY(BlueprintReadWrite, Category = "LobbyInfo")
-	int64 Avatar = 1;
 	
 	UPROPERTY(BlueprintReadWrite, Category = "LobbyInfo")
 	APC_MatchingLobby *PC = nullptr;

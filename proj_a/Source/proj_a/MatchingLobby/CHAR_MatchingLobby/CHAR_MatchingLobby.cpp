@@ -74,7 +74,7 @@ ACHAR_MatchingLobby::ACHAR_MatchingLobby()
 	LobbyInfoWidgetComponent->SetVisibility(true);
 	LobbyInfoWidgetComponent->SetWidgetSpace( EWidgetSpace::World);
 	LobbyInfoWidgetComponent->SetupAttachment(GetMesh());
-	LobbyInfoWidgetComponent->SetRelativeLocation(FVector(0, 0, 620));
+	LobbyInfoWidgetComponent->SetRelativeLocation(FVector(0, 0, 650));
 	LobbyInfoWidgetComponent->SetRelativeScale3D(FVector(1.4f, 1.4f, 1.4f));
 	LobbyInfoWidgetComponent->SetDrawSize(FVector2D(260,100));
 	LobbyInfoWidgetComponent->SetRelativeRotation(FRotator(-180, -90, 180));

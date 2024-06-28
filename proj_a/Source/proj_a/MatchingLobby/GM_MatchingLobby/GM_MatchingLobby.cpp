@@ -3,6 +3,7 @@
 #include "DPCharacter.h"
 #include "isteamfriends.h"
 #include "isteamuser.h"
+#include "isteamutils.h"
 #include "steamclientpublic.h"
 #include "GameFramework/PlayerState.h"
 #include "proj_a/MatchingLobby/GS_MachingLobby/GS_MatchingLobby.h"
