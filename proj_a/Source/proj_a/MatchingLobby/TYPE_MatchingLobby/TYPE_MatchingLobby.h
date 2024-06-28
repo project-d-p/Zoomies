@@ -7,7 +7,7 @@
 #include "proj_a/MatchingLobby/PS_MatchingLobby/PS_MatchingLobby.h"
 #include "TYPE_MatchingLobby.generated.h"
 
-#define MAX_USERS 2
+#define MAX_USERS 3
 
 USTRUCT(BlueprintType)
 struct FLobbyInfo

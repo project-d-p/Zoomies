@@ -1,6 +1,9 @@
 #include "GM_MatchingLobby.h"
 
 #include "DPCharacter.h"
+#include "isteamfriends.h"
+#include "isteamuser.h"
+#include "steamclientpublic.h"
 #include "GameFramework/PlayerState.h"
 #include "proj_a/MatchingLobby/GS_MachingLobby/GS_MatchingLobby.h"
 #include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
@@ -21,17 +24,13 @@ void AGM_MatchingLobby::PostLogin(APlayerController* NewPlayer) {
 	if (GS->HostPlayerIndex == -1)
 	{
 		GS->HostPlayerIndex = NewPlayer->PlayerState->GetPlayerId();
-		
 	}
-	//Add the player to the list of players
 	PCs.Add(NewPlayer);
-	//Set the camera view for the player
-	APC_MatchingLobby* PC = Cast<APC_MatchingLobby>(NewPlayer);
-	if (PC)
+	
+	if (APC_MatchingLobby* PC = Cast<APC_MatchingLobby>(NewPlayer))
 	{
 		PC->SetCineCameraView();
 	}
-	//Update the lobby platform
 	CheckAndUpdateLobbyPlatform();
 }
 
@@ -108,15 +107,7 @@ void AGM_MatchingLobby::CheckAndUpdateLobbyPlatform()
 	}
 	else
 	{
-		// Clear the timer when the lobby platforms are ready
 		GetWorldTimerManager().ClearTimer(UnusedHandle);
-
-		// Log on screen platform ready
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Lobby Platforms are ready"));
-		}
-
 		UpdatePlayerOnPlatform();
 	}
 }
@@ -126,6 +117,8 @@ void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 	for (int32 i = 0; i < PCs.Num(); i++)
 	{
 		bool bIsPlayerOnPlatform = false;
+		
+		//check player is already on platform
 		if (LobbyPlatforms.IsValidIndex(i))
 		{
 			for (int32 j = 0; j < LobbyPlatforms.Num(); j++)
@@ -135,36 +128,31 @@ void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 					if (PCs[i] == LobbyPlatforms[j]->PC)
 					{
 						bIsPlayerOnPlatform = true;
-						if (GEngine)
-						{
-							GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Player is on platform"));
-						}
 						break;
 					}
 				}
 			}
 		}
-		else
-		{
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("LobbyPlatforms is not valid index"));
-			}
-		}
-
+		
+		//if player is not on platform, spawn character on platform
 		if (!bIsPlayerOnPlatform)
 		{
+			//find the first available platform
 			for (int32 j = 0; j < LobbyPlatforms.Num(); j++)
 			{
 				if (LobbyPlatforms[j]->PC == nullptr)
 				{
 					LobbyPlatforms[j]->SpawnCharacter(PCs[i]);
+					//get GameState and set PlayerController to the Lobby Infos
+					if (AGS_MatchingLobby* GS = GetGameState<AGS_MatchingLobby>())
+					{
+						FString steam_username = UTF8_TO_TCHAR(SteamFriends()->GetPersonaName());
+						GS->LobbyInfos[j].Name = steam_username;
+						GS->LobbyInfos[j].PC = Cast<APC_MatchingLobby>(PCs[i]);
+						GS->LobbyInfos[j].PS = Cast<APS_MatchingLobby>(PCs[i]->PlayerState);
+						GS->UpdateLobbyInfo();
+					}
 					break;
-				}
-				else
-				{
-					if (GEngine)
-						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Platform is occupied"));
 				}
 			}
 		}
@@ -172,20 +160,12 @@ void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 
 	for (int32 i = 0; i < LobbyPlatforms.Num(); i++)
 	{
-		if (!LobbyPlatforms[i])
+		if (LobbyPlatforms[i])
 		{
-			UE_LOG(LogTemp, Warning, TEXT("LobbyPlatforms[%d] is null."), i);
-			continue;
+			if (LobbyPlatforms[i]->PC && !PCs.Contains(LobbyPlatforms[i]->PC))
+			{
+				LobbyPlatforms[i]->Clear_Platform();
+			}
 		}
-
-		if (LobbyPlatforms[i]->PC && !PCs.Contains(LobbyPlatforms[i]->PC))
-		{
-			LobbyPlatforms[i]->Clear_Platform();
-		}
-	}
-	//logging on screen successful update
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Players updated on platforms"));
 	}
 }

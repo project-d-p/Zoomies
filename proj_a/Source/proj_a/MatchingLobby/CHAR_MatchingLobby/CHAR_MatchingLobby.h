@@ -24,15 +24,17 @@ public:
 
 public:	// component
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MatchLobby")
 	class UDPWeaponActorComponent* weaponComponent;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MatchLobby", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* gun;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MatchLobby", meta = (AllowPrivateAccess = "true"))
 	class UWidgetComponent* userInfoWidget;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MatchLobby")
 	UAnimMontage* characterMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MatchLobby")
+	UWidgetComponent* LobbyInfoWidgetComponent = nullptr;
 
 	void StopAimAnimation();
 	void UpdateLobbyInfo();

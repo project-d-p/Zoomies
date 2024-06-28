@@ -26,6 +26,9 @@ public:
 	
 	UPROPERTY(VisibleAnywhere)
 	APlayerController* PC = nullptr;
+	
+	UPROPERTY(VisibleAnywhere)
+	AActor* CurrentCharacter;
 
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -38,6 +41,4 @@ private:
 	TSubclassOf<ACharacter> CharacterClass;
 
 
-	UPROPERTY(VisibleAnywhere)
-	AActor* CurrentCharacter;
 };

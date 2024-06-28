@@ -1,7 +1,11 @@
 #include "GS_MatchingLobby.h"
+
+#include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerState.h"
+#include "Kismet/GameplayStatics.h"
+#include "proj_a/MatchingLobby/CHAR_MatchingLobby/CHAR_MatchingLobby.h"
 #include "proj_a/MatchingLobby/GM_MatchingLobby/GM_MatchingLobby.h"
 
 AGS_MatchingLobby::AGS_MatchingLobby() {
@@ -20,8 +24,32 @@ void AGS_MatchingLobby::OnRep_ReadyPlayers()
 
 void AGS_MatchingLobby::OnRep_LobbyInfo()
 {
-	//need to Call Update Function on MatchLobby
+	UpdateLobbyInfo();
 }
+
+void AGS_MatchingLobby::UpdateLobbyInfo() const
+{
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACHAR_MatchingLobby::StaticClass(), FoundActors);
+	for (int32 j = 0; j < FoundActors.Num(); j++)
+	{
+		ACHAR_MatchingLobby* Character = Cast<ACHAR_MatchingLobby>(FoundActors[j]);
+		if (Character && Character->LobbyInfoWidgetComponent)
+		{
+			UUserWidget* Widget = Character->LobbyInfoWidgetComponent->GetUserWidgetObject();
+			if (Widget)
+			{
+				FString Command = FString::Printf(TEXT("Update %d"), j);
+				Widget->CallFunctionByNameWithArguments(*Command, *GLog, nullptr, true);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("&*Widget is null for Character at index %d"), j);
+			}
+		}
+	}
+}
+
 
 
 void AGS_MatchingLobby::SetPlayerReady(int32 PlayerIndex, bool bIsReady)
@@ -31,17 +59,7 @@ void AGS_MatchingLobby::SetPlayerReady(int32 PlayerIndex, bool bIsReady)
 	{
 		ReadyPlayers[PlayerOrder] = bIsReady;
 		LobbyInfos[PlayerOrder].bIsReady = bIsReady;
-		LobbyInfos[PlayerOrder].PS = Cast<APS_MatchingLobby>(GetWorld()->GetFirstPlayerController()->PlayerState);
-		LobbyInfos[PlayerOrder].PC = Cast<APC_MatchingLobby>(GetWorld()->GetFirstPlayerController());
-	}
-	// logging
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			30.f,
-			FColor::Green,
-			FString::Printf(TEXT("Player %d is %s"), PlayerIndex, bIsReady ? TEXT("Ready") : TEXT("Not Ready")));
+		UpdateLobbyInfo();
 	}
 	if (HasAuthority())
 	{

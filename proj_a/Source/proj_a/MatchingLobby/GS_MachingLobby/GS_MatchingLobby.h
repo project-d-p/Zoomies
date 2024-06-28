@@ -27,6 +27,7 @@ public:
 	
 	void FindFastestPlayer();
 	void SetHostPlayer(const APlayerState* NewHostPlayer);
+	void UpdateLobbyInfo() const;
 
 	UFUNCTION(Server, Reliable)
 	void ReportPing(APlayerState* ReportingPlayer, float AveragePing);

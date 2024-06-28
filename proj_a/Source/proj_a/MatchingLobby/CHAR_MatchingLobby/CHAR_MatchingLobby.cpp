@@ -59,7 +59,13 @@ ACHAR_MatchingLobby::ACHAR_MatchingLobby()
 	AActor::SetReplicatingMovement(false);
 	GetCharacterMovement()->Mass = 0.1f;
 
-	UWidgetComponent* LobbyInfoWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("LobbyInfoWidgetComponent"));
+	if (LobbyInfoWidgetComponent && LobbyInfoWidgetComponent->IsValidLowLevel())
+	{
+		LobbyInfoWidgetComponent->DestroyComponent();
+		LobbyInfoWidgetComponent = nullptr;
+	}
+	
+	LobbyInfoWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("LobbyInfoWidgetComponent"));
 	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClass(TEXT("/Game/widget/widget_LobbyInfo.widget_LobbyInfo_C"));
 	if (WidgetClass.Succeeded())
 	{
