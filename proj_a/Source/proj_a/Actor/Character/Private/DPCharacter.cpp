@@ -198,6 +198,8 @@ void ADPCharacter::PlayAimAnimation()
 	if (characterMontage && !isAim ) {
 		isAim = true;
 		PlayAnimMontage(characterMontage, 1.f, "aim");	UE_LOG(LogTemp, Warning, TEXT("PlayAimAnimation"));
+
+		springArm->TargetArmLength = 270.0f;
 	}
 }
 
@@ -206,6 +208,8 @@ void ADPCharacter::StopAimAnimation()
 	if (characterMontage) {
 		isAim = false;
 		StopAnimMontage(characterMontage); UE_LOG(LogTemp, Warning, TEXT("StopAimAnimation"));
+
+		springArm->TargetArmLength = 400.0f;
 	}
 }
 

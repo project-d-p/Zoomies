@@ -2,6 +2,8 @@
 
 #include "FNetLogger.h"
 #include "Components/ArrowComponent.h"
+#include "Components/SphereComponent.h"
+#include "Components/WidgetComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -32,6 +34,30 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
 		sparkleEffect = SPARKLE.Object;
 	}
 
+	GetMesh()->bRenderInDepthPass = true;
+	GetMesh()->CustomDepthStencilValue = 2;
+
+	//sphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("sphereComponent"));
+	//sphereComponent->SetupAttachment(GetMesh());
+	//sphereComponent->InitSphereRadius(400.f);
+	//sphereComponent->SetCollisionProfileName(TEXT("trigger"));
+
+	//sphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ABaseMonsterCharacter::OnSphereBeginOverlap);
+	//sphereComponent->OnComponentEndOverlap.AddDynamic(this, &ABaseMonsterCharacter::OnSphereEndOverlap);
+
+	widgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
+	widgetComponent->SetupAttachment(GetMesh());
+	widgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+	widgetComponent->SetDrawSize(FVector2D(500.f, 500.f));
+	widgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 300.f));
+	widgetComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> WIDGET
+	(TEXT("/Game/widget/widget_collect.widget_collect_C"));
+	if (WIDGET.Class != nullptr) {
+		widgetComponent->SetWidgetClass(WIDGET.Class);
+	}
+
 	/* XXX: comment for testing purposes. Restore after creating a UDP structure later. */
     // SetReplicatingMovement(false);
 }
@@ -58,6 +84,9 @@ void ABaseMonsterCharacter::BeginPlay()
 			true
 		);
 	}
+
+	if (widgetComponent)
+		widgetComponent->SetVisibility(false);
 }
 
 void ABaseMonsterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -70,3 +99,17 @@ float ABaseMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& 
 {
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
+
+//void ABaseMonsterCharacter::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+//{
+//	if (widgetComponent)
+//		widgetComponent->SetVisibility(true);
+//	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("begin overlap"));
+//	UE_LOG(LogTemp, Warning, TEXT("begin overlap"));
+//}
+//
+//void ABaseMonsterCharacter::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+//{
+//	if (widgetComponent)
+//		widgetComponent->SetVisibility(false);
+//}

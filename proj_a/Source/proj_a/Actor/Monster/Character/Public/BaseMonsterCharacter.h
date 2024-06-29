@@ -21,6 +21,10 @@ public:
 	class UArrowComponent* arrowSparkle;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "effects")
 	class UNiagaraSystem* sparkleEffect;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	//class USphereComponent* sphereComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UWidgetComponent* widgetComponent;
 
 private:
 	float MaxHp = 100.f;
@@ -29,4 +33,11 @@ private:
 protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void BeginPlay() override;
+
+//private:
+//	void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+//		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+//		bool bFromSweep, const FHitResult& SweepResult);
+//	void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+//		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };
