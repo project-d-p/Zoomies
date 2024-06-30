@@ -3,12 +3,15 @@
 
 #include "DPWeaponActorComponent.h"
 
+#include "DPCharacter.h"
 #include "DPPlayerController.h"
+#include "DPWeaponGun.h"
 #include "FNetLogger.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/PawnMovementComponent.h"
 //#include "DPWeapon.h"
 
+class ADPWeaponGun;
 // Sets default values for this component's properties
 UDPWeaponActorComponent::UDPWeaponActorComponent()
 {
@@ -24,6 +27,15 @@ void UDPWeaponActorComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	ADPCharacter* playerCharacter = Cast<ADPCharacter>(GetOwner());
+	if (playerCharacter) {
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = Cast<AActor>(playerCharacter);
+		ADPWeaponGun* WeaponGun = GetWorld()->SpawnActor<ADPWeaponGun>(ADPWeaponGun::StaticClass(), spawnParams);
+
+		if (WeaponGun)
+			WeaponGun->AttachToComponent(playerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("gunSocket"));
+	}
 }
 
 

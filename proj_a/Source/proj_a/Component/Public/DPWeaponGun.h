@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "DPWeapon.h"
+#include "Components/ArrowComponent.h"
 #include "DPWeaponGun.generated.h"
 
 /**
@@ -23,4 +24,10 @@ public:
 protected:
 	UPROPERTY()
 	UHitScan* hitScan;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UStaticMeshComponent* gunMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Muzzle")
+	UArrowComponent* muzzle;
 };

@@ -16,6 +16,20 @@ ADPWeaponGun::ADPWeaponGun()
 {
 	damage = 15.f;
 	hitScan = CreateDefaultSubobject<UHitScan>(TEXT("HitScan"));
+
+	gunMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GunMesh"));
+	RootComponent = gunMesh;
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> GUN
+	(TEXT("/Game/model/weapon/simpleGun.simpleGun"));
+	if (GUN.Succeeded()) {
+		gunMesh->SetStaticMesh(GUN.Object);
+	}
+
+	muzzle = CreateDefaultSubobject<UArrowComponent>(TEXT("Muzzle"));
+	muzzle->SetupAttachment(gunMesh);
+	muzzle->SetRelativeLocation(FVector(-30.005441, 0.000000, 4.690275));
+	muzzle->SetRelativeRotation(FRotator(0.000000, -180, 0.000000));
 }
 
 bool ADPWeaponGun::Attack(ADPPlayerController* controller, FHitResult& result, FRotator& info)
