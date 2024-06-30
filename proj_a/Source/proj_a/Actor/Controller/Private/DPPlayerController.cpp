@@ -76,6 +76,8 @@ ADPPlayerController::ADPPlayerController()
 	}
 	else
 		jumpSound = nullptr;
+
+	PrivateScoreManager = CreateDefaultSubobject<UPrivateScoreManager>(TEXT("PrivateScoreManager"));
 }
 
 void ADPPlayerController::SendChatMessageToServer(const FString& Message)
@@ -122,6 +124,11 @@ UPlayerScoreComp* ADPPlayerController::GetScoreManagerComponent() const
 		return nullptr;
 	}
 	return Cast<ADPPlayerState>(PlayerState)->GetPlayerScoreComp();
+}
+
+UPrivateScoreManager* ADPPlayerController::GetPrivateScoreManagerComponent() const
+{
+	return PrivateScoreManager;
 }
 
 void ADPPlayerController::ReleaseMemory()
