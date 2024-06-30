@@ -20,6 +20,8 @@ public:
 	// Matching starting function
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void StartMatchMaking();
+	
+	void ResetSession();
 
 private:
 	// Online subsystem & session interface pointers
@@ -41,8 +43,13 @@ private:
 	void onCreateComplete(FName session_name, bool bWasSuccessful);
 	FDelegateHandle dh_on_create_complete;
 	FOnCreateSessionComplete on_create_complete_event;
-	void onDestroySessionComplete(FName session_name, bool bWasSuccessful);
+
+	FDelegateHandle dh_on_session_failure;
+	void OnSessionFailure(const FUniqueNetId& NetId, ESessionFailure::Type FailureType);
+	
+	void OnDestroyComplete(FName session_name, bool bWasSuccessful);
 	FDelegateHandle dh_on_destroy_complete;
+	
 
 	int count = 0;
 	int max_count = 5;

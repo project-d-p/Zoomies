@@ -5,27 +5,8 @@
 #include "steam_api.h"
 #include "Kismet/GameplayStatics.h"
 #include "Online/OnlineSessionNames.h"
+#include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
 
-void UGI_Zoomies::OnHostDisconnected()
-{
-	if (ADPPlayerController* PC = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController()))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Destroying PlayerController"));
-		PC->ReleaseMemory();
-		PC->Destroy();
-	}
-	UGameplayStatics::OpenLevel(GetWorld(), FName("lobbyLevel?closed"));
-}
-
-void UGI_Zoomies::HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type Arg,
-                                       const FString& String)
-{
-	if (Arg == ENetworkFailure::ConnectionLost || Arg == ENetworkFailure::ConnectionTimeout)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Network failure In HandleNetworkFailure: %s"), *String);
-		OnHostDisconnected();
-	}
-}
 
 void UGI_Zoomies::Init()
 {
@@ -190,14 +171,18 @@ void UGI_Zoomies::onJoinComplete(FName session_name, EOnJoinSessionCompleteResul
 	}
 }
 
-void UGI_Zoomies::onDestroySessionComplete(FName session_name, bool bWasSuccessful)
+void UGI_Zoomies::OnSessionFailure(const FUniqueNetId& NetId, ESessionFailure::Type FailureType)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Session %s was destroyed. Success: %s"), *session_name.ToString(), bWasSuccessful ? TEXT("true") : TEXT("false"))
-	
-	if (bWasSuccessful)
+	UE_LOG(LogTemp, Error, TEXT("Session failure: %d"), (int32)FailureType);
+	if (GEngine)
 	{
-		OnHostDisconnected();
+		GEngine->AddOnScreenDebugMessage(
+			-1,
+			30.f,
+			FColor::Red,
+			FString::Printf(TEXT("Session failure: %d"), (int32)FailureType));
 	}
+	GetWorld()->ServerTravel(TEXT("lobbyLevel?closed"), true);
 }
 
 void UGI_Zoomies::CheckSteamInit()
@@ -276,6 +261,11 @@ void UGI_Zoomies::InitOnlineSubsystemSteam()
 						Log,
 						TEXT("Online Subsystem steam SUCCESS || SubsystemName: %s"),
 						*online_subsystem_->GetSubsystemName().ToString());
+				dh_on_session_failure = session_interface_->AddOnSessionFailureDelegate_Handle(
+					FOnSessionFailureDelegate::CreateUObject(
+						this,
+						&UGI_Zoomies::OnSessionFailure
+						));
 			}
 		}
 	}
@@ -293,3 +283,87 @@ void UGI_Zoomies::InitOnlineSubsystemSteam()
 		UE_LOG(LogTemp, Log, TEXT("Online Subsystem steam init failed"));
 	}
 }
+
+void UGI_Zoomies::ResetSession()
+{
+	if (session_interface_.IsValid())
+	{
+		if (session_interface_->GetNamedSession(NAME_GameSession) != nullptr)
+		{
+			// Register OnDestroySessionComplete delegate
+			dh_on_destroy_complete = session_interface_->AddOnDestroySessionCompleteDelegate_Handle(
+				FOnDestroySessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::OnDestroyComplete)
+			);
+
+			// Destroy the current session
+			session_interface_->DestroySession(NAME_GameSession);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("No existing session to reset"));
+		}
+	}
+}
+
+void UGI_Zoomies::OnDestroyComplete(FName session_name, bool bWasSuccessful)
+{
+	session_interface_->ClearOnDestroySessionCompleteDelegate_Handle(dh_on_destroy_complete);
+
+	if (bWasSuccessful)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Session destroyed successfully"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to destroy session"));
+	}
+}
+
+
+//작동이 되는 지 확인
+/*
+void UGI_Zoomies::OnHostDisconnected()
+{
+	//logging on screen about disconnected host and travel to lobby level
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(
+			-1,
+			30.f,
+			FColor::Red,
+			FString::Printf(TEXT("Host disconnected from the session. Returning to the lobby level.")));
+	}
+	if (ADPPlayerController* PC = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController()))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Resetting PlayerController"));
+		PC->Reset();
+	}
+	if (APC_MatchingLobby* PC = Cast<APC_MatchingLobby>(GetWorld()->GetFirstPlayerController()))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Resetting PlayerController"));
+		PC->Reset();
+	}
+	UGameplayStatics::OpenLevel(GetWorld(), FName("lobbyLevel?closed"));
+}
+
+void UGI_Zoomies::onDestroySessionComplete(FName session_name, bool bWasSuccessful)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Session %s was destroyed. Success: %s"), *session_name.ToString(), bWasSuccessful ? TEXT("true") : TEXT("false"))
+	
+	if (bWasSuccessful)
+	{
+		OnHostDisconnected();
+	}
+}
+
+void UGI_Zoomies::HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type Arg,
+                                       const FString& String)
+{
+	if (Arg == ENetworkFailure::ConnectionLost || Arg == ENetworkFailure::ConnectionTimeout)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Network failure In HandleNetworkFailure: %s"), *String);
+		OnHostDisconnected();
+	}
+}
+
+*/
