@@ -1,11 +1,7 @@
 #include "StateMachineComponent.h"
 
-#include "AISightComponent.h"
-#include "BaseMonsterAIController.h"
-#include "BaseMonsterPlayerState.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/PlayerState.h"
 
 UStateMachineComponent::UStateMachineComponent()
 {
@@ -17,12 +13,6 @@ UStateMachineComponent::UStateMachineComponent()
 void UStateMachineComponent::BeginPlay()
 {
     Super::BeginPlay();
-
-    ABaseMonsterAIController* AICon = Cast<ABaseMonsterAIController>(Cast<APlayerState>(GetOwner())->GetOwningController());
-    if (AICon)
-    {
-        AICon->GetAISightComponent()->OnEnemyDetected.AddDynamic(this, &UStateMachineComponent::HandleEnemyDetection);
-    }
 }
 
 void UStateMachineComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

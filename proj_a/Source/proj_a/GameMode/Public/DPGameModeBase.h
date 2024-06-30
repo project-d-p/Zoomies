@@ -34,6 +34,7 @@ public:
 	/** 테스트를 위해서 임시로 public에 선언 */
 	UPROPERTY()
 	UScoreManagerComp* ScoreManager;
+	FTimerHandle TimerHandle_SpawnAI;
 
 	// Called when the game starts or when spawned
 	virtual void PostLogin(APlayerController* newPlayer) override;

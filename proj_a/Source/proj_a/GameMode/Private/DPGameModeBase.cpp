@@ -118,7 +118,7 @@ void ADPGameModeBase::StartPlay()
 	TimerManager->StartTimer(60.0f);
 
 	// For Test Method
-	SpawnAndPossessAI();
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_SpawnAI, this, &ADPGameModeBase::SpawnAndPossessAI, 3.0f, true);
 }
 
 void ADPGameModeBase::SpawnAndPossessAI()

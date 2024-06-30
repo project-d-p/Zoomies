@@ -1,7 +1,9 @@
 #include "MonsterFactory.h"
 
+#include "AvoidPlayerMonsterAIController.h"
 #include "BaseMonsterAIController.h"
 #include "BaseMonsterCharacter.h"
+#include "ChasePlayerMonsterAIController.h"
 #include "CrabCharacter.h"
 #include "FNetLogger.h"
 #include "LobstarCharacter.h"
@@ -9,6 +11,7 @@
 #include "OctopusCharacter.h"
 #include "SlothCharacter.h"
 #include "StarFishCharacter.h"
+#include "TargetPointMonsterAIController.h"
 #include "GameFramework/Actor.h"
 
 ABaseMonsterAIController* UMonsterFactory::RandomMonsterSpawn(const FVector& Location)
@@ -41,9 +44,18 @@ ABaseMonsterAIController* UMonsterFactory::SpawnMonster(UClass* MonsterClass, co
 		FNetLogger::LogError(TEXT("Invalid parameters or class not derived from ABaseMonsterCharacter"));
 		return nullptr;
 	}
+
+	TArray<UClass*> AIControllerClasses = {
+		// ATargetPointMonsterAIController::StaticClass(),
+		AAvoidPlayerMonsterAIController::StaticClass(),
+		// AChasePlayerMonsterAIController::StaticClass()
+	};
+
+	int32 RandomIndex = FMath::RandRange(0, AIControllerClasses.Num() - 1);
+	UClass* SelectedClass = AIControllerClasses[RandomIndex];
 	
 	ABaseMonsterAIController* AIController = Cast<ABaseMonsterAIController>(
-		World->SpawnActor(ABaseMonsterAIController::StaticClass()));
+		World->SpawnActor(SelectedClass));
 	if (AIController == nullptr)
 	{
 		FNetLogger::LogError(TEXT("Failed to spawn AI controller"));
