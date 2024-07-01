@@ -22,6 +22,11 @@ ServerMessageHandler::ServerMessageHandler()
 	{
 		player_controller->HandleAim(msg.aim_state());
 	});
+
+	message_handlers_[Message::kActorPosition] = FServerMessageDelegate::CreateLambda([](ADPPlayerController* player_controller, const Message& msg, const float& /*delta*/)
+	{
+		player_controller->HandlePosition(msg.actor_position());
+	});
 }
 
 FServerMessageDelegate* ServerMessageHandler::HandleMessage(const Message& Msg)

@@ -31,11 +31,13 @@ public:
 	// void CreateSocket();
 	void Connect();
 	void RunTask();
-	
+
+	// Server Handling Message
 	void HandleMovement(const Movement& movement, const float& server_delta);
 	void HandleJump(const Jump& Jump);
 	void HandleFire(const Message& fire);
 	void HandleAim(const AimState& AimState);
+	void HandlePosition(const ActorPosition& ActorPosition);
 	void SimulateGunFire(SteamNetworkingSocket* steam_socket);
 	
 	UPlayerScoreComp* GetScoreManagerComponent() const;
@@ -73,6 +75,8 @@ private:
 	class UInputAction* aimAction;
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* cancelAction;
+	UPROPERTY(VisibleAnywhere, Category = Input)
+	class UInputAction* catchAction;
 
 	UPROPERTY()
 	UChatManager* ChatManager = nullptr;
@@ -80,10 +84,15 @@ private:
 	UPROPERTY()
 	UClientSocket* Socket = nullptr;
 
+	UPROPERTY()
+	class UHitScan* CatchRay = nullptr;
+
 	int gun_fire_count_ = 0;
 	std::queue<Message> gun_queue_;
+	std::queue<Message> catch_queue_;
 
 	virtual void Tick(float DeltaSeconds) override;
+	bool IsCatchable(FHitResult& hit_result);
 	
 	void Move(const FInputActionValue& value);
 	void Jump(const FInputActionValue& value);
@@ -93,6 +102,11 @@ private:
 	void Aim(const FInputActionValue& value);
 	void AimReleased(const FInputActionValue& value);
 	void ActionCancel(const FInputActionValue& value);
+	void Catch(const FInputActionValue& value);
+	
+	void SetRotation(const ActorPosition& ActorPosition);
+	void SetPosition(const ActorPosition& ActorPosition);
+	void SetState(const ActorPosition& ActorPosition);
 
 	// void UpdatePlayer();
 

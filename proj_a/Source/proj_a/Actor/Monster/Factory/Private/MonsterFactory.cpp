@@ -59,7 +59,7 @@ ABaseMonsterAIController* UMonsterFactory::SpawnMonster(UClass* MonsterClass, co
 	if (AIController == nullptr)
 	{
 		FNetLogger::LogError(TEXT("Failed to spawn AI controller"));
-		return nullptr;
+		return;
 	}
 	
 	ABaseMonsterCharacter* SpawnedMonster = Cast<ABaseMonsterCharacter>(

@@ -6,6 +6,8 @@
 #include "DPCharacter.h"
 #include "DPPlayerController.h"
 #include "FNetLogger.h"
+#include "HitScan.h"
+#include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "EntitySystem/MovieSceneEntitySystemTypes.h"
 #include "GameFramework/Character.h"
@@ -13,160 +15,47 @@
 ADPWeaponGun::ADPWeaponGun()
 {
 	damage = 15.f;
+	hitScan = CreateDefaultSubobject<UHitScan>(TEXT("HitScan"));
+
+	gunMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GunMesh"));
+	RootComponent = gunMesh;
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> GUN
+	(TEXT("/Game/model/weapon/simpleGun.simpleGun"));
+	if (GUN.Succeeded()) {
+		gunMesh->SetStaticMesh(GUN.Object);
+	}
+
+	muzzle = CreateDefaultSubobject<UArrowComponent>(TEXT("Muzzle"));
+	muzzle->SetupAttachment(gunMesh);
+	muzzle->SetRelativeLocation(FVector(-30.005441, 0.000000, 4.690275));
+	muzzle->SetRelativeRotation(FRotator(0.000000, -180, 0.000000));
 }
 
-bool ADPWeaponGun::Attack(ADPPlayerController* controller, FHitResult& result)
+bool ADPWeaponGun::Attack(ADPPlayerController* controller, FHitResult& result, FRotator& info)
 {
-	FVector start = controller->GetCharacter()->GetActorLocation();
-	// start += FVector(0, 0, controller->GetCharacter()->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("start : %s"), *start.ToString());
-
+	const FVector start_aim_pos = controller->GetCharacter()->FindComponentByClass<UCameraComponent>()->GetComponentLocation();
 	const FRotator aim_direction = controller->GetControlRotation();
-	FVector end = start + aim_direction.Vector() * 100000000.f;
 
-	/*
-	 * Debug Line
-	 */
-	UWorld *World = GetWorld();
-	DrawDebugLine(World, start, end, FColor::Blue, false, 4.0f, 0, 5.0f);
-	// ------------
-	
-	FHitResult hit;
-
-	FCollisionQueryParams query_params;
-	// query_params.AddIgnoredActor(GetOwner());
-	query_params.AddIgnoredActor(controller->GetCharacter());
-	query_params.AddIgnoredActor(this);
-
-	bool bHitSuccess = GetWorld()->LineTraceSingleByChannel(
-		hit,
-		start,
-		end,
-		ECC_Visibility,
-		query_params
-	);
-
-	if (bHitSuccess)
+	FVector impact_point;
+	if (hitScan->HitDetect(Cast<ADPCharacter>(controller->GetCharacter()), start_aim_pos, aim_direction, 100000000.f, result))
 	{
-		result = hit;
-		
-		ADPCharacter* character_ = Cast<ADPCharacter>(hit.GetActor());
-		if (character_ == nullptr)
-		{
-			FNetLogger::EditerLog(FColor::Cyan, TEXT("hit[not character], %s, %s"), *hit.Location.ToString(), *hit.GetActor()->GetName());
-		}
-		else
-		{
-			ADPPlayerState* player_state = Cast<ADPPlayerState>(character_->GetPlayerState());
-			FNetLogger::EditerLog(FColor::Cyan, TEXT("hit : %s, %s"), *hit.Location.ToString(), *player_state->GetPlayerName());
-		}
+		impact_point = result.ImpactPoint;
 	}
 	else
 	{
-		result = hit;
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("no hit"));
+		impact_point = start_aim_pos + aim_direction.Vector() * 100000000.f;
 	}
-	return bHitSuccess;
+	FVector muzzle_direction = impact_point - controller->GetCharacter()->GetActorLocation();
+	FVector normalized_muzzle_direction = muzzle_direction.GetSafeNormal();
+	info = normalized_muzzle_direction.Rotation();
+	const FVector muzzle_location = controller->GetCharacter()->GetActorLocation();
+	return hitScan->HitDetect(Cast<ADPCharacter>(controller->GetCharacter()), muzzle_location, normalized_muzzle_direction.Rotation(), 100000000.f, result);
 }
 
-bool ADPWeaponGun::SimulateAttack(ADPPlayerController* Controller, FHitResult& Result, const Message& Message)
+bool ADPWeaponGun::SimulateAttack(ADPCharacter* character, FHitResult& result, const Gunfire& gunfire)
 {
-	Gunfire gunfire = Message.gunfire();
-	FVector start = FVector(gunfire.position().x(), gunfire.position().y(), gunfire.position().z());
-
+	const FVector start = FVector(gunfire.position().x(), gunfire.position().y(), gunfire.position().z());
 	const FRotator aim_direction = FRotator(gunfire.direction().x(), gunfire.direction().y(), gunfire.direction().z());
-	FVector end = start + aim_direction.Vector() * 100000000.f;
-
-	/*
-	 * Debug Line
-	 */
-	UWorld *World = GetWorld();
-	DrawDebugLine(World, start, end, FColor::Blue, false, 4.0f, 0, 5.0f);
-	// ------------
-	
-	FCollisionQueryParams query_params;
-	// query_params.AddIgnoredActor(GetOwner());
-	query_params.AddIgnoredActor(Controller->GetCharacter());
-	query_params.AddIgnoredActor(this);
-
-	FHitResult hit;
-	bool bHitSuccess = GetWorld()->LineTraceSingleByChannel(
-		hit,
-		start,
-		end,
-		ECC_Visibility,
-		query_params
-	);
-
-	if (bHitSuccess)
-	{
-		Result = hit;
-		
-		ADPCharacter* character_ = Cast<ADPCharacter>(hit.GetActor());
-		if (character_ == nullptr)
-		{
-			FNetLogger::EditerLog(FColor::Cyan, TEXT("hit[not character], %s, %s"), *hit.Location.ToString(), *hit.GetActor()->GetName());
-		}
-		else
-		{
-			ADPPlayerState* player_state = Cast<ADPPlayerState>(character_->GetPlayerState());
-			FNetLogger::EditerLog(FColor::Cyan, TEXT("hit : %s, %s"), *hit.Location.ToString(), *player_state->GetPlayerName());
-		}
-	}
-	else
-	{
-		Result = hit;
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("no hit"));
-	}
-	return bHitSuccess;
-}
-
-bool ADPWeaponGun::SimulateAttackByClient(ADPCharacter* Character, FHitResult& Result, const Gunfire& Gunfire)
-{
-	FVector start = FVector(Gunfire.position().x(), Gunfire.position().y(), Gunfire.position().z());
-
-	const FRotator aim_direction = FRotator(Gunfire.direction().x(), Gunfire.direction().y(), Gunfire.direction().z());
-	FVector end = start + aim_direction.Vector() * 100000000.f;
-	FCollisionQueryParams query_params;
-	// query_params.AddIgnoredActor(GetOwner());
-	query_params.AddIgnoredActor(Character);
-	query_params.AddIgnoredActor(this);
-
-	/*
-	 * Debug Line
-	 */
-	UWorld *World = GetWorld();
-	DrawDebugLine(World, start, end, FColor::Blue, false, 4.0f, 0, 5.0f);
-	// ------------
-	
-	FHitResult hit;
-	bool bHitSuccess = GetWorld()->LineTraceSingleByChannel(
-		hit,
-		start,
-		end,
-		ECC_Visibility,
-		query_params
-	);
-
-	if (bHitSuccess)
-	{
-		Result = hit;
-		
-		ADPCharacter* character_ = Cast<ADPCharacter>(hit.GetActor());
-		if (character_ == nullptr)
-		{
-			FNetLogger::EditerLog(FColor::Cyan, TEXT("hit[not character], %s, %s"), *hit.Location.ToString(), *hit.GetActor()->GetName());
-		}
-		else
-		{
-			ADPPlayerState* player_state = Cast<ADPPlayerState>(character_->GetPlayerState());
-			FNetLogger::EditerLog(FColor::Cyan, TEXT("hit : %s, %s"), *hit.Location.ToString(), *player_state->GetPlayerName());
-		}
-	}
-	else
-	{
-		Result = hit;
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("no hit"));
-	}
-	return bHitSuccess;
+	return hitScan->HitDetect(character, start, aim_direction, 100000000.f, result);
 }

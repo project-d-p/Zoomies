@@ -72,12 +72,12 @@ void UCharacterPositionSync::SyncWithServer(ADPCharacter* character)
 void UCharacterPositionSync::SyncMyself(ADPCharacter* character)
 {
 	player_state_ = Cast<ADPPlayerState>(character->GetPlayerState());
-	const FString PlayerId = player_state_->GetPlayerName();
-	
-	if (character->GetMovementComponent()->IsFalling())
+	if (player_state_ == nullptr)
 	{
 		return;
 	}
+	const FString PlayerId = player_state_->GetPlayerName();
+	
 	actor_position_ = FDataHub::actorPosition[PlayerId];
 	
 	FVector position = FVector(actor_position_.position().x(), actor_position_.position().y(), actor_position_.position().z());
@@ -86,14 +86,14 @@ void UCharacterPositionSync::SyncMyself(ADPCharacter* character)
 	FVector current_position = character->GetActorLocation();
 	FVector curren_velocity = character->GetCharacterMovement()->Velocity;
 	
-	float significantDifference = 50.0f;
+	float significantDifference = 100.0f;
 	float distance = FVector::Dist(position, current_position);
 	
 	if (distance > significantDifference)
 	{
 		FNetLogger::EditerLog(FColor::Red, TEXT("Distance is too far, Syncing position."));
-		// this->SyncPosition(character);
-		character->SetActorLocation(position);
+		this->SyncPosition(character);
+		// character->SetActorLocation(position);
 	}
 }
 
@@ -113,7 +113,7 @@ void UCharacterPositionSync::SyncGunFire(ADPCharacter* character)
 	FDataHub::gunfireData.Remove(PlayerId);
 	FHitResult hit_result;
 	
-	if (character->weaponComponent->SimulateAttackByClient(character, hit_result, gunfire_))
+	if (character->weaponComponent->SimulateAttack(character, hit_result, gunfire_))
 	{
 		// hit success but not to do anything.
 	}
@@ -142,10 +142,10 @@ void UCharacterPositionSync::SyncPosition(ADPCharacter* character)
 	FVector velocity = FVector(actor_position_.velocity().x(), actor_position_.velocity().y(), actor_position_.velocity().z());
 	
 	FVector current_position = character->GetActorLocation();
-	FVector curren_velocity = character->GetCharacterMovement()->Velocity;
+	FVector current_velocity = character->GetCharacterMovement()->Velocity;
 	
 	FVector interpolated_position = FMath::VInterpTo(current_position, position, GetWorld()->GetDeltaSeconds(), 10.0f);
-	FVector interpolated_velocity = FMath::VInterpTo(curren_velocity, velocity, GetWorld()->GetDeltaSeconds(), 10.0f);
+	FVector interpolated_velocity = FMath::VInterpTo(current_velocity, velocity, GetWorld()->GetDeltaSeconds(), 10.0f);
 	
 	character->SetActorLocation(interpolated_position);
 	character->GetCharacterMovement()->Velocity = interpolated_velocity;
@@ -153,21 +153,6 @@ void UCharacterPositionSync::SyncPosition(ADPCharacter* character)
 
 void UCharacterPositionSync::SyncOrientationWithRotation(ADPCharacter* character)
 {
-	// FVector velocity = FVector(actor_position_.velocity().x(), actor_position_.velocity().y(), actor_position_.velocity().z());
-	//
-	// if (velocity.X == 0.0f && velocity.Y == 0.0f)
-	// {
-	// 	return ;
-	// }
-	//
-	// FVector current_position = character->GetActorLocation();
-	//
-	// FVector UnitVector = velocity.GetSafeNormal();
-	// FVector LookAtTarget = current_position + UnitVector;
-	// FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(current_position, LookAtTarget);
-	//
-	// FRotator FinalRotation = FRotator(0, NewRotation.Yaw, 0);
-
 	FRotator rotation = FRotator(actor_position_.rotation().x(), actor_position_.rotation().y(), actor_position_.rotation().z());
 	FRotator final_rotation = FRotator(0, rotation.Yaw, 0);
 	character->SetActorRotation(final_rotation);

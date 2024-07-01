@@ -111,7 +111,7 @@ Message MessageMaker::MakeJumpMessage(ADPPlayerController* Controller)
 	return msg;
 }
 
-Message MessageMaker::MakeFireMessage(ADPPlayerController* Controller,  const FRotator& Rotation, const FString& Target)
+Message MessageMaker::MakeFireMessage(ADPPlayerController* Controller, const FVector Position ,const FRotator& Rotation)
 {
 	Message msg;
 	if (Controller == nullptr)
@@ -126,16 +126,15 @@ Message MessageMaker::MakeFireMessage(ADPPlayerController* Controller,  const FR
 	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetPlayerName()));
 	Gunfire gunfire;
 	Vec3 position;
-	position.set_x(Controller->GetPawn()->GetActorLocation().X);
-	position.set_y(Controller->GetPawn()->GetActorLocation().Y);
-	position.set_z(Controller->GetPawn()->GetActorLocation().Z);
+	position.set_x(Position.X);
+	position.set_y(Position.Y);
+	position.set_z(Position.Z);
 	*gunfire.mutable_position() = position;
 	Vec3 direction;
 	direction.set_x(Rotation.Pitch);
 	direction.set_y(Rotation.Yaw);
 	direction.set_z(Rotation.Roll);
 	*gunfire.mutable_direction() = direction;
-	gunfire.set_target(TCHAR_TO_UTF8(*Target));
 	*msg.mutable_gunfire() = gunfire;
 	return msg;
 }
@@ -155,5 +154,52 @@ Message MessageMaker::MakeAimMessage(ADPPlayerController* controller, bool bAim)
 	AimState aim_state;
 	aim_state.set_aim_state(bAim ? AimState::AIM_STATE_ACTIVE : AimState::AIM_STATE_RELEASE);
 	*msg.mutable_aim_state() = aim_state;
+	return msg;
+}
+
+MonsterPosition MessageMaker::MakeMonsterPositionMessage(ABaseMonsterAIController* Monster_Controller)
+{
+	MonsterPosition msg;
+	if (Monster_Controller == nullptr)
+	{
+		return msg;
+	}
+	if (Monster_Controller->PlayerState == nullptr)
+	{
+		return msg;
+	}
+	msg.set_monster_id(std::to_string(Monster_Controller->PlayerState->GetPlayerId()));
+	Vec2 position;
+	position.set_x(Monster_Controller->GetPawn()->GetActorLocation().X);
+	position.set_y(Monster_Controller->GetPawn()->GetActorLocation().Y);
+	*msg.mutable_position() = position;
+	Vec2 rotation;
+	rotation.set_x(Monster_Controller->GetPawn()->GetActorRotation().Pitch);
+	rotation.set_y(Monster_Controller->GetPawn()->GetActorRotation().Yaw);
+	*msg.mutable_rotation() = rotation;
+	Vec2 velocity;
+	FVector velocity_ = Monster_Controller->GetPawn()->GetMovementComponent()->Velocity;
+	velocity.set_x(velocity_.X);
+	velocity.set_y(velocity_.Y);
+	*msg.mutable_velocity() = velocity;
+	return msg;
+}
+
+Message MessageMaker::MakeCatchMessage(ADPPlayerController* AdpPlayerController, const FHitResult& HitResult)
+{
+	Message msg;
+	if (AdpPlayerController == nullptr)
+	{
+		return msg;
+	}
+	if (AdpPlayerController->PlayerState == nullptr)
+	{
+		return msg;
+	}
+	// 내가 잡으려고 하는 대상이 순간적으로 서버에서는 위치가 변경되었을 수도 있다.
+	// 그러므로 서버에서는 클라이언트가 잡으려고 하는 대상이 누구인지 알 수 없다.
+	// 그러므로 클라이언트가 잡으려고 하는 대상이 누구인지 서버에게 알려줘야 한다.
+	msg.set_player_id(TCHAR_TO_UTF8(*AdpPlayerController->PlayerState->GetPlayerName()));
+	
 	return msg;
 }

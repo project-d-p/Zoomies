@@ -32,7 +32,7 @@ public class proj_a : ModuleRules
 		string protoFilesPath = Path.Combine(ModuleDirectory, "Protobuf", "Proto_file");
 		string generatedProtoFilesPath = Path.Combine(ModuleDirectory, "Protobuf", "Pb_File");
 		
-		// System.Console.WriteLine("Compiling .proto files...");
+		System.Console.WriteLine("Compiling .proto files...");
 		CompileProtoFiles(protocPath, protoFilesPath, generatedProtoFilesPath);
 		// XXX: 배포시에 컴파일 코드 삭제(혹은 주석 처리)
 		
@@ -53,6 +53,7 @@ public class proj_a : ModuleRules
 			"proj_a/Component/AnimNotify/Public",
 			"proj_a/Component/InGame/Score/Public",
 			"proj_a/Component/InGame/Chat/Public",
+			"proj_a/Component/InGame/HitDetection/Public",
 			"proj_a/Component/InGame/Timer/Public",
 			"proj_a/Component/ClientNetwork/Public",
             "proj_a/Widget/Public",

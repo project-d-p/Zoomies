@@ -6,6 +6,8 @@ ABaseMonsterPlayerState::ABaseMonsterPlayerState()
 	
 	StateMachineComponent = CreateDefaultSubobject<UStateMachineComponent>(TEXT("StateMachine"));
 	OnTakeAnyDamage.AddDynamic(this, &ABaseMonsterPlayerState::OnTakeDamage);
+
+	// TODO : UniqueID를 생성하고 PlayerState에 할당
 }
 
 float ABaseMonsterPlayerState::GetCurrentHealth() const

@@ -19,6 +19,8 @@
 #include "MessageMaker.h"
 #include "GameHelper.h"
 #include "Kismet/GameplayStatics.h"
+#include "state.pb.h"
+#include "HitScan.h"
 #include "Kismet/KismetMathLibrary.h"
 
 
@@ -65,9 +67,15 @@ ADPPlayerController::ADPPlayerController()
 	(TEXT("/Game/input/ia_cancel.ia_cancel"));
 	if (IA_CANCEL.Succeeded())
 		cancelAction = IA_CANCEL.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_CATCH
+	(TEXT("/Game/input/ia_catch.ia_catch"));
+	if (IA_CATCH.Succeeded())
+		catchAction = IA_CATCH.Object;
 	
 	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
 	Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
+	CatchRay = CreateDefaultSubobject<UHitScan>(TEXT("Catch Ray"));
 
 	static ConstructorHelpers::FObjectFinder<USoundBase> SoundAsset
 	(TEXT("/Game/sounds/effect/character/jump_Cue.jump_Cue"));
@@ -216,6 +224,38 @@ void ADPPlayerController::BeginPlay()
 void ADPPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	if (PlayerState == nullptr)
+	{
+		return ;
+	}
+	if (character == nullptr)
+	{
+		return ;
+	}
+	if (character->IsLocallyControlled())
+	{
+		FHitResult hit_result;
+		if (this->IsCatchable(hit_result))
+		{
+			FNetLogger::EditerLog(FColor::Cyan, TEXT("Catchable"));
+		}
+	}
+	if (HasAuthority())
+	{
+		return ;
+	}
+	Message msg = MessageMaker::MakePositionMessage(this);
+	Socket->AsyncSendPacket(msg);
+}
+
+bool ADPPlayerController::IsCatchable(FHitResult& hit_result)
+{
+	if (CatchRay->HitDetect(character, character->GetActorLocation(), this->GetControlRotation(), 300.0f, hit_result))
+	{
+		return true;
+	}
+	return false;
 }
 
 void ADPPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -265,6 +305,8 @@ void ADPPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(aimAction, ETriggerEvent::Completed, this, &ADPPlayerController::AimReleased);
 		//	취소, 채팅 끄기 ( esc - UE 에디터에서 기본 단축키 변경 필요 )
 		EnhancedInputComponent->BindAction(cancelAction, ETriggerEvent::Triggered, this, &ADPPlayerController::ActionCancel);
+		// 포획 (f)
+		EnhancedInputComponent->BindAction(catchAction, ETriggerEvent::Started, this, &ADPPlayerController::Catch);
 	}
 }
 
@@ -276,12 +318,13 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 	const FVector forwardVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
 
-	if (!HasAuthority())
-	{
-		FVector velocity = character->GetCharacterMovement()->Velocity;
-		Message message = MessageMaker::MakeMovementMessage(this, actionValue, controlRotation, velocity);
-		Socket->AsyncSendPacket(message);
-	}
+	// if (!HasAuthority())
+	// {
+	// 	FVector velocity = character->GetCharacterMovement()->Velocity;
+	// 	Message message = MessageMaker::MakeMovementMessage(this, actionValue, controlRotation, velocity);
+	// 	Socket->AsyncSendPacket(message);
+	// }
+	
 	character->AddMovementInput(forwardVector, actionValue.X);
 	character->AddMovementInput(rightVector, actionValue.Y);
 
@@ -302,10 +345,10 @@ void ADPPlayerController::Jump(const FInputActionValue& value)
 	}
 
 	Message msg = MessageMaker::MakeJumpMessage(this);
-	if (!HasAuthority())
-	{
-		Socket->AsyncSendPacket(msg);
-	}
+	// if (!HasAuthority())
+	// {
+	// 	Socket->AsyncSendPacket(msg);
+	// }
 	character->Jump();
 	UGameplayStatics::PlaySound2D(GetWorld(), jumpSound);
 }
@@ -324,6 +367,7 @@ void ADPPlayerController::Rotate(const FInputActionValue& value)
 	}
 }
 
+// TODO: 총 쏘는 로직 수정 필요
 void ADPPlayerController::Active(const FInputActionValue& value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Active"));
@@ -338,7 +382,15 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 		}
 		FHitResult hit_result;
 		character->PlayFireAnimation();
-		Message msg = MessageMaker::MakeFireMessage(this, GetControlRotation());
+		// 최종 발사 위치와, 방향을 알아야 함.
+		FRotator final_direction;
+		if (character->weaponComponent->Attack(this, hit_result, final_direction))
+		{
+			// Success Only Effect;
+			FNetLogger::EditerLog(FColor::Cyan, TEXT("Attack Success[Only Effect]"));
+		}
+		FVector position = character->GetActorLocation();
+		Message msg = MessageMaker::MakeFireMessage(this, position, final_direction);
 		if (!HasAuthority())
 		{
 			Socket->AsyncSendPacket(msg);
@@ -347,11 +399,6 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 		{
 			this->gun_fire_count_ += 1;
 			this->gun_queue_.push(msg);
-		}
-		if (character->weaponComponent->Attack(this, hit_result))
-		{
-			// Success Only Effect;
-			FNetLogger::EditerLog(FColor::Cyan, TEXT("Attack Success[Only Effect]"));
 		}
 	}
 	// if ("WALL" == state->equipmentState) {
@@ -466,6 +513,37 @@ void ADPPlayerController::ActionCancel(const FInputActionValue& value)
 	UE_LOG(LogTemp, Warning, TEXT("ActionCancel"));
 }
 
+void ADPPlayerController::Catch(const FInputActionValue& value)
+{
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Catch"));
+
+	// 마우스 에임으로 잡냐 마냐를 판단해야함.
+	// why? 해당 버튼을 눌렀을 때, 범위로 판단하게 되면 범위 내에 있는 모든 오브젝트를 잡게 되기 때문.
+	// 그러나 마우스 에임으로 잡을 때는 에임이 가리키는 오브젝트만 잡게됨.
+	// 그럼 유저로 하여금 본인이 해당 몬스터를 가리키고 있다라는 것을 알려줄 무언가가 필요함.
+	// 에임을 가져다 대면 몬스터가 빛나거나, 몬스터의 테두리가 빛나거나, 몬스터를 포획할거냐는 UI가 뜨게 해야 할듯.
+	
+	// 잡은 정보는 PlayerState에 업데이트가 되어서, RPC로 해당 정보를 동기화해야함.
+	// 그리고 해당 몬스터의 객체는 서버에서 사라짐.
+	// RPC로 해당 정보가 동기화가 됨에 따라서 클라이언트는 해당 정보를 바탕으로 렌더링을 할 수 있음.
+	// 이 때, 해당 몬스터의 객체는 사라지지만, 해당 몬스터의 정보는 서버에 남아있어야함.
+	// 왜냐하면, 클라이언트가 잡은 몬스터의 정보를 가지고 있어야함.
+
+	// HitScan을 Util Component로 만들어서 어떤 걸로 할거냐로 지정하게 해야 할듯.
+	
+	FHitResult hit_result;
+	
+	Message msg = MessageMaker::MakeCatchMessage(this, hit_result);
+	if (!HasAuthority())
+	{
+		Socket->AsyncSendPacket(msg);
+	}
+	else
+	{
+		catch_queue_.push(msg);
+	}
+}
+
 /*
  * 1. Handler Player Movement in Server (W, A, S, D) - Move Function with Movement Message
  */
@@ -529,7 +607,7 @@ void ADPPlayerController::SimulateGunFire(SteamNetworkingSocket* steam_socket)
 		gun_queue_.pop();
 		FHitResult hit_result;
 		this->character->PlayFireAnimation();
-		if (character->weaponComponent->SimulateAttack(this, hit_result, fire))
+		if (character->weaponComponent->SimulateAttack(character, hit_result, fire.gunfire()))
 		{
 			// Logic for Hit Success && Damage && Score
 			FNetLogger::EditerLog(FColor::Cyan, TEXT("Player %s Attack Success[Simulate]"), *PlayerState->GetPlayerName());
@@ -555,3 +633,64 @@ void ADPPlayerController::HandleAim(const AimState& AimState)
 		character->StopAimAnimation();
 	}
 }
+
+void ADPPlayerController::HandlePosition(const ActorPosition& ActorPosition)
+{
+	if (!character)
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("Character is null in HandleAim"));
+		return ;
+	}
+	SetState(ActorPosition);
+	SetRotation(ActorPosition);
+	SetPosition(ActorPosition);
+}
+
+void ADPPlayerController::SetRotation(const ActorPosition& ActorPosition)
+{
+	if (character->isAim == true)
+	{
+		FRotator control_rotation = FRotator(ActorPosition.control_rotation().x(), ActorPosition.control_rotation().y(), ActorPosition.control_rotation().z());
+		FRotator final_rotation = FRotator(0, control_rotation.Yaw, 0);
+		character->SetActorRotation(final_rotation);
+	}
+	else
+	{
+		FRotator rotation = FRotator(ActorPosition.rotation().x(), ActorPosition.rotation().y(), ActorPosition.rotation().z());
+		FRotator newRotation = FRotator(0, rotation.Yaw, 0);
+		character->SetActorRotation(newRotation);
+	}
+}
+
+void ADPPlayerController::SetPosition(const ActorPosition& ActorPosition)
+{
+	FVector position = FVector(ActorPosition.position().x(), ActorPosition.position().y(), ActorPosition.position().z());
+	FVector velocity = FVector(ActorPosition.velocity().x(), ActorPosition.velocity().y(), ActorPosition.velocity().z());
+
+	FVector current_position = character->GetActorLocation();
+	FVector current_velocity = character->GetCharacterMovement()->Velocity;
+	
+	FVector interpolated_position = FMath::VInterpTo(current_position, position, GetWorld()->GetDeltaSeconds(), 10.0f);
+	FVector interpolated_velocity = FMath::VInterpTo(current_velocity, velocity, GetWorld()->GetDeltaSeconds(), 10.0f);
+	
+	character->SetActorLocation(interpolated_position);
+	character->GetCharacterMovement()->Velocity = interpolated_velocity;
+}
+
+void ADPPlayerController::SetState(const ActorPosition& ActorPosition)
+{
+	State state_ = ActorPosition.state();
+	switch (state_)
+	{
+	case State::STATE_Walking:
+		character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		break;
+	case State::STATE_Falling:
+		character->GetCharacterMovement()->SetMovementMode(MOVE_Falling);
+		break;
+	default:
+		character->GetCharacterMovement()->SetMovementMode(MOVE_None);
+		break;
+	}
+}
+
