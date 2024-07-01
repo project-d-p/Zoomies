@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/GameStateBase.h"
 #include "proj_a/MatchingLobby/TYPE_MatchingLobby/TYPE_MatchingLobby.h"
 #include "GS_MatchingLobby.generated.h"
@@ -12,9 +13,9 @@ class PROJ_A_API AGS_MatchingLobby : public AGameStateBase
 public:
 	AGS_MatchingLobby();
 
-	// Replicated variable & function
-	UPROPERTY(ReplicatedUsing = OnRep_ReadyPlayers)
+	UPROPERTY(Replicated)
 	TArray<bool> ReadyPlayers;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_LobbyInfo)
 	TArray<FLobbyInfo> LobbyInfos;
 	int32 HostPlayerIndex;
@@ -28,14 +29,13 @@ public:
 	void FindFastestPlayer();
 	void SetHostPlayer(const APlayerState* NewHostPlayer);
 	void UpdateLobbyInfo() const;
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastShowLoadingWidget();
 
 	UFUNCTION(Server, Reliable)
 	void ReportPing(APlayerState* ReportingPlayer, float AveragePing);
 
-
-	// Set the player ready
-	UFUNCTION()
-	void OnRep_ReadyPlayers();
 	UFUNCTION()
 	void OnRep_LobbyInfo();
 	void SetPlayerReady(int32 PlayerIndex, bool bIsReady);

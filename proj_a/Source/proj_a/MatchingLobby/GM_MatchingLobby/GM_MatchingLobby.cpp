@@ -59,6 +59,7 @@ void AGM_MatchingLobby::CheckReadyToStart()
 		AGS_MatchingLobby* GS = GetGameState<AGS_MatchingLobby>();
 		if (GS && GS->AreAllPlayersReady() && GetNumPlayers() >= MAX_USERS)
 		{
+			GS->MulticastShowLoadingWidget();
 			StartGame_t();
 		}
 	}
@@ -166,6 +167,23 @@ void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 			if (LobbyPlatforms[i]->PC && !PCs.Contains(LobbyPlatforms[i]->PC))
 			{
 				LobbyPlatforms[i]->Clear_Platform();
+				if (AGS_MatchingLobby* GS = GetGameState<AGS_MatchingLobby>())
+				{
+					int32 playerIndex = i;
+					if (playerIndex >= 0 && playerIndex < GS->ReadyPlayers.Num())
+					{
+						GS->ReadyPlayers[i] = false;
+						GS->LobbyInfos[i].bIsReady = false;
+					}
+					else
+					{
+						//logging on screen about the error
+						if (GEngine)
+						{
+							GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Error: Player not found in ReadyPlayers"));
+						}
+					}
+				}
 			}
 		}
 	}

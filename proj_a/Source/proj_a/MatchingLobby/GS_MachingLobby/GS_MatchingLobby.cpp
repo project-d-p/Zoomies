@@ -17,11 +17,6 @@ AGS_MatchingLobby::AGS_MatchingLobby() {
 	HostPlayerIndex = -1;
 }
 
-void AGS_MatchingLobby::OnRep_ReadyPlayers()
-{
-	//ReadypPlayers array has been replicated
-}
-
 void AGS_MatchingLobby::OnRep_LobbyInfo()
 {
 	UpdateLobbyInfo();
@@ -50,15 +45,12 @@ void AGS_MatchingLobby::UpdateLobbyInfo() const
 	}
 }
 
-
-
 void AGS_MatchingLobby::SetPlayerReady(int32 PlayerIndex, bool bIsReady)
 {
-	int32 PlayerOrder = PlayerIndex - HostPlayerIndex;
-	if (PlayerOrder >= 0 && PlayerOrder < ReadyPlayers.Num())
+	if (PlayerIndex >= 0 && PlayerIndex < ReadyPlayers.Num())
 	{
-		ReadyPlayers[PlayerOrder] = bIsReady;
-		LobbyInfos[PlayerOrder].bIsReady = bIsReady;
+		ReadyPlayers[PlayerIndex] = bIsReady;
+		LobbyInfos[PlayerIndex].bIsReady = bIsReady;
 		UpdateLobbyInfo();
 	}
 	if (HasAuthority())
@@ -132,3 +124,32 @@ void AGS_MatchingLobby::ReportPing_Implementation(APlayerState* ReportingPlayer,
 	}
 }
 
+void AGS_MatchingLobby::MulticastShowLoadingWidget_Implementation()
+{
+	UClass* WidgetClass = nullptr;
+	FString WidgetPath = TEXT("/Game/widget/widget_loading.widget_loading_C");
+
+	WidgetClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *WidgetPath));
+
+	if (WidgetClass != nullptr)
+	{
+		UUserWidget* LoadingWidget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), WidgetClass);
+
+		if (LoadingWidget != nullptr)
+		{
+			LoadingWidget->AddToViewport();
+		}
+		else
+		{
+			//logging on screen about failed to create widget
+			if (GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(
+					-1,
+					30.f,
+					FColor::Red,
+					FString::Printf(TEXT("Failed to create widget")));
+			}
+		}
+	}
+}

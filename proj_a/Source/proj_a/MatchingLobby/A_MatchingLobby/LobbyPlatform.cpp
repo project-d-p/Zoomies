@@ -16,7 +16,7 @@ ALobbyPlatform::ALobbyPlatform()
 	CylinderComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CylinderComponent"));
 	CylinderComponent->SetupAttachment(RootComponent);
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(TEXT("'/Game/StarterContent/Shapes/Shape_Cylinder.Shape_Cylinder'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(TEXT("'/Game/etc/Lobby/Shape_Cylinder.Shape_Cylinder'"));
 	if (MeshAsset.Succeeded())
 	{
 		CylinderComponent->SetStaticMesh(MeshAsset.Object);

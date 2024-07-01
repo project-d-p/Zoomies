@@ -320,7 +320,7 @@ void UGI_Zoomies::OnDestroyComplete(FName session_name, bool bWasSuccessful)
 }
 
 
-//작동이 되는 지 확인
+//????? ??? ?? ???
 /*
 void UGI_Zoomies::OnHostDisconnected()
 {

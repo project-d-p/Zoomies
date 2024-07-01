@@ -3,15 +3,18 @@
 #include "CineCameraActor.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
+#include "proj_a/MatchingLobby/GM_MatchingLobby/GM_MatchingLobby.h"
 #include "proj_a/MatchingLobby/GS_MachingLobby/GS_MatchingLobby.h"
 
 // ServerSetReady: this Function called by Client but executed on Server
 void APC_MatchingLobby::ServerSetReady_Implementation(bool pIsReady)
 {
 	AGS_MatchingLobby* GS_matching_lobby = GetWorld()->GetGameState<AGS_MatchingLobby>();
-	if (GS_matching_lobby)
+	AGM_MatchingLobby* GM_matching_lobby = GetWorld()->GetAuthGameMode<AGM_MatchingLobby>();
+	
+	if (GS_matching_lobby && GM_matching_lobby)
 	{
-		int32 PlayerIndex = PlayerState->GetPlayerId();
+		int32 PlayerIndex = GM_matching_lobby->PCs.Find(this);
 		GS_matching_lobby->SetPlayerReady(PlayerIndex, pIsReady);
 	}
 }
