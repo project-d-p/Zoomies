@@ -34,7 +34,7 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
 		sparkleEffect = SPARKLE.Object;
 	}
 
-	GetMesh()->bRenderInDepthPass = true;
+	GetMesh()->SetRenderCustomDepth(true);
 	GetMesh()->CustomDepthStencilValue = 2;
 
 	//sphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("sphereComponent"));
