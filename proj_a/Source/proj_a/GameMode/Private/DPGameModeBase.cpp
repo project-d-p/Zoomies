@@ -1,10 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "DPGameModeBase.h"
 
 #include "BaseMonsterAIController.h"
-#include "BaseMonsterCharacter.h"
 #include "CrabCharacter.h"
 #include "DPCharacter.h"
 #include "DPInGameState.h"
@@ -13,11 +11,7 @@
 #include "SocketManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "FNetLogger.h"
-#include "isteamnetworkingsockets.h"
 #include "MessageMaker.h"
-#include "OctopusCharacter.h"
-#include "SlothCharacter.h"
-#include "StarFishCharacter.h"
 
 ADPGameModeBase::ADPGameModeBase()
 {
@@ -119,7 +113,7 @@ void ADPGameModeBase::StartPlay()
 	TimerManager->StartTimer(60.0f);
 
 	// For Test Method
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle_SpawnAI, this, &ADPGameModeBase::SpawnAndPossessAI, 3.0f, true);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_SpawnAI, this, &ADPGameModeBase::SpawnMonsters, 3.0f, true);
 }
 
 void ADPGameModeBase::SpawnAndPossessAI()
@@ -180,8 +174,8 @@ void ADPGameModeBase::SpawnMonsters()
 		if (monster_controllers_[i] == nullptr)
 		{
 			// Random Spawn
-			monster_controllers_[i] = MonsterFactory->SpawnMonster(
-				ACrabCharacter::StaticClass(), FVector(0.f, 0.f, 600.f));
+			monster_controllers_[i] = MonsterFactory->RandomMonsterSpawn(
+				FVector(0.f, 0.f, 600.f));
 		}
 	}
 }

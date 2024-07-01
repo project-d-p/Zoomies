@@ -169,9 +169,10 @@ MonsterPosition MessageMaker::MakeMonsterPositionMessage(ABaseMonsterAIControlle
 		return msg;
 	}
 	msg.set_monster_id(std::to_string(Monster_Controller->PlayerState->GetPlayerId()));
-	Vec2 position;
+	Vec3 position;
 	position.set_x(Monster_Controller->GetPawn()->GetActorLocation().X);
 	position.set_y(Monster_Controller->GetPawn()->GetActorLocation().Y);
+	position.set_z(Monster_Controller->GetPawn()->GetActorLocation().Z);
 	*msg.mutable_position() = position;
 	Vec2 rotation;
 	rotation.set_x(Monster_Controller->GetPawn()->GetActorRotation().Pitch);

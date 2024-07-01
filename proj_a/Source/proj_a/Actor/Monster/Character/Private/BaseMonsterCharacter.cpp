@@ -19,8 +19,7 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
     GetCharacterMovement()->bOrientRotationToMovement = true;
     bUseControllerRotationYaw = false;
 	
-	/* XXX: comment for testing purposes. Restore after creating a UDP structure later. */
-    // SetReplicatingMovement(false);
+    SetReplicatingMovement(false);
 }
 
 void ABaseMonsterCharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -52,7 +51,7 @@ void ABaseMonsterCharacter::SyncPosition()
 	FVector CurrentPosition = this->GetActorLocation();
 	FVector CurrentVelocity = this->GetCharacterMovement()->Velocity;
 	
-	FVector Position = FVector(MonsterData.position().x(), MonsterData.position().y(), CurrentPosition.Z);
+	FVector Position = FVector(MonsterData.position().x(), MonsterData.position().y(), MonsterData.position().z());
 	FVector Velocity = FVector(MonsterData.velocity().x(), MonsterData.velocity().y(), 0);
 	FRotator Rotation = FRotator(MonsterData.rotation().x(), MonsterData.rotation().y(), 0);
 	
@@ -71,6 +70,7 @@ void ABaseMonsterCharacter::Tick(float DeltaTime)
 
 	if (!HasAuthority())
 		this->SyncPosition();
+	// FNetLogger::EditerLog(FColor::Green, TEXT("Tick in BaseMonsterCharacter"));
 }
 
 void ABaseMonsterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

@@ -74,7 +74,7 @@ private:
 	ServerMessageHandler message_handler_;
 
 	// monster
-	enum { NUM_OF_MAX_MONSTERS = 20 };
+	enum { NUM_OF_MAX_MONSTERS = 200 };
 	std::vector<ABaseMonsterAIController*> monster_controllers_;
 
 private:

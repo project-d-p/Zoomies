@@ -16,7 +16,6 @@ ABaseMonsterAIController::ABaseMonsterAIController()
 	{
 		CrowdManager->RegisterAgent(this);
 	}
-	// XXX: When the Monster AI is deleted, unregister the agent.
 
 	BehaviorTreeAsset = CreateDefaultSubobject<UBT_Monster>(TEXT("BehaviorTreeAsset"));
 	BlackboardAsset = CreateDefaultSubobject<UBB_Monster>(TEXT("BlackboardAsset"));
