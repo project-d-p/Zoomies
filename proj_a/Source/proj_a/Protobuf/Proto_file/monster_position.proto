@@ -4,7 +4,7 @@ import "vector.proto";
 
 message MonsterPosition {
   string monster_id = 1;
-  Vec2 position = 2;
+  Vec3 position = 2;
   Vec2 velocity = 3;
   Vec2 rotation = 4;
 }
