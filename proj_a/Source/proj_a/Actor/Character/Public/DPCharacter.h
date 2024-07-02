@@ -74,6 +74,7 @@ private:
 	UCharacterPositionSync* syncer = nullptr;
 
 	FTimerHandle SynchronizeHandle;
+	TSubclassOf<UCameraShakeBase> cameraShake;
 public:
 	FVector currentVelocity{ 0.f, 0.f, 0.f };
 	UPROPERTY(BlueprintReadWrite)

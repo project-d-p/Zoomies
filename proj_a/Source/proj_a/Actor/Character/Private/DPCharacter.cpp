@@ -2,6 +2,7 @@
 
 #include "DPCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "DPHpActorComponent.h"
 #include "DPConstructionActorComponent.h"
 #include "DPPlayerState.h"
@@ -116,6 +117,13 @@ ADPCharacter::ADPCharacter()
 	GetMesh()->SetRenderCustomDepth(true);
 	GetMesh()->CustomDepthStencilValue = 2;
 
+
+	static ConstructorHelpers::FClassFinder<UCameraShakeBase> CAMERASHAKE
+	(TEXT("/Game/etc/bp_cameraShake.bp_cameraShake_C"));
+	if (CAMERASHAKE.Succeeded()) {
+		cameraShake = CAMERASHAKE.Class;
+	}
+
 	/*
 	 * 겹치게 만드는 요소
 	 * 즉, 충돌해도 보이는 것은 뚫고 지나가지만 충돌 이벤트는 발생됨.
@@ -220,6 +228,12 @@ void ADPCharacter::PlayFireAnimation()
 {
 	if (characterMontage) {
 		PlayAnimMontage(characterMontage, 1.f, "fire");	UE_LOG(LogTemp, Warning, TEXT("PlayFireAnimation"));
+	}
+
+	if (camera && cameraShake) {
+		FVector cameraLocation = camera->GetComponentLocation();
+		UGameplayStatics::PlayWorldCameraShake(this, cameraShake, cameraLocation, 0.0f, 500.0f);
+		FNetLogger::EditerLog(FColor::Magenta, TEXT("CAMERASHAKE"));
 	}
 }
 
