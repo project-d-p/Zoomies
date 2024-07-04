@@ -10,6 +10,7 @@
 #include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
 #include "proj_a/MatchingLobby/PS_MatchingLobby/PS_MatchingLobby.h"
 #include "Kismet/GameplayStatics.h"
+#include "proj_a/MatchingLobby/SteamInvite/SteamInvite.h"
 
 AGM_MatchingLobby::AGM_MatchingLobby() {
 	GameStateClass = AGS_MatchingLobby::StaticClass();
@@ -188,3 +189,4 @@ void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 		}
 	}
 }
+

@@ -4,6 +4,7 @@ using UnrealBuildTool;
 using System.IO;
 using System;
 using System.Diagnostics;
+using UnrealBuildBase;
 
 public class proj_a : ModuleRules
 {
@@ -16,7 +17,6 @@ public class proj_a : ModuleRules
 		{
 			throw new Exception("No Protobuf Error" + thirdPartyDir + ".");
 		}
-		
 		SetProtobuf(thirdPartyDir);
 		
 		// XXX: 배포시에 컴파일 코드 삭제(혹은 주석 처리)
@@ -68,6 +68,7 @@ public class proj_a : ModuleRules
 			"proj_a/Core/Public",
 			"proj_a/Utility/Public",
 			"proj_a/Protobuf/Pb_File",
+			Unreal.EngineDirectory.ToString() + "/Source/Editor/PropertyEditor/Public/",
 		});
 		
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
@@ -89,7 +90,11 @@ public class proj_a : ModuleRules
 			"AIModule",
 			"NavigationSystem",
 		});
-		PrivateDependencyModuleNames.AddRange(new string[] { "CinematicCamera" });
+		PrivateDependencyModuleNames.AddRange(new string[] { "CinematicCamera", "SessionServices" });
+		if (Target.Type == TargetType.Editor)
+		{
+			PrivateDependencyModuleNames.AddRange(new string[] { "PropertyEditor" });
+		}
 
 		string SteamSDKPath = Path.Combine(ModuleDirectory, "Steam");
 		if (Directory.Exists(SteamSDKPath))
@@ -102,9 +107,21 @@ public class proj_a : ModuleRules
 			}
 			else if (Target.Platform == UnrealTargetPlatform.Mac)
 			{
-				PublicAdditionalLibraries.Add(Path.Combine(SteamSDKPath, "redistributable_bin", "osx", "libsteam_api.dylib"));
-				RuntimeDependencies.Add("$(ProjectDir)/Binaries/Mac/libsteam_api.dylib", Path.Combine(SteamSDKPath,"redistributable_bin", "osx", "libsteam_api.dylib"));
+				string EngineSteamSDKPath = Path.Combine(
+					Unreal.EngineDirectory.ToString(), 
+					"Source", "ThirdParty", "Steamworks", "Steamv153", "sdk", "redistributable_bin", "osx"
+				);
+
+				PublicAdditionalLibraries.Add(Path.Combine(EngineSteamSDKPath, "libsteam_api.dylib"));
+
+				RuntimeDependencies.Add("$(ProjectDir)/Binaries/Mac/libsteam_api.dylib", Path.Combine(EngineSteamSDKPath, "libsteam_api.dylib"));
 			}
+			// else if (Target.Platform == UnrealTargetPlatform.Mac)
+			// {
+			// 	///Users/Shared/UnrealEngine/UE_5.3/Engine/Source/ThirdParty/Steamworks/Steamv153/sdk/redistributable_bin/osx/libsteam_api.dylib
+			// 	PublicAdditionalLibraries.Add(Path.Combine(SteamSDKPath, "redistributable_bin", "osx", "libsteam_api.dylib"));
+			// 	RuntimeDependencies.Add("$(ProjectDir)/Binaries/Mac/libsteam_api.dylib", Path.Combine(SteamSDKPath,"redistributable_bin", "osx", "libsteam_api.dylib"));
+			// }
 		}
     }
 

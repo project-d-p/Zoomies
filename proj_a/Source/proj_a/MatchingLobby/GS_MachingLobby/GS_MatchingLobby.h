@@ -4,6 +4,7 @@
 #include "Components/WidgetComponent.h"
 #include "GameFramework/GameStateBase.h"
 #include "proj_a/MatchingLobby/TYPE_MatchingLobby/TYPE_MatchingLobby.h"
+#include "steam_api.h"
 #include "GS_MatchingLobby.generated.h"
 
 UCLASS()
@@ -40,8 +41,9 @@ public:
 	void OnRep_LobbyInfo();
 	void SetPlayerReady(int32 PlayerIndex, bool bIsReady);
 
-	UFUNCTION(BlueprintCallable, Category = "GameState")
+	UFUNCTION(BlueprintCallable, Category = "MatchLobby")
 	bool AreAllPlayersReady();
+
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

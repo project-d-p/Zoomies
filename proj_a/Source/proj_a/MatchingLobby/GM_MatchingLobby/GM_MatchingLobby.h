@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "proj_a/MatchingLobby/A_MatchingLobby//LobbyPlatform.h"
+#include "proj_a/MatchingLobby/SteamInvite/SteamInvite.h"
 #include "proj_a/MatchingLobby/TYPE_MatchingLobby/TYPE_MatchingLobby.h"
 #include "GM_MatchingLobby.generated.h"
 
@@ -26,8 +27,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<ALobbyPlatform*> LobbyPlatforms;
 	FTimerHandle UnusedHandle;
+
 private:
 	void StartGame_t() const;
+	FString InviteURL;
 protected:
 	bool bIsLobbyPlatformReady = false;
 };

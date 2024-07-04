@@ -2,6 +2,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "proj_a/MatchingLobby/SteamInvite/SteamInvite.h"
+#include "proj_a/MatchingLobby/TYPE_MatchingLobby/TYPE_MatchingLobby.h"
 #include "PC_MatchingLobby.generated.h"
 
 UCLASS()
@@ -21,8 +23,12 @@ public:
 	bool bIsReady = false;
 	UPROPERTY(BlueprintReadWrite, Category = "MatchingLobbyInfo")
 	FString UserName = "DefaultName";
+	UFUNCTION(BlueprintCallable, Category = "Steam")
+	void ShowSteamInviteDialog();
 
 	bool GetIsReady();
+private:
+	USteamInvite* SteamInvite = nullptr;
 protected:
 	virtual void BeginPlay() override;
 private:

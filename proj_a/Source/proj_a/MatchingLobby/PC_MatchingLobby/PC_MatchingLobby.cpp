@@ -1,10 +1,12 @@
 #include "PC_MatchingLobby.h"
 
 #include "CineCameraActor.h"
+#include "OnlineSessionSettings.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
 #include "proj_a/MatchingLobby/GM_MatchingLobby/GM_MatchingLobby.h"
 #include "proj_a/MatchingLobby/GS_MachingLobby/GS_MatchingLobby.h"
+#include "Interfaces/OnlineSessionInterface.h"
 
 // ServerSetReady: this Function called by Client but executed on Server
 void APC_MatchingLobby::ServerSetReady_Implementation(bool pIsReady)
@@ -43,6 +45,8 @@ void APC_MatchingLobby::BeginPlay()
 	
 	FInputModeUIOnly InputMode;
 	SetInputMode(InputMode);
+	SteamInvite = NewObject<USteamInvite>();
+	// SteamInvite->InitializeInviteCallback();
 }
 
 void APC_MatchingLobby::SetCineCameraView()
@@ -67,4 +71,20 @@ void APC_MatchingLobby::SetCineCameraView()
 	}
 
 	this->SetViewTargetWithBlend(CineCamera);
+}
+
+void APC_MatchingLobby::ShowSteamInviteDialog()
+{
+	if (SteamInvite)
+	{
+		SteamInvite->ShowSteamOverlayInviteDialog();
+	}
+	else
+	{
+		//logging on screen about faile to show steam overlay with GEngine
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Failed to show Steam Overlay"));
+		}
+	}
 }
