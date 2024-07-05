@@ -14,4 +14,10 @@ class PROJ_A_API UDPResultRoomWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+    UPROPERTY(meta = (BindWidget))
+    class UVerticalBox* scoresVerticalBox;
+
+    UFUNCTION(BlueprintCallable, Category = "UI")
+    void UpdateScores(const TArray<FString>& names, const TArray<int32>& scores);
 };
