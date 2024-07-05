@@ -17,6 +17,7 @@ class PROJ_A_API ADPWeaponGun : public ADPWeapon
 	
 public:
 	ADPWeaponGun();
+	virtual void BeginPlay() override;
 
 	virtual bool Attack(ADPPlayerController* character, FHitResult& result, FRotator& info) override;
 	virtual bool SimulateAttack(ADPCharacter* character, FHitResult& result, const Gunfire& gunfire) override;
@@ -28,6 +29,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* gunMesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Muzzle")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MuzzleArrow")
 	UArrowComponent* muzzle;
 };

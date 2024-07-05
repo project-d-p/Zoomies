@@ -119,6 +119,25 @@ void UCharacterPositionSync::SyncGunFire(ADPCharacter* character)
 	}
 }
 
+void UCharacterPositionSync::SyncCatch(ADPCharacter* character)
+{
+	player_state_ = Cast<ADPPlayerState>(character->GetPlayerState());
+	if (player_state_ == nullptr)
+	{
+		return;
+	}
+	const FString PlayerId = player_state_->GetPlayerName();
+	if (!FDataHub::catchData.Contains(PlayerId))
+	{
+		return;
+	}
+	Catch catch_ = FDataHub::catchData[PlayerId];
+	FDataHub::catchData.Remove(PlayerId);
+	FString monster_id = UTF8_TO_TCHAR(catch_.target().c_str());
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Catch monster_id: %s"), *monster_id);
+	character->CatchMonster(monster_id);
+}
+
 void UCharacterPositionSync::SetState(ADPCharacter* character)
 {
 	State state = actor_position_.state();

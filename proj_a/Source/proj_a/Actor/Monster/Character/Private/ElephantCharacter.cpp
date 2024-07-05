@@ -2,13 +2,14 @@
 
 #include "Components/CapsuleComponent.h"
 
+
 AElephantCharacter::AElephantCharacter()
 {
 	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_FOX(
-		TEXT("/Game/model/animals/elephant/low_poly_elephant.low_poly_elephant"));
-	if (SK_FOX.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_FOX.Object);
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_ELEPHANT
+	(TEXT("/Game/model/animals/elephant/low_poly_elephant.low_poly_elephant"));
+	if (SK_ELEPHANT.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SK_ELEPHANT.Object);
 	}
 
 	/** Loading animations */

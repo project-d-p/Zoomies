@@ -15,5 +15,5 @@ public:
 	static Message MakeFireMessage(ADPPlayerController* Controller, const FVector Position, const FRotator& Rotation);
 	static Message MakeAimMessage(ADPPlayerController* controller, bool bAim);
 	static MonsterPosition MakeMonsterPositionMessage(ABaseMonsterAIController* Monster_Controller);
-	static Message MakeCatchMessage(ADPPlayerController* AdpPlayerController, const FHitResult& HitResult);
+	static Message MakeCatchMessage(ADPPlayerController* AdpPlayerController);
 };

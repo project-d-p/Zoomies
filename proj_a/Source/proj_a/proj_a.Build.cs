@@ -11,7 +11,17 @@ public class proj_a : ModuleRules
 	{
 		string projectDir = Path.Combine(ModuleDirectory, "../../");
 		string thirdPartyDir = Path.Combine(projectDir, "ThirdParty");
+		string editorDirPath = Environment.GetEnvironmentVariable("UE5_ROOT");
 		
+		if (string.IsNullOrEmpty(editorDirPath))
+		{
+			throw new Exception("No UE5_ROOT Error" + editorDirPath + ".");
+		}
+
+		editorDirPath = Path.Combine(editorDirPath, "steam_appid.txt");
+		string sourceFile = Path.Combine(projectDir, "steam_appid.txt");
+		File.Copy(sourceFile, editorDirPath, overwrite: true);
+			
 		if (string.IsNullOrEmpty(thirdPartyDir))
 		{
 			throw new Exception("No Protobuf Error" + thirdPartyDir + ".");

@@ -8,6 +8,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "DPCharacter.generated.h"
 
+class ABaseMonsterCharacter;
+
 UCLASS()
 class PROJ_A_API ADPCharacter : public ACharacter
 {
@@ -46,6 +48,8 @@ public:	// component
 	class UDPWeaponActorComponent* weaponComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UDPStateActorComponent* stateComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class UMonsterSlotComponent* monsterSlotComponent;
 
 	// gun mesh
 	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
@@ -61,7 +65,9 @@ public:	// component
 	void PlaceConstructionAnimation();
 	void DestroyConstructionAnimation();
 	void DyingAnimation();
-	
+
+	bool CatchMonster(const FString& monster_type);
+
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* springArm;

@@ -38,6 +38,11 @@ FMessageHandler::FMessageHandler()
 	{
 		FDataHub::PushMonsterDA(Msg);
 	}));
+
+	MessageHandlers.Add(Message::kCatch, FMessageDelegate::CreateLambda([](const Message& Msg)
+	{
+		FDataHub::PushCatachDA(Msg);
+	}));
 }
 
 void FMessageHandler::HandleMessage(const Message& Msg)

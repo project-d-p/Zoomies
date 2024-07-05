@@ -2,13 +2,14 @@
 
 #include "Components/CapsuleComponent.h"
 
+
 AStarFishCharacter::AStarFishCharacter()
 {
 	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_STARFISH
 	(TEXT("/Game/model/animals/starFish/star_fish.star_fish"));
-	if (SK_MAMMOTH.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_MAMMOTH.Object);
+	if (SK_STARFISH.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SK_STARFISH.Object);
 	}
 
 	/** Loading animations */

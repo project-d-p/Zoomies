@@ -16,8 +16,10 @@
 #include "isteamnetworkingsockets.h"
 #include "MessageMaker.h"
 #include "OctopusCharacter.h"
+#include "OnlineSubsystem.h"
 #include "SlothCharacter.h"
 #include "StarFishCharacter.h"
+#include "steam_api.h"
 
 ADPGameModeBase::ADPGameModeBase()
 {
@@ -173,6 +175,7 @@ void ADPGameModeBase::ProcessData(float delta_time)
 	}
 	this->SyncHostAiming();
 	this->SimulateGunFire();
+	this->SimulateCatch();
 	this->SyncMovement();
 	this->SyncMonsterMovement();
 }
@@ -208,8 +211,16 @@ void ADPGameModeBase::SimulateGunFire()
 	for (auto& pair: player_controllers_)
 	{
 		ADPPlayerController* controller = pair.second;
-		ADPCharacter* character = Cast<ADPCharacter>(controller->GetPawn());
 		controller->SimulateGunFire(steam_listen_socket_);
+	}
+}
+
+void ADPGameModeBase::SimulateCatch()
+{
+	for (auto& pair: player_controllers_)
+	{
+		ADPPlayerController* controller = pair.second;
+		controller->SimulateCatch(steam_listen_socket_);
 	}
 }
 

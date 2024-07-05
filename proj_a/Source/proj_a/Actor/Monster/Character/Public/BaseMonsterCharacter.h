@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DPCharacter.h"
 #include "GameFramework/Character.h"
 #include "BaseMonsterCharacter.generated.h"
 
@@ -26,4 +27,6 @@ protected:
 	virtual void BeginPlay() override;
 	void SyncPosition();
 	virtual void Tick(float DeltaTime) override;
+	
+	bool bCaught = false;
 };

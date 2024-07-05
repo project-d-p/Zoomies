@@ -1,13 +1,17 @@
 #include "BaseMonsterCharacter.h"
 
 #include "BaseMonsterPlayerState.h"
+#include "DPCharacter.h"
 #include "FDataHub.h"
 #include "FNetLogger.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 ABaseMonsterCharacter::ABaseMonsterCharacter()
 {
     bReplicates = true;
+	AActor::SetReplicatingMovement(false);
+	
     PrimaryActorTick.bCanEverTick = true;
 	
 	GetMesh()->SetCollisionProfileName(UCollisionProfile::BlockAllDynamic_ProfileName);

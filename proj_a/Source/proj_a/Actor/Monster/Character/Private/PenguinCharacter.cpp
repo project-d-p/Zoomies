@@ -2,13 +2,14 @@
 
 #include "Components/CapsuleComponent.h"
 
+
 APenguinCharacter::APenguinCharacter()
 {
 	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_FOX(
-		TEXT("/Game/model/animals/penguin/penguin_swimming.penguin_swimming"));
-	if (SK_FOX.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_FOX.Object);
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_PENGUIN
+	(TEXT("/Game/model/animals/penguin/penguin_swimming.penguin_swimming"));
+	if (SK_PENGUIN.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SK_PENGUIN.Object);
 	}
 
 	/** Loading animations */

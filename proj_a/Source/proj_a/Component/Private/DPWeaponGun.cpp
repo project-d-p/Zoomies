@@ -18,18 +18,26 @@ ADPWeaponGun::ADPWeaponGun()
 	hitScan = CreateDefaultSubobject<UHitScan>(TEXT("HitScan"));
 
 	gunMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GunMesh"));
-	RootComponent = gunMesh;
+	// RootComponent = gunMesh;
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> GUN
 	(TEXT("/Game/model/weapon/simpleGun.simpleGun"));
 	if (GUN.Succeeded()) {
 		gunMesh->SetStaticMesh(GUN.Object);
+		gunMesh->SetupAttachment(RootComponent);
 	}
 
-	muzzle = CreateDefaultSubobject<UArrowComponent>(TEXT("Muzzle"));
+	muzzle = CreateDefaultSubobject<UArrowComponent>(TEXT("MuzzleComp"));
 	muzzle->SetupAttachment(gunMesh);
 	muzzle->SetRelativeLocation(FVector(-30.005441, 0.000000, 4.690275));
 	muzzle->SetRelativeRotation(FRotator(0.000000, -180, 0.000000));
+}
+
+void ADPWeaponGun::BeginPlay()
+{
+	Super::BeginPlay();
+
+	muzzle->RegisterComponent();
 }
 
 bool ADPWeaponGun::Attack(ADPPlayerController* controller, FHitResult& result, FRotator& info)
@@ -46,10 +54,17 @@ bool ADPWeaponGun::Attack(ADPPlayerController* controller, FHitResult& result, F
 	{
 		impact_point = start_aim_pos + aim_direction.Vector() * 100000000.f;
 	}
-	FVector muzzle_direction = impact_point - controller->GetCharacter()->GetActorLocation();
+
+	FVector test_gun_mesh_location = gunMesh->GetComponentLocation();
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Start Location[gun Mesh]: %f, %f, %f"), test_gun_mesh_location.X, test_gun_mesh_location.Y, test_gun_mesh_location.Z);
+	FVector test_weapon_location = this->GetActorLocation();
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Start Location[weapon]: %f, %f, %f"), test_weapon_location.X, test_weapon_location.Y, test_weapon_location.Z);
+	
+	FVector muzzle_direction = impact_point - muzzle->GetComponentLocation();
 	FVector normalized_muzzle_direction = muzzle_direction.GetSafeNormal();
 	info = normalized_muzzle_direction.Rotation();
-	const FVector muzzle_location = controller->GetCharacter()->GetActorLocation();
+	const FVector muzzle_location = muzzle->GetComponentLocation();
+	
 	return hitScan->HitDetect(Cast<ADPCharacter>(controller->GetCharacter()), muzzle_location, normalized_muzzle_direction.Rotation(), 100000000.f, result);
 }
 

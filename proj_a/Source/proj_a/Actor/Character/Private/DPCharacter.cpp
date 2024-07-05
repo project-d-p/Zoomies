@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "DPCharacter.h"
+
+#include "BaseMonsterCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "DPHpActorComponent.h"
 #include "DPConstructionActorComponent.h"
@@ -10,6 +12,7 @@
 #include "DPWeaponGun.h"
 #include "FDataHub.h"
 #include "FNetLogger.h"
+#include "MonsterSlotComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -31,6 +34,7 @@ ADPCharacter::ADPCharacter()
 	constructionComponent = CreateDefaultSubobject<UDPConstructionActorComponent>(TEXT("ConstructionComponent"));
 	weaponComponent = CreateDefaultSubobject<UDPWeaponActorComponent>(TEXT("WeaponComponent"));
 	stateComponent = CreateDefaultSubobject<UDPStateActorComponent>(TEXT("StateComponent"));
+	monsterSlotComponent = CreateDefaultSubobject<UMonsterSlotComponent>(TEXT("MonsterSlotComponent"));
 
 	springArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SPRINGARM"));
 	camera = CreateDefaultSubobject<UCameraComponent>(TEXT("CAMERA"));
@@ -134,21 +138,8 @@ void ADPCharacter::BeginPlay()
 	constructionComponent->placeWall = false;
 	constructionComponent->placeturret = false;
 	UE_LOG(LogTemp, Log, TEXT("is it replicaed: %d"), GetCharacterMovement()->GetIsReplicated());
-	TSubclassOf<ADPWeapon> gunClass = ADPWeaponGun::StaticClass();
-	if (weaponComponent) {
-		weaponComponent->AddWeapons(gunClass);
-		weaponComponent->Equip(gunClass);
-	}
 	bUseControllerRotationYaw = false;
-
-	// if (GetLocalRole() == ROLE_AutonomousProxy)
-	// 	GetWorldTimerManager().SetTimer(SynchronizeHandle, this, &ADPCharacter::SyncOwn, 0.2f, true);
 }
-
-// void ADPCharacter::SyncOwn()
-// {
-// 	syncer->SyncMyself(this);
-// }
 
 // Called every frame
 void ADPCharacter::Tick(float DeltaTime)
@@ -166,6 +157,7 @@ void ADPCharacter::Tick(float DeltaTime)
 		syncer->SyncWithServer(this);
 		syncer->SyncGunFire(this);
 	}
+	syncer->SyncCatch(this);
 }
 
 // Called to bind functionality to input
@@ -222,4 +214,9 @@ void ADPCharacter::DestroyConstructionAnimation()
 
 void ADPCharacter::DyingAnimation()
 {
+}
+
+bool ADPCharacter::CatchMonster(const FString& monster_type)
+{
+	return monsterSlotComponent->AddMonsterToSlot(this, monster_type);
 }

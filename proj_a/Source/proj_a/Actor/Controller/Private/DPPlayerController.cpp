@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "DPPlayerController.h"
+
+#include "BaseMonsterCharacter.h"
 #include "DPCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -22,6 +24,7 @@
 #include "state.pb.h"
 #include "HitScan.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "VT/VirtualTextureScalability.h"
 
 
 DEFINE_LOG_CATEGORY(LogNetwork);
@@ -72,6 +75,11 @@ ADPPlayerController::ADPPlayerController()
 	(TEXT("/Game/input/ia_catch.ia_catch"));
 	if (IA_CATCH.Succeeded())
 		catchAction = IA_CATCH.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_RETURN
+	(TEXT("/Game/input/ia_return.ia_return"));
+	if (IA_RETURN.Succeeded())
+		returnAction = IA_RETURN.Object;
 	
 	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
 	Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
@@ -238,7 +246,10 @@ void ADPPlayerController::Tick(float DeltaSeconds)
 		FHitResult hit_result;
 		if (this->IsCatchable(hit_result))
 		{
-			FNetLogger::EditerLog(FColor::Cyan, TEXT("Catchable"));
+			if (Cast<ABaseMonsterCharacter>(hit_result.GetActor()) != nullptr)
+			{
+				// FNetLogger::EditerLog(FColor::Cyan, TEXT("Catchable"));
+			}
 		}
 	}
 	if (HasAuthority())
@@ -276,7 +287,7 @@ void ADPPlayerController::OnPossess(APawn* InPawn)
 	
 	state = Cast<UDPStateActorComponent>(character->GetComponentByClass(UDPStateActorComponent::StaticClass()));
 	construction = Cast<UDPConstructionActorComponent>(character->GetComponentByClass(UDPConstructionActorComponent::StaticClass()));
-	// state->equipmentState = "GUN";
+	
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		FNetLogger::EditerLog(FColor::Red, TEXT("Add Mapping Context [On Possess]"));
@@ -288,25 +299,26 @@ void ADPPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	// enhanced input component Ä³½ºÆÃÇÏ°í ¹ÙÀÎµù
+	// enhanced input component Ä³ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½Îµï¿½
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent)) {
-		// ÇÃ·¹ÀÌ¾î ÀÌµ¿ ( w, a, d, s )
+		// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½Ìµï¿½ ( w, a, d, s )
 		EnhancedInputComponent->BindAction(moveAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Move);
-		// ÇÃ·¹ÀÌ¾î Á¡ÇÁ ( space )
+		// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½ ( space )
 		EnhancedInputComponent->BindAction(jumpAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Jump);
-		// ½ÃÁ¡ º¯È¯ ( ¸¶¿ì½º È¸Àü )
+		// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯ ( ï¿½ï¿½ï¿½ì½º È¸ï¿½ï¿½ )
 		EnhancedInputComponent->BindAction(rotateAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Rotate);
-		//	Çàµ¿, ÃÑ ¹ß»ç/º® ¼³Ä¡/ÅÍ·¿ ¼³Ä¡ ( ¸¶¿ì½º ÁÂÅ¬¸¯ )
+		//	ï¿½àµ¿, ï¿½ï¿½ ï¿½ß»ï¿½/ï¿½ï¿½ ï¿½ï¿½Ä¡/ï¿½Í·ï¿½ ï¿½ï¿½Ä¡ ( ï¿½ï¿½ï¿½ì½º ï¿½ï¿½Å¬ï¿½ï¿½ )
 		EnhancedInputComponent->BindAction(activeAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Active);
-		//	º¯°æ, ¹«±â º¯°æ/º® È¸Àü ( ¸¶¿ì½º ½ºÅ©·Ñ )
+		//	ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ È¸ï¿½ï¿½ ( ï¿½ï¿½ï¿½ì½º ï¿½ï¿½Å©ï¿½ï¿½ )
 		EnhancedInputComponent->BindAction(additionalSettingAction, ETriggerEvent::Triggered, this, &ADPPlayerController::AdditionalSetting);
-		//	¿¡ÀÓ ( ¸¶¿ì½º ¿ìÅ¬¸¯ )
+		//	ï¿½ï¿½ï¿½ï¿½ ( ï¿½ï¿½ï¿½ì½º ï¿½ï¿½Å¬ï¿½ï¿½ )
 		EnhancedInputComponent->BindAction(aimAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Aim);	// 	key down
 		EnhancedInputComponent->BindAction(aimAction, ETriggerEvent::Completed, this, &ADPPlayerController::AimReleased);
-		//	Ãë¼Ò, Ã¤ÆÃ ²ô±â ( esc - UE ¿¡µðÅÍ¿¡¼­ ±âº» ´ÜÃàÅ° º¯°æ ÇÊ¿ä )
+		//	ï¿½ï¿½ï¿½, Ã¤ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ( esc - UE ï¿½ï¿½ï¿½ï¿½ï¿½Í¿ï¿½ï¿½ï¿½ ï¿½âº» ï¿½ï¿½ï¿½ï¿½Å° ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ )
 		EnhancedInputComponent->BindAction(cancelAction, ETriggerEvent::Triggered, this, &ADPPlayerController::ActionCancel);
-		// Æ÷È¹ (f)
+		// ï¿½ï¿½È¹ (f)
 		EnhancedInputComponent->BindAction(catchAction, ETriggerEvent::Started, this, &ADPPlayerController::Catch);
+		EnhancedInputComponent->BindAction(returnAction, ETriggerEvent::Started, this, &ADPPlayerController::ReturningAnimals);
 	}
 }
 
@@ -343,12 +355,6 @@ void ADPPlayerController::Jump(const FInputActionValue& value)
 	if (!actionValue) {
 		return ;
 	}
-
-	Message msg = MessageMaker::MakeJumpMessage(this);
-	// if (!HasAuthority())
-	// {
-	// 	Socket->AsyncSendPacket(msg);
-	// }
 	character->Jump();
 	UGameplayStatics::PlaySound2D(GetWorld(), jumpSound);
 }
@@ -367,7 +373,7 @@ void ADPPlayerController::Rotate(const FInputActionValue& value)
 	}
 }
 
-// TODO: ÃÑ ½î´Â ·ÎÁ÷ ¼öÁ¤ ÇÊ¿ä
+// TODO: ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½
 void ADPPlayerController::Active(const FInputActionValue& value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Active"));
@@ -382,7 +388,7 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 		}
 		FHitResult hit_result;
 		character->PlayFireAnimation();
-		// ÃÖÁ¾ ¹ß»ç À§Ä¡¿Í, ¹æÇâÀ» ¾Ë¾Æ¾ß ÇÔ.
+		// ï¿½ï¿½ï¿½ï¿½ ï¿½ß»ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ë¾Æ¾ï¿½ ï¿½ï¿½.
 		FRotator final_direction;
 		if (character->weaponComponent->Attack(this, hit_result, final_direction))
 		{
@@ -406,7 +412,7 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 	// 		character->GetCharacterMovement()->DisableMovement();
 	// 		construction->MakeWall({ 0, 0, 0 }, { 0, 0, 0 });
 	// 		character->constructionComponent->placeWall = true;
-	// 		// ´ÙÀ½ Æ½¿¡ false·Î ¹Ù²Þ
+	// 		// ï¿½ï¿½ï¿½ï¿½ Æ½ï¿½ï¿½ falseï¿½ï¿½ ï¿½Ù²ï¿½
 	// 		auto resetPlaceWall = [this]() {
 	// 			character->constructionComponent->placeWall = false;
 	// 		};
@@ -515,33 +521,30 @@ void ADPPlayerController::ActionCancel(const FInputActionValue& value)
 
 void ADPPlayerController::Catch(const FInputActionValue& value)
 {
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Catch"));
-
-	// ¸¶¿ì½º ¿¡ÀÓÀ¸·Î Àâ³Ä ¸¶³Ä¸¦ ÆÇ´ÜÇØ¾ßÇÔ.
-	// why? ÇØ´ç ¹öÆ°À» ´­·¶À» ¶§, ¹üÀ§·Î ÆÇ´ÜÇÏ°Ô µÇ¸é ¹üÀ§ ³»¿¡ ÀÖ´Â ¸ðµç ¿ÀºêÁ§Æ®¸¦ Àâ°Ô µÇ±â ¶§¹®.
-	// ±×·¯³ª ¸¶¿ì½º ¿¡ÀÓÀ¸·Î ÀâÀ» ¶§´Â ¿¡ÀÓÀÌ °¡¸®Å°´Â ¿ÀºêÁ§Æ®¸¸ Àâ°ÔµÊ.
-	// ±×·³ À¯Àú·Î ÇÏ¿©±Ý º»ÀÎÀÌ ÇØ´ç ¸ó½ºÅÍ¸¦ °¡¸®Å°°í ÀÖ´Ù¶ó´Â °ÍÀ» ¾Ë·ÁÁÙ ¹«¾ð°¡°¡ ÇÊ¿äÇÔ.
-	// ¿¡ÀÓÀ» °¡Á®´Ù ´ë¸é ¸ó½ºÅÍ°¡ ºû³ª°Å³ª, ¸ó½ºÅÍÀÇ Å×µÎ¸®°¡ ºû³ª°Å³ª, ¸ó½ºÅÍ¸¦ Æ÷È¹ÇÒ°Å³Ä´Â UI°¡ ¶ß°Ô ÇØ¾ß ÇÒµí.
-	
-	// ÀâÀº Á¤º¸´Â PlayerState¿¡ ¾÷µ¥ÀÌÆ®°¡ µÇ¾î¼­, RPC·Î ÇØ´ç Á¤º¸¸¦ µ¿±âÈ­ÇØ¾ßÇÔ.
-	// ±×¸®°í ÇØ´ç ¸ó½ºÅÍÀÇ °´Ã¼´Â ¼­¹ö¿¡¼­ »ç¶óÁü.
-	// RPC·Î ÇØ´ç Á¤º¸°¡ µ¿±âÈ­°¡ µÊ¿¡ µû¶ó¼­ Å¬¶óÀÌ¾ðÆ®´Â ÇØ´ç Á¤º¸¸¦ ¹ÙÅÁÀ¸·Î ·»´õ¸µÀ» ÇÒ ¼ö ÀÖÀ½.
-	// ÀÌ ¶§, ÇØ´ç ¸ó½ºÅÍÀÇ °´Ã¼´Â »ç¶óÁöÁö¸¸, ÇØ´ç ¸ó½ºÅÍÀÇ Á¤º¸´Â ¼­¹ö¿¡ ³²¾ÆÀÖ¾î¾ßÇÔ.
-	// ¿Ö³ÄÇÏ¸é, Å¬¶óÀÌ¾ðÆ®°¡ ÀâÀº ¸ó½ºÅÍÀÇ Á¤º¸¸¦ °¡Áö°í ÀÖ¾î¾ßÇÔ.
-
-	// HitScanÀ» Util Component·Î ¸¸µé¾î¼­ ¾î¶² °É·Î ÇÒ°Å³Ä·Î ÁöÁ¤ÇÏ°Ô ÇØ¾ß ÇÒµí.
-	
 	FHitResult hit_result;
-	
-	Message msg = MessageMaker::MakeCatchMessage(this, hit_result);
-	if (!HasAuthority())
+	if (!this->IsCatchable(hit_result))
 	{
-		Socket->AsyncSendPacket(msg);
+		return ;
 	}
-	else
+	if (Cast<ABaseMonsterCharacter>(hit_result.GetActor()) == nullptr)
+	{
+		return ;
+	}
+	Message msg = MessageMaker::MakeCatchMessage(this);
+	if (HasAuthority())
 	{
 		catch_queue_.push(msg);
 	}
+	else
+	{
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Send Catch Message"));
+		Socket->AsyncSendPacket(msg);
+	}
+}
+
+void ADPPlayerController::ReturningAnimals(const FInputActionValue& value)
+{
+	
 }
 
 /*
@@ -595,6 +598,11 @@ void ADPPlayerController::HandleFire(const Message& fire)
 	this->gun_queue_.push(fire);
 }
 
+void ADPPlayerController::HandleCatch(const Message& catch_)
+{
+	this->catch_queue_.push(catch_);
+}
+
 void ADPPlayerController::SimulateGunFire(SteamNetworkingSocket* steam_socket)
 {
 	if (gun_fire_count_ == 0)
@@ -616,6 +624,7 @@ void ADPPlayerController::SimulateGunFire(SteamNetworkingSocket* steam_socket)
 		gun_fire_count_ -= 1;
 	}
 }
+
 
 void ADPPlayerController::HandleAim(const AimState& AimState)
 {
@@ -694,3 +703,40 @@ void ADPPlayerController::SetState(const ActorPosition& ActorPosition)
 	}
 }
 
+void ADPPlayerController::SimulateCatch(SteamNetworkingSocket* steam_socket)
+{
+	if (catch_queue_.empty())
+	{
+		return ;
+	}
+	while (!catch_queue_.empty())
+	{
+		Message catch_ = catch_queue_.front();
+		catch_queue_.pop();
+		::Catch catch_message = catch_.catch_();
+		FVector start = FVector(catch_message.position().x(), catch_message.position().y(), catch_message.position().z());
+		FRotator direction = FRotator(catch_message.rotation().x(), catch_message.rotation().y(), catch_message.rotation().z());
+		
+		FHitResult hit_result;
+		if (!CatchRay->HitDetect(character, start, direction, 300.0f, hit_result))
+		{
+			continue;
+		}
+		if (Cast<ABaseMonsterCharacter>(hit_result.GetActor()) == nullptr)
+		{
+			continue;
+		}
+		UClass* class_type = hit_result.GetActor()->GetClass();
+		FString monster_type = class_type->GetName();
+		if (!this->character->CatchMonster(monster_type))
+		{
+			continue ;
+		}
+		::Catch reply;
+		reply.set_target(TCHAR_TO_UTF8(*monster_type));
+		*catch_.mutable_catch_() = reply;
+		FString TestString = UTF8_TO_TCHAR(reply.target().c_str());
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Catch monster_id: %s"), *TestString);
+		steam_socket->PushUdpFlushMessage(catch_);
+	}
+}

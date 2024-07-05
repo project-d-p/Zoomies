@@ -2,13 +2,14 @@
 
 #include "Components/CapsuleComponent.h"
 
+
 AStingRayCharacter::AStingRayCharacter()
 {
 	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_FOX(
-		TEXT("/Game/model/animals/stingRay/sting_ray.sting_ray"));
-	if (SK_FOX.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_FOX.Object);
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_STINGRAY
+	(TEXT("/Game/model/animals/stingRay/sting_ray.sting_ray"));
+	if (SK_STINGRAY.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SK_STINGRAY.Object);
 	}
 
 	/** Loading animations */
