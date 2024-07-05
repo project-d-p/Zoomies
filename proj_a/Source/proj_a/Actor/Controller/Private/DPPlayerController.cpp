@@ -533,11 +533,20 @@ void ADPPlayerController::Catch(const FInputActionValue& value)
 		FNetLogger::EditerLog(FColor::Cyan, TEXT("Send Catch Message"));
 		// Socket->AsyncSendPacket(msg);
 	}
+
+	/* Test */
+	UClass* class_type = hit_result.GetActor()->GetClass();
+	FString monster_type = class_type->GetName();
+	this->character->CatchMonster(monster_type);
 }
 
 void ADPPlayerController::ReturningAnimals(const FInputActionValue& value)
 {
-	
+	if (!character->IsAtReturnPlace())
+	{
+		return ;
+	}
+	character->ReturnMonsters();
 }
 
 /*

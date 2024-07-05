@@ -174,6 +174,7 @@ bool ADPCharacter::IsLocallyControlled() const
 	return Super::IsLocallyControlled();
 }
 
+
 void ADPCharacter::PlayAimAnimation()
 {
 	if (characterMontage && !isAim ) {
@@ -229,4 +230,9 @@ void ADPCharacter::SetAtReturnPlace(bool isReturnPlace)
 bool ADPCharacter::IsAtReturnPlace() const
 {
 	return this->isAtReturnPlace;
+}
+
+void ADPCharacter::ReturnMonsters()
+{
+	monsterSlotComponent->RemoveMonstersFromSlot();
 }

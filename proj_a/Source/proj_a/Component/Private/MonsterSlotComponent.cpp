@@ -194,4 +194,9 @@ bool UMonsterSlotComponent::AddMonsterToSlot(ADPCharacter* character, const FStr
 
 void UMonsterSlotComponent::RemoveMonstersFromSlot()
 {
+	for (auto monster : monstersInSlot)
+	{
+		monster->DestroyComponent();
+	}
+	monstersInSlot.clear();
 }

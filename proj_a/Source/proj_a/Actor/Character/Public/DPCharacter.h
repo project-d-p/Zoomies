@@ -32,6 +32,7 @@ public:
 
 	// Locally Controlled
 	virtual bool IsLocallyControlled() const override;
+	void ReturnMonsters();
 
 public:	// component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
