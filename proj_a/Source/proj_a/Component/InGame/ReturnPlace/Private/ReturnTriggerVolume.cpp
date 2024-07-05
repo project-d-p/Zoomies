@@ -1,6 +1,7 @@
 #include "ReturnTriggerVolume.h"
 
 #include "DPCharacter.h"
+#include "FNetLogger.h"
 #include "Evaluation/IMovieSceneEvaluationHook.h"
 
 AReturnTriggerVolume::AReturnTriggerVolume()
@@ -8,15 +9,15 @@ AReturnTriggerVolume::AReturnTriggerVolume()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Create and configure the box component
-	TriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerBox"));
-	TriggerBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	TriggerBox->SetCollisionObjectType(ECollisionChannel::ECC_WorldStatic);
-	TriggerBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	TriggerBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
-	RootComponent = TriggerBox;
+	TriggerSphere = CreateDefaultSubobject<USphereComponent>(TEXT("TriggerSphere"));
+	TriggerSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	TriggerSphere->SetCollisionObjectType(ECollisionChannel::ECC_WorldStatic);
+	TriggerSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	TriggerSphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+	RootComponent = TriggerSphere;
 
-	TriggerBox->OnComponentBeginOverlap.AddDynamic(this, &AReturnTriggerVolume::OnOverlapBegin);
-	TriggerBox->OnComponentEndOverlap.AddDynamic(this, &AReturnTriggerVolume::OnOverlapEnd);
+	TriggerSphere->OnComponentBeginOverlap.AddDynamic(this, &AReturnTriggerVolume::OnOverlapBegin);
+	TriggerSphere->OnComponentEndOverlap.AddDynamic(this, &AReturnTriggerVolume::OnOverlapEnd);
 }
 
 void AReturnTriggerVolume::BeginPlay()

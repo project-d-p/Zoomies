@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
 #include "ReturnTriggerVolume.generated.h"
 
 UCLASS()
@@ -18,7 +18,7 @@ protected:
 private:
 	// Box component to represent the volume
 	UPROPERTY(VisibleAnywhere)
-	UBoxComponent* TriggerBox;
+	USphereComponent* TriggerSphere;
 
 	// Function to handle the overlap beginning
 	UFUNCTION()

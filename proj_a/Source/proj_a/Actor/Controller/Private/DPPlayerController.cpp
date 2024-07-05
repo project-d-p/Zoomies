@@ -82,7 +82,7 @@ ADPPlayerController::ADPPlayerController()
 		returnAction = IA_RETURN.Object;
 	
 	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
-	Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
+	// Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
 	CatchRay = CreateDefaultSubobject<UHitScan>(TEXT("Catch Ray"));
 
 	static ConstructorHelpers::FObjectFinder<USoundBase> SoundAsset
@@ -257,7 +257,7 @@ void ADPPlayerController::Tick(float DeltaSeconds)
 		return ;
 	}
 	Message msg = MessageMaker::MakePositionMessage(this);
-	Socket->AsyncSendPacket(msg);
+	// Socket->AsyncSendPacket(msg);
 }
 
 bool ADPPlayerController::IsCatchable(FHitResult& hit_result)
@@ -330,13 +330,6 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 	const FVector forwardVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
 
-	// if (!HasAuthority())
-	// {
-	// 	FVector velocity = character->GetCharacterMovement()->Velocity;
-	// 	Message message = MessageMaker::MakeMovementMessage(this, actionValue, controlRotation, velocity);
-	// 	Socket->AsyncSendPacket(message);
-	// }
-	
 	character->AddMovementInput(forwardVector, actionValue.X);
 	character->AddMovementInput(rightVector, actionValue.Y);
 
@@ -399,7 +392,7 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 		Message msg = MessageMaker::MakeFireMessage(this, position, final_direction);
 		if (!HasAuthority())
 		{
-			Socket->AsyncSendPacket(msg);
+			// Socket->AsyncSendPacket(msg);
 		}
 		else
 		{
@@ -467,7 +460,7 @@ void ADPPlayerController::Aim(const FInputActionValue& value)
 			Message msg = MessageMaker::MakeAimMessage(this, !character->isAim);
 			if (!HasAuthority())
 			{
-				Socket->AsyncSendPacket(msg);
+				// Socket->AsyncSendPacket(msg);
 			}
 			else
 			{
@@ -498,7 +491,7 @@ void ADPPlayerController::AimReleased(const FInputActionValue& value)
 		Message msg = MessageMaker::MakeAimMessage(this, !character->isAim);
 		if (!HasAuthority())
 		{
-			Socket->AsyncSendPacket(msg);
+			// Socket->AsyncSendPacket(msg);
 		}
 		else
 		{
@@ -538,7 +531,7 @@ void ADPPlayerController::Catch(const FInputActionValue& value)
 	else
 	{
 		FNetLogger::EditerLog(FColor::Cyan, TEXT("Send Catch Message"));
-		Socket->AsyncSendPacket(msg);
+		// Socket->AsyncSendPacket(msg);
 	}
 }
 
@@ -569,8 +562,6 @@ void ADPPlayerController::HandleMovement(const Movement& movement, const float& 
 	const FVector forwardVector = FRotationMatrix(rotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(rotation).GetUnitAxis(EAxis::Y);
 
-	// character->AddMovementInput(forwardVector, action.X * delta / server_delta);
-	// character->AddMovementInput(rightVector, action.Y * delta / server_delta);
 	character->AddMovementInput(forwardVector, action.X);
 	character->AddMovementInput(rightVector, action.Y);
 
