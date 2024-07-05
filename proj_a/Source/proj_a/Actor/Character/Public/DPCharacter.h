@@ -20,7 +20,6 @@ public:
 	ADPCharacter();
 	
 protected:
-	// void SyncOwn();
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -30,11 +29,6 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	// FString playerID;
-	// FVector3f pos;
-	// FVector3f orientation;
-	// FString state;
 
 	// Locally Controlled
 	virtual bool IsLocallyControlled() const override;
@@ -51,10 +45,6 @@ public:	// component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UMonsterSlotComponent* monsterSlotComponent;
 
-	// gun mesh
-	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
-	// UStaticMeshComponent* gun;
-	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
 	UAnimMontage* characterMontage;
 
@@ -67,6 +57,9 @@ public:	// component
 	void DyingAnimation();
 
 	bool CatchMonster(const FString& monster_type);
+
+	void SetAtReturnPlace(bool isReturnPlace);
+	bool IsAtReturnPlace() const;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -82,7 +75,8 @@ private:
 	UPROPERTY()
 	UCharacterPositionSync* syncer = nullptr;
 
-	// FTimerHandle SynchronizeHandle;
+	bool isAtReturnPlace{ false };
+	
 public:
 	FVector currentVelocity{ 0.f, 0.f, 0.f };
 	UPROPERTY(BlueprintReadWrite)
