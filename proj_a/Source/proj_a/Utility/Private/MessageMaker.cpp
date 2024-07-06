@@ -162,14 +162,16 @@ MonsterPosition MessageMaker::MakeMonsterPositionMessage(ABaseMonsterAIControlle
 	MonsterPosition msg;
 	if (Monster_Controller == nullptr)
 	{
+		FNetLogger::LogError(TEXT("Monster Controller is nullptr"));
 		return msg;
 	}
-	if (Monster_Controller->PlayerState == nullptr)
-	{
-		return msg;
-	}
-	msg.set_monster_id(std::to_string(Monster_Controller->PlayerState->GetPlayerId()));
+	msg.set_monster_id(TCHAR_TO_UTF8(*FString::FromInt(Monster_Controller->GetMonsterId())));
 	Vec3 position;
+	if (Monster_Controller->GetPawn() == nullptr)
+	{
+		FNetLogger::LogError(TEXT("Monster Controller's Pawn is nullptr"));
+		return msg;
+	}
 	position.set_x(Monster_Controller->GetPawn()->GetActorLocation().X);
 	position.set_y(Monster_Controller->GetPawn()->GetActorLocation().Y);
 	position.set_z(Monster_Controller->GetPawn()->GetActorLocation().Z);

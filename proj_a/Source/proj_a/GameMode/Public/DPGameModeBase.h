@@ -33,7 +33,18 @@ public:
 
 	void SendChatToAllClients(const FString& SenderName, const FString& Message);
 
-	/** 테스트를 위해서 임시로 public에 선언 */
+	// monster
+	enum { NUM_OF_MAX_MONSTERS = 200 };
+	std::vector<ABaseMonsterAIController*> monster_controllers_;
+	std::vector<int32> empty_monster_slots_;
+
+	std::vector<std::thread> workers;
+	std::queue<std::function<void()>> tasks;
+	
+	std::condition_variable Condition;
+	std::mutex Mutex;
+	std::atomic<int32> PendingQueries;
+	
 	UPROPERTY()
 	UScoreManagerComp* ScoreManager;
 	FTimerHandle TimerHandle_SpawnAI;
@@ -57,7 +68,8 @@ private:
 	void SyncHostAiming();
 	void SyncMonsterMovement();
 	void ProcessData(float delta_time);
-	void SpawnMonsters();
+	void MonsterMoveSimulate(float delta_time);
+	void SpawnMonsters(float delta_time);
 	
 private:
 	// Member variables
@@ -72,10 +84,6 @@ private:
 	FMessageQueue_T message_queue_;
 	std::map<std::string, ADPPlayerController*> player_controllers_;
 	ServerMessageHandler message_handler_;
-
-	// monster
-	enum { NUM_OF_MAX_MONSTERS = 200 };
-	std::vector<ABaseMonsterAIController*> monster_controllers_;
 
 private:
 	UPROPERTY()

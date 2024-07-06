@@ -16,14 +16,20 @@ public:
 
 	UFUNCTION()
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-
+	void ScaleCapsuleSize(float ScaleFactor);
+	
+	UPROPERTY(Replicated)
+	int32 MonsterId;
+	int32 index;
 private:
 	float MaxHp = 100.f;
 	float MoveSpeed;
-	
+
 protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void BeginPlay() override;
-	void SyncPosition();
 	virtual void Tick(float DeltaTime) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	void SyncPosition();
 };

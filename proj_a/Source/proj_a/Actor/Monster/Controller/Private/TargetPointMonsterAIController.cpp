@@ -1,10 +1,21 @@
 #include "TargetPointMonsterAIController.h"
 
+#include "DPGameModeBase.h"
+#include "GameHelper.h"
 #include "Navigation/PathFollowingComponent.h"
+
+void ATargetPointMonsterAIController::OnMoveFinished(FAIRequestID FaiRequestID,
+	const FPathFollowingResult& PathFollowingResult)
+{
+	if (!TargetCharacter.IsValid())
+	{
+		return;
+	}
+}
 
 void ATargetPointMonsterAIController::MoveToTargetLocation()
 {
-	static FVector Dest = FVector(1500.0f, 0.0f, 0.0f);
+	static FVector Dest = FVector(4000.0f, 0.0f, 0.0f);
 	float AcceptanceRadius = 50.0f;
 	bool bStopOnOverlap = true;
 	bool bUsePathfinding = true;
@@ -12,6 +23,8 @@ void ATargetPointMonsterAIController::MoveToTargetLocation()
 	bool bCanStrafe = false;
 	TSubclassOf<UNavigationQueryFilter> FilterClass = nullptr;
 	bool bAllowPartialPath = true;
+	
+	GetPathFollowingComponent()->OnRequestFinished.AddUObject(this, &ATargetPointMonsterAIController::OnMoveFinished);
 	
 	EPathFollowingRequestResult::Type Result = MoveToLocation(Dest, AcceptanceRadius, bStopOnOverlap, bUsePathfinding,
 															  bProjectDestinationToNavigation, bCanStrafe, FilterClass, bAllowPartialPath);
@@ -22,9 +35,7 @@ void ATargetPointMonsterAIController::MoveToTargetLocation()
 	}
 }
 
-void ATargetPointMonsterAIController::Tick(float DeltaSeconds)
+void ATargetPointMonsterAIController::SimulateMovement(float delta_time)
 {
-	Super::Tick(DeltaSeconds);
-
 	MoveToTargetLocation();
 }

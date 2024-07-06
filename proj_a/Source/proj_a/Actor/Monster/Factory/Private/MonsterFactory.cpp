@@ -14,7 +14,9 @@
 #include "TargetPointMonsterAIController.h"
 #include "GameFramework/Actor.h"
 
-ABaseMonsterAIController* UMonsterFactory::RandomMonsterSpawn(const FVector& Location)
+// TODO: Currently, all random arrays in this function are hardcoded, but this will be changed later.
+
+ABaseMonsterAIController* UMonsterFactory::RandomMonsterSpawn(int32 idx)
 {
 	UWorld* World = GetWorld();
 	if (!World)
@@ -23,6 +25,10 @@ ABaseMonsterAIController* UMonsterFactory::RandomMonsterSpawn(const FVector& Loc
 		return nullptr;
 	}
 
+	// XXX: For now, hardcoding the Location.
+	float RandomY = FMath::FRandRange(-3000.f, 3000.f);
+	FVector Location = FVector(-5000.f, RandomY, 300.f);
+	
 	TArray<UClass*> MonsterClasses = {
 		ACrabCharacter::StaticClass(),
 		ALobstarCharacter::StaticClass(),
@@ -33,10 +39,10 @@ ABaseMonsterAIController* UMonsterFactory::RandomMonsterSpawn(const FVector& Loc
 	};
 	UClass* SelectedMonsterClass = MonsterClasses[FMath::RandRange(0, MonsterClasses.Num() - 1)];
 	
-	return SpawnMonster(SelectedMonsterClass, Location);
+	return SpawnMonster(SelectedMonsterClass, Location, idx);
 }
 
-ABaseMonsterAIController* UMonsterFactory::SpawnMonster(UClass* MonsterClass, const FVector& Location)
+ABaseMonsterAIController* UMonsterFactory::SpawnMonster(UClass* MonsterClass, const FVector& Location, int32 idx)
 {
 	UWorld* World = GetWorld();
 	if (!World || !MonsterClass || !MonsterClass->IsChildOf(ABaseMonsterCharacter::StaticClass()))
@@ -46,9 +52,9 @@ ABaseMonsterAIController* UMonsterFactory::SpawnMonster(UClass* MonsterClass, co
 	}
 
 	TArray<UClass*> AIControllerClasses = {
-		// ATargetPointMonsterAIController::StaticClass(),
-		AAvoidPlayerMonsterAIController::StaticClass(),
-		// AChasePlayerMonsterAIController::StaticClass()
+		ATargetPointMonsterAIController::StaticClass(),
+		// AAvoidPlayerMonsterAIController::StaticClass(),
+		AChasePlayerMonsterAIController::StaticClass()
 	};
 
 	int32 RandomIndex = FMath::RandRange(0, AIControllerClasses.Num() - 1);
@@ -59,7 +65,7 @@ ABaseMonsterAIController* UMonsterFactory::SpawnMonster(UClass* MonsterClass, co
 	if (AIController == nullptr)
 	{
 		FNetLogger::LogError(TEXT("Failed to spawn AI controller"));
-		return AIController;
+		return nullptr;
 	}
 	
 	ABaseMonsterCharacter* SpawnedMonster = Cast<ABaseMonsterCharacter>(
@@ -70,6 +76,15 @@ ABaseMonsterAIController* UMonsterFactory::SpawnMonster(UClass* MonsterClass, co
 		AIController->Destroy();
 		return nullptr;
 	}
+	if (SpawnedMonster)
+	{
+		TArray<float> ScaleFactors = { 0.5f, 1.0f, 2.0f };
+		float SelectedScaleFactor = ScaleFactors[FMath::RandRange(0, ScaleFactors.Num() - 1)];
+		SpawnedMonster->ScaleCapsuleSize(SelectedScaleFactor);
+		SpawnedMonster->index = idx;
+	}
+	SpawnedMonster->MonsterId = AIController->GetUniqueID();
 	AIController->Possess(SpawnedMonster);
+	
 	return AIController;
 }

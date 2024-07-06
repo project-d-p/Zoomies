@@ -1,9 +1,11 @@
 #include "BaseMonsterCharacter.h"
 
-#include "BaseMonsterPlayerState.h"
+#include "BaseMonsterAIController.h"
 #include "FDataHub.h"
 #include "FNetLogger.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Net/UnrealNetwork.h"
 
 ABaseMonsterCharacter::ABaseMonsterCharacter()
 {
@@ -35,13 +37,7 @@ void ABaseMonsterCharacter::BeginPlay()
 
 void ABaseMonsterCharacter::SyncPosition()
 {
-	ABaseMonsterPlayerState* mPlayerState = Cast<ABaseMonsterPlayerState>(this->GetPlayerState());
-	if (mPlayerState == nullptr)
-	{
-		FNetLogger::LogError(TEXT("PlayerState is nullptr"));
-		return;
-	}
-	int id = mPlayerState->GetPlayerId();
+	int32 id = MonsterId;
 	FString MonsterID = FString::FromInt(id);
 	if (!FDataHub::monsterData.Contains(MonsterID))
 	{
@@ -64,13 +60,31 @@ void ABaseMonsterCharacter::SyncPosition()
 	this->SetActorRotation(FinalRotation);
 }
 
+void ABaseMonsterCharacter::ScaleCapsuleSize(float ScaleFactor)
+{
+	UCapsuleComponent* LCC = GetCapsuleComponent();
+	if (LCC)
+	{
+		FVector Scalar = FVector(ScaleFactor, ScaleFactor, ScaleFactor);
+		LCC->SetRelativeScale3D(Scalar);
+	}
+}
+
 void ABaseMonsterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 	if (!HasAuthority())
+	{
 		this->SyncPosition();
-	// FNetLogger::EditerLog(FColor::Green, TEXT("Tick in BaseMonsterCharacter"));
+	}
+}
+
+void ABaseMonsterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ABaseMonsterCharacter, MonsterId, COND_InitialOnly);
 }
 
 void ABaseMonsterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

@@ -1,6 +1,8 @@
 #include "AvoidPlayerMonsterAIController.h"
 
+#include "DPGameModeBase.h"
 #include "FNetLogger.h"
+#include "GameHelper.h"
 #include "NavigationSystem.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "EnvironmentQuery/EnvQuery.h"
@@ -26,7 +28,7 @@ void AAvoidPlayerMonsterAIController::MoveToRandomTargetLocation()
 	if (!NavSys) return;
 
 	FVector Origin = GetPawn()->GetActorLocation();
-	float RandomRadius = 1000.0f;
+	float RandomRadius = 3000.0f;
 
 	FNavLocation Dest;
 	if (NavSys->GetRandomPointInNavigableRadius(Origin, RandomRadius, Dest))
@@ -75,6 +77,9 @@ void AAvoidPlayerMonsterAIController::OnQueryFinished(TSharedPtr<FEnvQueryResult
 	{
 		MoveToRandomTargetLocation();
 	}
+	ADPGameModeBase* GM = UGameHelper::GetInGameMode(GetWorld());
+	--GM->PendingQueries;
+	GM->Condition.notify_all();
 }
 
 void AAvoidPlayerMonsterAIController::BeginPlay()
@@ -87,22 +92,25 @@ void AAvoidPlayerMonsterAIController::BeginPlay()
 			UE_LOG(LogMonsterAI, Error, TEXT("UseBlackboard failed in BeginPlay!"));
 		if (!RunBehaviorTree(BehaviorTreeAsset))
 			UE_LOG(LogMonsterAI, Error, TEXT("RunBehaviorTree failed in BeginPlay!"));
-
-		GetWorld()->GetTimerManager().SetTimer(
-			EQSQueryTimerHandle,
-			this,
-			&AAvoidPlayerMonsterAIController::RunEQSQuery,
-			0.5f,
-			true);
-		GetWorld()->GetTimerManager().SetTimer(
-			DeSpawnTimerHandle,
-			this,
-			&AAvoidPlayerMonsterAIController::RemovePawnAndController,
-			10.0f,
-			false);
 	}
 	else
 	{
 		UE_LOG(LogMonsterAI, Error, TEXT("BehaviorTreeAsset or BlackboardAsset is null in BeginPlay!"));
+	}
+}
+
+void AAvoidPlayerMonsterAIController::SimulateMovement(float delta_time)
+{
+	elapsed_DeSpawnTime += delta_time;
+	if (elapsed_DeSpawnTime >= DeSpawnTime)
+	{
+		RemovePawnAndController();
+		return;
+	}
+	elapsed_EQSQueryTime += delta_time;
+	if (elapsed_EQSQueryTime >= EQSQueryTime)
+	{
+		RunEQSQuery();
+		elapsed_EQSQueryTime = 0;
 	}
 }

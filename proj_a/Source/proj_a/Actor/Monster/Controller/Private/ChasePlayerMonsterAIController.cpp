@@ -1,7 +1,10 @@
 #include "ChasePlayerMonsterAIController.h"
 
+#include "DPGameModeBase.h"
+#include "GameHelper.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
+#include "Navigation/PathFollowingComponent.h"
 
 void AChasePlayerMonsterAIController::MoveToPlayer()
 {
@@ -15,7 +18,7 @@ void AChasePlayerMonsterAIController::MoveToPlayer()
 		bool bCanStrafe = false;
 		TSubclassOf<UNavigationQueryFilter> FilterClass = nullptr;
 		bool bAllowPartialPath = true;
-    
+		
 		MoveToActor(
 			PlayerCharacter,
 			AcceptanceRadius,
@@ -30,14 +33,12 @@ void AChasePlayerMonsterAIController::MoveToPlayer()
 void AChasePlayerMonsterAIController::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	int32 NumPlayers = UGameplayStatics::GetNumPlayerControllers(GetWorld());
 	PlayerIndex = FMath::RandRange(0, NumPlayers - 1);
 }
 
-void AChasePlayerMonsterAIController::Tick(float DeltaSeconds)
+void AChasePlayerMonsterAIController::SimulateMovement(float delta_time)
 {
-	ABaseMonsterAIController::Tick(DeltaSeconds);
-
 	MoveToPlayer();
 }

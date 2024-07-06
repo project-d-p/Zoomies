@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "BaseMonsterCharacter.h"
 #include "BB_Monster.h"
 #include "BT_Monster.h"
 #include "Navigation/CrowdAgentInterface.h"
@@ -18,7 +19,10 @@ class PROJ_A_API ABaseMonsterAIController : public AAIController, public ICrowdA
 
 public:
 	ABaseMonsterAIController();
-	
+	int32 GetMonsterId() const { return Cast<ABaseMonsterCharacter>(GetCharacter())->MonsterId; }
+	void RemovePawnAndController();
+	virtual void SimulateMovement(float delta_time) {}
+
 protected:
 	UPROPERTY()
 	UBT_Monster* BehaviorTreeAsset;
@@ -29,6 +33,4 @@ protected:
 	UBB_Monster* BlackboardAsset;
 	UPROPERTY(Transient)
 	UBlackboardComponent* BlackboardComp;
-
-	void RemovePawnAndController();
 };

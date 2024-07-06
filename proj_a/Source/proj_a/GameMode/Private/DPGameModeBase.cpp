@@ -26,7 +26,14 @@ ADPGameModeBase::ADPGameModeBase()
 	MonsterFactory = CreateDefaultSubobject<UMonsterFactory>(TEXT("MonsterFactory"));
 
 	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.TickGroup = TG_PostPhysics;
 	monster_controllers_.resize(NUM_OF_MAX_MONSTERS, nullptr);
+	empty_monster_slots_.reserve(NUM_OF_MAX_MONSTERS);
+
+	for (int i = 0; i < NUM_OF_MAX_MONSTERS; i++)
+	{
+		empty_monster_slots_.push_back(i);
+	}
 	// PrimaryActorTick.TickInterval = 0.01f;
 	bReplicates = true;
 }
@@ -111,15 +118,6 @@ void ADPGameModeBase::StartPlay()
 	UE_LOG(LogTemp, Log, TEXT("Number of Players in this Session: %d"), GetNumPlayers());
 
 	TimerManager->StartTimer(60.0f);
-
-	// For Test Method
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle_SpawnAI, this, &ADPGameModeBase::SpawnMonsters, 3.0f, true);
-}
-
-void ADPGameModeBase::SpawnAndPossessAI()
-{
-	MonsterFactory->RandomMonsterSpawn(
-		FVector(-1500.f, 0.f, 600.f));
 }
 
 void ADPGameModeBase::Tick(float delta_time)
@@ -137,6 +135,8 @@ void ADPGameModeBase::Tick(float delta_time)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Game is not started yet."));
 	}
+	
+	FNetLogger::EditerLog(FColor::Green, TEXT("Number of monsters: %d"), NUM_OF_MAX_MONSTERS - empty_monster_slots_.size());
 }
 
 void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -153,7 +153,8 @@ void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void ADPGameModeBase::ProcessData(float delta_time)
 {
 	message_queue_ = steam_listen_socket_->GetReadBuffer();
-	// this->SpawnMonsters();
+	this->SpawnMonsters(delta_time);
+	this->MonsterMoveSimulate(delta_time);
 	while (!this->message_queue_.empty())
 	{
 		Message message = this->message_queue_.front();
@@ -167,15 +168,33 @@ void ADPGameModeBase::ProcessData(float delta_time)
 	this->SyncMonsterMovement();
 }
 
-void ADPGameModeBase::SpawnMonsters()
+void ADPGameModeBase::MonsterMoveSimulate(float delta_time)
 {
-	for (int i = 0; i < NUM_OF_MAX_MONSTERS; i++)
+	for (auto& mc: monster_controllers_)
 	{
-		if (monster_controllers_[i] == nullptr)
+		if (mc != nullptr)
 		{
-			// Random Spawn
-			monster_controllers_[i] = MonsterFactory->RandomMonsterSpawn(
-				FVector(0.f, 0.f, 600.f));
+			// ++PendingQueries;
+			mc->SimulateMovement(delta_time);
+		}
+	}
+	// std::unique_lock<std::mutex> Lock(Mutex);
+	// Condition.wait(Lock, [this] { return PendingQueries.load() == 0; });
+}
+
+void ADPGameModeBase::SpawnMonsters(float delta_time)
+{
+	static float spawn_timer = 0.0f;
+	constexpr float spawn_interval = 0.1f;
+
+	spawn_timer += delta_time;
+	if (spawn_timer >= spawn_interval)
+	{
+		if (empty_monster_slots_.size() != 0)
+		{
+			int32 idx = empty_monster_slots_.back();
+			if ((monster_controllers_[idx] = MonsterFactory->RandomMonsterSpawn(idx)) != nullptr)
+				empty_monster_slots_.pop_back();
 		}
 	}
 }
@@ -222,14 +241,14 @@ void ADPGameModeBase::SyncHostAiming()
 void ADPGameModeBase::SyncMonsterMovement()
 {
 	MonsterPositionList msg_list;
+
 	for (int i = 0; i < NUM_OF_MAX_MONSTERS; i++)
 	{
-		if (monster_controllers_[i] == nullptr)
+		if (monster_controllers_[i] != nullptr)
 		{
-			continue;
+			MonsterPosition msg = MessageMaker::MakeMonsterPositionMessage(monster_controllers_[i]);
+			msg_list.add_monster_positions()->CopyFrom(msg);
 		}
-		MonsterPosition msg = MessageMaker::MakeMonsterPositionMessage(monster_controllers_[i]);
-		msg_list.add_monster_positions()->CopyFrom(msg);
 	}
 	Message msg;
 	*msg.mutable_monster_position() = msg_list;

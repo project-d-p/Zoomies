@@ -15,5 +15,6 @@ private:
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaSeconds) override;
+	virtual void SimulateMovement(float delta_time) override;
+	// virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
 };

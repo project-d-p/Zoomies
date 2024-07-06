@@ -288,24 +288,24 @@ void ADPPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	// enhanced input component Ä³½ºÆÃÇÏ°í ¹ÙÀÎµù
+	// enhanced input component ìºìŠ¤íŒ…í•˜ê³  ë°”ì¸ë”©
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent)) {
-		// ÇÃ·¹ÀÌ¾î ÀÌµ¿ ( w, a, d, s )
+		// í”Œë ˆì´ì–´ ì´ë™ ( w, a, d, s )
 		EnhancedInputComponent->BindAction(moveAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Move);
-		// ÇÃ·¹ÀÌ¾î Á¡ÇÁ ( space )
+		// í”Œë ˆì´ì–´ ì í”„ ( space )
 		EnhancedInputComponent->BindAction(jumpAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Jump);
-		// ½ÃÁ¡ º¯È¯ ( ¸¶¿ì½º È¸Àü )
+		// ì‹œì  ë³€í™˜ ( ë§ˆìš°ìŠ¤ íšŒì „ )
 		EnhancedInputComponent->BindAction(rotateAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Rotate);
-		//	Çàµ¿, ÃÑ ¹ß»ç/º® ¼³Ä¡/ÅÍ·¿ ¼³Ä¡ ( ¸¶¿ì½º ÁÂÅ¬¸¯ )
+		//	í–‰ë™, ì´ ë°œì‚¬/ë²½ ì„¤ì¹˜/í„°ë › ì„¤ì¹˜ ( ë§ˆìš°ìŠ¤ ì¢Œí´ë¦­ )
 		EnhancedInputComponent->BindAction(activeAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Active);
-		//	º¯°æ, ¹«±â º¯°æ/º® È¸Àü ( ¸¶¿ì½º ½ºÅ©·Ñ )
+		//	ë³€ê²½, ë¬´ê¸° ë³€ê²½/ë²½ íšŒì „ ( ë§ˆìš°ìŠ¤ ìŠ¤í¬ë¡¤ )
 		EnhancedInputComponent->BindAction(additionalSettingAction, ETriggerEvent::Triggered, this, &ADPPlayerController::AdditionalSetting);
-		//	¿¡ÀÓ ( ¸¶¿ì½º ¿ìÅ¬¸¯ )
+		//	ì—ì„ ( ë§ˆìš°ìŠ¤ ìš°í´ë¦­ )
 		EnhancedInputComponent->BindAction(aimAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Aim);	// 	key down
 		EnhancedInputComponent->BindAction(aimAction, ETriggerEvent::Completed, this, &ADPPlayerController::AimReleased);
-		//	Ãë¼Ò, Ã¤ÆÃ ²ô±â ( esc - UE ¿¡µğÅÍ¿¡¼­ ±âº» ´ÜÃàÅ° º¯°æ ÇÊ¿ä )
+		//	ì·¨ì†Œ, ì±„íŒ… ë„ê¸° ( esc - UE ì—ë””í„°ì—ì„œ ê¸°ë³¸ ë‹¨ì¶•í‚¤ ë³€ê²½ í•„ìš” )
 		EnhancedInputComponent->BindAction(cancelAction, ETriggerEvent::Triggered, this, &ADPPlayerController::ActionCancel);
-		// Æ÷È¹ (f)
+		// í¬íš (f)
 		EnhancedInputComponent->BindAction(catchAction, ETriggerEvent::Started, this, &ADPPlayerController::Catch);
 	}
 }
@@ -367,7 +367,7 @@ void ADPPlayerController::Rotate(const FInputActionValue& value)
 	}
 }
 
-// TODO: ÃÑ ½î´Â ·ÎÁ÷ ¼öÁ¤ ÇÊ¿ä
+// TODO: ì´ ì˜ëŠ” ë¡œì§ ìˆ˜ì • í•„ìš”
 void ADPPlayerController::Active(const FInputActionValue& value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Active"));
@@ -382,7 +382,7 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 		}
 		FHitResult hit_result;
 		character->PlayFireAnimation();
-		// ÃÖÁ¾ ¹ß»ç À§Ä¡¿Í, ¹æÇâÀ» ¾Ë¾Æ¾ß ÇÔ.
+		// ìµœì¢… ë°œì‚¬ ìœ„ì¹˜ì™€, ë°©í–¥ì„ ì•Œì•„ì•¼ í•¨.
 		FRotator final_direction;
 		if (character->weaponComponent->Attack(this, hit_result, final_direction))
 		{
@@ -406,7 +406,7 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 	// 		character->GetCharacterMovement()->DisableMovement();
 	// 		construction->MakeWall({ 0, 0, 0 }, { 0, 0, 0 });
 	// 		character->constructionComponent->placeWall = true;
-	// 		// ´ÙÀ½ Æ½¿¡ false·Î ¹Ù²Ş
+	// 		// ë‹¤ìŒ í‹±ì— falseë¡œ ë°”ê¿ˆ
 	// 		auto resetPlaceWall = [this]() {
 	// 			character->constructionComponent->placeWall = false;
 	// 		};
@@ -517,19 +517,19 @@ void ADPPlayerController::Catch(const FInputActionValue& value)
 {
 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Catch"));
 
-	// ¸¶¿ì½º ¿¡ÀÓÀ¸·Î Àâ³Ä ¸¶³Ä¸¦ ÆÇ´ÜÇØ¾ßÇÔ.
-	// why? ÇØ´ç ¹öÆ°À» ´­·¶À» ¶§, ¹üÀ§·Î ÆÇ´ÜÇÏ°Ô µÇ¸é ¹üÀ§ ³»¿¡ ÀÖ´Â ¸ğµç ¿ÀºêÁ§Æ®¸¦ Àâ°Ô µÇ±â ¶§¹®.
-	// ±×·¯³ª ¸¶¿ì½º ¿¡ÀÓÀ¸·Î ÀâÀ» ¶§´Â ¿¡ÀÓÀÌ °¡¸®Å°´Â ¿ÀºêÁ§Æ®¸¸ Àâ°ÔµÊ.
-	// ±×·³ À¯Àú·Î ÇÏ¿©±İ º»ÀÎÀÌ ÇØ´ç ¸ó½ºÅÍ¸¦ °¡¸®Å°°í ÀÖ´Ù¶ó´Â °ÍÀ» ¾Ë·ÁÁÙ ¹«¾ğ°¡°¡ ÇÊ¿äÇÔ.
-	// ¿¡ÀÓÀ» °¡Á®´Ù ´ë¸é ¸ó½ºÅÍ°¡ ºû³ª°Å³ª, ¸ó½ºÅÍÀÇ Å×µÎ¸®°¡ ºû³ª°Å³ª, ¸ó½ºÅÍ¸¦ Æ÷È¹ÇÒ°Å³Ä´Â UI°¡ ¶ß°Ô ÇØ¾ß ÇÒµí.
+	// ë§ˆìš°ìŠ¤ ì—ì„ìœ¼ë¡œ ì¡ëƒ ë§ˆëƒë¥¼ íŒë‹¨í•´ì•¼í•¨.
+	// why? í•´ë‹¹ ë²„íŠ¼ì„ ëˆŒë €ì„ ë•Œ, ë²”ìœ„ë¡œ íŒë‹¨í•˜ê²Œ ë˜ë©´ ë²”ìœ„ ë‚´ì— ìˆëŠ” ëª¨ë“  ì˜¤ë¸Œì íŠ¸ë¥¼ ì¡ê²Œ ë˜ê¸° ë•Œë¬¸.
+	// ê·¸ëŸ¬ë‚˜ ë§ˆìš°ìŠ¤ ì—ì„ìœ¼ë¡œ ì¡ì„ ë•ŒëŠ” ì—ì„ì´ ê°€ë¦¬í‚¤ëŠ” ì˜¤ë¸Œì íŠ¸ë§Œ ì¡ê²Œë¨.
+	// ê·¸ëŸ¼ ìœ ì €ë¡œ í•˜ì—¬ê¸ˆ ë³¸ì¸ì´ í•´ë‹¹ ëª¬ìŠ¤í„°ë¥¼ ê°€ë¦¬í‚¤ê³  ìˆë‹¤ë¼ëŠ” ê²ƒì„ ì•Œë ¤ì¤„ ë¬´ì–¸ê°€ê°€ í•„ìš”í•¨.
+	// ì—ì„ì„ ê°€ì ¸ë‹¤ ëŒ€ë©´ ëª¬ìŠ¤í„°ê°€ ë¹›ë‚˜ê±°ë‚˜, ëª¬ìŠ¤í„°ì˜ í…Œë‘ë¦¬ê°€ ë¹›ë‚˜ê±°ë‚˜, ëª¬ìŠ¤í„°ë¥¼ í¬íší• ê±°ëƒëŠ” UIê°€ ëœ¨ê²Œ í•´ì•¼ í• ë“¯.
 	
-	// ÀâÀº Á¤º¸´Â PlayerState¿¡ ¾÷µ¥ÀÌÆ®°¡ µÇ¾î¼­, RPC·Î ÇØ´ç Á¤º¸¸¦ µ¿±âÈ­ÇØ¾ßÇÔ.
-	// ±×¸®°í ÇØ´ç ¸ó½ºÅÍÀÇ °´Ã¼´Â ¼­¹ö¿¡¼­ »ç¶óÁü.
-	// RPC·Î ÇØ´ç Á¤º¸°¡ µ¿±âÈ­°¡ µÊ¿¡ µû¶ó¼­ Å¬¶óÀÌ¾ğÆ®´Â ÇØ´ç Á¤º¸¸¦ ¹ÙÅÁÀ¸·Î ·»´õ¸µÀ» ÇÒ ¼ö ÀÖÀ½.
-	// ÀÌ ¶§, ÇØ´ç ¸ó½ºÅÍÀÇ °´Ã¼´Â »ç¶óÁöÁö¸¸, ÇØ´ç ¸ó½ºÅÍÀÇ Á¤º¸´Â ¼­¹ö¿¡ ³²¾ÆÀÖ¾î¾ßÇÔ.
-	// ¿Ö³ÄÇÏ¸é, Å¬¶óÀÌ¾ğÆ®°¡ ÀâÀº ¸ó½ºÅÍÀÇ Á¤º¸¸¦ °¡Áö°í ÀÖ¾î¾ßÇÔ.
+	// ì¡ì€ ì •ë³´ëŠ” PlayerStateì— ì—…ë°ì´íŠ¸ê°€ ë˜ì–´ì„œ, RPCë¡œ í•´ë‹¹ ì •ë³´ë¥¼ ë™ê¸°í™”í•´ì•¼í•¨.
+	// ê·¸ë¦¬ê³  í•´ë‹¹ ëª¬ìŠ¤í„°ì˜ ê°ì²´ëŠ” ì„œë²„ì—ì„œ ì‚¬ë¼ì§.
+	// RPCë¡œ í•´ë‹¹ ì •ë³´ê°€ ë™ê¸°í™”ê°€ ë¨ì— ë”°ë¼ì„œ í´ë¼ì´ì–¸íŠ¸ëŠ” í•´ë‹¹ ì •ë³´ë¥¼ ë°”íƒ•ìœ¼ë¡œ ë Œë”ë§ì„ í•  ìˆ˜ ìˆìŒ.
+	// ì´ ë•Œ, í•´ë‹¹ ëª¬ìŠ¤í„°ì˜ ê°ì²´ëŠ” ì‚¬ë¼ì§€ì§€ë§Œ, í•´ë‹¹ ëª¬ìŠ¤í„°ì˜ ì •ë³´ëŠ” ì„œë²„ì— ë‚¨ì•„ìˆì–´ì•¼í•¨.
+	// ì™œëƒí•˜ë©´, í´ë¼ì´ì–¸íŠ¸ê°€ ì¡ì€ ëª¬ìŠ¤í„°ì˜ ì •ë³´ë¥¼ ê°€ì§€ê³  ìˆì–´ì•¼í•¨.
 
-	// HitScanÀ» Util Component·Î ¸¸µé¾î¼­ ¾î¶² °É·Î ÇÒ°Å³Ä·Î ÁöÁ¤ÇÏ°Ô ÇØ¾ß ÇÒµí.
+	// HitScanì„ Util Componentë¡œ ë§Œë“¤ì–´ì„œ ì–´ë–¤ ê±¸ë¡œ í• ê±°ëƒë¡œ ì§€ì •í•˜ê²Œ í•´ì•¼ í• ë“¯.
 	
 	FHitResult hit_result;
 	
@@ -609,6 +609,15 @@ void ADPPlayerController::SimulateGunFire(SteamNetworkingSocket* steam_socket)
 		this->character->PlayFireAnimation();
 		if (character->weaponComponent->SimulateAttack(character, hit_result, fire.gunfire()))
 		{
+			ABaseMonsterCharacter* MC = Cast<ABaseMonsterCharacter>(hit_result.GetActor());
+			if (MC)
+			{
+				ABaseMonsterAIController* MAC = Cast<ABaseMonsterAIController>(MC->GetOwner());
+				if (MAC)
+				{
+					MAC->RemovePawnAndController();
+				}
+			}
 			// Logic for Hit Success && Damage && Score
 			FNetLogger::EditerLog(FColor::Cyan, TEXT("Player %s Attack Success[Simulate]"), *PlayerState->GetPlayerName());
 		}
