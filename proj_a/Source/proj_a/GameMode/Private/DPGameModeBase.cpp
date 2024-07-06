@@ -49,13 +49,13 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 	Super::PostLogin(newPlayer);
 	try
 	{
-		// if (steam_listen_socket_ == nullptr)
-		// {
-		// 	steam_listen_socket_ = new SteamNetworkingSocket();
-		// 	ADPInGameState* game_state_ = Cast<ADPInGameState>(GameState);
-		// 	if (game_state_ != nullptr)
-		// 		game_state_->bServerTraveled = true;
-		// }
+		if (steam_listen_socket_ == nullptr)
+		{
+			steam_listen_socket_ = new SteamNetworkingSocket();
+			ADPInGameState* game_state_ = Cast<ADPInGameState>(GameState);
+			if (game_state_ != nullptr)
+				game_state_->bServerTraveled = true;
+		}
 	}
 	catch (std::exception& e)
 	{
@@ -242,7 +242,8 @@ void ADPGameModeBase::SyncHostAiming()
 
 void ADPGameModeBase::SyncMonsterMovement()
 {
-	MonsterPositionList msg_list;
+	std::vector<MonsterPositionList> msg_list;
+	msg_list.emplace_back();
 	for (int i = 0; i < NUM_OF_MAX_MONSTERS; i++)
 	{
 		if (monster_controllers_[i] == nullptr)
@@ -250,9 +251,19 @@ void ADPGameModeBase::SyncMonsterMovement()
 			continue;
 		}
 		MonsterPosition msg = MessageMaker::MakeMonsterPositionMessage(monster_controllers_[i]);
-		msg_list.add_monster_positions()->CopyFrom(msg);
+		
+		// 1024 bytes limit to make sure that the message is not over MTU size.
+		if (msg_list.back().ByteSizeLong() + msg.ByteSizeLong() > 1024)
+		{
+			msg_list.emplace_back();
+		}
+		msg_list.back().add_monster_positions()->CopyFrom(msg);
 	}
-	Message msg;
-	*msg.mutable_monster_position() = msg_list;
-	steam_listen_socket_->PushUdpFlushMessage(msg);
+
+	for (auto& msg: msg_list)
+	{
+		Message message;
+		*message.mutable_monster_position() = msg;
+		steam_listen_socket_->PushUdpFlushMessage(message);
+	}
 }
