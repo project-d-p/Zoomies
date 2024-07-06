@@ -11,6 +11,7 @@
 #include "SocketManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "FNetLogger.h"
+#include <exception>
 #include "MessageMaker.h"
 
 ADPGameModeBase::ADPGameModeBase()
@@ -46,21 +47,13 @@ void ADPGameModeBase::SendChatToAllClients(const FString& SenderName, const FStr
 void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 {
 	Super::PostLogin(newPlayer);
-	try
+	if (steam_listen_socket_ == nullptr)
 	{
-		if (steam_listen_socket_ == nullptr)
-		{
-			steam_listen_socket_ = new SteamNetworkingSocket();
-			ADPInGameState* game_state_ = Cast<ADPInGameState>(GameState);
-			if (game_state_ != nullptr)
-				game_state_->bServerTraveled = true;
-		}
+		steam_listen_socket_ = new SteamNetworkingSocket();
+		ADPInGameState* game_state_ = Cast<ADPInGameState>(GameState);
+		if (game_state_ != nullptr)
+			game_state_->bServerTraveled = true;
 	}
-	catch (std::exception& e)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed to create listen socket: %hs"), UTF8_TO_TCHAR(e.what()));
-	}
-
 	if (!newPlayer)
 	{
 		return ;
@@ -240,17 +233,37 @@ void ADPGameModeBase::SyncHostAiming()
 
 void ADPGameModeBase::SyncMonsterMovement()
 {
-	MonsterPositionList msg_list;
-
+	std::vector<MonsterPositionList> msg_list;
+	msg_list.emplace_back();
 	for (int i = 0; i < NUM_OF_MAX_MONSTERS; i++)
 	{
-		if (monster_controllers_[i] != nullptr)
+		if (monster_controllers_[i] == nullptr)
 		{
-			MonsterPosition msg = MessageMaker::MakeMonsterPositionMessage(monster_controllers_[i]);
-			msg_list.add_monster_positions()->CopyFrom(msg);
+			continue;
 		}
+		MonsterPosition msg = MessageMaker::MakeMonsterPositionMessage(monster_controllers_[i], i);
+		if (msg.ByteSizeLong() == 0)
+		{
+			continue;
+		}
+		
+		// 1024 bytes limit to make sure that the message is not over MTU size.
+		if (msg_list.back().ByteSizeLong() + msg.ByteSizeLong() > 1024)
+		{
+			msg_list.emplace_back();
+		}
+		msg_list.back().add_monster_positions()->CopyFrom(msg);
 	}
-	Message msg;
-	*msg.mutable_monster_position() = msg_list;
-	steam_listen_socket_->PushUdpFlushMessage(msg);
+	
+	if (msg_list[0].ByteSizeLong() == 0)
+	{
+		return;
+	}
+	
+	for (auto& msg: msg_list)
+	{
+		Message message;
+		*message.mutable_monster_position() = msg;
+		steam_listen_socket_->PushUdpFlushMessage(message);
+	}
 }

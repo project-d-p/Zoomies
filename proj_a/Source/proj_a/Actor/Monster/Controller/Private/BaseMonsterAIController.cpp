@@ -15,7 +15,7 @@ ABaseMonsterAIController::ABaseMonsterAIController()
 	
 	// UCrowdManager* CrowdManager = UCrowdManager::GetCurrent(this);
 	// if (CrowdManager)
-	// {
+	// {j
 	// 	CrowdManager->RegisterAgent(this);
 	// }
 
@@ -34,20 +34,20 @@ void ABaseMonsterAIController::RemovePawnAndController()
 	// }
 
 	int32 index = Cast<ABaseMonsterCharacter>(GetCharacter())->index;
+	int32 id = Cast<ABaseMonsterCharacter>(GetCharacter())->MonsterId;
 	// XXX: 이거 서버가 제거하는게 아니라 클라이언트가 제거하도록 해야한다.
-	APawn* ControlledPawn = GetPawn();
-	if (ControlledPawn)
-	{
-		FDataHub::monsterData.Remove(TCHAR_TO_UTF8(*FString::FromInt(Cast<ABaseMonsterCharacter>(ControlledPawn)->MonsterId)));
-		ControlledPawn->Destroy();
-	}
 
-	ADPGameModeBase* GM = Cast<ADPGameModeBase>(UGameHelper::GetInGameMode(GetWorld()));
+	ADPGameModeBase* GM = GetWorld()->GetAuthGameMode<ADPGameModeBase>();
 	if (GM)
 	{
 		GM->monster_controllers_[index] = nullptr;
-		GM->empty_monster_slots_.push_back(index);
+		// GM->empty_monster_slots_.push_back(index);
 	}
 	
+	ABaseMonsterCharacter* ControlledCharacter = Cast<ABaseMonsterCharacter>(GetCharacter());
+	if (ControlledCharacter)
+	{
+		ControlledCharacter->Destroy();
+	}
 	Destroy();
 }

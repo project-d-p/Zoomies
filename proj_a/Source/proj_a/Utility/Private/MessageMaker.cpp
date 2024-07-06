@@ -3,8 +3,6 @@
 #include "DPCharacter.h"
 #include "DPPlayerController.h"
 #include "FNetLogger.h"
-#include "PlayerName.h"
-#include "PropertyEditorModule.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/PlayerState.h"
 
@@ -157,19 +155,21 @@ Message MessageMaker::MakeAimMessage(ADPPlayerController* controller, bool bAim)
 	return msg;
 }
 
-MonsterPosition MessageMaker::MakeMonsterPositionMessage(ABaseMonsterAIController* Monster_Controller)
+MonsterPosition MessageMaker::MakeMonsterPositionMessage(ABaseMonsterAIController* Monster_Controller, int index)
 {
 	MonsterPosition msg;
 	if (Monster_Controller == nullptr)
 	{
-		FNetLogger::LogError(TEXT("Monster Controller is nullptr"));
+		return msg;
+	}
+	if (Monster_Controller->GetCharacter() == nullptr)
+	{
 		return msg;
 	}
 	msg.set_monster_id(TCHAR_TO_UTF8(*FString::FromInt(Monster_Controller->GetMonsterId())));
 	Vec3 position;
 	if (Monster_Controller->GetPawn() == nullptr)
 	{
-		FNetLogger::LogError(TEXT("Monster Controller's Pawn is nullptr"));
 		return msg;
 	}
 	position.set_x(Monster_Controller->GetPawn()->GetActorLocation().X);

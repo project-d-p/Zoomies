@@ -26,7 +26,7 @@ ABaseMonsterAIController* UMonsterFactory::RandomMonsterSpawn(int32 idx)
 	}
 
 	// XXX: For now, hardcoding the Location.
-	float RandomY = FMath::FRandRange(-3000.f, 3000.f);
+	float RandomY = FMath::FRandRange(3000.f, 3000.f);
 	FVector Location = FVector(-5000.f, RandomY, 300.f);
 	
 	TArray<UClass*> MonsterClasses = {
@@ -76,13 +76,10 @@ ABaseMonsterAIController* UMonsterFactory::SpawnMonster(UClass* MonsterClass, co
 		AIController->Destroy();
 		return nullptr;
 	}
-	if (SpawnedMonster)
-	{
-		TArray<float> ScaleFactors = { 0.5f, 1.0f, 2.0f };
-		float SelectedScaleFactor = ScaleFactors[FMath::RandRange(0, ScaleFactors.Num() - 1)];
-		SpawnedMonster->ScaleCapsuleSize(SelectedScaleFactor);
-		SpawnedMonster->index = idx;
-	}
+	// TArray<float> ScaleFactors = { 0.5f, 1.0f, 2.0f };
+	// float SelectedScaleFactor = ScaleFactors[FMath::RandRange(0, ScaleFactors.Num() - 1)];
+	// SpawnedMonster->ScaleCapsuleSize(SelectedScaleFactor);
+	SpawnedMonster->index = idx;
 	SpawnedMonster->MonsterId = AIController->GetUniqueID();
 	AIController->Possess(SpawnedMonster);
 	

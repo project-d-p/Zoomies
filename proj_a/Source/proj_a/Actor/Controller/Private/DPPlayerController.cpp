@@ -74,7 +74,9 @@ ADPPlayerController::ADPPlayerController()
 		catchAction = IA_CATCH.Object;
 	
 	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
+
 	Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
+	
 	CatchRay = CreateDefaultSubobject<UHitScan>(TEXT("Catch Ray"));
 
 	static ConstructorHelpers::FObjectFinder<USoundBase> SoundAsset

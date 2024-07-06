@@ -79,7 +79,6 @@ bool FSocketManager::RunTask()
 	FSocket* UdpSocket = GetUDPSocket();
 	if (UdpSocket == nullptr)
 	{
-		FNetLogger::LogError(TEXT("UDP Socket is null!"));
 		return false;
 	}
 	UdpReceiveTask = new FUdpReceiveTask(Addr->ToString(false), Addr->GetPort());

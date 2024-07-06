@@ -1,11 +1,13 @@
 #include "BaseMonsterCharacter.h"
 
 #include "BaseMonsterAIController.h"
+#include "DPGameModeBase.h"
 #include "FDataHub.h"
 #include "FNetLogger.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "Serialization/BulkDataRegistry.h"
 
 ABaseMonsterCharacter::ABaseMonsterCharacter()
 {
@@ -22,10 +24,13 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
     bUseControllerRotationYaw = false;
 	
     SetReplicatingMovement(false);
+
+	this->MonsterId = -1;
+	this->index = -1;
 }
 
 void ABaseMonsterCharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                           UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	FNetLogger::EditerLog(FColor::Green, TEXT("OnBeginOverlap"));
 }
@@ -96,4 +101,35 @@ float ABaseMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& 
 	AController* EventInstigator, AActor* DamageCauser)
 {
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}
+
+ABaseMonsterCharacter::~ABaseMonsterCharacter()
+{
+	if (!HasAuthority())
+	{
+		if (MonsterId == -1)
+		{
+			return ;
+		}
+		// FDataHub::monsterData.Remove(FString::FromInt(MonsterId));
+		return ;
+	}
+	if (GetWorld() == nullptr)
+	{
+		return ;
+	}
+	ADPGameModeBase* GM = GetWorld()->GetAuthGameMode<ADPGameModeBase>();
+	if (!GM)
+	{
+		return ;
+	}
+	if (this->MonsterId == -1 && this->index == -1)
+	{
+		return ;
+	}
+	if (GM->monster_controllers_[index] != nullptr)
+	{
+		GM->monster_controllers_[index] = nullptr;
+	}
+	GM->empty_monster_slots_.push_back(index);
 }

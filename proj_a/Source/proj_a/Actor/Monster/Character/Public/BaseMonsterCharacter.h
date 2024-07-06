@@ -11,6 +11,7 @@ class PROJ_A_API ABaseMonsterCharacter : public ACharacter
 
 public:
 	ABaseMonsterCharacter();
+	virtual ~ABaseMonsterCharacter() override;
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	                    int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
