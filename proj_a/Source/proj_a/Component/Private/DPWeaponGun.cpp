@@ -46,7 +46,7 @@ bool ADPWeaponGun::Attack(ADPPlayerController* controller, FHitResult& result, F
 	const FRotator aim_direction = controller->GetControlRotation();
 
 	FVector impact_point;
-	if (hitScan->HitDetect(Cast<ADPCharacter>(controller->GetCharacter()), start_aim_pos, aim_direction, 100000000.f, result))
+	if (hitScan->HitDetect(Cast<ADPCharacter>(controller->GetCharacter()), start_aim_pos, aim_direction, 100000000.f, result, false))
 	{
 		impact_point = result.ImpactPoint;
 	}
