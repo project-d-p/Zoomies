@@ -82,7 +82,7 @@ ADPPlayerController::ADPPlayerController()
 		returnAction = IA_RETURN.Object;
 	
 	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
-	// Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
+	Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
 	CatchRay = CreateDefaultSubobject<UHitScan>(TEXT("Catch Ray"));
 
 	static ConstructorHelpers::FObjectFinder<USoundBase> SoundAsset
@@ -146,6 +146,7 @@ UPrivateScoreManager* ADPPlayerController::GetPrivateScoreManagerComponent() con
 {
 	return PrivateScoreManager;
 }
+
 
 void ADPPlayerController::ReleaseMemory()
 {
@@ -257,12 +258,12 @@ void ADPPlayerController::Tick(float DeltaSeconds)
 		return ;
 	}
 	Message msg = MessageMaker::MakePositionMessage(this);
-	// Socket->AsyncSendPacket(msg);
+	Socket->AsyncSendPacket(msg);
 }
 
 bool ADPPlayerController::IsCatchable(FHitResult& hit_result)
 {
-	if (CatchRay->HitDetect(character, character->GetActorLocation(), this->GetControlRotation(), 300.0f, hit_result))
+	if (CatchRay->HitDetect(character, character->GetActorLocation(), this->GetControlRotation(), 300.0f, hit_result, false))
 	{
 		return true;
 	}
@@ -388,11 +389,11 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 			// Success Only Effect;
 			FNetLogger::EditerLog(FColor::Cyan, TEXT("Attack Success[Only Effect]"));
 		}
-		FVector position = character->GetActorLocation();
+		FVector position = character->weaponComponent->GetFireLocation();
 		Message msg = MessageMaker::MakeFireMessage(this, position, final_direction);
 		if (!HasAuthority())
 		{
-			// Socket->AsyncSendPacket(msg);
+			Socket->AsyncSendPacket(msg);
 		}
 		else
 		{
@@ -460,7 +461,7 @@ void ADPPlayerController::Aim(const FInputActionValue& value)
 			Message msg = MessageMaker::MakeAimMessage(this, !character->isAim);
 			if (!HasAuthority())
 			{
-				// Socket->AsyncSendPacket(msg);
+				Socket->AsyncSendPacket(msg);
 			}
 			else
 			{
@@ -491,7 +492,7 @@ void ADPPlayerController::AimReleased(const FInputActionValue& value)
 		Message msg = MessageMaker::MakeAimMessage(this, !character->isAim);
 		if (!HasAuthority())
 		{
-			// Socket->AsyncSendPacket(msg);
+			Socket->AsyncSendPacket(msg);
 		}
 		else
 		{
@@ -531,13 +532,13 @@ void ADPPlayerController::Catch(const FInputActionValue& value)
 	else
 	{
 		FNetLogger::EditerLog(FColor::Cyan, TEXT("Send Catch Message"));
-		// Socket->AsyncSendPacket(msg);
+		Socket->AsyncSendPacket(msg);
 	}
 
 	/* Test */
-	UClass* class_type = hit_result.GetActor()->GetClass();
-	FString monster_type = class_type->GetName();
-	this->character->CatchMonster(monster_type);
+	// UClass* class_type = hit_result.GetActor()->GetClass();
+	// FString monster_type = class_type->GetName();
+	// this->character->CatchMonster(monster_type);
 }
 
 void ADPPlayerController::ReturningAnimals(const FInputActionValue& value)
@@ -546,7 +547,34 @@ void ADPPlayerController::ReturningAnimals(const FInputActionValue& value)
 	{
 		return ;
 	}
-	character->ReturnMonsters();
+	TArray<EAnimal> animals = character->ReturnMonsters();
+	// 개인 점수 증가
+	ADPPlayerState* player_state = Cast<ADPPlayerState>(PlayerState);
+	if (player_state)
+	{
+		this->PrivateScoreManager->IncreasePrivatePlayerScore(player_state->GetPlayerJob(), animals);
+	}
+	if (HasAuthority())
+	{
+		ADPGameModeBase* GM = GetWorld()->GetAuthGameMode<ADPGameModeBase>();
+		if (GM)
+		{
+			GM->ScoreManager->IncreasePlayerScore(this, animals);
+		}
+
+		for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+		{
+			ADPPlayerController* PC = Cast<ADPPlayerController>(It->Get());
+			if (PC && PC != this) // 자기 자신을 제외한 모든 클라이언트
+			{
+				PC->character->ClientNotifyAnimalReturn(player_state->GetPlayerName());
+			}
+		}
+	}
+	else
+	{
+		this->ServerNotifyReturnAnimals();
+	}
 }
 
 /*
@@ -739,4 +767,40 @@ void ADPPlayerController::SimulateCatch(SteamNetworkingSocket* steam_socket)
 		FNetLogger::EditerLog(FColor::Cyan, TEXT("Catch monster_id: %s"), *TestString);
 		steam_socket->PushUdpFlushMessage(catch_);
 	}
+}
+
+void ADPPlayerController::ServerNotifyReturnAnimals_Implementation()
+{
+	// 개인 점수 증가
+	ADPPlayerState* player_state = Cast<ADPPlayerState>(PlayerState);
+	if (!player_state)
+	{
+		return ;
+	}
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Server Notify Return Animals[from: %s]"), *player_state->GetPlayerName());
+	
+	// 클라이언트의 동물 반환 처리를 처리한다.
+	TArray<EAnimal> animals = character->ReturnMonsters();
+	
+	this->PrivateScoreManager->IncreasePrivatePlayerScoreByServer(player_state->GetPlayerJob(), animals);
+	ADPGameModeBase* GM = GetWorld()->GetAuthGameMode<ADPGameModeBase>();
+	if (GM)
+	{
+		GM->ScoreManager->IncreasePlayerScore(this, animals);
+	}
+	
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		ADPPlayerController* PC = Cast<ADPPlayerController>(It->Get());
+		if (PC && PC != this) // 자기 자신을 제외한 모든 클라이언트
+		{
+			PC->character->ClientNotifyAnimalReturn(player_state->GetPlayerName());
+		}
+	}
+}
+
+bool ADPPlayerController::ServerNotifyReturnAnimals_Validate()
+{
+	// 호출이 유효한지 확인하는 로직을 구현
+	return true; // 유효성 검증이 항상 참인 경우
 }

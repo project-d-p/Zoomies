@@ -45,6 +45,10 @@ public:
 	
 	UPlayerScoreComp* GetScoreManagerComponent() const;
 	UPrivateScoreManager* GetPrivateScoreManagerComponent() const;
+
+	// Server RPC Called by Client
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerNotifyReturnAnimals();
 	
 	void ReleaseMemory();
 
@@ -53,6 +57,9 @@ protected:
 	virtual void SetupInputComponent() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void OnPossess(APawn* InPawn) override;
+	
+	void ServerNotifyReturnAnimals_Implementation();
+	bool ServerNotifyReturnAnimals_Validate();
 
 private:
 	class ADPCharacter* character;

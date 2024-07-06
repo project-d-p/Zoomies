@@ -29,6 +29,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	bool SimulateAttack(ADPCharacter* character, FHitResult& result, const Gunfire& gunfire);
+	FVector GetFireLocation();
+
 public:
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	TArray<ADPWeapon*> weapons;

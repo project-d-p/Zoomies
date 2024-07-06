@@ -21,6 +21,7 @@
 #include "Engine/TextureRenderTarget2D.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerState.h"
+#include "Serialization/BulkDataRegistry.h"
 
 // Sets default values
 ADPCharacter::ADPCharacter()
@@ -43,7 +44,6 @@ ADPCharacter::ADPCharacter()
 	sceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SCENECAPTURE"));
 
 	UE_LOG(LogTemp, Warning, TEXT("DPCharacter Constructor"));
-	// gun = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GunMesh"));
 
 	springArm->SetupAttachment(RootComponent);
 	camera->SetupAttachment(springArm);
@@ -51,13 +51,6 @@ ADPCharacter::ADPCharacter()
 	sceneCaptureSpringArm->SetupAttachment(RootComponent);
 	sceneCapture->SetupAttachment(sceneCaptureSpringArm);
 
-	// static ConstructorHelpers::FObjectFinder<UStaticMesh> GUNASSET
-	// (TEXT("/Game/model/weapon/simpleGun.simpleGun"));
-	// if (GUNASSET.Succeeded()) {
-	// 	gun->SetStaticMesh(GUNASSET.Object);
-	// 	gun->SetupAttachment(GetMesh(), TEXT("gunSocket"));
-	// }
-	
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CHARACTER
 	(TEXT("/Game/model/steve/StickManForMixamo.StickManForMixamo"));
 	if (SK_CHARACTER.Succeeded()) {
@@ -156,6 +149,7 @@ void ADPCharacter::Tick(float DeltaTime)
 	{
 		syncer->SyncWithServer(this);
 		syncer->SyncGunFire(this);
+		syncer->SyncReturnAnimal(this);
 	}
 	syncer->SyncCatch(this);
 }
@@ -232,7 +226,12 @@ bool ADPCharacter::IsAtReturnPlace() const
 	return this->isAtReturnPlace;
 }
 
-void ADPCharacter::ReturnMonsters()
+void ADPCharacter::ClientNotifyAnimalReturn_Implementation(const FString& player_name)
 {
-	monsterSlotComponent->RemoveMonstersFromSlot();
+	FDataHub::PushReturnAnimalDA(player_name, true);
+}
+
+TArray<EAnimal> ADPCharacter::ReturnMonsters()
+{
+	return monsterSlotComponent->RemoveMonstersFromSlot();
 }

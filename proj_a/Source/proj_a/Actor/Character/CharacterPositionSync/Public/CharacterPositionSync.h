@@ -23,6 +23,7 @@ public:
 	void SyncMyself(ADPCharacter* character);
 	void SyncGunFire(ADPCharacter* character);
 	void SyncCatch(ADPCharacter* character);
+	void SyncReturnAnimal(ADPCharacter* character);
 
 private:
 	void PlayAimAnimation(ADPCharacter* character);
@@ -33,7 +34,9 @@ private:
 	void SyncOrientation(ADPCharacter* character);
 	void SyncJump(ADPCharacter* character);
 
-	ADPPlayerState* player_state_ = nullptr;
+	UPROPERTY()
+	ADPPlayerState* Player_State = nullptr;
+	
 	ActorPosition actor_position_;
 	Gunfire gunfire_;
 	Jump jump_;

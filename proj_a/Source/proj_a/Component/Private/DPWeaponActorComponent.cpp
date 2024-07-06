@@ -48,6 +48,13 @@ bool UDPWeaponActorComponent::SimulateAttack(ADPCharacter* character, FHitResult
 	return false;
 }
 
+FVector UDPWeaponActorComponent::GetFireLocation()
+{
+	if (currentWeapon)
+		return currentWeapon->GetFireLocation();
+	return FVector();
+}
+
 void UDPWeaponActorComponent::AddWeapons(TSubclassOf<ADPWeapon> weaponClass)
 {
 	ADPCharacter* playerCharacter = Cast<ADPCharacter>(GetOwner());

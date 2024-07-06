@@ -30,6 +30,7 @@ public:
 	virtual bool Attack(ADPPlayerController* controller, FHitResult& result, FRotator& info);
 	
 	virtual bool SimulateAttack(ADPCharacter* character, FHitResult& result, const Gunfire& gunfire);
+	virtual FVector GetFireLocation();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	int maxBullet{};

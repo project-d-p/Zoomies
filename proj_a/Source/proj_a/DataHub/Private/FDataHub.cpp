@@ -10,6 +10,7 @@ TMap<ID_TYPE, Gunfire> FDataHub::gunfireData;
 TMap<ID_TYPE, AimState> FDataHub::aimStateData;
 TMap<ID_TYPE, MonsterPosition> FDataHub::monsterData;
 TMap<ID_TYPE, Catch> FDataHub::catchData;
+TMap<ID_TYPE, bool> FDataHub::returnAnimalData;
 //XXX: Player, Enermy 등등 각자의 Map을 가질 예정.
 
 void FDataHub::PushActorDA(const Message& NewData)
@@ -83,4 +84,12 @@ void FDataHub::PushCatachDA(const Message& Msg)
         // 새로운 데이터 생성 알림
     }
     catchData.Add(key, Msg.catch_()); 
+}
+
+void FDataHub::PushReturnAnimalDA(const FString& Key, bool bCond)
+{
+    if (!returnAnimalData.Contains(Key)) {
+        // 새로운 데이터 생성 알림
+    }
+    returnAnimalData.Add(Key, bCond);
 }

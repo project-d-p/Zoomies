@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "CharacterPositionSync.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "proj_a/Component/InGame/Score/Types/ScoreTypes.h"
 #include "DPCharacter.generated.h"
 
 class ABaseMonsterCharacter;
@@ -32,7 +33,10 @@ public:
 
 	// Locally Controlled
 	virtual bool IsLocallyControlled() const override;
-	void ReturnMonsters();
+	TArray<EAnimal> ReturnMonsters();
+
+	UFUNCTION(Client, Reliable)
+	void ClientNotifyAnimalReturn(const FString& player_name);
 
 public:	// component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -61,7 +65,15 @@ public:	// component
 
 	void SetAtReturnPlace(bool isReturnPlace);
 	bool IsAtReturnPlace() const;
+public:
+	FVector currentVelocity{ 0.f, 0.f, 0.f };
+	UPROPERTY(BlueprintReadWrite)
+	float speed{ 0.f };
+	bool isAim{ false };
 
+protected:
+	void ClientNotifyAnimalReturn_Implementation(const FString& player_name);
+	
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* springArm;
@@ -76,11 +88,6 @@ private:
 	UPROPERTY()
 	UCharacterPositionSync* syncer = nullptr;
 
-	bool isAtReturnPlace{ false };
+	bool isAtReturnPlace{ true };
 	
-public:
-	FVector currentVelocity{ 0.f, 0.f, 0.f };
-	UPROPERTY(BlueprintReadWrite)
-	float speed{ 0.f };
-	bool isAim{ false };
 };
