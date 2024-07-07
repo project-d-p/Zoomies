@@ -44,20 +44,6 @@ void ADPGameModeBase::SendChatToAllClients(const FString& SenderName, const FStr
 void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 {
 	Super::PostLogin(newPlayer);
-	try
-	{
-		if (steam_listen_socket_ == nullptr)
-		{
-			steam_listen_socket_ = new SteamNetworkingSocket();
-			ADPInGameState* game_state_ = Cast<ADPInGameState>(GameState);
-			if (game_state_ != nullptr)
-				game_state_->bServerTraveled = true;
-		}
-	}
-	catch (std::exception& e)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed to create listen socket: %hs"), UTF8_TO_TCHAR(e.what()));
-	}
 
 	if (!newPlayer)
 	{

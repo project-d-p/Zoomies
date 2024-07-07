@@ -4,9 +4,7 @@
 #include "DPPlayerController.h"
 #include "FNetLogger.h"
 #include "PlayerName.h"
-#include "PropertyEditorModule.h"
 #include "GameFramework/PawnMovementComponent.h"
-#include "PropertyEditorModule.h"
 #include "GameFramework/PlayerState.h"
 
 Message MessageMaker::MakeMovementMessage(const ADPPlayerController* Controller, const FVector2d& ActionValue, const FRotator& Rotation, const FVector& Velocity)
