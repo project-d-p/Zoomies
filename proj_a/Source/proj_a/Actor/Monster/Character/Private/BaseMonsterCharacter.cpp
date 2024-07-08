@@ -4,6 +4,11 @@
 #include "DPCharacter.h"
 #include "FDataHub.h"
 #include "FNetLogger.h"
+#include "Components/ArrowComponent.h"
+#include "Components/SphereComponent.h"
+#include "Components/WidgetComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -23,6 +28,42 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
 	
     GetCharacterMovement()->bOrientRotationToMovement = true;
     bUseControllerRotationYaw = false;
+	
+	arrowSparkle = CreateDefaultSubobject<UArrowComponent>(TEXT("arrowComponent"));
+	arrowSparkle->SetupAttachment(GetMesh());
+	arrowSparkle->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
+	arrowSparkle->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+	arrowSparkle->SetRelativeScale3D(FVector(2.f, 2.f, 2.f));
+
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> SPARKLE
+	(TEXT("/Game/effect/ns_sparkle.ns_sparkle"));
+	if (SPARKLE.Succeeded()) {
+		sparkleEffect = SPARKLE.Object;
+	}
+
+	GetMesh()->SetRenderCustomDepth(true);
+	GetMesh()->CustomDepthStencilValue = 2;
+
+	//sphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("sphereComponent"));
+	//sphereComponent->SetupAttachment(GetMesh());
+	//sphereComponent->InitSphereRadius(400.f);
+	//sphereComponent->SetCollisionProfileName(TEXT("trigger"));
+
+	//sphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ABaseMonsterCharacter::OnSphereBeginOverlap);
+	//sphereComponent->OnComponentEndOverlap.AddDynamic(this, &ABaseMonsterCharacter::OnSphereEndOverlap);
+
+	widgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
+	widgetComponent->SetupAttachment(GetMesh());
+	widgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+	widgetComponent->SetDrawSize(FVector2D(500.f, 500.f));
+	widgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 300.f));
+	widgetComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> WIDGET
+	(TEXT("/Game/widget/widget_collect.widget_collect_C"));
+	if (WIDGET.Class != nullptr) {
+		widgetComponent->SetWidgetClass(WIDGET.Class);
+	}
 
 	this->MonsterId = -1;
 }
@@ -30,6 +71,22 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
 void ABaseMonsterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// special animals
+	if (sparkleEffect && arrowSparkle) {
+		UNiagaraFunctionLibrary::SpawnSystemAttached(
+			sparkleEffect,
+			arrowSparkle,
+			NAME_None,
+			FVector::ZeroVector,
+			FRotator::ZeroRotator,
+			EAttachLocation::KeepRelativeOffset,
+			true
+		);
+	}
+
+	if (widgetComponent)
+		widgetComponent->SetVisibility(false);
 }
 
 void ABaseMonsterCharacter::SyncPosition()
@@ -94,7 +151,7 @@ void ABaseMonsterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void ABaseMonsterCharacter::TakeDamage(float Dmg)
+void ABaseMonsterCharacter::TakeMonsterDamage(float Dmg)
 {
 	CurrentHp -= Dmg;
 	if (CurrentHp <= 0 && CurrentState != EMonsterState::Faint)

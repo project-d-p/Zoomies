@@ -20,7 +20,7 @@ public:
 	ABaseMonsterCharacter();
 	virtual ~ABaseMonsterCharacter() override;
 	
-	void TakeDamage(float Dmg);
+	void TakeMonsterDamage(float Dmg);
 	UFUNCTION()
 	void OnRep_FaintCharacterMotion() const;
 	void ScaleCapsuleSize(float ScaleFactor);
@@ -28,6 +28,13 @@ public:
 	
 	UPROPERTY(Replicated)
 	int32 MonsterId;
+
+	UPROPERTY(VisibleAnywhere)
+	class UArrowComponent* arrowSparkle;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "effects")
+	class UNiagaraSystem* sparkleEffect;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UWidgetComponent* widgetComponent;
 private:
 	const float MaxHp = 100.f;
 	float CurrentHp = 100.f;
@@ -36,7 +43,7 @@ private:
 	EMonsterState CurrentState = EMonsterState::Idle;
 
 	float MoveSpeed;
-
+	
 protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void BeginPlay() override;

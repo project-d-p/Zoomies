@@ -53,6 +53,9 @@ public:	// component
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
 	UAnimMontage* characterMontage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
+	UMaterialInstanceDynamic* dynamicMaterialInstance;
+
 	void PlayAimAnimation();
 	void StopAimAnimation();
 	void PlayFireAnimation();
@@ -65,11 +68,6 @@ public:	// component
 
 	void SetAtReturnPlace(bool isReturnPlace);
 	bool IsAtReturnPlace() const;
-public:
-	FVector currentVelocity{ 0.f, 0.f, 0.f };
-	UPROPERTY(BlueprintReadWrite)
-	float speed{ 0.f };
-	bool isAim{ false };
 
 protected:
 	void ClientNotifyAnimalReturn_Implementation(const FString& player_name);
@@ -88,6 +86,12 @@ private:
 	UPROPERTY()
 	UCharacterPositionSync* syncer = nullptr;
 
-	bool isAtReturnPlace{ true };
-	
+	FTimerHandle SynchronizeHandle;
+	TSubclassOf<UCameraShakeBase> cameraShake;
+public:
+	FVector currentVelocity{ 0.f, 0.f, 0.f };
+	UPROPERTY(BlueprintReadWrite)
+	float speed{ 0.f };
+	bool isAim{ false };
+	bool mIsAtReturnPlace{ true };
 };

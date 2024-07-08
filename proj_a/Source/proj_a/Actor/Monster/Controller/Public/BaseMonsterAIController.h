@@ -21,7 +21,7 @@ public:
 	ABaseMonsterAIController();
 	int32 GetMonsterId() const { return Cast<ABaseMonsterCharacter>(GetCharacter())->MonsterId; }
 	void RemovePawnAndController();
-	void TakeDamage(float dmg);
+	void TakeMonsterDamage(float dmg);
 	virtual void SimulateMovement(float delta_time) {}
 
 	int32 index = -1;

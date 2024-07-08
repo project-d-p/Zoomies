@@ -654,7 +654,7 @@ void ADPPlayerController::SimulateGunFire(SteamNetworkingSocket* steam_socket)
 				if (MAC)
 				{
 					// MAC->RemovePawnAndController();
-					MAC->TakeDamage(100);
+					MAC->TakeMonsterDamage(100);
 				}
 			}
 			// Logic for Hit Success && Damage && Score
