@@ -95,12 +95,15 @@ void ABaseMonsterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 void ABaseMonsterCharacter::TakeDamage(float Dmg)
 {
 	CurrentHp -= Dmg;
-	if (CurrentHp <= 0)
+	if (CurrentHp <= 0 && CurrentState != Faint)
 	{
 		CurrentHp = 0;
 		ABaseMonsterAIController *BMC = Cast<ABaseMonsterAIController>(GetOwner());
 		check(BMC)
 		BMC->StopMovement();
+		FRotator NewRotation = FRotator(0.0f, 0.0f, 90.0f);
+		GetCapsuleComponent()->SetRelativeRotation(NewRotation);
+		GetMesh()->SetRelativeRotation(NewRotation);
 		CurrentState = Faint;
 	}
 }
