@@ -6,7 +6,7 @@
 #include "ChasePlayerMonsterAIController.h"
 #include "CrabCharacter.h"
 #include "FNetLogger.h"
-#include "LobstarCharacter.h"
+#include "LobsterCharacter.h"
 #include "MammothCharacter.h"
 #include "OctopusCharacter.h"
 #include "SlothCharacter.h"
@@ -31,7 +31,7 @@ ABaseMonsterAIController* UMonsterFactory::RandomMonsterSpawn(int32 idx)
 	
 	TArray MonsterClasses = {
 		ACrabCharacter::StaticClass(),
-		ALobstarCharacter::StaticClass(),
+		ALobsterCharacter::StaticClass(),
 		AMammothCharacter::StaticClass(),
 		AOctopusCharacter::StaticClass(),
 		AStarFishCharacter::StaticClass(),

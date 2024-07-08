@@ -246,7 +246,7 @@ void ADPGameModeBase::SyncMonsterMovement()
 		{
 			continue;
 		}
-		MonsterPosition msg = MessageMaker::MakeMonsterPositionMessage(monster_controllers_[i], i);
+		MonsterPosition msg = MessageMaker::MakeMonsterPositionMessage(monster_controllers_[i]);
 		if (msg.ByteSizeLong() == 0)
 		{
 			continue;

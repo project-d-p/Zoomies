@@ -155,7 +155,7 @@ Message MessageMaker::MakeAimMessage(ADPPlayerController* controller, bool bAim)
 	return msg;
 }
 
-MonsterPosition MessageMaker::MakeMonsterPositionMessage(ABaseMonsterAIController* Monster_Controller, int index)
+MonsterPosition MessageMaker::MakeMonsterPositionMessage(ABaseMonsterAIController* Monster_Controller)
 {
 	MonsterPosition msg;
 	if (Monster_Controller == nullptr)
