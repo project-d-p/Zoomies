@@ -247,12 +247,12 @@ bool ADPCharacter::CatchMonster(const FString& monster_type)
 
 void ADPCharacter::SetAtReturnPlace(bool isReturnPlace)
 {
-	this->isAtReturnPlace = isReturnPlace;
+	this->mIsAtReturnPlace = isReturnPlace;
 }
 
 bool ADPCharacter::IsAtReturnPlace() const
 {
-	return this->isAtReturnPlace;
+	return this->mIsAtReturnPlace;
 }
 
 void ADPCharacter::ClientNotifyAnimalReturn_Implementation(const FString& player_name)

@@ -65,10 +65,6 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
 		widgetComponent->SetWidgetClass(WIDGET.Class);
 	}
 
-	/* XXX: comment for testing purposes. Restore after creating a UDP structure later. */
-    // SetReplicatingMovement(false);
-}
-
 	this->MonsterId = -1;
 }
 
