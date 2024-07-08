@@ -2,13 +2,14 @@
 
 #include "Components/CapsuleComponent.h"
 
+
 ASquidCharacter::ASquidCharacter()
 {
 	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH(
-		TEXT("/Game/model/animals/squid/Squid1.Squid1"));
-	if (SK_MAMMOTH.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_MAMMOTH.Object);
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SQUID
+	(TEXT("/Game/model/animals/squid/Squid1.Squid1"));
+	if (SK_SQUID.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SK_SQUID.Object);
 	}
 
 	/** Loading animations */

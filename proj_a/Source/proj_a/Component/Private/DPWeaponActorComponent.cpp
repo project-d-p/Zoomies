@@ -3,12 +3,15 @@
 
 #include "DPWeaponActorComponent.h"
 
+#include "DPCharacter.h"
 #include "DPPlayerController.h"
+#include "DPWeaponGun.h"
 #include "FNetLogger.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/PawnMovementComponent.h"
 //#include "DPWeapon.h"
 
+class ADPWeaponGun;
 // Sets default values for this component's properties
 UDPWeaponActorComponent::UDPWeaponActorComponent()
 {
@@ -24,6 +27,9 @@ void UDPWeaponActorComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	TSubclassOf<ADPWeapon> gunClass = ADPWeaponGun::StaticClass();
+	this->AddWeapons(gunClass);
+	this->Equip(gunClass);
 }
 
 
@@ -35,19 +41,32 @@ void UDPWeaponActorComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	// ...
 }
 
-bool UDPWeaponActorComponent::SimulateAttackByClient(ADPCharacter* Character, FHitResult& HitResult, const Gunfire& Gunfire)
+bool UDPWeaponActorComponent::SimulateAttack(ADPCharacter* character, FHitResult& result, const Gunfire& gunfire)
 {
 	if (currentWeapon)
-		return currentWeapon->SimulateAttackByClient(Character, HitResult, Gunfire);
+		return currentWeapon->SimulateAttack(character, result, gunfire);
 	return false;
+}
+
+FVector UDPWeaponActorComponent::GetFireLocation()
+{
+	if (currentWeapon)
+		return currentWeapon->GetFireLocation();
+	return FVector();
 }
 
 void UDPWeaponActorComponent::AddWeapons(TSubclassOf<ADPWeapon> weaponClass)
 {
+	ADPCharacter* playerCharacter = Cast<ADPCharacter>(GetOwner());
 	if (weaponClass) {
-		ADPWeapon* newWeapon = NewObject<ADPWeapon>(this, weaponClass);
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = Cast<AActor>(playerCharacter);
+		ADPWeapon* newWeapon = GetWorld()->SpawnActor<ADPWeaponGun>(ADPWeaponGun::StaticClass(), spawnParams);
 		if (newWeapon)
+		{
 			weapons.Add(newWeapon); UE_LOG(LogTemp, Warning, TEXT("add weapon : %s"), *newWeapon->GetName());
+			newWeapon->AttachToComponent(playerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("gunSocket"));
+		}
 	}
 }
 
@@ -62,17 +81,9 @@ void UDPWeaponActorComponent::Equip(TSubclassOf<ADPWeapon> weaponClass)
 	}
 }
 
-bool UDPWeaponActorComponent::Attack(ADPPlayerController* controller, FHitResult& result)
+bool UDPWeaponActorComponent::Attack(ADPPlayerController* controller, FHitResult& result, FRotator& info)
 {
 	if (currentWeapon)
-		return currentWeapon->Attack(controller, result);
+		return currentWeapon->Attack(controller, result, info);
 	return false;
 }
-
-bool UDPWeaponActorComponent::SimulateAttack(ADPPlayerController* controller, FHitResult& result, Message message)
-{
-	if (currentWeapon)
-		return currentWeapon->SimulateAttack(controller, result, message);
-	return false;
-}
-

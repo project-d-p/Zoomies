@@ -5,10 +5,11 @@
 ASealCharacter::ASealCharacter()
 {
 	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH(
-		TEXT("/Game/model/animals/seal/seal1.seal1"));
-	if (SK_MAMMOTH.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_MAMMOTH.Object);
+	
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SEAL
+	(TEXT("/Game/model/animals/seal/seal1.seal1"));
+	if (SK_SEAL.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SK_SEAL.Object);
 	}
 
 	/** Loading animations */

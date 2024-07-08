@@ -2,13 +2,14 @@
 
 #include "Components/CapsuleComponent.h"
 
+
 AOctopusCharacter::AOctopusCharacter()
 {
 	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_OCTOPUS
 	(TEXT("/Game/model/animals/octopus/Octopus1.Octopus1"));
-	if (SK_MAMMOTH.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_MAMMOTH.Object);
+	if (SK_OCTOPUS.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SK_OCTOPUS.Object);
 	}
 
 	/** Loading animations */

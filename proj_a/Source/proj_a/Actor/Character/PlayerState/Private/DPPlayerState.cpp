@@ -19,15 +19,21 @@ UPlayerScoreComp* ADPPlayerState::GetPlayerScoreComp() const
 	return PlayerScoreComp;
 }
 
+EPlayerJob ADPPlayerState::GetPlayerJob() const
+{
+	return PlayerJob;
+}
+
 void ADPPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-// void ADPPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-// {
-// 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-//
-// 	// DOREPLIFETIME(ADPPlayerState, PlayerScoreComp);
-// 	DOREPLIFETIME(ADPPlayerState, APlayerState::PlayerName);
-// }
+void ADPPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// DOREPLIFETIME(ADPPlayerState, PlayerScoreComp);
+	// DOREPLIFETIME(ADPPlayerState, APlayerState::PlayerName);
+	DOREPLIFETIME(ADPPlayerState, PlayerJob);
+}

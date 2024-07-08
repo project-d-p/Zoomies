@@ -22,6 +22,16 @@ ServerMessageHandler::ServerMessageHandler()
 	{
 		player_controller->HandleAim(msg.aim_state());
 	});
+
+	message_handlers_[Message::kActorPosition] = FServerMessageDelegate::CreateLambda([](ADPPlayerController* player_controller, const Message& msg, const float& /*delta*/)
+	{
+		player_controller->HandlePosition(msg.actor_position());
+	});
+
+	message_handlers_[Message::kCatch] = FServerMessageDelegate::CreateLambda([](ADPPlayerController* player_controller, const Message& msg, const float& /*delta*/)
+	{
+		player_controller->HandleCatch(msg);
+	});
 }
 
 FServerMessageDelegate* ServerMessageHandler::HandleMessage(const Message& Msg)

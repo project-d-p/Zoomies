@@ -1,14 +1,15 @@
-#include "LobstarCharacter.h"
+#include "LobsterCharacter.h"
 
 #include "Components/CapsuleComponent.h"
 
-ALobstarCharacter::ALobstarCharacter()
+
+ALobsterCharacter::ALobsterCharacter()
 {
-	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_LOBSTER
 	(TEXT("/Game/model/animals/lobstar/Object_7.Object_7"));
-	if (SK_MAMMOTH.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_MAMMOTH.Object);
+	/** Loading models */
+	if (SK_LOBSTER.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SK_LOBSTER.Object);
 	}
 
 	/** Loading animations */
