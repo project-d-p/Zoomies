@@ -27,15 +27,9 @@ void UDPWeaponActorComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ADPCharacter* playerCharacter = Cast<ADPCharacter>(GetOwner());
-	if (playerCharacter) {
-		FActorSpawnParameters spawnParams;
-		spawnParams.Owner = Cast<AActor>(playerCharacter);
-		ADPWeaponGun* WeaponGun = GetWorld()->SpawnActor<ADPWeaponGun>(ADPWeaponGun::StaticClass(), spawnParams);
-
-		if (WeaponGun)
-			WeaponGun->AttachToComponent(playerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("gunSocket"));
-	}
+	TSubclassOf<ADPWeapon> gunClass = ADPWeaponGun::StaticClass();
+	this->AddWeapons(gunClass);
+	this->Equip(gunClass);
 }
 
 
@@ -54,12 +48,25 @@ bool UDPWeaponActorComponent::SimulateAttack(ADPCharacter* character, FHitResult
 	return false;
 }
 
+FVector UDPWeaponActorComponent::GetFireLocation()
+{
+	if (currentWeapon)
+		return currentWeapon->GetFireLocation();
+	return FVector();
+}
+
 void UDPWeaponActorComponent::AddWeapons(TSubclassOf<ADPWeapon> weaponClass)
 {
+	ADPCharacter* playerCharacter = Cast<ADPCharacter>(GetOwner());
 	if (weaponClass) {
-		ADPWeapon* newWeapon = NewObject<ADPWeapon>(this, weaponClass);
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = Cast<AActor>(playerCharacter);
+		ADPWeapon* newWeapon = GetWorld()->SpawnActor<ADPWeaponGun>(ADPWeaponGun::StaticClass(), spawnParams);
 		if (newWeapon)
+		{
 			weapons.Add(newWeapon); UE_LOG(LogTemp, Warning, TEXT("add weapon : %s"), *newWeapon->GetName());
+			newWeapon->AttachToComponent(playerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("gunSocket"));
+		}
 	}
 }
 

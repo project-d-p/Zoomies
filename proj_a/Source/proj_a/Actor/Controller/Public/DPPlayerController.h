@@ -36,19 +36,30 @@ public:
 	void HandleMovement(const Movement& movement, const float& server_delta);
 	void HandleJump(const Jump& Jump);
 	void HandleFire(const Message& fire);
+	void HandleCatch(const Message& Msg);
 	void HandleAim(const AimState& AimState);
 	void HandlePosition(const ActorPosition& ActorPosition);
+	
 	void SimulateGunFire(SteamNetworkingSocket* steam_socket);
+	void SimulateCatch(SteamNetworkingSocket* steam_socket);
 	
 	UPlayerScoreComp* GetScoreManagerComponent() const;
 	UPrivateScoreManager* GetPrivateScoreManagerComponent() const;
+
+	// Server RPC Called by Client
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerNotifyReturnAnimals();
 	
 	void ReleaseMemory();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void OnPossess(APawn* InPawn) override;
+	
+	void ServerNotifyReturnAnimals_Implementation();
+	bool ServerNotifyReturnAnimals_Validate();
 
 private:
 	class ADPCharacter* character;
@@ -77,6 +88,8 @@ private:
 	class UInputAction* cancelAction;
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* catchAction;
+	UPROPERTY(VisibleAnywhere, Category = Input)
+	class UInputAction* returnAction;
 
 	UPROPERTY()
 	UChatManager* ChatManager = nullptr;
@@ -103,6 +116,7 @@ private:
 	void AimReleased(const FInputActionValue& value);
 	void ActionCancel(const FInputActionValue& value);
 	void Catch(const FInputActionValue& value);
+	void ReturningAnimals(const FInputActionValue& value);
 	
 	void SetRotation(const ActorPosition& ActorPosition);
 	void SetPosition(const ActorPosition& ActorPosition);

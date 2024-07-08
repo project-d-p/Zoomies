@@ -30,9 +30,21 @@ void UPrivateScoreManager::IncreasePrivatePlayerScore(const EPlayerJob& playerJo
 	UpdatePrivatePlayerScoreUI();
 }
 
+void UPrivateScoreManager::IncreasePrivatePlayerScoreByServer(const EPlayerJob& playerJob, const TArray<EAnimal>& animals)
+{
+	FScoreData newScore = UCalculateScoreByJobs::CalculateScoreByJobs(playerJob, animals);
+	PrivatePlayerBaseScore += newScore.baseScore; 
+	PrivatePlayerMulScore += newScore.addMulScore;
+	PrivatePlayerMulScore *= newScore.mulMulScore;
+	PrivatePlayerScore = PrivatePlayerBaseScore * PrivatePlayerMulScore;
+	
+	CapturedAnimals.Add(animals);
+	ScoreDatas.Add(newScore);
+}
+
 void UPrivateScoreManager::UpdatePrivatePlayerScoreUI()
 {
-   if (ScoreTextPrivate == nullptr)
+	if (ScoreTextPrivate == nullptr)
 	{
 		ScoreTextPrivate = ScoreUI_Private->GetPrivateScoreTextBlock();
 	}	

@@ -4,15 +4,18 @@
 #include "DPWeaponActorComponent.h"
 
 // TODO: Make HitDetection as a Component
-bool UHitScan::HitDetect(const ADPCharacter* character, const FVector& start, const FRotator& direction, const float& distance, FHitResult& result)
+bool UHitScan::HitDetect(const ADPCharacter* character, const FVector& start, const FRotator& direction, const float& distance, FHitResult& result, bool bDebugLine)
 {
 	FVector end = start + direction.Vector() * distance;
 
 	/* 
 	 * Debug Line
 	 */
-	UWorld *World = GetWorld();
-	DrawDebugLine(World, start, end, FColor::Blue, false, 4.0f, 0, 5.0f);
+	if (bDebugLine)
+	{
+		UWorld *World = GetWorld();
+		DrawDebugLine(World, start, end, FColor::Blue, false, 4.0f, 0, 5.0f);
+	}
 	// ------------
 	
 	FHitResult hit;

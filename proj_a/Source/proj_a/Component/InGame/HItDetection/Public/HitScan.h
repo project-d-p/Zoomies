@@ -11,6 +11,6 @@ class UHitScan : public UActorComponent
 	GENERATED_BODY()
 public:
 	bool HitDetect(const ADPCharacter* character, const FVector& start, const FRotator& direction, const float& distance, FHitResult&
-	               result);
+	               result, bool bDebugLine = true);
 	virtual ~UHitScan() override;
 };

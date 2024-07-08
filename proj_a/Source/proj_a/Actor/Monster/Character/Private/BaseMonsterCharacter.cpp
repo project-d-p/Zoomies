@@ -1,6 +1,7 @@
 #include "BaseMonsterCharacter.h"
 
 #include "BaseMonsterAIController.h"
+#include "DPCharacter.h"
 #include "FDataHub.h"
 #include "FNetLogger.h"
 #include "Components/CapsuleComponent.h"
@@ -10,6 +11,8 @@
 ABaseMonsterCharacter::ABaseMonsterCharacter()
 {
     bReplicates = true;
+	SetReplicatingMovement(false);
+	
     PrimaryActorTick.bCanEverTick = true;
 	
 	GetMesh()->SetCollisionProfileName(UCollisionProfile::BlockAllDynamic_ProfileName);
@@ -20,8 +23,6 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
 	
     GetCharacterMovement()->bOrientRotationToMovement = true;
     bUseControllerRotationYaw = false;
-	
-    SetReplicatingMovement(false);
 
 	this->MonsterId = -1;
 }

@@ -39,3 +39,8 @@ bool ADPWeapon::SimulateAttack(ADPCharacter* character, FHitResult& result, cons
 	return false;
 }
 
+FVector ADPWeapon::GetFireLocation()
+{
+	return FVector();
+}
+

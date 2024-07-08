@@ -2,13 +2,14 @@
 
 #include "Components/CapsuleComponent.h"
 
+
 ASlothCharacter::ASlothCharacter()
 {
 	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SLOTH
 	(TEXT("/Game/model/animals/sloth/sm_sloth.sm_sloth"));
-	if (SK_MAMMOTH.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_MAMMOTH.Object);
+	if (SK_SLOTH.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SK_SLOTH.Object);
 	}
 
 	/** Loading animations */

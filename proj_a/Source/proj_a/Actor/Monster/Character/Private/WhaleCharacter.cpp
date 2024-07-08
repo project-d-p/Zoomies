@@ -2,13 +2,14 @@
 
 #include "Components/CapsuleComponent.h"
 
+
 AWhaleCharacter::AWhaleCharacter()
 {
 	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_FOX(
-		TEXT("/Game/model/animals/whale/whale1.whale1"));
-	if (SK_FOX.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_FOX.Object);
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_WHALE
+	(TEXT("/Game/model/animals/whale/whale1.whale1"));
+	if (SK_WHALE.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SK_WHALE.Object);
 	}
 
 	/** Loading animations */

@@ -186,21 +186,29 @@ MonsterPosition MessageMaker::MakeMonsterPositionMessage(ABaseMonsterAIControlle
 	return msg;
 }
 
-Message MessageMaker::MakeCatchMessage(ADPPlayerController* AdpPlayerController, const FHitResult& HitResult)
+Message MessageMaker::MakeCatchMessage(ADPPlayerController* Controller)
 {
 	Message msg;
-	if (AdpPlayerController == nullptr)
+	if (Controller == nullptr)
 	{
 		return msg;
 	}
-	if (AdpPlayerController->PlayerState == nullptr)
+	if (Controller->PlayerState == nullptr)
 	{
 		return msg;
 	}
-	// 내가 잡으려고 하는 대상이 순간적으로 서버에서는 위치가 변경되었을 수도 있다.
-	// 그러므로 서버에서는 클라이언트가 잡으려고 하는 대상이 누구인지 알 수 없다.
-	// 그러므로 클라이언트가 잡으려고 하는 대상이 누구인지 서버에게 알려줘야 한다.
-	msg.set_player_id(TCHAR_TO_UTF8(*AdpPlayerController->PlayerState->GetPlayerName()));
-	
+	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetPlayerName()));
+	Catch catch_;
+	Vec3 position;
+	position.set_x(Controller->GetPawn()->GetActorLocation().X);
+	position.set_y(Controller->GetPawn()->GetActorLocation().Y);
+	position.set_z(Controller->GetPawn()->GetActorLocation().Z);
+	*catch_.mutable_position() = position;
+	Vec3 direction;
+	direction.set_x(Controller->GetControlRotation().Pitch);
+	direction.set_y(Controller->GetControlRotation().Yaw);
+	direction.set_z(Controller->GetControlRotation().Roll);
+	*catch_.mutable_rotation() = direction;
+	*msg.mutable_catch_() = catch_;
 	return msg;
 }

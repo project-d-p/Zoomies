@@ -38,4 +38,5 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void SyncPosition();
+	bool bCaught = false;
 };

@@ -27,7 +27,7 @@ ADPGameModeBase::ADPGameModeBase()
 	MonsterFactory = CreateDefaultSubobject<UMonsterFactory>(TEXT("MonsterFactory"));
 
 	PrimaryActorTick.bCanEverTick = true;
-	PrimaryActorTick.TickGroup = TG_PostPhysics;
+	// PrimaryActorTick.TickGroup = TG_PostPhysics;
 	monster_controllers_.resize(NUM_OF_MAX_MONSTERS, nullptr);
 	empty_monster_slots_.reserve(NUM_OF_MAX_MONSTERS);
 
@@ -35,7 +35,6 @@ ADPGameModeBase::ADPGameModeBase()
 	{
 		empty_monster_slots_.push_back(i);
 	}
-	// PrimaryActorTick.TickInterval = 0.01f;
 	bReplicates = true;
 }
 
@@ -129,7 +128,7 @@ void ADPGameModeBase::Tick(float delta_time)
 		UE_LOG(LogTemp, Warning, TEXT("Game is not started yet."));
 	}
 	
-	FNetLogger::EditerLog(FColor::Green, TEXT("Number of monsters: %d"), NUM_OF_MAX_MONSTERS - empty_monster_slots_.size());
+	// FNetLogger::EditerLog(FColor::Green, TEXT("Number of monsters: %d"), NUM_OF_MAX_MONSTERS - empty_monster_slots_.size());
 }
 
 void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -157,6 +156,7 @@ void ADPGameModeBase::ProcessData(float delta_time)
 	}
 	this->SyncHostAiming();
 	this->SimulateGunFire();
+	this->SimulateCatch();
 	this->SyncMovement();
 	this->SyncMonsterMovement();
 }
@@ -207,8 +207,16 @@ void ADPGameModeBase::SimulateGunFire()
 	for (auto& pair: player_controllers_)
 	{
 		ADPPlayerController* controller = pair.second;
-		ADPCharacter* character = Cast<ADPCharacter>(controller->GetPawn());
 		controller->SimulateGunFire(steam_listen_socket_);
+	}
+}
+
+void ADPGameModeBase::SimulateCatch()
+{
+	for (auto& pair: player_controllers_)
+	{
+		ADPPlayerController* controller = pair.second;
+		controller->SimulateCatch(steam_listen_socket_);
 	}
 }
 

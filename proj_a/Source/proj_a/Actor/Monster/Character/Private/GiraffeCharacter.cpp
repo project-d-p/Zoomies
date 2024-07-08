@@ -2,13 +2,14 @@
 
 #include "Components/CapsuleComponent.h"
 
+
 AGiraffeCharacter::AGiraffeCharacter()
 {
 	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_GIRAFFE
 	(TEXT("/Game/model/animals/giraffe/giraffe-lowpoly.giraffe-lowpoly"));
-	if (SK_MAMMOTH.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_MAMMOTH.Object);
+	if (SK_GIRAFFE.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SK_GIRAFFE.Object);
 	}
 
 	/** Loading animations */

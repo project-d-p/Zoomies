@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "DPPlayerController.h"
+
+#include "BaseMonsterCharacter.h"
 #include "DPCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -72,11 +74,14 @@ ADPPlayerController::ADPPlayerController()
 	(TEXT("/Game/input/ia_catch.ia_catch"));
 	if (IA_CATCH.Succeeded())
 		catchAction = IA_CATCH.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_RETURN
+	(TEXT("/Game/input/ia_return.ia_return"));
+	if (IA_RETURN.Succeeded())
+		returnAction = IA_RETURN.Object;
 	
 	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
-
 	Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
-	
 	CatchRay = CreateDefaultSubobject<UHitScan>(TEXT("Catch Ray"));
 
 	static ConstructorHelpers::FObjectFinder<USoundBase> SoundAsset
@@ -240,7 +245,10 @@ void ADPPlayerController::Tick(float DeltaSeconds)
 		FHitResult hit_result;
 		if (this->IsCatchable(hit_result))
 		{
-			FNetLogger::EditerLog(FColor::Cyan, TEXT("Catchable"));
+			if (Cast<ABaseMonsterCharacter>(hit_result.GetActor()) != nullptr)
+			{
+				// FNetLogger::EditerLog(FColor::Cyan, TEXT("Catchable"));
+			}
 		}
 	}
 	if (HasAuthority())
@@ -253,7 +261,7 @@ void ADPPlayerController::Tick(float DeltaSeconds)
 
 bool ADPPlayerController::IsCatchable(FHitResult& hit_result)
 {
-	if (CatchRay->HitDetect(character, character->GetActorLocation(), this->GetControlRotation(), 300.0f, hit_result))
+	if (CatchRay->HitDetect(character, character->GetActorLocation(), this->GetControlRotation(), 300.0f, hit_result, false))
 	{
 		return true;
 	}
@@ -278,7 +286,7 @@ void ADPPlayerController::OnPossess(APawn* InPawn)
 	
 	state = Cast<UDPStateActorComponent>(character->GetComponentByClass(UDPStateActorComponent::StaticClass()));
 	construction = Cast<UDPConstructionActorComponent>(character->GetComponentByClass(UDPConstructionActorComponent::StaticClass()));
-	// state->equipmentState = "GUN";
+	
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		FNetLogger::EditerLog(FColor::Red, TEXT("Add Mapping Context [On Possess]"));
@@ -309,6 +317,7 @@ void ADPPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(cancelAction, ETriggerEvent::Triggered, this, &ADPPlayerController::ActionCancel);
 		// 포획 (f)
 		EnhancedInputComponent->BindAction(catchAction, ETriggerEvent::Started, this, &ADPPlayerController::Catch);
+		EnhancedInputComponent->BindAction(returnAction, ETriggerEvent::Started, this, &ADPPlayerController::ReturningAnimals);
 	}
 }
 
@@ -320,13 +329,6 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 	const FVector forwardVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
 
-	// if (!HasAuthority())
-	// {
-	// 	FVector velocity = character->GetCharacterMovement()->Velocity;
-	// 	Message message = MessageMaker::MakeMovementMessage(this, actionValue, controlRotation, velocity);
-	// 	Socket->AsyncSendPacket(message);
-	// }
-	
 	character->AddMovementInput(forwardVector, actionValue.X);
 	character->AddMovementInput(rightVector, actionValue.Y);
 
@@ -345,12 +347,6 @@ void ADPPlayerController::Jump(const FInputActionValue& value)
 	if (!actionValue) {
 		return ;
 	}
-
-	Message msg = MessageMaker::MakeJumpMessage(this);
-	// if (!HasAuthority())
-	// {
-	// 	Socket->AsyncSendPacket(msg);
-	// }
 	character->Jump();
 	UGameplayStatics::PlaySound2D(GetWorld(), jumpSound);
 }
@@ -391,7 +387,7 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 			// Success Only Effect;
 			FNetLogger::EditerLog(FColor::Cyan, TEXT("Attack Success[Only Effect]"));
 		}
-		FVector position = character->GetActorLocation();
+		FVector position = character->weaponComponent->GetFireLocation();
 		Message msg = MessageMaker::MakeFireMessage(this, position, final_direction);
 		if (!HasAuthority())
 		{
@@ -517,32 +513,65 @@ void ADPPlayerController::ActionCancel(const FInputActionValue& value)
 
 void ADPPlayerController::Catch(const FInputActionValue& value)
 {
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Catch"));
-
-	// 마우스 에임으로 잡냐 마냐를 판단해야함.
-	// why? 해당 버튼을 눌렀을 때, 범위로 판단하게 되면 범위 내에 있는 모든 오브젝트를 잡게 되기 때문.
-	// 그러나 마우스 에임으로 잡을 때는 에임이 가리키는 오브젝트만 잡게됨.
-	// 그럼 유저로 하여금 본인이 해당 몬스터를 가리키고 있다라는 것을 알려줄 무언가가 필요함.
-	// 에임을 가져다 대면 몬스터가 빛나거나, 몬스터의 테두리가 빛나거나, 몬스터를 포획할거냐는 UI가 뜨게 해야 할듯.
-	
-	// 잡은 정보는 PlayerState에 업데이트가 되어서, RPC로 해당 정보를 동기화해야함.
-	// 그리고 해당 몬스터의 객체는 서버에서 사라짐.
-	// RPC로 해당 정보가 동기화가 됨에 따라서 클라이언트는 해당 정보를 바탕으로 렌더링을 할 수 있음.
-	// 이 때, 해당 몬스터의 객체는 사라지지만, 해당 몬스터의 정보는 서버에 남아있어야함.
-	// 왜냐하면, 클라이언트가 잡은 몬스터의 정보를 가지고 있어야함.
-
-	// HitScan을 Util Component로 만들어서 어떤 걸로 할거냐로 지정하게 해야 할듯.
-	
 	FHitResult hit_result;
-	
-	Message msg = MessageMaker::MakeCatchMessage(this, hit_result);
-	if (!HasAuthority())
+	if (!this->IsCatchable(hit_result))
 	{
-		Socket->AsyncSendPacket(msg);
+		return ;
+	}
+	if (Cast<ABaseMonsterCharacter>(hit_result.GetActor()) == nullptr)
+	{
+		return ;
+	}
+	Message msg = MessageMaker::MakeCatchMessage(this);
+	if (HasAuthority())
+	{
+		catch_queue_.push(msg);
 	}
 	else
 	{
-		catch_queue_.push(msg);
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Send Catch Message"));
+		Socket->AsyncSendPacket(msg);
+	}
+
+	/* Test */
+	// UClass* class_type = hit_result.GetActor()->GetClass();
+	// FString monster_type = class_type->GetName();
+	// this->character->CatchMonster(monster_type);
+}
+
+void ADPPlayerController::ReturningAnimals(const FInputActionValue& value)
+{
+	if (!character->IsAtReturnPlace())
+	{
+		return ;
+	}
+	TArray<EAnimal> animals = character->ReturnMonsters();
+	// 개인 점수 증가
+	ADPPlayerState* player_state = Cast<ADPPlayerState>(PlayerState);
+	if (player_state)
+	{
+		this->PrivateScoreManager->IncreasePrivatePlayerScore(player_state->GetPlayerJob(), animals);
+	}
+	if (HasAuthority())
+	{
+		ADPGameModeBase* GM = GetWorld()->GetAuthGameMode<ADPGameModeBase>();
+		if (GM)
+		{
+			GM->ScoreManager->IncreasePlayerScore(this, animals);
+		}
+
+		for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+		{
+			ADPPlayerController* PC = Cast<ADPPlayerController>(It->Get());
+			if (PC && PC != this) // 자기 자신을 제외한 모든 클라이언트
+			{
+				PC->character->ClientNotifyAnimalReturn(player_state->GetPlayerName());
+			}
+		}
+	}
+	else
+	{
+		this->ServerNotifyReturnAnimals();
 	}
 }
 
@@ -568,8 +597,6 @@ void ADPPlayerController::HandleMovement(const Movement& movement, const float& 
 	const FVector forwardVector = FRotationMatrix(rotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(rotation).GetUnitAxis(EAxis::Y);
 
-	// character->AddMovementInput(forwardVector, action.X * delta / server_delta);
-	// character->AddMovementInput(rightVector, action.Y * delta / server_delta);
 	character->AddMovementInput(forwardVector, action.X);
 	character->AddMovementInput(rightVector, action.Y);
 
@@ -595,6 +622,11 @@ void ADPPlayerController::HandleFire(const Message& fire)
 {
 	this->gun_fire_count_ += 1;
 	this->gun_queue_.push(fire);
+}
+
+void ADPPlayerController::HandleCatch(const Message& catch_)
+{
+	this->catch_queue_.push(catch_);
 }
 
 void ADPPlayerController::SimulateGunFire(SteamNetworkingSocket* steam_socket)
@@ -706,3 +738,76 @@ void ADPPlayerController::SetState(const ActorPosition& ActorPosition)
 	}
 }
 
+void ADPPlayerController::SimulateCatch(SteamNetworkingSocket* steam_socket)
+{
+	if (catch_queue_.empty())
+	{
+		return ;
+	}
+	while (!catch_queue_.empty())
+	{
+		Message catch_ = catch_queue_.front();
+		catch_queue_.pop();
+		::Catch catch_message = catch_.catch_();
+		FVector start = FVector(catch_message.position().x(), catch_message.position().y(), catch_message.position().z());
+		FRotator direction = FRotator(catch_message.rotation().x(), catch_message.rotation().y(), catch_message.rotation().z());
+		
+		FHitResult hit_result;
+		if (!CatchRay->HitDetect(character, start, direction, 300.0f, hit_result))
+		{
+			continue;
+		}
+		if (Cast<ABaseMonsterCharacter>(hit_result.GetActor()) == nullptr)
+		{
+			continue;
+		}
+		UClass* class_type = hit_result.GetActor()->GetClass();
+		FString monster_type = class_type->GetName();
+		if (!this->character->CatchMonster(monster_type))
+		{
+			continue ;
+		}
+		::Catch reply;
+		reply.set_target(TCHAR_TO_UTF8(*monster_type));
+		*catch_.mutable_catch_() = reply;
+		FString TestString = UTF8_TO_TCHAR(reply.target().c_str());
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Catch monster_id: %s"), *TestString);
+		steam_socket->PushUdpFlushMessage(catch_);
+	}
+}
+
+void ADPPlayerController::ServerNotifyReturnAnimals_Implementation()
+{
+	// 개인 점수 증가
+	ADPPlayerState* player_state = Cast<ADPPlayerState>(PlayerState);
+	if (!player_state)
+	{
+		return ;
+	}
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Server Notify Return Animals[from: %s]"), *player_state->GetPlayerName());
+	
+	// 클라이언트의 동물 반환 처리를 처리한다.
+	TArray<EAnimal> animals = character->ReturnMonsters();
+	
+	this->PrivateScoreManager->IncreasePrivatePlayerScoreByServer(player_state->GetPlayerJob(), animals);
+	ADPGameModeBase* GM = GetWorld()->GetAuthGameMode<ADPGameModeBase>();
+	if (GM)
+	{
+		GM->ScoreManager->IncreasePlayerScore(this, animals);
+	}
+	
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		ADPPlayerController* PC = Cast<ADPPlayerController>(It->Get());
+		if (PC && PC != this) // 자기 자신을 제외한 모든 클라이언트
+		{
+			PC->character->ClientNotifyAnimalReturn(player_state->GetPlayerName());
+		}
+	}
+}
+
+bool ADPPlayerController::ServerNotifyReturnAnimals_Validate()
+{
+	// 호출이 유효한지 확인하는 로직을 구현
+	return true; // 유효성 검증이 항상 참인 경우
+}
