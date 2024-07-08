@@ -2,13 +2,14 @@
 
 #include "Components/CapsuleComponent.h"
 
+
 AShepherdCharacter::AShepherdCharacter()
 {
 	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH(
-		TEXT("/Game/model/animals/shepherd/stylized_low_poly_german_shepherd.stylized_low_poly_german_shepherd"));
-	if (SK_MAMMOTH.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_MAMMOTH.Object);
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SHEPHERD
+	(TEXT("/Game/model/animals/shepherd/stylized_low_poly_german_shepherd.stylized_low_poly_german_shepherd"));
+	if (SK_SHEPHERD.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SK_SHEPHERD.Object);
 	}
 
 	/** Loading animations */

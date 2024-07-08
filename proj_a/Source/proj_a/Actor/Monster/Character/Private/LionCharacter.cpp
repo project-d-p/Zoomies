@@ -1,14 +1,15 @@
-#include "LionCharactor.h"
+#include "LionCharacter.h"
 
 #include "Components/CapsuleComponent.h"
 
-ALionCharactor::ALionCharactor()
+
+ALionCharacter::ALionCharacter()
 {
 	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_LION
 	(TEXT("/Game/model/animals/lion/low_poly_lion.low_poly_lion"));
-	if (SK_MAMMOTH.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_MAMMOTH.Object);
+	if (SK_LION.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SK_LION.Object);
 	}
 
 	/** Loading animations */

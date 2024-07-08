@@ -1,5 +1,4 @@
 #include "GI_Zoomies.h"
-
 #include "DPPlayerController.h"
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
@@ -31,46 +30,7 @@ void UGI_Zoomies::HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENe
 void UGI_Zoomies::Init()
 {
 	Super::Init();
-
-	// Get the online subsystem
-	online_subsystem_ = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
-	if (online_subsystem_)
-	{
-		session_interface_ = online_subsystem_->GetSessionInterface();
-		if (!session_interface_.IsValid())
-		{
-			UE_LOG(LogTemp, Error, TEXT("Failed to get session interface"));	
-			return ;
-		}
-		UE_LOG(
-			LogTemp,
-			Log,
-			TEXT("Current Online Subsystem: %s"),
-			*online_subsystem_->GetSubsystemName().ToString());
-		
-		dh_on_destroy_complete = session_interface_->AddOnDestroySessionCompleteDelegate_Handle(
-				FOnDestroySessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onDestroySessionComplete));
-	}
-
-	// Initialize Steam API
-	if (SteamAPI_Init())
-	{
-		CSteamID steam_id = SteamUser()->GetSteamID();
-		FString steam_username = UTF8_TO_TCHAR(SteamFriends()->GetPersonaName());
-		if (steam_id.IsValid() && !steam_username.IsEmpty())
-		{
-			UE_LOG(LogTemp, Log, TEXT("Steam ID: %llu, Username: %s"), steam_id.ConvertToUint64(), *steam_username);
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("STEAM INIT FAILED"));
-	}
-
-	if (GEngine)
-	{
-		GEngine->OnNetworkFailure().AddUObject(this, &UGI_Zoomies::HandleNetworkFailure);
-	}
+	CheckSteamInit();
 }
 
 // matching session Functions
@@ -237,5 +197,98 @@ void UGI_Zoomies::onDestroySessionComplete(FName session_name, bool bWasSuccessf
 	if (bWasSuccessful)
 	{
 		OnHostDisconnected();
+	}
+}
+
+void UGI_Zoomies::CheckSteamInit()
+{
+	if (count < max_count && (!is_steamAPI_init || !is_online_session_steam_init))
+	{
+		InitSteamAPI();
+		count+= 1;
+		GetWorld()->GetTimerManager().SetTimer(
+			UnusedHandle,
+			this, &UGI_Zoomies::CheckSteamInit,
+			2.0f,
+			false);
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().ClearTimer(UnusedHandle);
+	}
+	if (count >= max_count)
+	{
+		UE_LOG(LogTemp, Error, TEXT("SteamAPI init failed max attempts reached"));
+	}
+}
+
+void UGI_Zoomies::InitSteamAPI()
+{
+	if (!is_steamAPI_init && SteamAPI_Init())
+	{
+		is_steamAPI_init = true;
+		CSteamID steam_id = SteamUser()->GetSteamID();
+		FString steam_username = UTF8_TO_TCHAR(SteamFriends()->GetPersonaName());
+		if (steam_id.IsValid() && !steam_username.IsEmpty())
+		{
+			UE_LOG(LogTemp, Log, TEXT("SteamAPI INIT SUCCESS || ID: %llu, Username: %s"), steam_id.ConvertToUint64(), *steam_username);
+		}
+		// SteamNetworkingUtils()->InitRelayNetworkAccess();
+	}
+	
+	if (!is_steamAPI_init)
+	{
+		UE_LOG(LogTemp, Log, TEXT("SteamAPI init failed"));
+		//logging on Screen if GEngine is available
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				30.f,
+				FColor::Red,
+				FString::Printf(TEXT("SteamAPI init failed")));
+		}
+	}
+	else
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(
+			TimerHandle,
+			this, &UGI_Zoomies::InitOnlineSubsystemSteam,
+			0.5f, false);
+	}
+}
+
+void UGI_Zoomies::InitOnlineSubsystemSteam()
+{
+	if (!is_online_session_steam_init)
+	{
+		online_subsystem_ = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
+		if (online_subsystem_)
+		{
+			session_interface_ = online_subsystem_->GetSessionInterface();
+			is_online_session_steam_init = true;
+			if (session_interface_.IsValid())
+			{
+				UE_LOG(
+						LogTemp,
+						Log,
+						TEXT("Online Subsystem steam SUCCESS || SubsystemName: %s"),
+						*online_subsystem_->GetSubsystemName().ToString());
+			}
+		}
+	}
+	if (!is_online_session_steam_init)
+	{
+		//logging on Screen if GEngine is available
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				30.f,
+				FColor::Red,
+				FString::Printf(TEXT("Online Subsystem steam init failed")));
+		}
+		UE_LOG(LogTemp, Log, TEXT("Online Subsystem steam init failed"));
 	}
 }

@@ -31,22 +31,35 @@ public:
 	// void CreateSocket();
 	void Connect();
 	void RunTask();
-	
+
+	// Server Handling Message
 	void HandleMovement(const Movement& movement, const float& server_delta);
 	void HandleJump(const Jump& Jump);
 	void HandleFire(const Message& fire);
+	void HandleCatch(const Message& Msg);
 	void HandleAim(const AimState& AimState);
+	void HandlePosition(const ActorPosition& ActorPosition);
+	
 	void SimulateGunFire(SteamNetworkingSocket* steam_socket);
+	void SimulateCatch(SteamNetworkingSocket* steam_socket);
 	
 	UPlayerScoreComp* GetScoreManagerComponent() const;
 	UPrivateScoreManager* GetPrivateScoreManagerComponent() const;
+
+	// Server RPC Called by Client
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerNotifyReturnAnimals();
 	
 	void ReleaseMemory();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void OnPossess(APawn* InPawn) override;
+	
+	void ServerNotifyReturnAnimals_Implementation();
+	bool ServerNotifyReturnAnimals_Validate();
 
 private:
 	class ADPCharacter* character;
@@ -73,6 +86,10 @@ private:
 	class UInputAction* aimAction;
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* cancelAction;
+	UPROPERTY(VisibleAnywhere, Category = Input)
+	class UInputAction* catchAction;
+	UPROPERTY(VisibleAnywhere, Category = Input)
+	class UInputAction* returnAction;
 
 	UPROPERTY()
 	UChatManager* ChatManager = nullptr;
@@ -80,10 +97,15 @@ private:
 	UPROPERTY()
 	UClientSocket* Socket = nullptr;
 
+	UPROPERTY()
+	class UHitScan* CatchRay = nullptr;
+
 	int gun_fire_count_ = 0;
 	std::queue<Message> gun_queue_;
+	std::queue<Message> catch_queue_;
 
 	virtual void Tick(float DeltaSeconds) override;
+	bool IsCatchable(FHitResult& hit_result);
 	
 	void Move(const FInputActionValue& value);
 	void Jump(const FInputActionValue& value);
@@ -93,6 +115,12 @@ private:
 	void Aim(const FInputActionValue& value);
 	void AimReleased(const FInputActionValue& value);
 	void ActionCancel(const FInputActionValue& value);
+	void Catch(const FInputActionValue& value);
+	void ReturningAnimals(const FInputActionValue& value);
+	
+	void SetRotation(const ActorPosition& ActorPosition);
+	void SetPosition(const ActorPosition& ActorPosition);
+	void SetState(const ActorPosition& ActorPosition);
 
 	// void UpdatePlayer();
 

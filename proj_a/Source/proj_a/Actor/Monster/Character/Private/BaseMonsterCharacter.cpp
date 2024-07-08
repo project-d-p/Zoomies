@@ -1,16 +1,23 @@
 #include "BaseMonsterCharacter.h"
 
+#include "BaseMonsterAIController.h"
+#include "DPCharacter.h"
+#include "FDataHub.h"
 #include "FNetLogger.h"
 #include "Components/ArrowComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Net/UnrealNetwork.h"
 
 ABaseMonsterCharacter::ABaseMonsterCharacter()
 {
     bReplicates = true;
+	SetReplicatingMovement(false);
+	
     PrimaryActorTick.bCanEverTick = true;
 	
 	GetMesh()->SetCollisionProfileName(UCollisionProfile::BlockAllDynamic_ProfileName);
@@ -62,10 +69,7 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
     // SetReplicatingMovement(false);
 }
 
-void ABaseMonsterCharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	FNetLogger::EditerLog(FColor::Green, TEXT("OnBeginOverlap"));
+	this->MonsterId = -1;
 }
 
 void ABaseMonsterCharacter::BeginPlay()
@@ -89,27 +93,94 @@ void ABaseMonsterCharacter::BeginPlay()
 		widgetComponent->SetVisibility(false);
 }
 
+void ABaseMonsterCharacter::SyncPosition()
+{
+	int32 id = MonsterId;
+	FString MonsterID = FString::FromInt(id);
+	FNetLogger::LogInfo(TEXT("SyncPosition: %s"), *MonsterID);
+	
+	MonsterPosition* MonsterData = FDataHub::monsterData.Find(MonsterID);
+	if (!MonsterData)
+	{
+		FNetLogger::LogInfo(TEXT("Monster data does not contain: %s"), *MonsterID);
+		return ;
+	}
+	
+	FVector CurrentPosition = this->GetActorLocation();
+	FVector CurrentVelocity = this->GetCharacterMovement()->Velocity;
+	
+	FVector Position = FVector(MonsterData->position().x(), MonsterData->position().y(), MonsterData->position().z());
+	FVector Velocity = FVector(MonsterData->velocity().x(), MonsterData->velocity().y(), 0);
+	FRotator Rotation = FRotator(MonsterData->rotation().x(), MonsterData->rotation().y(), 0);
+	
+	FVector InterpolatedPosition = FMath::VInterpTo(CurrentPosition, Position, 0.1f, 1.0f);
+	FVector InterpolatedVelocity = FMath::VInterpTo(CurrentVelocity, Velocity, 0.1f, 1.0f);
+	FRotator FinalRotation = FRotator(0, Rotation.Yaw, 0);
+
+	this->SetActorLocation(InterpolatedPosition);
+	this->GetCharacterMovement()->Velocity = InterpolatedVelocity;
+	this->SetActorRotation(FinalRotation);
+}
+
+void ABaseMonsterCharacter::ScaleCapsuleSize(float ScaleFactor)
+{
+	UCapsuleComponent* LCC = GetCapsuleComponent();
+	if (LCC)
+	{
+		FVector Scalar = FVector(ScaleFactor, ScaleFactor, ScaleFactor);
+		LCC->SetRelativeScale3D(Scalar);
+	}
+}
+
+void ABaseMonsterCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (!HasAuthority())
+	{
+		this->SyncPosition();
+	}
+}
+
+void ABaseMonsterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ABaseMonsterCharacter, MonsterId, COND_InitialOnly);
+	DOREPLIFETIME(ABaseMonsterCharacter, CurrentState);
+}
+
 void ABaseMonsterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-float ABaseMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
-	AController* EventInstigator, AActor* DamageCauser)
+void ABaseMonsterCharacter::TakeDamage(float Dmg)
 {
-	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	CurrentHp -= Dmg;
+	if (CurrentHp <= 0 && CurrentState != EMonsterState::Faint)
+	{
+		CurrentHp = 0;
+		CurrentState = EMonsterState::Faint;
+		ABaseMonsterAIController *BMC = Cast<ABaseMonsterAIController>(GetOwner());
+		check(BMC)
+		BMC->StopMovement();
+		OnRep_FaintCharacterMotion();
+	}
 }
 
-//void ABaseMonsterCharacter::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-//{
-//	if (widgetComponent)
-//		widgetComponent->SetVisibility(true);
-//	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("begin overlap"));
-//	UE_LOG(LogTemp, Warning, TEXT("begin overlap"));
-//}
-//
-//void ABaseMonsterCharacter::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-//{
-//	if (widgetComponent)
-//		widgetComponent->SetVisibility(false);
-//}
+void ABaseMonsterCharacter::OnRep_FaintCharacterMotion() const
+{
+	FRotator NewRotation = FRotator(0.0f, 0.0f, 90.0f);
+	GetCapsuleComponent()->SetRelativeRotation(NewRotation);
+	GetMesh()->SetRelativeRotation(NewRotation);
+}
+
+ABaseMonsterCharacter::~ABaseMonsterCharacter()
+{
+	// if (!HasAuthority())
+	// {
+	// 	if (FDataHub::monsterData.Contains(FString::FromInt(MonsterId)))
+	// 		FDataHub::monsterData.Remove(FString::FromInt(MonsterId));
+	// }
+}

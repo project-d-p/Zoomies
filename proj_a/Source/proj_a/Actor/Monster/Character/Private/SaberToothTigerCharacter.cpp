@@ -1,14 +1,15 @@
-#include "SabertoothTigherCharacter.h"
+#include "SaberToothTigerCharacter.h"
 
 #include "Components/CapsuleComponent.h"
 
-ASabertoothTigherCharacter::ASabertoothTigherCharacter()
+
+ASaberToothTigerCharacter::ASaberToothTigerCharacter()
 {
 	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH(
-		TEXT("/Game/model/animals/sabertoothTiger/sm_sabertoothTiger.sm_sabertoothTiger"));
-	if (SK_MAMMOTH.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_MAMMOTH.Object);
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SABERTOOTHTIGER
+	(TEXT("/Game/model/animals/sabertoothTiger/sm_sabertoothTiger.sm_sabertoothTiger"));
+	if (SK_SABERTOOTHTIGER.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SK_SABERTOOTHTIGER.Object);
 	}
 
 	/** Loading animations */

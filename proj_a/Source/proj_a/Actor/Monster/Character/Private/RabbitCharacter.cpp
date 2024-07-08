@@ -2,13 +2,14 @@
 
 #include "Components/CapsuleComponent.h"
 
+
 ARabbitCharacter::ARabbitCharacter()
 {
 	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_RABBIT
 	(TEXT("/Game/model/animals/rabbit/low_poly_rabbit.low_poly_rabbit"));
-	if (SK_MAMMOTH.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_MAMMOTH.Object);
+	if (SK_RABBIT.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SK_RABBIT.Object);
 	}
 
 	/** Loading animations */

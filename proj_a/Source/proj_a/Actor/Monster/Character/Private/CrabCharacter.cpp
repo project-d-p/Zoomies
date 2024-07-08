@@ -5,10 +5,10 @@
 ACrabCharacter::ACrabCharacter()
 {
 	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CRAB
 	(TEXT("/Game/model/animals/crab/crab.crab"));
-	if (SK_MAMMOTH.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_MAMMOTH.Object);
+	if (SK_CRAB.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SK_CRAB.Object);
 	}
 
 	/** Loading animations */
