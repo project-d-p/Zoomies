@@ -86,6 +86,7 @@ void ABaseMonsterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(ABaseMonsterCharacter, MonsterId, COND_InitialOnly);
+	DOREPLIFETIME(ABaseMonsterCharacter, CurrentState);
 }
 
 void ABaseMonsterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -96,17 +97,22 @@ void ABaseMonsterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 void ABaseMonsterCharacter::TakeDamage(float Dmg)
 {
 	CurrentHp -= Dmg;
-	if (CurrentHp <= 0 && CurrentState != Faint)
+	if (CurrentHp <= 0 && CurrentState != EMonsterState::Faint)
 	{
 		CurrentHp = 0;
+		CurrentState = EMonsterState::Faint;
 		ABaseMonsterAIController *BMC = Cast<ABaseMonsterAIController>(GetOwner());
 		check(BMC)
 		BMC->StopMovement();
-		FRotator NewRotation = FRotator(0.0f, 0.0f, 90.0f);
-		GetCapsuleComponent()->SetRelativeRotation(NewRotation);
-		GetMesh()->SetRelativeRotation(NewRotation);
-		CurrentState = Faint;
+		OnRep_FaintCharacterMotion();
 	}
+}
+
+void ABaseMonsterCharacter::OnRep_FaintCharacterMotion() const
+{
+	FRotator NewRotation = FRotator(0.0f, 0.0f, 90.0f);
+	GetCapsuleComponent()->SetRelativeRotation(NewRotation);
+	GetMesh()->SetRelativeRotation(NewRotation);
 }
 
 ABaseMonsterCharacter::~ABaseMonsterCharacter()

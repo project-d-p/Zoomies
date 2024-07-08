@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "BaseMonsterCharacter.h"
+#include "DPCharacter.h"
 #include "Components/ActorComponent.h"
 #include <map>
 

@@ -4,10 +4,11 @@
 #include "GameFramework/Character.h"
 #include "BaseMonsterCharacter.generated.h"
 
-enum EMonsterState
+UENUM()
+enum class EMonsterState : uint8
 {
-	Idle,
-	Faint,
+	Idle UMETA(DisplayName = "Idle"),
+	Faint UMETA(DisplayName = "Faint"),
 };
 
 UCLASS()
@@ -20,6 +21,8 @@ public:
 	virtual ~ABaseMonsterCharacter() override;
 	
 	void TakeDamage(float Dmg);
+	UFUNCTION()
+	void OnRep_FaintCharacterMotion() const;
 	void ScaleCapsuleSize(float ScaleFactor);
 	EMonsterState GetState() const { return CurrentState; } 
 	
@@ -28,7 +31,10 @@ public:
 private:
 	const float MaxHp = 100.f;
 	float CurrentHp = 100.f;
-	EMonsterState CurrentState = Idle;
+
+	UPROPERTY(ReplicatedUsing=OnRep_FaintCharacterMotion)
+	EMonsterState CurrentState = EMonsterState::Idle;
+
 	float MoveSpeed;
 
 protected:

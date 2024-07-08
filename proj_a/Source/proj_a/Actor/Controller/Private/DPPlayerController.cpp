@@ -522,6 +522,10 @@ void ADPPlayerController::Catch(const FInputActionValue& value)
 	{
 		return ;
 	}
+	if (Cast<ABaseMonsterCharacter>(hit_result.GetActor())->GetState() != EMonsterState::Faint)
+	{
+		return ;
+	}
 	Message msg = MessageMaker::MakeCatchMessage(this);
 	if (HasAuthority())
 	{
@@ -757,7 +761,12 @@ void ADPPlayerController::SimulateCatch(SteamNetworkingSocket* steam_socket)
 		{
 			continue;
 		}
-		if (Cast<ABaseMonsterCharacter>(hit_result.GetActor()) == nullptr)
+		ABaseMonsterCharacter* MC = Cast<ABaseMonsterCharacter>(hit_result.GetActor());
+		if (!MC)
+		{
+			continue;
+		}
+		if (MC->GetState() != EMonsterState::Faint)
 		{
 			continue;
 		}
@@ -767,12 +776,16 @@ void ADPPlayerController::SimulateCatch(SteamNetworkingSocket* steam_socket)
 		{
 			continue ;
 		}
+		ABaseMonsterAIController* MAC = Cast<ABaseMonsterAIController>(MC->GetOwner());
+		check(MAC)
+		MAC->RemovePawnAndController();
 		::Catch reply;
 		reply.set_target(TCHAR_TO_UTF8(*monster_type));
 		*catch_.mutable_catch_() = reply;
 		FString TestString = UTF8_TO_TCHAR(reply.target().c_str());
 		FNetLogger::EditerLog(FColor::Cyan, TEXT("Catch monster_id: %s"), *TestString);
 		steam_socket->PushUdpFlushMessage(catch_);
+		
 	}
 }
 

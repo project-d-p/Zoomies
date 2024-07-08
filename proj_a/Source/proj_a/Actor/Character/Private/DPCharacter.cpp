@@ -43,8 +43,6 @@ ADPCharacter::ADPCharacter()
 	sceneCaptureSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SCENECAPTURESPRINGARM"));
 	sceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SCENECAPTURE"));
 
-	UE_LOG(LogTemp, Warning, TEXT("DPCharacter Constructor"));
-
 	springArm->SetupAttachment(RootComponent);
 	camera->SetupAttachment(springArm);
 

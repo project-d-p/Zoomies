@@ -1,5 +1,6 @@
 #include "CharacterPositionSync.h"
 
+#include "BaseMonsterCharacter.h"
 #include "DPPlayerState.h"
 #include "FDataHub.h"
 #include "DPCharacter.h"
@@ -115,7 +116,6 @@ void UCharacterPositionSync::SyncGunFire(ADPCharacter* character)
 	
 	if (character->weaponComponent->SimulateAttack(character, hit_result, gunfire_))
 	{
-		// hit success but not to do anything.
 	}
 }
 

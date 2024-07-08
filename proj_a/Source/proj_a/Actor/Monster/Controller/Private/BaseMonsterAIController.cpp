@@ -45,7 +45,7 @@ bool ABaseMonsterAIController::GetMovementAllowed()
 {
 	ABaseMonsterCharacter* CC = Cast<ABaseMonsterCharacter>(GetCharacter());
 	check(CC);
-	if (CC->GetState() == Faint)
+	if (CC->GetState() == EMonsterState::Faint)
 		return false;
 	return true;
 }

@@ -1,5 +1,6 @@
 #include "MonsterSlotComponent.h"
 
+#include "DPCharacter.h"
 #include "FNetLogger.h"
 #include "proj_a/Component/InGame/Score/Types/ScoreTypes.h"
 

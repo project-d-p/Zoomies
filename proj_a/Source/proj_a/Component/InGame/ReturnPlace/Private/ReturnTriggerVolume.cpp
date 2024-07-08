@@ -18,6 +18,9 @@ AReturnTriggerVolume::AReturnTriggerVolume()
 
 	TriggerSphere->OnComponentBeginOverlap.AddDynamic(this, &AReturnTriggerVolume::OnOverlapBegin);
 	TriggerSphere->OnComponentEndOverlap.AddDynamic(this, &AReturnTriggerVolume::OnOverlapEnd);
+	
+	TriggerSphere->SetRelativeLocation(FVector(-1.185065, 1.450112, -4.687501));
+	TriggerSphere->SetSphereRadius(750.0f);
 }
 
 void AReturnTriggerVolume::BeginPlay()
