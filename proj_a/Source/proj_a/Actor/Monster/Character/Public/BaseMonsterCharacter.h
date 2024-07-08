@@ -20,7 +20,7 @@ public:
 	ABaseMonsterCharacter();
 	virtual ~ABaseMonsterCharacter() override;
 	
-	void TakeDamage(float Dmg);
+	void TakeMonsterDamage(float Dmg);
 	UFUNCTION()
 	void OnRep_FaintCharacterMotion() const;
 	void ScaleCapsuleSize(float ScaleFactor);

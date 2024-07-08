@@ -151,7 +151,7 @@ void ABaseMonsterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void ABaseMonsterCharacter::TakeDamage(float Dmg)
+void ABaseMonsterCharacter::TakeMonsterDamage(float Dmg)
 {
 	CurrentHp -= Dmg;
 	if (CurrentHp <= 0 && CurrentState != EMonsterState::Faint)

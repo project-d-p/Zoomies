@@ -34,11 +34,11 @@ void ABaseMonsterAIController::RemovePawnAndController()
 	Destroy();
 }
 
-void ABaseMonsterAIController::TakeDamage(float dmg)
+void ABaseMonsterAIController::TakeMonsterDamage(float dmg)
 {
 	ABaseMonsterCharacter* CC = Cast<ABaseMonsterCharacter>(GetCharacter());
 	check(CC);
-	CC->TakeDamage(dmg);
+	CC->TakeMonsterDamage(dmg);
 }
 
 bool ABaseMonsterAIController::GetMovementAllowed()
