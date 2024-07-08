@@ -10,7 +10,6 @@ class PROJ_A_API ATargetPointMonsterAIController : public ABaseMonsterAIControll
 	GENERATED_BODY()
 
 private:
-	void OnMoveFinished(FAIRequestID FaiRequestID, const FPathFollowingResult& PathFollowingResult);
 	void MoveToTargetLocation();
 
 	TWeakObjectPtr<ACharacter> TargetCharacter;

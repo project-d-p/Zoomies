@@ -77,9 +77,6 @@ void AAvoidPlayerMonsterAIController::OnQueryFinished(TSharedPtr<FEnvQueryResult
 	{
 		MoveToRandomTargetLocation();
 	}
-	ADPGameModeBase* GM = UGameHelper::GetInGameMode(GetWorld());
-	--GM->PendingQueries;
-	GM->Condition.notify_all();
 }
 
 void AAvoidPlayerMonsterAIController::BeginPlay()
@@ -101,11 +98,13 @@ void AAvoidPlayerMonsterAIController::BeginPlay()
 
 void AAvoidPlayerMonsterAIController::SimulateMovement(float delta_time)
 {
+	if (!GetMovementAllowed())
+		return;
 	elapsed_DeSpawnTime += delta_time;
 	if (elapsed_DeSpawnTime >= DeSpawnTime)
 	{
 		RemovePawnAndController();
-		return;
+		return ;
 	}
 	elapsed_EQSQueryTime += delta_time;
 	if (elapsed_EQSQueryTime >= EQSQueryTime)

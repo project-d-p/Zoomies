@@ -167,18 +167,15 @@ void ADPGameModeBase::MonsterMoveSimulate(float delta_time)
 	{
 		if (mc != nullptr)
 		{
-			// ++PendingQueries;
 			mc->SimulateMovement(delta_time);
 		}
 	}
-	// std::unique_lock<std::mutex> Lock(Mutex);
-	// Condition.wait(Lock, [this] { return PendingQueries.load() == 0; });
 }
 
 void ADPGameModeBase::SpawnMonsters(float delta_time)
 {
 	static float spawn_timer = 0.0f;
-	constexpr float spawn_interval = 0.1f;
+	constexpr float spawn_interval = 0.0f;
 
 	spawn_timer += delta_time;
 	if (spawn_timer >= spawn_interval)

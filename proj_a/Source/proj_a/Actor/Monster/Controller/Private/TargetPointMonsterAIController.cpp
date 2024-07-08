@@ -4,15 +4,6 @@
 #include "GameHelper.h"
 #include "Navigation/PathFollowingComponent.h"
 
-void ATargetPointMonsterAIController::OnMoveFinished(FAIRequestID FaiRequestID,
-	const FPathFollowingResult& PathFollowingResult)
-{
-	if (!TargetCharacter.IsValid())
-	{
-		return;
-	}
-}
-
 void ATargetPointMonsterAIController::MoveToTargetLocation()
 {
 	static FVector Dest = FVector(4000.0f, 0.0f, 0.0f);
@@ -23,8 +14,6 @@ void ATargetPointMonsterAIController::MoveToTargetLocation()
 	bool bCanStrafe = false;
 	TSubclassOf<UNavigationQueryFilter> FilterClass = nullptr;
 	bool bAllowPartialPath = true;
-	
-	GetPathFollowingComponent()->OnRequestFinished.AddUObject(this, &ATargetPointMonsterAIController::OnMoveFinished);
 	
 	EPathFollowingRequestResult::Type Result = MoveToLocation(Dest, AcceptanceRadius, bStopOnOverlap, bUsePathfinding,
 															  bProjectDestinationToNavigation, bCanStrafe, FilterClass, bAllowPartialPath);
@@ -37,5 +26,7 @@ void ATargetPointMonsterAIController::MoveToTargetLocation()
 
 void ATargetPointMonsterAIController::SimulateMovement(float delta_time)
 {
+	if (!GetMovementAllowed())
+		return;
 	MoveToTargetLocation();
 }

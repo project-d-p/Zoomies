@@ -54,8 +54,8 @@ void UCharacterPositionSync::SyncWithServer(ADPCharacter* character)
 	}
 	
 	const FString PlayerId = player_state_->GetPlayerName();
-	if (!FDataHub::actorPosition.Contains(PlayerId) && !FDataHub::jumpData.Contains(PlayerId)
-		&& !FDataHub::gunfireData.Contains(PlayerId) && !FDataHub::aimStateData.Contains(PlayerId))
+	if (!FDataHub::actorPosition.Contains(PlayerId) || !FDataHub::jumpData.Contains(PlayerId)
+		|| !FDataHub::gunfireData.Contains(PlayerId) || !FDataHub::aimStateData.Contains(PlayerId))
 	{
 		return;
 	}
@@ -77,7 +77,9 @@ void UCharacterPositionSync::SyncMyself(ADPCharacter* character)
 		return;
 	}
 	const FString PlayerId = player_state_->GetPlayerName();
-	
+
+	if (!FDataHub::actorPosition.Contains(PlayerId))
+		return;
 	actor_position_ = FDataHub::actorPosition[PlayerId];
 	
 	FVector position = FVector(actor_position_.position().x(), actor_position_.position().y(), actor_position_.position().z());

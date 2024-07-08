@@ -4,6 +4,12 @@
 #include "GameFramework/Character.h"
 #include "BaseMonsterCharacter.generated.h"
 
+enum EMonsterState
+{
+	Idle,
+	Faint,
+};
+
 UCLASS()
 class PROJ_A_API ABaseMonsterCharacter : public ACharacter
 {
@@ -12,18 +18,17 @@ class PROJ_A_API ABaseMonsterCharacter : public ACharacter
 public:
 	ABaseMonsterCharacter();
 	virtual ~ABaseMonsterCharacter() override;
-	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	                    int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION()
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	
+	void TakeDamage(float Dmg);
 	void ScaleCapsuleSize(float ScaleFactor);
+	EMonsterState GetState() const { return CurrentState; } 
 	
 	UPROPERTY(Replicated)
 	int32 MonsterId;
-	int32 index;
 private:
-	float MaxHp = 100.f;
+	const float MaxHp = 100.f;
+	float CurrentHp = 100.f;
+	EMonsterState CurrentState = Idle;
 	float MoveSpeed;
 
 protected:

@@ -34,7 +34,7 @@ public:
 	void SendChatToAllClients(const FString& SenderName, const FString& Message);
 
 	// monster
-	enum { NUM_OF_MAX_MONSTERS = 200 };
+	enum { NUM_OF_MAX_MONSTERS = 10 };
 	std::vector<ABaseMonsterAIController*> monster_controllers_;
 	std::vector<int32> empty_monster_slots_;
 

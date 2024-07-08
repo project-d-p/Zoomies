@@ -164,14 +164,12 @@ MonsterPosition MessageMaker::MakeMonsterPositionMessage(ABaseMonsterAIControlle
 	}
 	if (Monster_Controller->GetCharacter() == nullptr)
 	{
+		Monster_Controller->RemovePawnAndController();
 		return msg;
 	}
 	msg.set_monster_id(TCHAR_TO_UTF8(*FString::FromInt(Monster_Controller->GetMonsterId())));
 	Vec3 position;
-	if (Monster_Controller->GetPawn() == nullptr)
-	{
-		return msg;
-	}
+	
 	position.set_x(Monster_Controller->GetPawn()->GetActorLocation().X);
 	position.set_y(Monster_Controller->GetPawn()->GetActorLocation().Y);
 	position.set_z(Monster_Controller->GetPawn()->GetActorLocation().Z);

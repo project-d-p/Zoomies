@@ -73,7 +73,7 @@ void SteamNetworkingSocket::RecieveMessages()
 		return ;
 	}
 	TArray<uint8> data;
-	data.Reserve(1024);
+	data.Reserve(1501);
 	
 	for (int i = 0; i < n_messages; ++i)
 	{

@@ -21,9 +21,14 @@ public:
 	ABaseMonsterAIController();
 	int32 GetMonsterId() const { return Cast<ABaseMonsterCharacter>(GetCharacter())->MonsterId; }
 	void RemovePawnAndController();
+	void TakeDamage(float dmg);
 	virtual void SimulateMovement(float delta_time) {}
 
+	int32 index = -1;
+
 protected:
+	bool GetMovementAllowed();
+	
 	UPROPERTY()
 	UBT_Monster* BehaviorTreeAsset;
 	UPROPERTY(Transient)

@@ -26,10 +26,10 @@ ABaseMonsterAIController* UMonsterFactory::RandomMonsterSpawn(int32 idx)
 	}
 
 	// XXX: For now, hardcoding the Location.
-	float RandomY = FMath::FRandRange(3000.f, 3000.f);
+	float RandomY = FMath::FRandRange(-3000.f, 3000.f);
 	FVector Location = FVector(-5000.f, RandomY, 300.f);
 	
-	TArray<UClass*> MonsterClasses = {
+	TArray MonsterClasses = {
 		ACrabCharacter::StaticClass(),
 		ALobstarCharacter::StaticClass(),
 		AMammothCharacter::StaticClass(),
@@ -51,9 +51,9 @@ ABaseMonsterAIController* UMonsterFactory::SpawnMonster(UClass* MonsterClass, co
 		return nullptr;
 	}
 
-	TArray<UClass*> AIControllerClasses = {
+	TArray AIControllerClasses = {
 		ATargetPointMonsterAIController::StaticClass(),
-		// AAvoidPlayerMonsterAIController::StaticClass(),
+		AAvoidPlayerMonsterAIController::StaticClass(),
 		AChasePlayerMonsterAIController::StaticClass()
 	};
 
@@ -72,16 +72,17 @@ ABaseMonsterAIController* UMonsterFactory::SpawnMonster(UClass* MonsterClass, co
 		World->SpawnActor(MonsterClass, &Location, &FRotator::ZeroRotator));
 	if (SpawnedMonster == nullptr)
 	{
-		FNetLogger::LogError(TEXT("Failed to spawn monster character"));
+		FNetLogger::LogError(TEXT("Failed to spawn monster character id %d"), AIController->GetUniqueID());
 		AIController->Destroy();
 		return nullptr;
 	}
-	// TArray<float> ScaleFactors = { 0.5f, 1.0f, 2.0f };
-	// float SelectedScaleFactor = ScaleFactors[FMath::RandRange(0, ScaleFactors.Num() - 1)];
-	// SpawnedMonster->ScaleCapsuleSize(SelectedScaleFactor);
-	SpawnedMonster->index = idx;
+	TArray ScaleFactors = { 0.5f, 1.0f, 2.0f };
+	float SelectedScaleFactor = ScaleFactors[FMath::RandRange(0, ScaleFactors.Num() - 1)];
+	SpawnedMonster->ScaleCapsuleSize(SelectedScaleFactor);
+	AIController->index = idx;
 	SpawnedMonster->MonsterId = AIController->GetUniqueID();
 	AIController->Possess(SpawnedMonster);
+	FNetLogger::LogError(TEXT("Monster spawned successfully id: %d"), SpawnedMonster->MonsterId);
 	
 	return AIController;
 }

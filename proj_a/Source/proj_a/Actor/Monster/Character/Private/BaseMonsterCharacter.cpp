@@ -1,13 +1,11 @@
 #include "BaseMonsterCharacter.h"
 
 #include "BaseMonsterAIController.h"
-#include "DPGameModeBase.h"
 #include "FDataHub.h"
 #include "FNetLogger.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
-#include "Serialization/BulkDataRegistry.h"
 
 ABaseMonsterCharacter::ABaseMonsterCharacter()
 {
@@ -26,13 +24,6 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
     SetReplicatingMovement(false);
 
 	this->MonsterId = -1;
-	this->index = -1;
-}
-
-void ABaseMonsterCharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                                           UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	FNetLogger::EditerLog(FColor::Green, TEXT("OnBeginOverlap"));
 }
 
 void ABaseMonsterCharacter::BeginPlay()
@@ -44,17 +35,21 @@ void ABaseMonsterCharacter::SyncPosition()
 {
 	int32 id = MonsterId;
 	FString MonsterID = FString::FromInt(id);
-	if (!FDataHub::monsterData.Contains(MonsterID))
+	FNetLogger::LogInfo(TEXT("SyncPosition: %s"), *MonsterID);
+	
+	MonsterPosition* MonsterData = FDataHub::monsterData.Find(MonsterID);
+	if (!MonsterData)
 	{
+		FNetLogger::LogInfo(TEXT("Monster data does not contain: %s"), *MonsterID);
 		return ;
 	}
-	MonsterPosition MonsterData = FDataHub::monsterData[MonsterID];
+	
 	FVector CurrentPosition = this->GetActorLocation();
 	FVector CurrentVelocity = this->GetCharacterMovement()->Velocity;
 	
-	FVector Position = FVector(MonsterData.position().x(), MonsterData.position().y(), MonsterData.position().z());
-	FVector Velocity = FVector(MonsterData.velocity().x(), MonsterData.velocity().y(), 0);
-	FRotator Rotation = FRotator(MonsterData.rotation().x(), MonsterData.rotation().y(), 0);
+	FVector Position = FVector(MonsterData->position().x(), MonsterData->position().y(), MonsterData->position().z());
+	FVector Velocity = FVector(MonsterData->velocity().x(), MonsterData->velocity().y(), 0);
+	FRotator Rotation = FRotator(MonsterData->rotation().x(), MonsterData->rotation().y(), 0);
 	
 	FVector InterpolatedPosition = FMath::VInterpTo(CurrentPosition, Position, 0.1f, 1.0f);
 	FVector InterpolatedVelocity = FMath::VInterpTo(CurrentVelocity, Velocity, 0.1f, 1.0f);
@@ -97,39 +92,24 @@ void ABaseMonsterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-float ABaseMonsterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
-	AController* EventInstigator, AActor* DamageCauser)
+void ABaseMonsterCharacter::TakeDamage(float Dmg)
 {
-	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	CurrentHp -= Dmg;
+	if (CurrentHp <= 0)
+	{
+		CurrentHp = 0;
+		ABaseMonsterAIController *BMC = Cast<ABaseMonsterAIController>(GetOwner());
+		check(BMC)
+		BMC->StopMovement();
+		CurrentState = Faint;
+	}
 }
 
 ABaseMonsterCharacter::~ABaseMonsterCharacter()
 {
-	if (!HasAuthority())
-	{
-		if (MonsterId == -1)
-		{
-			return ;
-		}
-		// FDataHub::monsterData.Remove(FString::FromInt(MonsterId));
-		return ;
-	}
-	if (GetWorld() == nullptr)
-	{
-		return ;
-	}
-	ADPGameModeBase* GM = GetWorld()->GetAuthGameMode<ADPGameModeBase>();
-	if (!GM)
-	{
-		return ;
-	}
-	if (this->MonsterId == -1 && this->index == -1)
-	{
-		return ;
-	}
-	if (GM->monster_controllers_[index] != nullptr)
-	{
-		GM->monster_controllers_[index] = nullptr;
-	}
-	GM->empty_monster_slots_.push_back(index);
+	// if (!HasAuthority())
+	// {
+	// 	if (FDataHub::monsterData.Contains(FString::FromInt(MonsterId)))
+	// 		FDataHub::monsterData.Remove(FString::FromInt(MonsterId));
+	// }
 }

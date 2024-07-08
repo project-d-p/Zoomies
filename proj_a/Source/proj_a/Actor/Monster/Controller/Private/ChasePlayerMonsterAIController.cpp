@@ -40,5 +40,7 @@ void AChasePlayerMonsterAIController::BeginPlay()
 
 void AChasePlayerMonsterAIController::SimulateMovement(float delta_time)
 {
+	if (!GetMovementAllowed())
+		return;
 	MoveToPlayer();
 }
