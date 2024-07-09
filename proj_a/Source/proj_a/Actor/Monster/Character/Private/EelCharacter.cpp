@@ -2,13 +2,14 @@
 
 #include "Components/CapsuleComponent.h"
 
+
 AEelCharacter::AEelCharacter()
 {
 	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_FOX(
-		TEXT("/Game/model/animals/eel/eel.eel"));
-	if (SK_FOX.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_FOX.Object);
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_EEL
+	(TEXT("/Game/model/animals/eel/eel.eel"));
+	if (SK_EEL.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SK_EEL.Object);
 	}
 
 	/** Loading animations */

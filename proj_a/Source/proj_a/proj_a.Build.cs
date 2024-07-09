@@ -12,7 +12,7 @@ public class proj_a : ModuleRules
 	{
 		string projectDir = Path.Combine(ModuleDirectory, "../../");
 		string thirdPartyDir = Path.Combine(projectDir, "ThirdParty");
-		
+			
 		if (string.IsNullOrEmpty(thirdPartyDir))
 		{
 			throw new Exception("No Protobuf Error" + thirdPartyDir + ".");
@@ -32,7 +32,7 @@ public class proj_a : ModuleRules
 		string protoFilesPath = Path.Combine(ModuleDirectory, "Protobuf", "Proto_file");
 		string generatedProtoFilesPath = Path.Combine(ModuleDirectory, "Protobuf", "Pb_File");
 		
-		// System.Console.WriteLine("Compiling .proto files...");
+		System.Console.WriteLine("Compiling .proto files...");
 		CompileProtoFiles(protocPath, protoFilesPath, generatedProtoFilesPath);
 		// XXX: 배포시에 컴파일 코드 삭제(혹은 주석 처리)
 		
@@ -45,13 +45,16 @@ public class proj_a : ModuleRules
 			"proj_a/Actor/Character/PlayerState/Public",
 			"proj_a/Actor/Monster/Character/Public",
 			"proj_a/Actor/Monster/Controller/Public",
-			"proj_a/Actor/Monster/PlayerState/Public",
 			"proj_a/Actor/Monster/Factory/Public",
+			"proj_a/Actor/Monster/AI/Public",
+			"proj_a/Actor/Lobby/Public",
 			"proj_a/Component/Public",
 			"proj_a/Component/AnimNotify/Public",
 			"proj_a/Component/InGame/Score/Public",
 			"proj_a/Component/InGame/Chat/Public",
+			"proj_a/Component/InGame/HitDetection/Public",
 			"proj_a/Component/InGame/Timer/Public",
+			"proj_a/Component/InGame/ReturnPlace/Public",
 			"proj_a/Component/ClientNetwork/Public",
             "proj_a/Widget/Public",
             "proj_a/Widget/InGame/Public",
@@ -89,13 +92,16 @@ public class proj_a : ModuleRules
 			"SlateCore",
 			"AIModule",
 			"NavigationSystem",
-		});
+			"Niagara",
+            "GameplayCameras"
+        });
+		
 		PrivateDependencyModuleNames.AddRange(new string[] { "CinematicCamera", "SessionServices" });
 		if (Target.Type == TargetType.Editor)
 		{
 			PrivateDependencyModuleNames.AddRange(new string[] { "PropertyEditor" });
 		}
-
+		
 		string SteamSDKPath = Path.Combine(ModuleDirectory, "Steam");
 		if (Directory.Exists(SteamSDKPath))
 		{

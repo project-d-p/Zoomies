@@ -72,8 +72,9 @@ void SteamNetworkingSocket::RecieveMessages()
 	{
 		return ;
 	}
+
 	TArray<uint8> data;
-	data.Reserve(1024);
+	data.Reserve(1512);
 	
 	for (int i = 0; i < n_messages; ++i)
 	{
@@ -83,6 +84,10 @@ void SteamNetworkingSocket::RecieveMessages()
 		const uint8* msg = static_cast<const uint8*>(pp_message[i]->GetData());
 		int32 size = pp_message[i]->m_cbSize;
 		data.Append(msg, size);
+		
+		Message ret_msg = Marshaller::DeserializeMessage(data);
+		pp_message[i]->Release();
+		recieve_buffer_.Push(ret_msg);
 	}
 }
 

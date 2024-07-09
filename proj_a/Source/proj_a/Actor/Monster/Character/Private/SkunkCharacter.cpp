@@ -2,13 +2,14 @@
 
 #include "Components/CapsuleComponent.h"
 
+
 ASkunkCharacter::ASkunkCharacter()
 {
 	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH(
-		TEXT("/Game/model/animals/skunk/low_poly_skunk.low_poly_skunk"));
-	if (SK_MAMMOTH.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_MAMMOTH.Object);
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SKUNK
+	(TEXT("/Game/model/animals/skunk/low_poly_skunk.low_poly_skunk"));
+	if (SK_SKUNK.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SK_SKUNK.Object);
 	}
 
 	/** Loading animations */

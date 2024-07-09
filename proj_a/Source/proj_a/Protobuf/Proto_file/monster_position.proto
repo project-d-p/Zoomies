@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+import "vector.proto";
+
+message MonsterPosition {
+  string monster_id = 1;
+  Vec3 position = 2;
+  Vec2 velocity = 3;
+  Vec2 rotation = 4;
+}
+
+message MonsterPositionList {
+  repeated MonsterPosition monster_positions = 1;
+}

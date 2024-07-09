@@ -1,7 +1,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+// #include "PlayerScoreComp.h"
 #include "GameFramework/PlayerState.h"
+#include "proj_a/Component/InGame/Score/Types/ScoreTypes.h"
 #include "DPPlayerState.generated.h"
 
 UCLASS()
@@ -14,10 +16,16 @@ public:
 	UFUNCTION()
 	UPlayerScoreComp* GetPlayerScoreComp() const;
 
+	UFUNCTION()
+	EPlayerJob GetPlayerJob() const;
+
 private:
 	UPROPERTY()
 	UPlayerScoreComp* PlayerScoreComp = nullptr;
 
+	UPROPERTY(Replicated)
+	EPlayerJob PlayerJob = EPlayerJob::JOB_ARCHAEOLOGIST;
+	
 	virtual void BeginPlay() override;
-	// virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

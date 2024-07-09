@@ -1,10 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "DPGameModeBase.h"
 
 #include "BaseMonsterAIController.h"
-#include "BaseMonsterCharacter.h"
 #include "CrabCharacter.h"
 #include "DPCharacter.h"
 #include "DPInGameState.h"
@@ -13,11 +11,8 @@
 #include "SocketManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "FNetLogger.h"
-#include "isteamnetworkingsockets.h"
+#include <exception>
 #include "MessageMaker.h"
-#include "OctopusCharacter.h"
-#include "SlothCharacter.h"
-#include "StarFishCharacter.h"
 
 ADPGameModeBase::ADPGameModeBase()
 {
@@ -32,7 +27,14 @@ ADPGameModeBase::ADPGameModeBase()
 	MonsterFactory = CreateDefaultSubobject<UMonsterFactory>(TEXT("MonsterFactory"));
 
 	PrimaryActorTick.bCanEverTick = true;
-	// PrimaryActorTick.TickInterval = 0.01f;
+	// PrimaryActorTick.TickGroup = TG_PostPhysics;
+	monster_controllers_.resize(NUM_OF_MAX_MONSTERS, nullptr);
+	empty_monster_slots_.reserve(NUM_OF_MAX_MONSTERS);
+
+	for (int i = 0; i < NUM_OF_MAX_MONSTERS; i++)
+	{
+		empty_monster_slots_.push_back(i);
+	}
 	bReplicates = true;
 }
 
@@ -44,7 +46,13 @@ void ADPGameModeBase::SendChatToAllClients(const FString& SenderName, const FStr
 void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 {
 	Super::PostLogin(newPlayer);
-
+	if (steam_listen_socket_ == nullptr)
+	{
+		steam_listen_socket_ = new SteamNetworkingSocket();
+		ADPInGameState* game_state_ = Cast<ADPInGameState>(GameState);
+		if (game_state_ != nullptr)
+			game_state_->bServerTraveled = true;
+	}
 	if (!newPlayer)
 	{
 		return ;
@@ -102,19 +110,6 @@ void ADPGameModeBase::StartPlay()
 	UE_LOG(LogTemp, Log, TEXT("Number of Players in this Session: %d"), GetNumPlayers());
 
 	TimerManager->StartTimer(60.0f);
-
-	// For Test Method
-	SpawnAndPossessAI();
-}
-
-void ADPGameModeBase::SpawnAndPossessAI()
-{
-	MonsterFactory->SpawnMonster(
-		AOctopusCharacter::StaticClass(), FVector(1500.f, 0.f, 600.f));
-	MonsterFactory->SpawnMonster(
-		ASlothCharacter::StaticClass(), FVector(1000.f, 0.f, 600.f));
-	MonsterFactory->SpawnMonster(
-		AStarFishCharacter::StaticClass(), FVector(500.f, 0.f, 600.f));
 }
 
 void ADPGameModeBase::Tick(float delta_time)
@@ -132,6 +127,8 @@ void ADPGameModeBase::Tick(float delta_time)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Game is not started yet."));
 	}
+	
+	// FNetLogger::EditerLog(FColor::Green, TEXT("Number of monsters: %d"), NUM_OF_MAX_MONSTERS - empty_monster_slots_.size());
 }
 
 void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -148,6 +145,8 @@ void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void ADPGameModeBase::ProcessData(float delta_time)
 {
 	message_queue_ = steam_listen_socket_->GetReadBuffer();
+	this->SpawnMonsters(delta_time);
+	this->MonsterMoveSimulate(delta_time);
 	while (!this->message_queue_.empty())
 	{
 		Message message = this->message_queue_.front();
@@ -157,7 +156,37 @@ void ADPGameModeBase::ProcessData(float delta_time)
 	}
 	this->SyncHostAiming();
 	this->SimulateGunFire();
+	this->SimulateCatch();
 	this->SyncMovement();
+	this->SyncMonsterMovement();
+}
+
+void ADPGameModeBase::MonsterMoveSimulate(float delta_time)
+{
+	for (auto& mc: monster_controllers_)
+	{
+		if (mc != nullptr)
+		{
+			mc->SimulateMovement(delta_time);
+		}
+	}
+}
+
+void ADPGameModeBase::SpawnMonsters(float delta_time)
+{
+	static float spawn_timer = 0.0f;
+	constexpr float spawn_interval = 0.0f;
+
+	spawn_timer += delta_time;
+	if (spawn_timer >= spawn_interval)
+	{
+		if (empty_monster_slots_.size() != 0)
+		{
+			int32 idx = empty_monster_slots_.back();
+			if ((monster_controllers_[idx] = MonsterFactory->RandomMonsterSpawn(idx)) != nullptr)
+				empty_monster_slots_.pop_back();
+		}
+	}
 }
 
 ADPGameModeBase::~ADPGameModeBase()
@@ -178,8 +207,16 @@ void ADPGameModeBase::SimulateGunFire()
 	for (auto& pair: player_controllers_)
 	{
 		ADPPlayerController* controller = pair.second;
-		ADPCharacter* character = Cast<ADPCharacter>(controller->GetPawn());
 		controller->SimulateGunFire(steam_listen_socket_);
+	}
+}
+
+void ADPGameModeBase::SimulateCatch()
+{
+	for (auto& pair: player_controllers_)
+	{
+		ADPPlayerController* controller = pair.second;
+		controller->SimulateCatch(steam_listen_socket_);
 	}
 }
 
@@ -196,5 +233,42 @@ void ADPGameModeBase::SyncHostAiming()
 		host_controller->aim_queue_.pop();
 		Message msg = MessageMaker::MakeAimMessage(host_controller, aim_state);
 		steam_listen_socket_->PushUdpFlushMessage(msg);
+	}
+}
+
+void ADPGameModeBase::SyncMonsterMovement()
+{
+	std::vector<MonsterPositionList> msg_list;
+	msg_list.emplace_back();
+	for (int i = 0; i < NUM_OF_MAX_MONSTERS; i++)
+	{
+		if (monster_controllers_[i] == nullptr)
+		{
+			continue;
+		}
+		MonsterPosition msg = MessageMaker::MakeMonsterPositionMessage(monster_controllers_[i]);
+		if (msg.ByteSizeLong() == 0)
+		{
+			continue;
+		}
+		
+		// 1024 bytes limit to make sure that the message is not over MTU size.
+		if (msg_list.back().ByteSizeLong() + msg.ByteSizeLong() > 1024)
+		{
+			msg_list.emplace_back();
+		}
+		msg_list.back().add_monster_positions()->CopyFrom(msg);
+	}
+	
+	if (msg_list[0].ByteSizeLong() == 0)
+	{
+		return;
+	}
+	
+	for (auto& msg: msg_list)
+	{
+		Message message;
+		*message.mutable_monster_position() = msg;
+		steam_listen_socket_->PushUdpFlushMessage(message);
 	}
 }

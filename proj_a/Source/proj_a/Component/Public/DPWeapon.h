@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "DPPlayerController.h"
 #include "GameFramework/Actor.h"
+#include "HitScan.h"
+#include "message.pb.h"
 #include "DPWeapon.generated.h"
 
 UCLASS()
@@ -23,13 +25,12 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	virtual bool SimulateAttack(ADPPlayerController* Controller, FHitResult& Result, const Message& Message);
-	virtual bool SimulateAttackByClient(ADPCharacter* Character, FHitResult& HitResult, const Gunfire& Gunfire);
-
-	class ADPCharacter* character;
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	virtual bool Attack(ADPPlayerController* controller, FHitResult& result);
+	virtual bool Attack(ADPPlayerController* controller, FHitResult& result, FRotator& info);
+	
+	virtual bool SimulateAttack(ADPCharacter* character, FHitResult& result, const Gunfire& gunfire);
+	virtual FVector GetFireLocation();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	int maxBullet{};

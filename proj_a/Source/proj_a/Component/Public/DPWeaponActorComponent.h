@@ -7,6 +7,7 @@
 #include "DPPlayerController.h"
 #include "DPWeapon.h"
 #include "Components/ActorComponent.h"
+#include "message.pb.h"
 #include "DPWeaponActorComponent.generated.h"
 
 
@@ -26,8 +27,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	bool SimulateAttackByClient(ADPCharacter* Character, FHitResult& HitResult, const Gunfire& Gunfire);
-	bool SimulateAttack(ADPPlayerController* controller, FHitResult& result, Message message);
+
+	bool SimulateAttack(ADPCharacter* character, FHitResult& result, const Gunfire& gunfire);
+	FVector GetFireLocation();
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Weapon")
@@ -40,6 +42,5 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void Equip(TSubclassOf<ADPWeapon> weaponClass);
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	bool Attack(ADPPlayerController* controller, FHitResult& result);
-
+	bool Attack(ADPPlayerController* controller, FHitResult& result, FRotator& info);
 };

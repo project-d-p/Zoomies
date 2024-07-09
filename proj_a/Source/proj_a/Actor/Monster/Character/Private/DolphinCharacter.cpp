@@ -2,13 +2,14 @@
 
 #include "Components/CapsuleComponent.h"
 
+
 ADolphinCharacter::ADolphinCharacter()
 {
 	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_FOX(
-		TEXT("/Game/model/animals/dolphin/dolphin1.dolphin1"));
-	if (SK_FOX.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_FOX.Object);
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_DOLPHIN
+	(TEXT("/Game/model/animals/dolphin/dolphin1.dolphin1"));
+	if (SK_DOLPHIN.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SK_DOLPHIN.Object);
 	}
 
 	/** Loading animations */

@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+import "vector.proto";
+
+message Catch {
+  Vec3 position = 1;
+  Vec3 rotation = 2;
+  string target = 3;
+}

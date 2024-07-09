@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "DPPlayerController.h"
+
+#include "BaseMonsterCharacter.h"
 #include "DPCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -19,6 +21,8 @@
 #include "MessageMaker.h"
 #include "GameHelper.h"
 #include "Kismet/GameplayStatics.h"
+#include "state.pb.h"
+#include "HitScan.h"
 #include "Kismet/KismetMathLibrary.h"
 
 
@@ -65,9 +69,20 @@ ADPPlayerController::ADPPlayerController()
 	(TEXT("/Game/input/ia_cancel.ia_cancel"));
 	if (IA_CANCEL.Succeeded())
 		cancelAction = IA_CANCEL.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_CATCH
+	(TEXT("/Game/input/ia_catch.ia_catch"));
+	if (IA_CATCH.Succeeded())
+		catchAction = IA_CATCH.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_RETURN
+	(TEXT("/Game/input/ia_return.ia_return"));
+	if (IA_RETURN.Succeeded())
+		returnAction = IA_RETURN.Object;
 	
 	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
 	Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
+	CatchRay = CreateDefaultSubobject<UHitScan>(TEXT("Catch Ray"));
 
 	static ConstructorHelpers::FObjectFinder<USoundBase> SoundAsset
 	(TEXT("/Game/sounds/effect/character/jump_Cue.jump_Cue"));
@@ -216,6 +231,41 @@ void ADPPlayerController::BeginPlay()
 void ADPPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	if (PlayerState == nullptr)
+	{
+		return ;
+	}
+	if (character == nullptr)
+	{
+		return ;
+	}
+	if (character->IsLocallyControlled())
+	{
+		FHitResult hit_result;
+		if (this->IsCatchable(hit_result))
+		{
+			if (Cast<ABaseMonsterCharacter>(hit_result.GetActor()) != nullptr)
+			{
+				// FNetLogger::EditerLog(FColor::Cyan, TEXT("Catchable"));
+			}
+		}
+	}
+	if (HasAuthority())
+	{
+		return ;
+	}
+	Message msg = MessageMaker::MakePositionMessage(this);
+	Socket->AsyncSendPacket(msg);
+}
+
+bool ADPPlayerController::IsCatchable(FHitResult& hit_result)
+{
+	if (CatchRay->HitDetect(character, character->GetActorLocation(), this->GetControlRotation(), 300.0f, hit_result, false))
+	{
+		return true;
+	}
+	return false;
 }
 
 void ADPPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -236,7 +286,7 @@ void ADPPlayerController::OnPossess(APawn* InPawn)
 	
 	state = Cast<UDPStateActorComponent>(character->GetComponentByClass(UDPStateActorComponent::StaticClass()));
 	construction = Cast<UDPConstructionActorComponent>(character->GetComponentByClass(UDPConstructionActorComponent::StaticClass()));
-	// state->equipmentState = "GUN";
+	
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		FNetLogger::EditerLog(FColor::Red, TEXT("Add Mapping Context [On Possess]"));
@@ -248,23 +298,26 @@ void ADPPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	// enhanced input component Ä³½ºÆÃÇÏ°í ¹ÙÀÎµù
+	// enhanced input component ìºìŠ¤íŒ…í•˜ê³  ë°”ì¸ë”©
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent)) {
-		// ÇÃ·¹ÀÌ¾î ÀÌµ¿ ( w, a, d, s )
+		// í”Œë ˆì´ì–´ ì´ë™ ( w, a, d, s )
 		EnhancedInputComponent->BindAction(moveAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Move);
-		// ÇÃ·¹ÀÌ¾î Á¡ÇÁ ( space )
+		// í”Œë ˆì´ì–´ ì í”„ ( space )
 		EnhancedInputComponent->BindAction(jumpAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Jump);
-		// ½ÃÁ¡ º¯È¯ ( ¸¶¿ì½º È¸Àü )
+		// ì‹œì  ë³€í™˜ ( ë§ˆìš°ìŠ¤ íšŒì „ )
 		EnhancedInputComponent->BindAction(rotateAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Rotate);
-		//	Çàµ¿, ÃÑ ¹ß»ç/º® ¼³Ä¡/ÅÍ·¿ ¼³Ä¡ ( ¸¶¿ì½º ÁÂÅ¬¸¯ )
+		//	í–‰ë™, ì´ ë°œì‚¬/ë²½ ì„¤ì¹˜/í„°ë › ì„¤ì¹˜ ( ë§ˆìš°ìŠ¤ ì¢Œí´ë¦­ )
 		EnhancedInputComponent->BindAction(activeAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Active);
-		//	º¯°æ, ¹«±â º¯°æ/º® È¸Àü ( ¸¶¿ì½º ½ºÅ©·Ñ )
+		//	ë³€ê²½, ë¬´ê¸° ë³€ê²½/ë²½ íšŒì „ ( ë§ˆìš°ìŠ¤ ìŠ¤í¬ë¡¤ )
 		EnhancedInputComponent->BindAction(additionalSettingAction, ETriggerEvent::Triggered, this, &ADPPlayerController::AdditionalSetting);
-		//	¿¡ÀÓ ( ¸¶¿ì½º ¿ìÅ¬¸¯ )
+		//	ì—ì„ ( ë§ˆìš°ìŠ¤ ìš°í´ë¦­ )
 		EnhancedInputComponent->BindAction(aimAction, ETriggerEvent::Triggered, this, &ADPPlayerController::Aim);	// 	key down
 		EnhancedInputComponent->BindAction(aimAction, ETriggerEvent::Completed, this, &ADPPlayerController::AimReleased);
-		//	Ãë¼Ò, Ã¤ÆÃ ²ô±â ( esc - UE ¿¡µğÅÍ¿¡¼­ ±âº» ´ÜÃàÅ° º¯°æ ÇÊ¿ä )
+		//	ì·¨ì†Œ, ì±„íŒ… ë„ê¸° ( esc - UE ì—ë””í„°ì—ì„œ ê¸°ë³¸ ë‹¨ì¶•í‚¤ ë³€ê²½ í•„ìš” )
 		EnhancedInputComponent->BindAction(cancelAction, ETriggerEvent::Triggered, this, &ADPPlayerController::ActionCancel);
+		// í¬íš (f)
+		EnhancedInputComponent->BindAction(catchAction, ETriggerEvent::Started, this, &ADPPlayerController::Catch);
+		EnhancedInputComponent->BindAction(returnAction, ETriggerEvent::Started, this, &ADPPlayerController::ReturningAnimals);
 	}
 }
 
@@ -276,12 +329,6 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 	const FVector forwardVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
 
-	if (!HasAuthority())
-	{
-		FVector velocity = character->GetCharacterMovement()->Velocity;
-		Message message = MessageMaker::MakeMovementMessage(this, actionValue, controlRotation, velocity);
-		Socket->AsyncSendPacket(message);
-	}
 	character->AddMovementInput(forwardVector, actionValue.X);
 	character->AddMovementInput(rightVector, actionValue.Y);
 
@@ -299,12 +346,6 @@ void ADPPlayerController::Jump(const FInputActionValue& value)
 	bool actionValue = value.Get<bool>();
 	if (!actionValue) {
 		return ;
-	}
-
-	Message msg = MessageMaker::MakeJumpMessage(this);
-	if (!HasAuthority())
-	{
-		Socket->AsyncSendPacket(msg);
 	}
 	character->Jump();
 	UGameplayStatics::PlaySound2D(GetWorld(), jumpSound);
@@ -324,6 +365,7 @@ void ADPPlayerController::Rotate(const FInputActionValue& value)
 	}
 }
 
+// TODO: ì´ ì˜ëŠ” ë¡œì§ ìˆ˜ì • í•„ìš”
 void ADPPlayerController::Active(const FInputActionValue& value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Active"));
@@ -338,7 +380,15 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 		}
 		FHitResult hit_result;
 		character->PlayFireAnimation();
-		Message msg = MessageMaker::MakeFireMessage(this, GetControlRotation());
+		// ìµœì¢… ë°œì‚¬ ìœ„ì¹˜ì™€, ë°©í–¥ì„ ì•Œì•„ì•¼ í•¨.
+		FRotator final_direction;
+		if (character->weaponComponent->Attack(this, hit_result, final_direction))
+		{
+			// Success Only Effect;
+			FNetLogger::EditerLog(FColor::Cyan, TEXT("Attack Success[Only Effect]"));
+		}
+		FVector position = character->weaponComponent->GetFireLocation();
+		Message msg = MessageMaker::MakeFireMessage(this, position, final_direction);
 		if (!HasAuthority())
 		{
 			Socket->AsyncSendPacket(msg);
@@ -348,18 +398,13 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 			this->gun_fire_count_ += 1;
 			this->gun_queue_.push(msg);
 		}
-		if (character->weaponComponent->Attack(this, hit_result))
-		{
-			// Success Only Effect;
-			FNetLogger::EditerLog(FColor::Cyan, TEXT("Attack Success[Only Effect]"));
-		}
 	}
 	// if ("WALL" == state->equipmentState) {
 	// 	//if (character->isAim) {
 	// 		character->GetCharacterMovement()->DisableMovement();
 	// 		construction->MakeWall({ 0, 0, 0 }, { 0, 0, 0 });
 	// 		character->constructionComponent->placeWall = true;
-	// 		// ´ÙÀ½ Æ½¿¡ false·Î ¹Ù²Ş
+	// 		// ë‹¤ìŒ í‹±ì— falseë¡œ ë°”ê¿ˆ
 	// 		auto resetPlaceWall = [this]() {
 	// 			character->constructionComponent->placeWall = false;
 	// 		};
@@ -466,6 +511,74 @@ void ADPPlayerController::ActionCancel(const FInputActionValue& value)
 	UE_LOG(LogTemp, Warning, TEXT("ActionCancel"));
 }
 
+void ADPPlayerController::Catch(const FInputActionValue& value)
+{
+	FHitResult hit_result;
+	if (!this->IsCatchable(hit_result))
+	{
+		return ;
+	}
+	if (Cast<ABaseMonsterCharacter>(hit_result.GetActor()) == nullptr)
+	{
+		return ;
+	}
+	if (Cast<ABaseMonsterCharacter>(hit_result.GetActor())->GetState() != EMonsterState::Faint)
+	{
+		return ;
+	}
+	Message msg = MessageMaker::MakeCatchMessage(this);
+	if (HasAuthority())
+	{
+		catch_queue_.push(msg);
+	}
+	else
+	{
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Send Catch Message"));
+		Socket->AsyncSendPacket(msg);
+	}
+
+	/* Test */
+	// UClass* class_type = hit_result.GetActor()->GetClass();
+	// FString monster_type = class_type->GetName();
+	// this->character->CatchMonster(monster_type);
+}
+
+void ADPPlayerController::ReturningAnimals(const FInputActionValue& value)
+{
+	if (!character->IsAtReturnPlace())
+	{
+		return ;
+	}
+	TArray<EAnimal> animals = character->ReturnMonsters();
+	// ê°œì¸ ì ìˆ˜ ì¦ê°€
+	ADPPlayerState* player_state = Cast<ADPPlayerState>(PlayerState);
+	if (player_state)
+	{
+		this->PrivateScoreManager->IncreasePrivatePlayerScore(player_state->GetPlayerJob(), animals);
+	}
+	if (HasAuthority())
+	{
+		ADPGameModeBase* GM = GetWorld()->GetAuthGameMode<ADPGameModeBase>();
+		if (GM)
+		{
+			GM->ScoreManager->IncreasePlayerScore(this, animals);
+		}
+
+		for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+		{
+			ADPPlayerController* PC = Cast<ADPPlayerController>(It->Get());
+			if (PC && PC != this) // ìê¸° ìì‹ ì„ ì œì™¸í•œ ëª¨ë“  í´ë¼ì´ì–¸íŠ¸
+			{
+				PC->character->ClientNotifyAnimalReturn(player_state->GetPlayerName());
+			}
+		}
+	}
+	else
+	{
+		this->ServerNotifyReturnAnimals();
+	}
+}
+
 /*
  * 1. Handler Player Movement in Server (W, A, S, D) - Move Function with Movement Message
  */
@@ -488,8 +601,6 @@ void ADPPlayerController::HandleMovement(const Movement& movement, const float& 
 	const FVector forwardVector = FRotationMatrix(rotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(rotation).GetUnitAxis(EAxis::Y);
 
-	// character->AddMovementInput(forwardVector, action.X * delta / server_delta);
-	// character->AddMovementInput(rightVector, action.Y * delta / server_delta);
 	character->AddMovementInput(forwardVector, action.X);
 	character->AddMovementInput(rightVector, action.Y);
 
@@ -517,6 +628,11 @@ void ADPPlayerController::HandleFire(const Message& fire)
 	this->gun_queue_.push(fire);
 }
 
+void ADPPlayerController::HandleCatch(const Message& catch_)
+{
+	this->catch_queue_.push(catch_);
+}
+
 void ADPPlayerController::SimulateGunFire(SteamNetworkingSocket* steam_socket)
 {
 	if (gun_fire_count_ == 0)
@@ -529,8 +645,18 @@ void ADPPlayerController::SimulateGunFire(SteamNetworkingSocket* steam_socket)
 		gun_queue_.pop();
 		FHitResult hit_result;
 		this->character->PlayFireAnimation();
-		if (character->weaponComponent->SimulateAttack(this, hit_result, fire))
+		if (character->weaponComponent->SimulateAttack(character, hit_result, fire.gunfire()))
 		{
+			ABaseMonsterCharacter* MC = Cast<ABaseMonsterCharacter>(hit_result.GetActor());
+			if (MC)
+			{
+				ABaseMonsterAIController* MAC = Cast<ABaseMonsterAIController>(MC->GetOwner());
+				if (MAC)
+				{
+					// MAC->RemovePawnAndController();
+					MAC->TakeMonsterDamage(100);
+				}
+			}
 			// Logic for Hit Success && Damage && Score
 			FNetLogger::EditerLog(FColor::Cyan, TEXT("Player %s Attack Success[Simulate]"), *PlayerState->GetPlayerName());
 		}
@@ -554,4 +680,147 @@ void ADPPlayerController::HandleAim(const AimState& AimState)
 	{
 		character->StopAimAnimation();
 	}
+}
+
+void ADPPlayerController::HandlePosition(const ActorPosition& ActorPosition)
+{
+	if (!character)
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("Character is null in HandleAim"));
+		return ;
+	}
+	SetState(ActorPosition);
+	SetRotation(ActorPosition);
+	SetPosition(ActorPosition);
+}
+
+void ADPPlayerController::SetRotation(const ActorPosition& ActorPosition)
+{
+	if (character->isAim == true)
+	{
+		FRotator control_rotation = FRotator(ActorPosition.control_rotation().x(), ActorPosition.control_rotation().y(), ActorPosition.control_rotation().z());
+		FRotator final_rotation = FRotator(0, control_rotation.Yaw, 0);
+		character->SetActorRotation(final_rotation);
+	}
+	else
+	{
+		FRotator rotation = FRotator(ActorPosition.rotation().x(), ActorPosition.rotation().y(), ActorPosition.rotation().z());
+		FRotator newRotation = FRotator(0, rotation.Yaw, 0);
+		character->SetActorRotation(newRotation);
+	}
+}
+
+void ADPPlayerController::SetPosition(const ActorPosition& ActorPosition)
+{
+	FVector position = FVector(ActorPosition.position().x(), ActorPosition.position().y(), ActorPosition.position().z());
+	FVector velocity = FVector(ActorPosition.velocity().x(), ActorPosition.velocity().y(), ActorPosition.velocity().z());
+
+	FVector current_position = character->GetActorLocation();
+	FVector current_velocity = character->GetCharacterMovement()->Velocity;
+	
+	FVector interpolated_position = FMath::VInterpTo(current_position, position, GetWorld()->GetDeltaSeconds(), 10.0f);
+	FVector interpolated_velocity = FMath::VInterpTo(current_velocity, velocity, GetWorld()->GetDeltaSeconds(), 10.0f);
+	
+	character->SetActorLocation(interpolated_position);
+	character->GetCharacterMovement()->Velocity = interpolated_velocity;
+}
+
+void ADPPlayerController::SetState(const ActorPosition& ActorPosition)
+{
+	State state_ = ActorPosition.state();
+	switch (state_)
+	{
+	case State::STATE_Walking:
+		character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		break;
+	case State::STATE_Falling:
+		character->GetCharacterMovement()->SetMovementMode(MOVE_Falling);
+		break;
+	default:
+		character->GetCharacterMovement()->SetMovementMode(MOVE_None);
+		break;
+	}
+}
+
+void ADPPlayerController::SimulateCatch(SteamNetworkingSocket* steam_socket)
+{
+	if (catch_queue_.empty())
+	{
+		return ;
+	}
+	while (!catch_queue_.empty())
+	{
+		Message catch_ = catch_queue_.front();
+		catch_queue_.pop();
+		::Catch catch_message = catch_.catch_();
+		FVector start = FVector(catch_message.position().x(), catch_message.position().y(), catch_message.position().z());
+		FRotator direction = FRotator(catch_message.rotation().x(), catch_message.rotation().y(), catch_message.rotation().z());
+		
+		FHitResult hit_result;
+		if (!CatchRay->HitDetect(character, start, direction, 300.0f, hit_result))
+		{
+			continue;
+		}
+		ABaseMonsterCharacter* MC = Cast<ABaseMonsterCharacter>(hit_result.GetActor());
+		if (!MC)
+		{
+			continue;
+		}
+		if (MC->GetState() != EMonsterState::Faint)
+		{
+			continue;
+		}
+		UClass* class_type = hit_result.GetActor()->GetClass();
+		FString monster_type = class_type->GetName();
+		if (!this->character->CatchMonster(monster_type))
+		{
+			continue ;
+		}
+		ABaseMonsterAIController* MAC = Cast<ABaseMonsterAIController>(MC->GetOwner());
+		check(MAC)
+		MAC->RemovePawnAndController();
+		::Catch reply;
+		reply.set_target(TCHAR_TO_UTF8(*monster_type));
+		*catch_.mutable_catch_() = reply;
+		FString TestString = UTF8_TO_TCHAR(reply.target().c_str());
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Catch monster_id: %s"), *TestString);
+		steam_socket->PushUdpFlushMessage(catch_);
+		
+	}
+}
+
+void ADPPlayerController::ServerNotifyReturnAnimals_Implementation()
+{
+	// ê°œì¸ ì ìˆ˜ ì¦ê°€
+	ADPPlayerState* player_state = Cast<ADPPlayerState>(PlayerState);
+	if (!player_state)
+	{
+		return ;
+	}
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Server Notify Return Animals[from: %s]"), *player_state->GetPlayerName());
+	
+	// í´ë¼ì´ì–¸íŠ¸ì˜ ë™ë¬¼ ë°˜í™˜ ì²˜ë¦¬ë¥¼ ì²˜ë¦¬í•œë‹¤.
+	TArray<EAnimal> animals = character->ReturnMonsters();
+	
+	this->PrivateScoreManager->IncreasePrivatePlayerScoreByServer(player_state->GetPlayerJob(), animals);
+	ADPGameModeBase* GM = GetWorld()->GetAuthGameMode<ADPGameModeBase>();
+	if (GM)
+	{
+		GM->ScoreManager->IncreasePlayerScore(this, animals);
+	}
+	
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		ADPPlayerController* PC = Cast<ADPPlayerController>(It->Get());
+		if (PC && PC != this) // ìê¸° ìì‹ ì„ ì œì™¸í•œ ëª¨ë“  í´ë¼ì´ì–¸íŠ¸
+		{
+			PC->character->ClientNotifyAnimalReturn(player_state->GetPlayerName());
+		}
+	}
+}
+
+bool ADPPlayerController::ServerNotifyReturnAnimals_Validate()
+{
+	// í˜¸ì¶œì´ ìœ íš¨í•œì§€ í™•ì¸í•˜ëŠ” ë¡œì§ì„ êµ¬í˜„
+	return true; // ìœ íš¨ì„± ê²€ì¦ì´ í•­ìƒ ì°¸ì¸ ê²½ìš°
 }

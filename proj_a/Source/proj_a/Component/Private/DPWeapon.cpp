@@ -28,19 +28,19 @@ void ADPWeapon::Tick(float DeltaTime)
 
 }
 
-bool ADPWeapon::SimulateAttack(ADPPlayerController* Controller, FHitResult& Result, const Message& Message)
-{
-	return false;
-}
-
-bool ADPWeapon::SimulateAttackByClient(ADPCharacter* Character, FHitResult& HitResult, const Gunfire& Gunfire)
-{
-	return false;
-}
-
-bool ADPWeapon::Attack(ADPPlayerController* controller, FHitResult& result)
+bool ADPWeapon::Attack(ADPPlayerController* controller, FHitResult& result, FRotator& info)
 {
 	UE_LOG(LogTemp, Warning, TEXT("attack weapon"));
 	return false;
+}
+
+bool ADPWeapon::SimulateAttack(ADPCharacter* character, FHitResult& result, const Gunfire& gunfire)
+{
+	return false;
+}
+
+FVector ADPWeapon::GetFireLocation()
+{
+	return FVector();
 }
 

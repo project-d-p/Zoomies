@@ -18,6 +18,7 @@ public:
 
 	int32 GetPrivatePlayerScore() const;
 	void IncreasePrivatePlayerScore(const EPlayerJob& playerJob,const TArray<EAnimal>& animals);
+	void IncreasePrivatePlayerScoreByServer(const EPlayerJob& playerJob, const TArray<EAnimal>& animals);
 	void UpdatePrivatePlayerScoreUI();
 	void SetScoreUI_Private(UScoreUiPrivate* ScoreUI_Private);
 	

@@ -2,10 +2,12 @@
 
 #include "Components/CapsuleComponent.h"
 
+
 AMammothCharacter::AMammothCharacter()
 {
 	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH(TEXT("/Game/model/animals/mammoth/sm_mammoth.sm_mammoth"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH
+	(TEXT("/Game/model/animals/mammoth/sm_mammoth.sm_mammoth"));
 	if (SK_MAMMOTH.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_MAMMOTH.Object);
 	}

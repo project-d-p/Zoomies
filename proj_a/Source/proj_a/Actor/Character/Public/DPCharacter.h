@@ -6,7 +6,10 @@
 #include "GameFramework/Character.h"
 #include "CharacterPositionSync.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "proj_a/Component/InGame/Score/Types/ScoreTypes.h"
 #include "DPCharacter.generated.h"
+
+class ABaseMonsterCharacter;
 
 UCLASS()
 class PROJ_A_API ADPCharacter : public ACharacter
@@ -18,7 +21,6 @@ public:
 	ADPCharacter();
 	
 protected:
-	void SyncOwn();
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -29,13 +31,12 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	// FString playerID;
-	// FVector3f pos;
-	// FVector3f orientation;
-	// FString state;
-
 	// Locally Controlled
 	virtual bool IsLocallyControlled() const override;
+	TArray<EAnimal> ReturnMonsters();
+
+	UFUNCTION(Client, Reliable)
+	void ClientNotifyAnimalReturn(const FString& player_name);
 
 public:	// component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -46,13 +47,14 @@ public:	// component
 	class UDPWeaponActorComponent* weaponComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UDPStateActorComponent* stateComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class UMonsterSlotComponent* monsterSlotComponent;
 
-	// gun mesh
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* gun;
-	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
 	UAnimMontage* characterMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
+	UMaterialInstanceDynamic* dynamicMaterialInstance;
 
 	void PlayAimAnimation();
 	void StopAimAnimation();
@@ -61,6 +63,15 @@ public:	// component
 	void PlaceConstructionAnimation();
 	void DestroyConstructionAnimation();
 	void DyingAnimation();
+
+	bool CatchMonster(const FString& monster_type);
+
+	void SetAtReturnPlace(bool isReturnPlace);
+	bool IsAtReturnPlace() const;
+
+protected:
+	void ClientNotifyAnimalReturn_Implementation(const FString& player_name);
+	
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* springArm;
@@ -76,9 +87,11 @@ private:
 	UCharacterPositionSync* syncer = nullptr;
 
 	FTimerHandle SynchronizeHandle;
+	TSubclassOf<UCameraShakeBase> cameraShake;
 public:
 	FVector currentVelocity{ 0.f, 0.f, 0.f };
 	UPROPERTY(BlueprintReadWrite)
 	float speed{ 0.f };
 	bool isAim{ false };
+	bool mIsAtReturnPlace{ true };
 };
