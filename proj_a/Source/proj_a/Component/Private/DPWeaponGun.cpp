@@ -87,7 +87,7 @@ bool ADPWeaponGun::SimulateAttack(ADPCharacter* character, FHitResult& result, c
 {
 	const FVector start = FVector(gunfire.position().x(), gunfire.position().y(), gunfire.position().z());
 	const FRotator aim_direction = FRotator(gunfire.direction().x(), gunfire.direction().y(), gunfire.direction().z());
-	return hitScan->HitDetect(character, start, aim_direction, 100'000'000.f, result);
+	return hitScan->HitDetect(character, start, aim_direction, 100000000.f, result);
 }
 
 FVector ADPWeaponGun::GetFireLocation()
@@ -97,27 +97,50 @@ FVector ADPWeaponGun::GetFireLocation()
 
 void ADPWeaponGun::SpawnEffects(FVector location, FRotator rotation)
 {
+	// location은 총알이 맞은 위치.
 	if (location == FVector::ZeroVector)
 	{
-		location = muzzle->GetComponentLocation() + muzzle->GetForwardVector() * 100'000'000.f;
+		location = muzzle->GetComponentLocation() + rotation.Vector() * 100000000.f;
 	}
 
-	FVector direction = rotation.Vector();
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Impact Point[Weapon}: %f, %f, %f"), location.X, location.Y, location.Z);
+
 	UNiagaraComponent* trail = nullptr;
+	// if (trailEffect && muzzle) {
+	// 	trail = UNiagaraFunctionLibrary::SpawnSystemAttached(
+	// 		trailEffect,
+	// 		muzzle,
+	// 		NAME_None,
+	// 		FVector::ZeroVector,
+	// 		FRotator::ZeroRotator,
+	// 		EAttachLocation::KeepRelativeOffset,
+	// 		true
+	// 	);
+	// }
+	// if (trail)
+	// {
+	// 	// 방향 설정: 월드 방향을 로컬 방향으로 변환
+	// 	FVector WorldDirection = (location - muzzle->GetComponentLocation()).GetSafeNormal();
+	// 	FVector LocalDirection = muzzle->GetComponentTransform().InverseTransformVectorNoScale(WorldDirection);
+	// 	trail->SetVectorParameter(FName("Direction_FIRE"), LocalDirection * 100000.f); // 1000.f은 속도 조절을 위한 스칼라 값
+	// }
+
 	if (trailEffect && muzzle) {
-		trail = UNiagaraFunctionLibrary::SpawnSystemAttached(
+		trail = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			GetWorld(),
 			trailEffect,
-			muzzle,
-			NAME_None,
-			FVector::ZeroVector,
-			rotation,
-			EAttachLocation::KeepRelativeOffset,
-			true
+			muzzle->GetComponentLocation(),
+			FRotator::ZeroRotator
 		);
 	}
 	if (trail)
-		trail->SetVectorParameter(FName("Direction_FIRE"), location);
-
+	{
+		// 방향 설정: 월드 방향을 로컬 방향으로 변환
+		FVector WorldDirection = (location - muzzle->GetComponentLocation()).GetSafeNormal();
+		// FVector LocalDirection = muzzle->GetComponentTransform().InverseTransformVectorNoScale(WorldDirection);
+		trail->SetVectorParameter(FName("Direction_FIRE"), WorldDirection * 100000.f); // 1000.f은 속도 조절을 위한 스칼라 값
+	}
+	
 	if (smokeEffect && muzzle) {
 		UNiagaraFunctionLibrary::SpawnSystemAttached(
 		smokeEffect,

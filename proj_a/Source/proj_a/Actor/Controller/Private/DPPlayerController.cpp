@@ -396,6 +396,7 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 		{
 			// Success Only Effect;
 			ImpactPoint = hit_result.ImpactPoint;
+			FNetLogger::EditerLog(FColor::Cyan, TEXT("Impact Point[Controller]: %f, %f, %f"), ImpactPoint.X, ImpactPoint.Y, ImpactPoint.Z);
 			FNetLogger::EditerLog(FColor::Cyan, TEXT("Attack Success[Only Effect]"));
 		}
 		FVector position = character->weaponComponent->GetFireLocation();
