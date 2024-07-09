@@ -23,6 +23,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "state.pb.h"
 #include "HitScan.h"
+#include "ReturnTriggerVolume.h"
 #include "Kismet/KismetMathLibrary.h"
 
 
@@ -195,6 +196,13 @@ void ADPPlayerController::BeginPlay()
 	{
 		FNetLogger::EditerLog(FColor::Red, TEXT("Add Mapping Context [Begin Play]"));
 		SubSystem->AddMappingContext(defaultContext, 0);
+	}
+
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AReturnTriggerVolume::StaticClass(), FoundActors);
+	if (FoundActors.Num() > 0)
+	{
+		ReturnTriggerVolume = Cast<AReturnTriggerVolume>(FoundActors[0]);
 	}
 	
 	// GetWorldTimerManager().SetTimer(MovementTimerHandle, this, &ADPPlayerController::SendCompressedMovement, 0.01f, true);
@@ -580,6 +588,10 @@ void ADPPlayerController::ReturningAnimals(const FInputActionValue& value)
 	else
 	{
 		this->ServerNotifyReturnAnimals();
+	}
+	if (ReturnTriggerVolume)
+	{
+		ReturnTriggerVolume->SpawnReturnEffect(animals);
 	}
 }
 
