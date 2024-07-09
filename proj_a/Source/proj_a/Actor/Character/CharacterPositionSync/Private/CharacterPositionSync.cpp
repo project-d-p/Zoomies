@@ -27,13 +27,13 @@ void UCharacterPositionSync::PlayAimAnimation(ADPCharacter* character)
 		return;
 	}
 	const FString PlayerId = Player_State->GetPlayerName();
-	if (!FDataHub::aimStateData.Contains(PlayerId))
+	AimState* aim_state = FDataHub::aimStateData.Find(PlayerId);
+	if (aim_state == nullptr)
 	{
 		return;
 	}
-	AimState aim_state = FDataHub::aimStateData[PlayerId];
 	FDataHub::aimStateData.Remove(PlayerId);
-	switch (aim_state.aim_state())
+	switch (aim_state->aim_state())
 	{
 	case AimState::AIM_STATE_ACTIVE:
 		character->PlayAimAnimation();
@@ -55,12 +55,14 @@ void UCharacterPositionSync::SyncWithServer(ADPCharacter* character)
 	}
 	
 	const FString PlayerId = Player_State->GetPlayerName();
-	if (!FDataHub::actorPosition.Contains(PlayerId) && !FDataHub::jumpData.Contains(PlayerId)
-		&& !FDataHub::gunfireData.Contains(PlayerId) && !FDataHub::aimStateData.Contains(PlayerId))
+
+	ActorPosition* actor_position = FDataHub::actorPosition.Find(PlayerId);
+	if (actor_position == nullptr)
 	{
 		return;
 	}
-	actor_position_ = FDataHub::actorPosition[PlayerId];
+	
+	actor_position_ = *actor_position;
 
 	this->SetState(character);
 
@@ -68,34 +70,6 @@ void UCharacterPositionSync::SyncWithServer(ADPCharacter* character)
 
 	SyncOrientation(character);
 	SyncPosition(character);
-}
-
-void UCharacterPositionSync::SyncMyself(ADPCharacter* character)
-{
-	Player_State = Cast<ADPPlayerState>(character->GetPlayerState());
-	if (Player_State == nullptr)
-	{
-		return;
-	}
-	const FString PlayerId = Player_State->GetPlayerName();
-	
-	actor_position_ = FDataHub::actorPosition[PlayerId];
-	
-	FVector position = FVector(actor_position_.position().x(), actor_position_.position().y(), actor_position_.position().z());
-	FVector velocity = FVector(actor_position_.velocity().x(), actor_position_.velocity().y(), actor_position_.velocity().z());
-	
-	FVector current_position = character->GetActorLocation();
-	FVector curren_velocity = character->GetCharacterMovement()->Velocity;
-	
-	float significantDifference = 100.0f;
-	float distance = FVector::Dist(position, current_position);
-	
-	if (distance > significantDifference)
-	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("Distance is too far, Syncing position."));
-		this->SyncPosition(character);
-		// character->SetActorLocation(position);
-	}
 }
 
 void UCharacterPositionSync::SyncGunFire(ADPCharacter* character)
@@ -106,11 +80,12 @@ void UCharacterPositionSync::SyncGunFire(ADPCharacter* character)
 		return;
 	}
 	const FString PlayerId = Player_State->GetPlayerName();
-	if (!FDataHub::gunfireData.Contains(PlayerId))
+	Gunfire* gunfire = FDataHub::gunfireData.Find(PlayerId);
+	if (gunfire == nullptr)
 	{
 		return;
 	}
-	gunfire_ = FDataHub::gunfireData[PlayerId];
+	gunfire_ = *gunfire;
 	FDataHub::gunfireData.Remove(PlayerId);
 	FHitResult hit_result;
 	
@@ -127,13 +102,14 @@ void UCharacterPositionSync::SyncCatch(ADPCharacter* character)
 		return;
 	}
 	const FString PlayerId = Player_State->GetPlayerName();
-	if (!FDataHub::catchData.Contains(PlayerId))
+	Catch* catch_ = FDataHub::catchData.Find(PlayerId);
+	if (catch_ == nullptr)
 	{
 		return;
 	}
-	Catch catch_ = FDataHub::catchData[PlayerId];
+	Catch catch_data = *catch_;
 	FDataHub::catchData.Remove(PlayerId);
-	FString monster_id = UTF8_TO_TCHAR(catch_.target().c_str());
+	FString monster_id = UTF8_TO_TCHAR(catch_data.target().c_str());
 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Catch monster_id: %s"), *monster_id);
 	character->CatchMonster(monster_id);
 }
@@ -146,12 +122,12 @@ void UCharacterPositionSync::SyncReturnAnimal(ADPCharacter* character)
 		return;
 	}
 	const FString PlayerId = Player_State->GetPlayerName();
-	if (!FDataHub::returnAnimalData.Contains(PlayerId))
+	bool* isReturn = FDataHub::returnAnimalData.Find(PlayerId);
+	if (isReturn == nullptr)
 	{
 		return;
 	}
-	bool isReturn = FDataHub::returnAnimalData[PlayerId];
-	if (isReturn)
+	if (*isReturn)
 	{
 		character->ReturnMonsters();
 	}
