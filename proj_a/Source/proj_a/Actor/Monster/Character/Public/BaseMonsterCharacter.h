@@ -24,8 +24,9 @@ public:
 	UFUNCTION()
 	void OnRep_FaintCharacterMotion() const;
 	void ScaleCapsuleSize(float ScaleFactor);
-	EMonsterState GetState() const { return CurrentState; } 
-	
+	EMonsterState GetState() const { return CurrentState; }
+	void SetCatchable(bool bCond);
+
 	UPROPERTY(Replicated)
 	int32 MonsterId;
 

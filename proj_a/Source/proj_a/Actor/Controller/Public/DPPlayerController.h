@@ -107,6 +107,8 @@ private:
 	std::queue<Message> gun_queue_;
 	std::queue<Message> catch_queue_;
 
+	class ABaseMonsterCharacter* CurrentTarget; // 현재 타겟팅된 동물
+
 	virtual void Tick(float DeltaSeconds) override;
 	bool IsCatchable(FHitResult& hit_result);
 	
@@ -124,6 +126,7 @@ private:
 	void SetRotation(const ActorPosition& ActorPosition);
 	void SetPosition(const ActorPosition& ActorPosition);
 	void SetState(const ActorPosition& ActorPosition);
+	void ChangeMonsterCatchable(const FHitResult& HitResult);
 
 	// void UpdatePlayer();
 

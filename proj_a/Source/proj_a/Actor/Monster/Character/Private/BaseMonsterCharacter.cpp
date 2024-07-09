@@ -128,6 +128,20 @@ void ABaseMonsterCharacter::ScaleCapsuleSize(float ScaleFactor)
 	}
 }
 
+void ABaseMonsterCharacter::SetCatchable(bool bCond)
+{
+	if (bCond)
+	{
+		GetMesh()->CustomDepthStencilValue = 3;
+		widgetComponent->SetVisibility(bCond);
+	}
+	else
+	{
+		GetMesh()->CustomDepthStencilValue = 2;
+		widgetComponent->SetVisibility(bCond);
+	}
+}
+
 void ABaseMonsterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

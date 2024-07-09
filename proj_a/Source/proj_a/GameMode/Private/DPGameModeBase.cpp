@@ -115,6 +115,8 @@ void ADPGameModeBase::StartPlay()
 void ADPGameModeBase::Tick(float delta_time)
 {
 	Super::Tick(delta_time);
+
+	this->SpawnMonsters(delta_time);
 	if (steam_listen_socket_ == nullptr)
 	{
 		return;

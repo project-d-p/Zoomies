@@ -248,17 +248,14 @@ void ADPPlayerController::Tick(float DeltaSeconds)
 	{
 		return ;
 	}
+
 	if (character->IsLocallyControlled())
 	{
 		FHitResult hit_result;
-		if (this->IsCatchable(hit_result))
-		{
-			if (Cast<ABaseMonsterCharacter>(hit_result.GetActor()) != nullptr)
-			{
-				// FNetLogger::EditerLog(FColor::Cyan, TEXT("Catchable"));
-			}
-		}
+		this->IsCatchable(hit_result);
+		this->ChangeMonsterCatchable(hit_result);
 	}
+	
 	if (HasAuthority())
 	{
 		return ;
@@ -793,6 +790,7 @@ void ADPPlayerController::SimulateCatch(SteamNetworkingSocket* steam_socket)
 		{
 			continue ;
 		}
+		this->CurrentTarget = nullptr;
 		ABaseMonsterAIController* MAC = Cast<ABaseMonsterAIController>(MC->GetOwner());
 		check(MAC)
 		MAC->RemovePawnAndController();
@@ -840,4 +838,26 @@ bool ADPPlayerController::ServerNotifyReturnAnimals_Validate()
 {
 	// 호출이 유효한지 확인하는 로직을 구현
 	return true; // 유효성 검증이 항상 참인 경우
+}
+
+void ADPPlayerController::ChangeMonsterCatchable(const FHitResult& HitResult)
+{
+	ABaseMonsterCharacter* NewTarget = Cast<ABaseMonsterCharacter>(HitResult.GetActor());
+
+	if (CurrentTarget != NewTarget)
+	{
+		if (CurrentTarget)
+		{
+			CurrentTarget->SetCatchable(false);
+		}
+		if (NewTarget)
+		{
+			CurrentTarget = NewTarget;
+			CurrentTarget->SetCatchable(true);
+		}
+		else
+		{
+			CurrentTarget = nullptr;
+		}
+	}
 }
