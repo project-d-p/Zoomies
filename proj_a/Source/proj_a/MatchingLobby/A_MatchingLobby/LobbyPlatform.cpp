@@ -54,6 +54,18 @@ void ALobbyPlatform::Clear_Platform()
 
 	if (CurrentCharacter && CurrentCharacter->IsValidLowLevel())
 	{
+		TArray<AActor*> AttachedActors;
+		CurrentCharacter->GetAttachedActors(AttachedActors);
+
+		for (AActor* Actor : AttachedActors)
+		{
+			if (Actor)
+			{
+				Actor->Destroy();
+			}
+		}
+
+		// CurrentCharacter ÆÄ±«
 		CurrentCharacter->Destroy();
 		CurrentCharacter = nullptr;
 	}

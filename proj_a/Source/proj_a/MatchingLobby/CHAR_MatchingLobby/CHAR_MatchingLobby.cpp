@@ -25,14 +25,6 @@ ACHAR_MatchingLobby::ACHAR_MatchingLobby()
 	PrimaryActorTick.bCanEverTick = true;
 
 	weaponComponent = CreateDefaultSubobject<UDPWeaponActorComponent>(TEXT("WeaponComponent"));
-	gun = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GunMesh"));
-
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> GUNASSET
-	(TEXT("/Game/model/weapon/simpleGun.simpleGun"));
-	if (GUNASSET.Succeeded()) {
-		gun->SetStaticMesh(GUNASSET.Object);
-		gun->SetupAttachment(GetMesh(), TEXT("gunSocket"));
-	}
 	
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CHARACTER
 	(TEXT("/Game/model/steve/StickManForMixamo.StickManForMixamo"));
@@ -85,11 +77,15 @@ void ACHAR_MatchingLobby::BeginPlay()
 {
 	Super::BeginPlay();
 
-	TSubclassOf<ADPWeapon> gunClass = ADPWeaponGun::StaticClass();
-	if (weaponComponent) {
-		weaponComponent->AddWeapons(gunClass);
-		weaponComponent->Equip(gunClass);
+	if (GetMesh()) {
+		UMaterialInterface* Material = GetMesh()->GetMaterial(0);
+		if (Material) {
+			dynamicMaterialInstance = UMaterialInstanceDynamic::Create(Material, this);
+			GetMesh()->SetMaterial(0, dynamicMaterialInstance);
+		}
 	}
+	if (dynamicMaterialInstance)
+		dynamicMaterialInstance->SetVectorParameterValue(FName("color"), FVector4(0.f, 0.f, 1.f, 1.f));
 }
 
 // Called every frame

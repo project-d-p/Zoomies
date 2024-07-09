@@ -27,12 +27,14 @@ public:	// component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MatchLobby")
 	class UDPWeaponActorComponent* weaponComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MatchLobby", meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* gun;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MatchLobby", meta = (AllowPrivateAccess = "true"))
 	class UWidgetComponent* userInfoWidget;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MatchLobby")
 	UAnimMontage* characterMontage;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
+	UMaterialInstanceDynamic* dynamicMaterialInstance;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MatchLobby")
 	UWidgetComponent* LobbyInfoWidgetComponent = nullptr;
 
