@@ -224,6 +224,19 @@ void UGI_Zoomies::CheckSteamInit()
 
 void UGI_Zoomies::InitSteamAPI()
 {
+	// 초기화 실패를 구체적으로 로그로 남기기 위한 함수
+	auto LogSteamAPIError = []()
+	{
+		if (SteamAPI_IsSteamRunning() == false)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("SteamAPI init failed: Steam client is not running."));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("SteamAPI init failed: Unknown reason."));
+		}
+	};
+
 	if (!is_steamAPI_init && SteamAPI_Init())
 	{
 		is_steamAPI_init = true;
@@ -238,7 +251,9 @@ void UGI_Zoomies::InitSteamAPI()
 	
 	if (!is_steamAPI_init)
 	{
-		UE_LOG(LogTemp, Log, TEXT("SteamAPI init failed"));
+		UE_LOG(LogTemp, Error, TEXT("SteamAPI init failed"));
+		LogSteamAPIError(); // 실패 원인 로그 추가
+
 		//logging on Screen if GEngine is available
 		if (GEngine)
 		{
@@ -263,7 +278,7 @@ void UGI_Zoomies::InitOnlineSubsystemSteam()
 {
 	if (!is_online_session_steam_init)
 	{
-		online_subsystem_ = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
+		online_subsystem_ = IOnlineSubsystem::Get();
 		if (online_subsystem_)
 		{
 			session_interface_ = online_subsystem_->GetSessionInterface();

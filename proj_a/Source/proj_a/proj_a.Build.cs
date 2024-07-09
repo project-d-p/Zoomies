@@ -4,6 +4,7 @@ using UnrealBuildTool;
 using System.IO;
 using System;
 using System.Diagnostics;
+using UnrealBuildBase;
 
 public class proj_a : ModuleRules
 {
@@ -106,8 +107,14 @@ public class proj_a : ModuleRules
 			}
 			else if (Target.Platform == UnrealTargetPlatform.Mac)
 			{
-				PublicAdditionalLibraries.Add(Path.Combine(SteamSDKPath, "redistributable_bin", "osx", "libsteam_api.dylib"));
-				RuntimeDependencies.Add("$(ProjectDir)/Binaries/Mac/libsteam_api.dylib", Path.Combine(SteamSDKPath,"redistributable_bin", "osx", "libsteam_api.dylib"));
+				string EngineSteamSDKPath = Path.Combine(
+					Unreal.EngineDirectory.ToString(), 
+					"Source", "ThirdParty", "Steamworks", "Steamv153", "sdk", "redistributable_bin", "osx"
+				);
+
+				PublicAdditionalLibraries.Add(Path.Combine(EngineSteamSDKPath, "libsteam_api.dylib"));
+
+				RuntimeDependencies.Add("$(ProjectDir)/Binaries/Mac/libsteam_api.dylib", Path.Combine(EngineSteamSDKPath, "libsteam_api.dylib"));
 			}
 		}
     }
