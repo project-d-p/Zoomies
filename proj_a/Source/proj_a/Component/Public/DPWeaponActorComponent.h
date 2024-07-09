@@ -30,6 +30,7 @@ public:
 
 	bool SimulateAttack(ADPCharacter* character, FHitResult& result, const Gunfire& gunfire);
 	FVector GetFireLocation();
+	void SpawnEffects(const FVector& Vector, const FRotator& Rotator);
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Weapon")

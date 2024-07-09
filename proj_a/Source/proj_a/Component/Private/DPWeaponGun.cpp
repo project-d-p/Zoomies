@@ -7,6 +7,8 @@
 #include "DPPlayerController.h"
 #include "FNetLogger.h"
 #include "HitScan.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "EntitySystem/MovieSceneEntitySystemTypes.h"
@@ -44,20 +46,6 @@ ADPWeaponGun::ADPWeaponGun()
 	if (SMOKE.Succeeded()) {
 		smokeEffect = SMOKE.Object;
 	}
-
-	/*
-	if (sparkleEffect && arrowSparkle) {
-		UNiagaraFunctionLibrary::SpawnSystemAttached(
-			sparkleEffect,
-			arrowSparkle,
-			NAME_None,
-			FVector::ZeroVector,
-			FRotator::ZeroRotator,
-			EAttachLocation::KeepRelativeOffset,
-			true
-		);
-	}
-	*/
 }
 
 void ADPWeaponGun::BeginPlay()
@@ -92,17 +80,53 @@ bool ADPWeaponGun::Attack(ADPPlayerController* controller, FHitResult& result, F
 	info = normalized_muzzle_direction.Rotation();
 	const FVector muzzle_location = muzzle->GetComponentLocation();
 	
-	return hitScan->HitDetect(Cast<ADPCharacter>(controller->GetCharacter()), muzzle_location, normalized_muzzle_direction.Rotation(), 100000000.f, result);
+	return hitScan->HitDetect(Cast<ADPCharacter>(controller->GetCharacter()), muzzle_location, normalized_muzzle_direction.Rotation(), 100000000.f, result, false);
 }
 
 bool ADPWeaponGun::SimulateAttack(ADPCharacter* character, FHitResult& result, const Gunfire& gunfire)
 {
 	const FVector start = FVector(gunfire.position().x(), gunfire.position().y(), gunfire.position().z());
 	const FRotator aim_direction = FRotator(gunfire.direction().x(), gunfire.direction().y(), gunfire.direction().z());
-	return hitScan->HitDetect(character, start, aim_direction, 100000000.f, result);
+	return hitScan->HitDetect(character, start, aim_direction, 100'000'000.f, result);
 }
 
 FVector ADPWeaponGun::GetFireLocation()
 {
 	return muzzle->GetComponentLocation();
+}
+
+void ADPWeaponGun::SpawnEffects(FVector location, FRotator rotation)
+{
+	if (location == FVector::ZeroVector)
+	{
+		location = muzzle->GetComponentLocation() + muzzle->GetForwardVector() * 100'000'000.f;
+	}
+
+	FVector direction = rotation.Vector();
+	UNiagaraComponent* trail = nullptr;
+	if (trailEffect && muzzle) {
+		trail = UNiagaraFunctionLibrary::SpawnSystemAttached(
+			trailEffect,
+			muzzle,
+			NAME_None,
+			FVector::ZeroVector,
+			rotation,
+			EAttachLocation::KeepRelativeOffset,
+			true
+		);
+	}
+	if (trail)
+		trail->SetVectorParameter(FName("Direction_FIRE"), location);
+
+	if (smokeEffect && muzzle) {
+		UNiagaraFunctionLibrary::SpawnSystemAttached(
+		smokeEffect,
+		muzzle,
+		NAME_None,
+		FVector::ZeroVector,
+		FRotator::ZeroRotator,
+		EAttachLocation::KeepRelativeOffset,
+		true
+		);
+	}
 }

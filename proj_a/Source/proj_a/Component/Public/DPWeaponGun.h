@@ -21,8 +21,9 @@ public:
 
 	virtual bool Attack(ADPPlayerController* character, FHitResult& result, FRotator& info) override;
 	virtual bool SimulateAttack(ADPCharacter* character, FHitResult& result, const Gunfire& gunfire) override;
+	virtual void SpawnEffects(FVector localtion, FRotator rotation) override;
 	virtual FVector GetFireLocation() override;
-	
+
 protected:
 	UPROPERTY()
 	UHitScan* hitScan;

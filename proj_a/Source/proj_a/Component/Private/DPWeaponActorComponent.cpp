@@ -55,6 +55,12 @@ FVector UDPWeaponActorComponent::GetFireLocation()
 	return FVector();
 }
 
+void UDPWeaponActorComponent::SpawnEffects(const FVector& Vector, const FRotator& Rotator)
+{
+	if (currentWeapon)
+		currentWeapon->SpawnEffects(Vector, Rotator);
+}
+
 void UDPWeaponActorComponent::AddWeapons(TSubclassOf<ADPWeapon> weaponClass)
 {
 	ADPCharacter* playerCharacter = Cast<ADPCharacter>(GetOwner());
