@@ -20,7 +20,6 @@ public:
 	UCharacterPositionSync();
 	virtual ~UCharacterPositionSync() override;
 	void SyncWithServer(ADPCharacter* character);
-	void SyncMyself(ADPCharacter* character);
 	void SyncGunFire(ADPCharacter* character);
 	void SyncCatch(ADPCharacter* character);
 	void SyncReturnAnimal(ADPCharacter* character);
