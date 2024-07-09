@@ -32,4 +32,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MuzzleArrow")
 	UArrowComponent* muzzle;
+	
+	// effect
+	//UPROPERTY(VisibleAnywhere)
+	//UArrowComponent* arrowSparkle;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "effects")
+	class UNiagaraSystem* trailEffect;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "effects")
+	class UNiagaraSystem* smokeEffect;
 };

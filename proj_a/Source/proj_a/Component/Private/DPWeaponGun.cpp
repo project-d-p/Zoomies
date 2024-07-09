@@ -31,6 +31,33 @@ ADPWeaponGun::ADPWeaponGun()
 	muzzle->SetupAttachment(gunMesh);
 	muzzle->SetRelativeLocation(FVector(-30.005441, 0.000000, 4.690275));
 	muzzle->SetRelativeRotation(FRotator(0.000000, -180, 0.000000));
+
+	// effects
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> TRAIL
+	(TEXT("/Game/effect/ns_gunTrail2.ns_gunTrail2"));
+	if (TRAIL.Succeeded()) {
+		trailEffect = TRAIL.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> SMOKE
+	(TEXT("/Game/effect/ns_gunSmokeSpark.ns_gunSmokeSpark"));
+	if (SMOKE.Succeeded()) {
+		smokeEffect = SMOKE.Object;
+	}
+
+	/*
+	if (sparkleEffect && arrowSparkle) {
+		UNiagaraFunctionLibrary::SpawnSystemAttached(
+			sparkleEffect,
+			arrowSparkle,
+			NAME_None,
+			FVector::ZeroVector,
+			FRotator::ZeroRotator,
+			EAttachLocation::KeepRelativeOffset,
+			true
+		);
+	}
+	*/
 }
 
 void ADPWeaponGun::BeginPlay()
