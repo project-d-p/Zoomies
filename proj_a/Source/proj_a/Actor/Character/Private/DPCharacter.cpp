@@ -14,6 +14,8 @@
 #include "FDataHub.h"
 #include "FNetLogger.h"
 #include "MonsterSlotComponent.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -124,15 +126,22 @@ ADPCharacter::ADPCharacter()
 	if (CAMERASHAKE.Succeeded()) {
 		cameraShake = CAMERASHAKE.Class;
 	}
-
-	/*
-	 * 겹치게 만드는 요소
-	 * 즉, 충돌해도 보이는 것은 뚫고 지나가지만 충돌 이벤트는 발생됨.
-	 */
-	// GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	
-	// GetCapsuleComponent()->SetSimulatePhysics(true);
-	// GetCapsuleComponent()->SetNotifyRigidBodyCollision(true);
+	StunArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("StunArrow"));
+	StunArrow->SetupAttachment(GetMesh(), FName("Stun_Pos"));
+	StunArrow->SetRelativeLocation(FVector(0, -20.f, 0));
+	StunArrow->SetHiddenInGame(true);
+
+	StunEffectComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("StunEffectComponent"));
+	StunEffectComponent->SetupAttachment(StunArrow);
+	StunEffectComponent->SetAutoActivate(false);
+	
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> STUN
+	(TEXT("/Game/effect/ns_stun.ns_stun"));
+	if (STUN.Succeeded()) {
+		StunEffect = STUN.Object;
+		StunEffectComponent->SetAsset(StunEffect);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -177,6 +186,14 @@ void ADPCharacter::Tick(float DeltaTime)
 		syncer->SyncReturnAnimal(this);
 	}
 	syncer->SyncCatch(this);
+
+	if (bIsStunned)
+	{
+		// Rotate the arrow component
+		FRotator NewRotation = StunArrow->GetRelativeRotation();
+		NewRotation.Roll += DeltaTime * 180.0f; // Rotate 180 degrees per second
+		StunArrow->SetRelativeRotation(NewRotation);
+	}
 }
 
 // Called to bind functionality to input
@@ -296,15 +313,37 @@ void ADPCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, 
 	{
 		return ;
 	}
-	this->SetStunned(true);
+	
+	if (monster->GetState() == EMonsterState::Faint)
+	{
+		return ;
+	}
+	
+	this->ApplyStunEffect();
 	
 	FTimerDelegate timerCollisionDelegate;
 	timerCollisionDelegate.BindLambda([this]()
 	{
 		FNetLogger::EditerLog(FColor::Cyan, TEXT("Stun End"));
-		this->SetStunned(false);
+		this->RemoveStunEffect();
 	});
 	float stunTime = 1.0f;
 	GetWorld()->GetTimerManager().SetTimer(timerCollisionHandle, timerCollisionDelegate, stunTime, false);
 }
 
+void ADPCharacter::ApplyStunEffect()
+{
+	if (!bIsStunned)
+	{
+		bIsStunned = true;
+		StunArrow->SetHiddenInGame(false);
+		StunEffectComponent->Activate(true);
+	}
+}
+
+void ADPCharacter::RemoveStunEffect()
+{
+	bIsStunned = false;
+	StunArrow->SetHiddenInGame(true);
+	StunEffectComponent->Deactivate();
+}

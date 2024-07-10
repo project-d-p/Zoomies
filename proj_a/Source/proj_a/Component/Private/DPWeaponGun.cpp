@@ -106,24 +106,6 @@ void ADPWeaponGun::SpawnEffects(FVector location, FRotator rotation)
 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Impact Point[Weapon}: %f, %f, %f"), location.X, location.Y, location.Z);
 
 	UNiagaraComponent* trail = nullptr;
-	// if (trailEffect && muzzle) {
-	// 	trail = UNiagaraFunctionLibrary::SpawnSystemAttached(
-	// 		trailEffect,
-	// 		muzzle,
-	// 		NAME_None,
-	// 		FVector::ZeroVector,
-	// 		FRotator::ZeroRotator,
-	// 		EAttachLocation::KeepRelativeOffset,
-	// 		true
-	// 	);
-	// }
-	// if (trail)
-	// {
-	// 	// 방향 설정: 월드 방향을 로컬 방향으로 변환
-	// 	FVector WorldDirection = (location - muzzle->GetComponentLocation()).GetSafeNormal();
-	// 	FVector LocalDirection = muzzle->GetComponentTransform().InverseTransformVectorNoScale(WorldDirection);
-	// 	trail->SetVectorParameter(FName("Direction_FIRE"), LocalDirection * 100000.f); // 1000.f은 속도 조절을 위한 스칼라 값
-	// }
 
 	if (trailEffect && muzzle) {
 		trail = UNiagaraFunctionLibrary::SpawnSystemAtLocation(

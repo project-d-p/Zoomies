@@ -42,6 +42,7 @@ public:
 			   FVector NormalImpulse, const FHitResult& Hit);
 	
 	TArray<EAnimal> ReturnMonsters();
+
 public:	// component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UDPHpActorComponent* hpComponent;
@@ -60,6 +61,14 @@ public:	// component
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
 	UMaterialInstanceDynamic* dynamicMaterialInstance;
 
+	// stun effect
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "effects")
+	class UNiagaraSystem* StunEffect;
+	UPROPERTY(VisibleAnywhere)
+	class UArrowComponent* StunArrow;
+	UPROPERTY(VisibleAnywhere)
+	class UNiagaraComponent* StunEffectComponent;
+
 	void PlayAimAnimation();
 	void StopAimAnimation();
 	void PlayFireAnimation();
@@ -72,8 +81,12 @@ public:	// component
 
 	void SetAtReturnPlace(bool isReturnPlace);
 	bool IsAtReturnPlace() const;
+
+	
 	void SetStunned(bool bCond);
 	bool IsStunned() const;
+	void ApplyStunEffect();
+	void RemoveStunEffect();
 
 protected:
 	void ClientNotifyAnimalReturn_Implementation(const FString& player_name);
@@ -88,6 +101,7 @@ private:
 	class USpringArmComponent* sceneCaptureSpringArm;
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class  USceneCaptureComponent2D* sceneCapture;
+
 
 	UPROPERTY()
 	UCharacterPositionSync* syncer = nullptr;
