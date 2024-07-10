@@ -28,17 +28,17 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
     GetCharacterMovement()->bOrientRotationToMovement = true;
     bUseControllerRotationYaw = false;
 	
-	arrowSparkle = CreateDefaultSubobject<UArrowComponent>(TEXT("arrowComponent"));
-	arrowSparkle->SetupAttachment(GetMesh());
-	arrowSparkle->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
-	arrowSparkle->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
-	arrowSparkle->SetRelativeScale3D(FVector(2.f, 2.f, 2.f));
+	// arrowSparkle = CreateDefaultSubobject<UArrowComponent>(TEXT("arrowComponent"));
+	// arrowSparkle->SetupAttachment(GetMesh());
+	// arrowSparkle->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
+	// arrowSparkle->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+	// arrowSparkle->SetRelativeScale3D(FVector(2.f, 2.f, 2.f));
 
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> SPARKLE
-	(TEXT("/Game/effect/ns_sparkle.ns_sparkle"));
-	if (SPARKLE.Succeeded()) {
-		sparkleEffect = SPARKLE.Object;
-	}
+	// static ConstructorHelpers::FObjectFinder<UNiagaraSystem> SPARKLE
+	// (TEXT("/Game/effect/ns_sparkle.ns_sparkle"));
+	// if (SPARKLE.Succeeded()) {
+	// 	sparkleEffect = SPARKLE.Object;
+	// }
 
 	GetMesh()->SetRenderCustomDepth(true);
 	GetMesh()->CustomDepthStencilValue = 2;
@@ -163,6 +163,8 @@ void ABaseMonsterCharacter::TakeMonsterDamage(float Dmg)
 
 void ABaseMonsterCharacter::OnRep_FaintCharacterMotion()
 {
+	GetCapsuleComponent()->SetCapsuleRadius(FaintCP.Radius);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(FaintCP.HalfHeight);
 	GetMesh()->SetRelativeTransform(CB_FaintStateMtx);
 }
 

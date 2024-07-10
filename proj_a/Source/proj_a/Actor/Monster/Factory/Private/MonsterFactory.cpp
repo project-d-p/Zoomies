@@ -5,21 +5,30 @@
 #include "BaseMonsterCharacter.h"
 #include "ChasePlayerMonsterAIController.h"
 #include "CrabCharacter.h"
+#include "DolphinCharacter.h"
+#include "EelCharacter.h"
 #include "FNetLogger.h"
+#include "FoxCharacter.h"
+#include "GiraffeCharacter.h"
+#include "LionCharacter.h"
 #include "LobsterCharacter.h"
 #include "MammothCharacter.h"
 #include "OctopusCharacter.h"
+#include "PenguinCharacter.h"
+#include "RabbitCharacter.h"
+#include "SaberToothTigerCharacter.h"
+#include "SealCharacter.h"
+#include "ShepherdCharacter.h"
+#include "SkunkCharacter.h"
 #include "SlothCharacter.h"
+#include "SquidCharacter.h"
 #include "StarFishCharacter.h"
+#include "StingRayCharacter.h"
 #include "TargetPointMonsterAIController.h"
+#include "WhaleCharacter.h"
 #include "GameFramework/Actor.h"
 
 // TODO: Currently, all random arrays in this function are hardcoded, but this will be changed later.
-
-UMonsterFactory::UMonsterFactory()
-{
-	LoadBlueprintClasses();
-}
 
 ABaseMonsterAIController* UMonsterFactory::RandomMonsterSpawn(int32 idx)
 {
@@ -33,9 +42,31 @@ ABaseMonsterAIController* UMonsterFactory::RandomMonsterSpawn(int32 idx)
 	// XXX: For now, hardcoding the Location.
 	float RandomY = FMath::FRandRange(-3000.f, 3000.f);
 	FVector Location = FVector(-5000.f, RandomY, 300.f);
-
-	UINT RandomRange = FMath::RandRange(0, MonsterBlueprintClasses.Num() - 1);
-	UClass* SelectedMonsterClass = MonsterBlueprintClasses[RandomRange];
+	
+	std::vector MonsterClasses = {
+		ACrabCharacter::StaticClass(),
+		ALobsterCharacter::StaticClass(),
+		AMammothCharacter::StaticClass(),
+		// AOctopusCharacter::StaticClass(),
+		// AStarFishCharacter::StaticClass(),
+		// ASlothCharacter::StaticClass(),
+		// ADolphinCharacter::StaticClass(),
+		// AEelCharacter::StaticClass(),
+		// AFoxCharacter::StaticClass(),
+		// AGiraffeCharacter::StaticClass(),
+		// ALionCharacter::StaticClass(),
+		// APenguinCharacter::StaticClass(),
+		// ARabbitCharacter::StaticClass(),
+		// ASaberToothTigerCharacter::StaticClass(),
+		// ASealCharacter::StaticClass(),
+		// AShepherdCharacter::StaticClass(),
+		// ASkunkCharacter::StaticClass(),
+		// ASquidCharacter::StaticClass(),
+		// AStarFishCharacter::StaticClass(),
+		// AStingRayCharacter::StaticClass(),
+		// AWhaleCharacter::StaticClass()
+	};
+	UClass* SelectedMonsterClass = MonsterClasses[FMath::RandRange(0, MonsterClasses.size() - 1)];
 	
 	return SpawnMonster(SelectedMonsterClass, Location, idx);
 }
@@ -49,13 +80,13 @@ ABaseMonsterAIController* UMonsterFactory::SpawnMonster(UClass* MonsterClass, co
 		return nullptr;
 	}
 
-	TArray AIControllerClasses = {
+	std::vector AIControllerClasses = {
 		ATargetPointMonsterAIController::StaticClass(),
 		AAvoidPlayerMonsterAIController::StaticClass(),
 		AChasePlayerMonsterAIController::StaticClass()
 	};
 
-	int32 RandomIndex = FMath::RandRange(0, AIControllerClasses.Num() - 1);
+	int32 RandomIndex = FMath::RandRange(0, AIControllerClasses.size() - 1);
 	UClass* SelectedClass = AIControllerClasses[RandomIndex];
 	
 	ABaseMonsterAIController* AIController = Cast<ABaseMonsterAIController>(
@@ -74,44 +105,12 @@ ABaseMonsterAIController* UMonsterFactory::SpawnMonster(UClass* MonsterClass, co
 		AIController->Destroy();
 		return nullptr;
 	}
-	TArray ScaleFactors = { 1.0f, 1.5f, 2.0f };
-	float SelectedScaleFactor = ScaleFactors[FMath::RandRange(0, ScaleFactors.Num() - 1)];
+	std::vector ScaleFactors = { 1.0f, 1.5f, 2.0f };
+	float SelectedScaleFactor = ScaleFactors[FMath::RandRange(0, ScaleFactors.size() - 1)];
 	SpawnedMonster->ScaleCapsuleSize(SelectedScaleFactor);
 	AIController->index = idx;
 	SpawnedMonster->MonsterId = AIController->GetUniqueID();
 	AIController->Possess(SpawnedMonster);
 	
 	return AIController;
-}
-
-UClass* UMonsterFactory::LoadBlueprintClass(const TCHAR* Path)
-{
-	ConstructorHelpers::FClassFinder<AActor> BlueprintClassFinder(Path);
-	return BlueprintClassFinder.Class;
-}
-
-void UMonsterFactory::LoadBlueprintClasses()
-{
-	MonsterBlueprintClasses.Add(LoadBlueprintClass(TEXT("/Game/Monster/CrabCharacter_BP")));
-	// MonsterBlueprintClasses.Add(LoadBlueprintClass(TEXT("/Game/Monster/LobsterCharacterBP")));
-	// MonsterBlueprintClasses.Add(LoadBlueprintClass(TEXT("/Game/Monster/MammothCharacterBP")));
-	// MonsterBlueprintClasses.Add(LoadBlueprintClass(TEXT("/Game/Monster/OctopusCharacterBP")));
-	// MonsterBlueprintClasses.Add(LoadBlueprintClass(TEXT("/Game/Monster/StarFishCharacterBP")));
-	// MonsterBlueprintClasses.Add(LoadBlueprintClass(TEXT("/Game/Monster/SlothCharacterBP")));
-	// MonsterBlueprintClasses.Add(LoadBlueprintClass(TEXT("/Game/Monster/DolphinCharacterBP")));
-	// MonsterBlueprintClasses.Add(LoadBlueprintClass(TEXT("/Game/Monster/EelCharacterBP")));
-	// MonsterBlueprintClasses.Add(LoadBlueprintClass(TEXT("/Game/Monster/FoxCharacterBP")));
-	// MonsterBlueprintClasses.Add(LoadBlueprintClass(TEXT("/Game/Monster/GiraffeCharacterBP")));
-
-	// MonsterBlueprintClasses.Add(LoadBlueprintClass(TEXT("/Game/Monster/LionCharacterBP")));
-	// MonsterBlueprintClasses.Add(LoadBlueprintClass(TEXT("/Game/Monster/PenguinCharacterBP")));
-	// MonsterBlueprintClasses.Add(LoadBlueprintClass(TEXT("/Game/Monster/RabbitCharacterBP")));
-	// MonsterBlueprintClasses.Add(LoadBlueprintClass(TEXT("/Game/Monster/SaberToothTigerCharacterBP")));
-	// MonsterBlueprintClasses.Add(LoadBlueprintClass(TEXT("/Game/Monster/SealCharacterBP")));
-	
-	// MonsterBlueprintClasses.Add(LoadBlueprintClass(TEXT("/Game/Monster/ShepherdCharacterBP")));
-	// MonsterBlueprintClasses.Add(LoadBlueprintClass(TEXT("/Game/Monster/SkunkCharacterBP")));
-	// MonsterBlueprintClasses.Add(LoadBlueprintClass(TEXT("/Game/Monster/SquidCharacterBP")));
-	// MonsterBlueprintClasses.Add(LoadBlueprintClass(TEXT("/Game/Monster/StingRayCharacterBP")));
-	// MonsterBlueprintClasses.Add(LoadBlueprintClass(TEXT("/Game/Monster/WhaleCharacterBP")));
 }
