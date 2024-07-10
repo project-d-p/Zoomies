@@ -22,7 +22,6 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
 	
 	GetMesh()->SetCollisionProfileName(UCollisionProfile::BlockAllDynamic_ProfileName);
 	GetMesh()->SetupAttachment(RootComponent);
-	GetMesh()->SetGenerateOverlapEvents(true);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	GetMesh()->SetCollisionResponseToAllChannels(ECR_Block);
 	
@@ -158,18 +157,13 @@ void ABaseMonsterCharacter::TakeMonsterDamage(float Dmg)
 	{
 		CurrentHp = 0;
 		CurrentState = EMonsterState::Faint;
-		ABaseMonsterAIController *BMC = Cast<ABaseMonsterAIController>(GetOwner());
-		check(BMC)
-		BMC->StopMovement();
 		OnRep_FaintCharacterMotion();
 	}
 }
 
-void ABaseMonsterCharacter::OnRep_FaintCharacterMotion() const
+void ABaseMonsterCharacter::OnRep_FaintCharacterMotion()
 {
-	FRotator NewRotation = FRotator(0.0f, 0.0f, 90.0f);
-	GetCapsuleComponent()->SetRelativeRotation(NewRotation);
-	GetMesh()->SetRelativeRotation(NewRotation);
+	GetMesh()->SetRelativeTransform(CB_FaintStateMtx);
 }
 
 ABaseMonsterCharacter::~ABaseMonsterCharacter()

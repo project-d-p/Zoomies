@@ -25,6 +25,17 @@ ACrabCharacter::ACrabCharacter()
 	
 	/** Set the model size and adjust position */
 	GetMesh()->SetRelativeScale3D(FVector(1.f, 1.f, 1.f));
-	GetMesh()->SetRelativeLocationAndRotation(
-		FVector(0.f, 0.f, -12.f), FRotator(0.f, -90.f, 0.f));
+	
+	FVector Location(0.f, 0.f, 0.f);
+	FRotator Rotation(0.f, -90.f, 0.f);
+	FTransform Transform(Rotation, Location, FVector::OneVector);
+		
+	MeshAdjMtx = Transform;
+	GetMesh()->SetRelativeTransform(MeshAdjMtx);
+	
+	FaintStateMtx = FTransform(
+		FRotator(0.f, 0.f, 90.f),
+		FVector::ZeroVector,
+		FVector::OneVector);
+	CB_FaintStateMtx =  MeshAdjMtx.Inverse() * FaintStateMtx * MeshAdjMtx;
 }
