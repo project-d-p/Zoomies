@@ -72,9 +72,10 @@ void ABaseMonsterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UNiagaraComponent* sparkle = nullptr;
 	// special animals
 	if (sparkleEffect && arrowSparkle) {
-		UNiagaraFunctionLibrary::SpawnSystemAttached(
+		sparkle = UNiagaraFunctionLibrary::SpawnSystemAttached(
 			sparkleEffect,
 			arrowSparkle,
 			NAME_None,
@@ -85,6 +86,9 @@ void ABaseMonsterCharacter::BeginPlay()
 		);
 	}
 
+	if (sparkle)
+		sparkle->SetVectorParameter(FName("particleBoxSize"),GetMesh()->GetRelativeScale3D() * 100.f);
+	
 	if (widgetComponent)
 		widgetComponent->SetVisibility(false);
 }
@@ -133,11 +137,13 @@ void ABaseMonsterCharacter::SetCatchable(bool bCond)
 	if (bCond)
 	{
 		GetMesh()->CustomDepthStencilValue = 3;
+		GetMesh()->MarkRenderStateDirty();	// render 상태 갱신
 		widgetComponent->SetVisibility(bCond);
 	}
 	else
 	{
 		GetMesh()->CustomDepthStencilValue = 2;
+		GetMesh()->MarkRenderStateDirty();
 		widgetComponent->SetVisibility(bCond);
 	}
 }
