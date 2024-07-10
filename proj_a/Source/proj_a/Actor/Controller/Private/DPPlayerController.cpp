@@ -408,6 +408,9 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 			this->gun_queue_.push(msg);
 		}
 		character->weaponComponent->SpawnEffects(ImpactPoint, final_direction);
+
+		// TEST
+		this->SimulateGunFire(nullptr);
 	}
 	// if ("WALL" == state->equipmentState) {
 	// 	//if (character->isAim) {
@@ -547,6 +550,9 @@ void ADPPlayerController::Catch(const FInputActionValue& value)
 		// Socket->AsyncSendPacket(msg);
 	}
 
+	// TEST
+	this->SimulateCatch(nullptr);
+
 	/* Test */
 	// UClass* class_type = hit_result.GetActor()->GetClass();
 	// FString monster_type = class_type->GetName();
@@ -587,6 +593,7 @@ void ADPPlayerController::ReturningAnimals(const FInputActionValue& value)
 	{
 		this->ServerNotifyReturnAnimals();
 	}
+	
 	if (ReturnTriggerVolume)
 	{
 		ReturnTriggerVolume->SpawnReturnEffect(animals);
@@ -674,7 +681,7 @@ void ADPPlayerController::SimulateGunFire(SteamNetworkingSocket* steam_socket)
 			// Logic for Hit Success && Damage && Score
 			FNetLogger::EditerLog(FColor::Cyan, TEXT("Player %s Attack Success[Simulate]"), *PlayerState->GetPlayerName());
 		}
-		steam_socket->PushUdpFlushMessage(fire);
+		// steam_socket->PushUdpFlushMessage(fire);
 		gun_fire_count_ -= 1;
 	}
 }
@@ -799,8 +806,7 @@ void ADPPlayerController::SimulateCatch(SteamNetworkingSocket* steam_socket)
 		*catch_.mutable_catch_() = reply;
 		FString TestString = UTF8_TO_TCHAR(reply.target().c_str());
 		FNetLogger::EditerLog(FColor::Cyan, TEXT("Catch monster_id: %s"), *TestString);
-		steam_socket->PushUdpFlushMessage(catch_);
-		
+		// steam_socket->PushUdpFlushMessage(catch_);
 	}
 }
 
