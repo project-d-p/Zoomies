@@ -44,6 +44,6 @@ FVector ADPWeapon::GetFireLocation()
 	return FVector();
 }
 
-void ADPWeapon::SpawnEffects(FVector location, FRotator rotation)
+void ADPWeapon::SpawnEffects(const FHitResult& location, const FRotator& rotation)
 {
 }

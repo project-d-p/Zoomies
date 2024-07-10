@@ -55,10 +55,10 @@ FVector UDPWeaponActorComponent::GetFireLocation()
 	return FVector();
 }
 
-void UDPWeaponActorComponent::SpawnEffects(const FVector& Vector, const FRotator& Rotator)
+void UDPWeaponActorComponent::SpawnEffects(const FHitResult& HitResult, const FRotator& Rotator)
 {
 	if (currentWeapon)
-		currentWeapon->SpawnEffects(Vector, Rotator);
+		currentWeapon->SpawnEffects(HitResult, Rotator);
 }
 
 void UDPWeaponActorComponent::AddWeapons(TSubclassOf<ADPWeapon> weaponClass)

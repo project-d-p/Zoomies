@@ -398,13 +398,10 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 		character->PlayFireAnimation();
 		// 최종 발사 위치와, 방향을 알아야 함.
 		FRotator final_direction;
-
-		FVector ImpactPoint = FVector::ZeroVector;
 		if (character->weaponComponent->Attack(this, hit_result, final_direction))
 		{
 			// Success Only Effect;
-			ImpactPoint = hit_result.ImpactPoint;
-			FNetLogger::EditerLog(FColor::Cyan, TEXT("Impact Point[Controller]: %f, %f, %f"), ImpactPoint.X, ImpactPoint.Y, ImpactPoint.Z);
+			FNetLogger::EditerLog(FColor::Cyan, TEXT("Impact Point[Controller]: %f, %f, %f"), hit_result.ImpactPoint.X, hit_result.ImpactPoint.Y, hit_result.ImpactPoint.Z);
 			FNetLogger::EditerLog(FColor::Cyan, TEXT("Attack Success[Only Effect]"));
 		}
 		FVector position = character->weaponComponent->GetFireLocation();
@@ -418,7 +415,7 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 			this->gun_fire_count_ += 1;
 			this->gun_queue_.push(msg);
 		}
-		character->weaponComponent->SpawnEffects(ImpactPoint, final_direction);
+		character->weaponComponent->SpawnEffects(hit_result, final_direction);
 
 		// TEST
 		this->SimulateGunFire(nullptr);
@@ -695,6 +692,9 @@ void ADPPlayerController::SimulateGunFire(SteamNetworkingSocket* steam_socket)
 			}
 			// Logic for Hit Success && Damage && Score
 			FNetLogger::EditerLog(FColor::Cyan, TEXT("Player %s Attack Success[Simulate]"), *PlayerState->GetPlayerName());
+
+			// Add Particle Effect
+			
 		}
 		// steam_socket->PushUdpFlushMessage(fire);
 		gun_fire_count_ -= 1;

@@ -46,6 +46,12 @@ ADPWeaponGun::ADPWeaponGun()
 	if (SMOKE.Succeeded()) {
 		smokeEffect = SMOKE.Object;
 	}
+	
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> PARTICLE
+	(TEXT("/Game/effect/ns_animalHit.ns_animalHit"));
+	if (PARTICLE.Succeeded()) {
+		particleEffect = PARTICLE.Object;
+	}
 }
 
 void ADPWeaponGun::BeginPlay()
@@ -95,15 +101,23 @@ FVector ADPWeaponGun::GetFireLocation()
 	return muzzle->GetComponentLocation();
 }
 
-void ADPWeaponGun::SpawnEffects(FVector location, FRotator rotation)
+void ADPWeaponGun::SpawnEffects(const FHitResult& HitResult, const FRotator& rotation)
 {
+	bool bCond = true;
 	// location은 총알이 맞은 위치.
-	if (location == FVector::ZeroVector)
+
+	FVector ImpactPoint;
+	if (HitResult.bBlockingHit)
 	{
-		location = muzzle->GetComponentLocation() + rotation.Vector() * 100000000.f;
+		ImpactPoint = HitResult.ImpactPoint;
+	}
+	else
+	{
+		ImpactPoint = muzzle->GetComponentLocation() + rotation.Vector() * 100000000.f;
+		bCond = false;
 	}
 
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Impact Point[Weapon}: %f, %f, %f"), location.X, location.Y, location.Z);
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Impact Point[Weapon}: %f, %f, %f"), ImpactPoint.X, ImpactPoint.Y, ImpactPoint.Z);
 
 	UNiagaraComponent* trail = nullptr;
 
@@ -118,7 +132,7 @@ void ADPWeaponGun::SpawnEffects(FVector location, FRotator rotation)
 	if (trail)
 	{
 		// 방향 설정: 월드 방향을 로컬 방향으로 변환
-		FVector WorldDirection = (location - muzzle->GetComponentLocation()).GetSafeNormal();
+		FVector WorldDirection = (ImpactPoint - muzzle->GetComponentLocation()).GetSafeNormal();
 		// FVector LocalDirection = muzzle->GetComponentTransform().InverseTransformVectorNoScale(WorldDirection);
 		trail->SetVectorParameter(FName("Direction_FIRE"), WorldDirection * 100000.f); // 1000.f은 속도 조절을 위한 스칼라 값
 	}
@@ -132,6 +146,29 @@ void ADPWeaponGun::SpawnEffects(FVector location, FRotator rotation)
 		FRotator::ZeroRotator,
 		EAttachLocation::KeepRelativeOffset,
 		true
+		);
+	}
+
+	// Spawn the hit effect at the impact point
+	if (bCond)
+	{
+		SpawnHitEffect(HitResult);
+	}
+}
+
+void ADPWeaponGun::SpawnHitEffect(const FHitResult& HitResult)
+{
+	FVector ImpactPoint = HitResult.ImpactPoint;
+	FVector ImpactNormal = HitResult.ImpactNormal;
+
+	FRotator ParticleRotation = ImpactNormal.Rotation();
+	if (particleEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			GetWorld(),
+			particleEffect,
+			ImpactPoint,
+			ParticleRotation
 		);
 	}
 }
