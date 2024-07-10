@@ -873,8 +873,15 @@ void ADPPlayerController::ChangeMonsterCatchable(const FHitResult& HitResult)
 		}
 		if (NewTarget)
 		{
-			CurrentTarget = NewTarget;
-			CurrentTarget->SetCatchable(true);
+			if (NewTarget->GetState() == EMonsterState::Faint)
+			{
+				CurrentTarget = NewTarget;
+				CurrentTarget->SetCatchable(true);
+			}
+			else
+			{
+				CurrentTarget = nullptr;
+			}
 		}
 		else
 		{

@@ -336,7 +336,6 @@ void ADPCharacter::ApplyStunEffect()
 	if (!bIsStunned)
 	{
 		bIsStunned = true;
-		StunArrow->SetHiddenInGame(false);
 		StunEffectComponent->Activate(true);
 	}
 }
@@ -344,6 +343,5 @@ void ADPCharacter::ApplyStunEffect()
 void ADPCharacter::RemoveStunEffect()
 {
 	bIsStunned = false;
-	StunArrow->SetHiddenInGame(true);
 	StunEffectComponent->Deactivate();
 }
