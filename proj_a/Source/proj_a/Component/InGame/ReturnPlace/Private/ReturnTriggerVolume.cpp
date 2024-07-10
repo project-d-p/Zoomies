@@ -202,6 +202,7 @@ void AReturnTriggerVolume::SpawnReturnEffect(TArray<EAnimal> Array)
         );
     }
 
+	// Spawn the first monster immediately
 	if (Array.Num() > 0)
 	{
 		SpawnSingleMonster(Array[0], 0);
