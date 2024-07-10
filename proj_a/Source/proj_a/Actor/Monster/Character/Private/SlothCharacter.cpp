@@ -7,7 +7,7 @@ ASlothCharacter::ASlothCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SLOTH
-	(TEXT("/Game/model/animals/sloth/sm_sloth.sm_sloth"));
+	(TEXT("/Game/model/animals/sloth/low_poly_giant_sloth.low_poly_giant_sloth"));
 	if (SK_SLOTH.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_SLOTH.Object);
 	}

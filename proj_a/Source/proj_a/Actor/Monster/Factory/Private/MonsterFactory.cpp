@@ -105,7 +105,7 @@ ABaseMonsterAIController* UMonsterFactory::SpawnMonster(UClass* MonsterClass, co
 		AIController->Destroy();
 		return nullptr;
 	}
-	std::vector ScaleFactors = { 1.0f, 1.5f, 2.0f };
+	std::vector ScaleFactors = { 1.f, 1.f, 1.f };
 	float SelectedScaleFactor = ScaleFactors[FMath::RandRange(0, ScaleFactors.size() - 1)];
 	SpawnedMonster->ScaleCapsuleSize(SelectedScaleFactor);
 	AIController->index = idx;
