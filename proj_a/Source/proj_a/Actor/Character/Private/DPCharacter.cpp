@@ -109,6 +109,12 @@ ADPCharacter::ADPCharacter()
 	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
+	// Enable hit events
+	GetCapsuleComponent()->SetNotifyRigidBodyCollision(true);
+    
+	// Bind the hit event
+	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ADPCharacter::OnHit);
+
 	GetMesh()->SetRenderCustomDepth(true);
 	GetMesh()->CustomDepthStencilValue = 2;
 
@@ -255,6 +261,16 @@ bool ADPCharacter::IsAtReturnPlace() const
 	return this->mIsAtReturnPlace;
 }
 
+void ADPCharacter::SetStunned(bool bCond)
+{
+	this->bIsStunned = bCond;
+}
+
+bool ADPCharacter::IsStunned() const
+{
+	return this->bIsStunned;
+}
+
 void ADPCharacter::ClientNotifyAnimalReturn_Implementation(const FString& player_name)
 {
 	FDataHub::PushReturnAnimalDA(player_name, true);
@@ -264,3 +280,31 @@ TArray<EAnimal> ADPCharacter::ReturnMonsters()
 {
 	return monsterSlotComponent->RemoveMonstersFromSlot();
 }
+
+void ADPCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (this->IsStunned())
+	{
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("It's Already Stunned"));
+		return ;
+	}
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Collsion Detected"));
+	
+	ABaseMonsterCharacter* monster = Cast<ABaseMonsterCharacter>(OtherActor);
+	if (!monster)
+	{
+		return ;
+	}
+	this->SetStunned(true);
+	
+	FTimerDelegate timerCollisionDelegate;
+	timerCollisionDelegate.BindLambda([this]()
+	{
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Stun End"));
+		this->SetStunned(false);
+	});
+	float stunTime = 1.0f;
+	GetWorld()->GetTimerManager().SetTimer(timerCollisionHandle, timerCollisionDelegate, stunTime, false);
+}
+

@@ -328,6 +328,10 @@ void ADPPlayerController::SetupInputComponent()
 
 void ADPPlayerController::Move(const FInputActionValue& value)
 {
+	if (character->IsStunned())
+	{
+		return ;
+	}
 	const FVector2D actionValue = value.Get<FVector2D>();
 	const FRotator controlRotation = GetControlRotation();
 
@@ -347,7 +351,10 @@ void ADPPlayerController::Move(const FInputActionValue& value)
 void ADPPlayerController::Jump(const FInputActionValue& value)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("ia_jump : %d"), value.Get<bool>());
-
+	if (character->IsStunned())
+	{
+		return ;
+	}
 	bool actionValue = value.Get<bool>();
 	if (!actionValue) {
 		return ;
@@ -373,6 +380,10 @@ void ADPPlayerController::Rotate(const FInputActionValue& value)
 // TODO: 총 쏘는 로직 수정 필요
 void ADPPlayerController::Active(const FInputActionValue& value)
 {
+	if (character->IsStunned())
+	{
+		return ;
+	}
 	UE_LOG(LogTemp, Warning, TEXT("Active"));
 
 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Active with %s"), *state->equipmentState);
@@ -527,6 +538,10 @@ void ADPPlayerController::ActionCancel(const FInputActionValue& value)
 void ADPPlayerController::Catch(const FInputActionValue& value)
 {
 	FHitResult hit_result;
+	if (character->IsStunned())
+	{
+		return ;
+	}
 	if (!this->IsCatchable(hit_result))
 	{
 		return ;

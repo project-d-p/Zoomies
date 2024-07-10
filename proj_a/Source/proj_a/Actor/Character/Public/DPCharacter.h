@@ -33,11 +33,15 @@ public:
 
 	// Locally Controlled
 	virtual bool IsLocallyControlled() const override;
-	TArray<EAnimal> ReturnMonsters();
 
 	UFUNCTION(Client, Reliable)
 	void ClientNotifyAnimalReturn(const FString& player_name);
 
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
+			   FVector NormalImpulse, const FHitResult& Hit);
+	
+	TArray<EAnimal> ReturnMonsters();
 public:	// component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UDPHpActorComponent* hpComponent;
@@ -68,6 +72,8 @@ public:	// component
 
 	void SetAtReturnPlace(bool isReturnPlace);
 	bool IsAtReturnPlace() const;
+	void SetStunned(bool bCond);
+	bool IsStunned() const;
 
 protected:
 	void ClientNotifyAnimalReturn_Implementation(const FString& player_name);
@@ -86,8 +92,12 @@ private:
 	UPROPERTY()
 	UCharacterPositionSync* syncer = nullptr;
 
-	FTimerHandle SynchronizeHandle;
 	TSubclassOf<UCameraShakeBase> cameraShake;
+
+	// Collision with monster
+	FTimerHandle timerCollisionHandle;
+	bool bIsStunned{ false };
+	
 public:
 	FVector currentVelocity{ 0.f, 0.f, 0.f };
 	UPROPERTY(BlueprintReadWrite)
