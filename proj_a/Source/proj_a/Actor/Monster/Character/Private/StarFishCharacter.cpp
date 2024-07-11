@@ -25,7 +25,18 @@ AStarFishCharacter::AStarFishCharacter()
 	GetCapsuleComponent()->SetCapsuleHalfHeight(32.f);
 	
 	/** Set the model size and adjust position */
-	GetMesh()->SetRelativeScale3D(FVector(2.f, 2.f, 2.f));
-	GetMesh()->SetRelativeLocationAndRotation(
-		FVector(0.f, 0.f, -28.f), FRotator(0.f, -90.f, 0.f));
+	FVector Scale(FVector::OneVector);
+	FVector Location(0.f, 0.f, 0.f);
+	FRotator Rotation(0.f, 0.f, 0.f);
+	FTransform Transform(Rotation, Location, Scale);
+		
+	MeshAdjMtx = Transform;
+	GetMesh()->SetRelativeTransform(MeshAdjMtx);
+
+	/** Set the faint state matrix */
+	FaintStateMtx = FTransform(
+		FRotator(90.f, 0.f, 0.f),
+		FVector::ZeroVector,
+		FVector::OneVector);
+	CB_FaintStateMtx =  MeshAdjMtx.Inverse() * FaintStateMtx * MeshAdjMtx;
 }

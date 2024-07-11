@@ -18,13 +18,29 @@ ACrabCharacter::ACrabCharacter()
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}
-
+	
 	/** Set the Capsule size */
-	GetCapsuleComponent()->SetCapsuleRadius(91.f);
-	GetCapsuleComponent()->SetCapsuleHalfHeight(91.f);
+	DefaultCP.Radius = 91.f;
+	DefaultCP.HalfHeight = 91.f;
+	GetCapsuleComponent()->SetCapsuleRadius(DefaultCP.Radius);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(DefaultCP.HalfHeight);
+
+	FaintCP.Radius = 91.f;
+	FaintCP.HalfHeight = 91.f;
 	
 	/** Set the model size and adjust position */
-	GetMesh()->SetRelativeScale3D(FVector(1.f, 1.f, 1.f));
-	GetMesh()->SetRelativeLocationAndRotation(
-		FVector(0.f, 0.f, -12.f), FRotator(0.f, -90.f, 0.f));
+	FVector Scale(FVector::OneVector);
+	FVector Location(0.f, 0.f, 0.f);
+	FRotator Rotation(0.f, 90.f, 0.f);
+	FTransform Transform(Rotation, Location, Scale);
+		
+	MeshAdjMtx = Transform;
+	GetMesh()->SetRelativeTransform(MeshAdjMtx);
+	
+	/** Set the faint state matrix */
+	FaintStateMtx = FTransform(
+		FRotator(90.f, 0.f, 0.f),
+		FVector::ZeroVector,
+		FVector::OneVector);
+	CB_FaintStateMtx =  MeshAdjMtx.Inverse() * FaintStateMtx * MeshAdjMtx;
 }

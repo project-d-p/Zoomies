@@ -5,13 +5,27 @@
 #include "BaseMonsterCharacter.h"
 #include "ChasePlayerMonsterAIController.h"
 #include "CrabCharacter.h"
+#include "DolphinCharacter.h"
+#include "EelCharacter.h"
 #include "FNetLogger.h"
+#include "FoxCharacter.h"
+#include "GiraffeCharacter.h"
+#include "LionCharacter.h"
 #include "LobsterCharacter.h"
 #include "MammothCharacter.h"
 #include "OctopusCharacter.h"
+#include "PenguinCharacter.h"
+#include "RabbitCharacter.h"
+#include "SaberToothTigerCharacter.h"
+#include "SealCharacter.h"
+#include "ShepherdCharacter.h"
+#include "SkunkCharacter.h"
 #include "SlothCharacter.h"
+#include "SquidCharacter.h"
 #include "StarFishCharacter.h"
+#include "StingRayCharacter.h"
 #include "TargetPointMonsterAIController.h"
+#include "WhaleCharacter.h"
 #include "GameFramework/Actor.h"
 
 // TODO: Currently, all random arrays in this function are hardcoded, but this will be changed later.
@@ -29,15 +43,30 @@ ABaseMonsterAIController* UMonsterFactory::RandomMonsterSpawn(int32 idx)
 	float RandomY = FMath::FRandRange(-3000.f, 3000.f);
 	FVector Location = FVector(-5000.f, RandomY, 300.f);
 	
-	TArray MonsterClasses = {
+	std::vector MonsterClasses = {
 		ACrabCharacter::StaticClass(),
 		ALobsterCharacter::StaticClass(),
 		AMammothCharacter::StaticClass(),
-		AOctopusCharacter::StaticClass(),
-		AStarFishCharacter::StaticClass(),
-		ASlothCharacter::StaticClass(),
+		// AOctopusCharacter::StaticClass(),
+		// AStarFishCharacter::StaticClass(),
+		// ASlothCharacter::StaticClass(),
+		// ADolphinCharacter::StaticClass(),
+		// AEelCharacter::StaticClass(),
+		// AFoxCharacter::StaticClass(),
+		// AGiraffeCharacter::StaticClass(),
+		// ALionCharacter::StaticClass(),
+		// APenguinCharacter::StaticClass(),
+		// ARabbitCharacter::StaticClass(),
+		// ASaberToothTigerCharacter::StaticClass(),
+		// ASealCharacter::StaticClass(),
+		// AShepherdCharacter::StaticClass(),
+		// ASkunkCharacter::StaticClass(),
+		// ASquidCharacter::StaticClass(),
+		// AStarFishCharacter::StaticClass(),
+		// AStingRayCharacter::StaticClass(),
+		// AWhaleCharacter::StaticClass()
 	};
-	UClass* SelectedMonsterClass = MonsterClasses[FMath::RandRange(0, MonsterClasses.Num() - 1)];
+	UClass* SelectedMonsterClass = MonsterClasses[FMath::RandRange(0, MonsterClasses.size() - 1)];
 	
 	return SpawnMonster(SelectedMonsterClass, Location, idx);
 }
@@ -51,13 +80,13 @@ ABaseMonsterAIController* UMonsterFactory::SpawnMonster(UClass* MonsterClass, co
 		return nullptr;
 	}
 
-	TArray AIControllerClasses = {
+	std::vector AIControllerClasses = {
 		ATargetPointMonsterAIController::StaticClass(),
 		AAvoidPlayerMonsterAIController::StaticClass(),
 		AChasePlayerMonsterAIController::StaticClass()
 	};
 
-	int32 RandomIndex = FMath::RandRange(0, AIControllerClasses.Num() - 1);
+	int32 RandomIndex = FMath::RandRange(0, AIControllerClasses.size() - 1);
 	UClass* SelectedClass = AIControllerClasses[RandomIndex];
 	
 	ABaseMonsterAIController* AIController = Cast<ABaseMonsterAIController>(
@@ -76,13 +105,12 @@ ABaseMonsterAIController* UMonsterFactory::SpawnMonster(UClass* MonsterClass, co
 		AIController->Destroy();
 		return nullptr;
 	}
-	TArray ScaleFactors = { 0.5f, 1.0f, 2.0f };
-	float SelectedScaleFactor = ScaleFactors[FMath::RandRange(0, ScaleFactors.Num() - 1)];
+	std::vector ScaleFactors = { 1.f, 1.f, 1.f };
+	float SelectedScaleFactor = ScaleFactors[FMath::RandRange(0, ScaleFactors.size() - 1)];
 	SpawnedMonster->ScaleCapsuleSize(SelectedScaleFactor);
 	AIController->index = idx;
 	SpawnedMonster->MonsterId = AIController->GetUniqueID();
 	AIController->Possess(SpawnedMonster);
-	FNetLogger::LogError(TEXT("Monster spawned successfully id: %d"), SpawnedMonster->MonsterId);
 	
 	return AIController;
 }
