@@ -77,9 +77,7 @@ bool ADPWeaponGun::Attack(ADPPlayerController* controller, FHitResult& result, F
 	}
 
 	FVector test_gun_mesh_location = gunMesh->GetComponentLocation();
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Start Location[gun Mesh]: %f, %f, %f"), test_gun_mesh_location.X, test_gun_mesh_location.Y, test_gun_mesh_location.Z);
 	FVector test_weapon_location = this->GetActorLocation();
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Start Location[weapon]: %f, %f, %f"), test_weapon_location.X, test_weapon_location.Y, test_weapon_location.Z);
 	
 	FVector muzzle_direction = impact_point - muzzle->GetComponentLocation();
 	FVector normalized_muzzle_direction = muzzle_direction.GetSafeNormal();
@@ -116,8 +114,6 @@ void ADPWeaponGun::SpawnEffects(const FHitResult& HitResult, const FRotator& rot
 		ImpactPoint = muzzle->GetComponentLocation() + rotation.Vector() * 100000000.f;
 		bCond = false;
 	}
-
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Impact Point[Weapon}: %f, %f, %f"), ImpactPoint.X, ImpactPoint.Y, ImpactPoint.Z);
 
 	UNiagaraComponent* trail = nullptr;
 

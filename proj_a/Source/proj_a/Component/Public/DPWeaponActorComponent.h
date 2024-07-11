@@ -19,6 +19,7 @@ class PROJ_A_API UDPWeaponActorComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UDPWeaponActorComponent();
+	virtual ~UDPWeaponActorComponent() override;
 
 protected:
 	// Called when the game starts

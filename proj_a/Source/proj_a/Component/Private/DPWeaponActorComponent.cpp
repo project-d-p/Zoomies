@@ -21,6 +21,15 @@ UDPWeaponActorComponent::UDPWeaponActorComponent()
 
 }
 
+UDPWeaponActorComponent::~UDPWeaponActorComponent()
+{
+	if (weapons.Num() > 0) {
+		for (ADPWeapon* weapon : weapons) {
+			weapon->Destroy();
+		}
+	}
+}
+
 
 // Called when the game starts
 void UDPWeaponActorComponent::BeginPlay()

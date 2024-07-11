@@ -149,6 +149,10 @@ ADPCharacter::ADPCharacter()
 	}
 }
 
+ADPCharacter::~ADPCharacter()
+{
+}
+
 // Called when the game starts or when spawned
 void ADPCharacter::BeginPlay()
 {
@@ -259,7 +263,6 @@ void ADPCharacter::PlayFireAnimation()
 	if (camera && cameraShake) {
 		FVector cameraLocation = camera->GetComponentLocation();
 		UGameplayStatics::PlayWorldCameraShake(this, cameraShake, cameraLocation, 0.0f, 500.0f);
-		FNetLogger::EditerLog(FColor::Magenta, TEXT("CAMERASHAKE"));
 	}
 }
 
@@ -335,7 +338,6 @@ void ADPCharacter::CheckCollisionWithMonster()
 			QueryParams
 		))
 		{
-			// FNetLogger::EditerLog(FColor::Cyan, TEXT("Collision Detected"));
 			if (ABaseMonsterCharacter* MC = Cast<ABaseMonsterCharacter>(HitResult.GetActor()))
 			{
 				// 몬스터와 충돌 발생
@@ -357,10 +359,8 @@ void ADPCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, 
 {
 	if (this->IsStunned())
 	{
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("It's Already Stunned"));
 		return ;
 	}
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Collsion Detected"));
 	
 	ABaseMonsterCharacter* monster = Cast<ABaseMonsterCharacter>(OtherActor);
 	if (!monster)
@@ -377,7 +377,6 @@ void ADPCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, 
 	FTimerDelegate timerCollisionDelegate;
 	timerCollisionDelegate.BindLambda([this]()
 	{
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("Stun End"));
 		this->RemoveStunEffect();
 	});
 	float stunTime = 1.0f;
@@ -411,16 +410,12 @@ void ADPCharacter::OnServerHit(const FHitResult& HitResult)
 {
 	if (this->IsStunned())
 	{
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("It's Already Stunned"));
 		return ;
 	}
-	// FNetLogger::EditerLog(FColor::Cyan, TEXT("Collsion Detected"));
 	
 	ABaseMonsterCharacter* monster = Cast<ABaseMonsterCharacter>(HitResult.GetActor());
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Collision Actor: %s"), *HitResult.GetActor()->GetName());
 	if (!monster)
 	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("Not Monster"));
 		return ;
 	}
 	
@@ -433,7 +428,6 @@ void ADPCharacter::OnServerHit(const FHitResult& HitResult)
 	FTimerDelegate timerCollisionDelegate;
 	timerCollisionDelegate.BindLambda([this]()
 	{
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("Stun End"));
 		this->RemoveStunEffect();
 	});
 	float stunTime = 1.5f;

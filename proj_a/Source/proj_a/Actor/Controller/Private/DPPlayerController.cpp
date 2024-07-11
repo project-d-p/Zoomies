@@ -194,7 +194,6 @@ void ADPPlayerController::BeginPlay()
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
 		GetLocalPlayer()))
 	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("Add Mapping Context [Begin Play]"));
 		SubSystem->AddMappingContext(defaultContext, 0);
 	}
 	
@@ -287,7 +286,6 @@ void ADPPlayerController::OnPossess(APawn* InPawn)
 	
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("Add Mapping Context [On Possess]"));
 		SubSystem->AddMappingContext(defaultContext, 0);
 	}
 }
@@ -376,7 +374,6 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Active"));
 
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Active with %s"), *state->equipmentState);
 	if ("NONE" == state->equipmentState) {
 
 	}
@@ -390,9 +387,6 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 		FRotator final_direction;
 		if (character->weaponComponent->Attack(this, hit_result, final_direction))
 		{
-			// Success Only Effect;
-			FNetLogger::EditerLog(FColor::Cyan, TEXT("Impact Point[Controller]: %f, %f, %f"), hit_result.ImpactPoint.X, hit_result.ImpactPoint.Y, hit_result.ImpactPoint.Z);
-			FNetLogger::EditerLog(FColor::Cyan, TEXT("Attack Success[Only Effect]"));
 		}
 		FVector position = character->weaponComponent->GetFireLocation();
 		Message msg = MessageMaker::MakeFireMessage(this, position, final_direction);
@@ -545,7 +539,6 @@ void ADPPlayerController::Catch(const FInputActionValue& value)
 	}
 	else
 	{
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("Send Catch Message"));
 		Socket->AsyncSendPacket(msg);
 	}
 }
@@ -603,7 +596,6 @@ void ADPPlayerController::HandleMovement(const Movement& movement, const float& 
 	
 	if (!character)
 	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("Character is null in HandleMovement"));
 		return ;
 	}
 	
@@ -626,7 +618,6 @@ void ADPPlayerController::HandleJump(const ::Jump& Jump)
 {
 	if (!character)
 	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("Character is null in HandleMovement"));
 		return ;
 	}
 	character->Jump();
@@ -669,8 +660,6 @@ void ADPPlayerController::SimulateGunFire(SteamNetworkingSocket* steam_socket)
 				}
 			}
 			// Logic for Hit Success && Damage && Score
-			FNetLogger::EditerLog(FColor::Cyan, TEXT("Player %s Attack Success[Simulate]"), *PlayerState->GetPlayerName());
-
 			// Add Particle Effect
 			if (!IsLocalController())
 			{
@@ -687,7 +676,6 @@ void ADPPlayerController::HandleAim(const AimState& AimState)
 {
 	if (!character)
 	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("Character is null in HandleAim"));
 		return ;
 	}
 	if (AimState.aim_state() == AimState::AIM_STATE_ACTIVE)
@@ -704,7 +692,6 @@ void ADPPlayerController::HandlePosition(const ActorPosition& ActorPosition)
 {
 	if (!character)
 	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("Character is null in HandleAim"));
 		return ;
 	}
 	SetState(ActorPosition);
@@ -802,7 +789,6 @@ void ADPPlayerController::SimulateCatch(SteamNetworkingSocket* steam_socket)
 		reply.set_target(TCHAR_TO_UTF8(*monster_type));
 		*catch_.mutable_catch_() = reply;
 		FString TestString = UTF8_TO_TCHAR(reply.target().c_str());
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("Catch monster_id: %s"), *TestString);
 		steam_socket->PushUdpFlushMessage(catch_);
 	}
 }
@@ -815,7 +801,6 @@ void ADPPlayerController::ServerNotifyReturnAnimals_Implementation()
 	{
 		return ;
 	}
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Server Notify Return Animals[from: %s]"), *player_state->GetPlayerName());
 	
 	// 클라이언트의 동물 반환 처리를 처리한다.
 	TArray<EAnimal> animals = character->ReturnMonsters();

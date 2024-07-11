@@ -114,7 +114,6 @@ void UCharacterPositionSync::SyncCatch(ADPCharacter* character)
 	Catch catch_data = *catch_;
 	FDataHub::catchData.Remove(PlayerId);
 	FString monster_id = UTF8_TO_TCHAR(catch_data.target().c_str());
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Catch monster_id: %s"), *monster_id);
 	character->CatchMonster(monster_id);
 }
 

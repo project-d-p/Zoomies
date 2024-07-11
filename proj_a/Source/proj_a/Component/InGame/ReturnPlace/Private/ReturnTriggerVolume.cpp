@@ -212,7 +212,6 @@ void AReturnTriggerVolume::SpawnReturnEffect(TArray<EAnimal> Array)
 	for (int32 Index = 1; Index < Array.Num(); ++Index)
 	{
 		EAnimal Animal = Array[Index];
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("SpawnReturnEffect: %d"), Index);
 		FTimerHandle SpawnTimerHandle;
 		FTimerDelegate SpawnTimerDelegate;
         

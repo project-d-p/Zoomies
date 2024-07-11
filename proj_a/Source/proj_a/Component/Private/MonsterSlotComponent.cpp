@@ -169,7 +169,6 @@ bool UMonsterSlotComponent::AddMonsterToSlot(ADPCharacter* character, USkeletalM
 {
 	if (monstersInSlot.size() >= 5)
 	{
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("MonsterSlot is full"));
 		return false;
 	}
 	// monstersInSlot.push_back(monster);
@@ -204,10 +203,8 @@ bool UMonsterSlotComponent::AddMonsterToSlot(ADPCharacter* character, USkeletalM
 
 bool UMonsterSlotComponent::AddMonsterToSlot(ADPCharacter* character, const FString& monster_type)
 {
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("AddMonsterToSlot: %s"), *monster_type);
 	if (!monsterMeshMap.contains(monster_type))
 	{
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("Monster type not found"));
 		return false;
 	}
 	return AddMonsterToSlot(character, monsterMeshMap[monster_type], monster_type);

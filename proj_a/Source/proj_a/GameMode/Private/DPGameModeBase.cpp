@@ -147,7 +147,7 @@ void ADPGameModeBase::ProcessData(float delta_time)
 {
 	message_queue_ = steam_listen_socket_->GetReadBuffer();
 	this->SpawnMonsters(delta_time);
-	// this->MonsterMoveSimulate(delta_time);
+	this->MonsterMoveSimulate(delta_time);
 	while (!this->message_queue_.empty())
 	{
 		Message message = this->message_queue_.front();

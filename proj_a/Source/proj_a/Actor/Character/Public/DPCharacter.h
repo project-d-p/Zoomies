@@ -19,6 +19,7 @@ class PROJ_A_API ADPCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ADPCharacter();
+	virtual ~ADPCharacter() override;
 	
 protected:
 	// Called when the game starts or when spawned
