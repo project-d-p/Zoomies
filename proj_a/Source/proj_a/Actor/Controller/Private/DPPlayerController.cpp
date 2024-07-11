@@ -374,10 +374,6 @@ void ADPPlayerController::Rotate(const FInputActionValue& value)
 // TODO: 총 쏘는 로직 수정 필요
 void ADPPlayerController::Active(const FInputActionValue& value)
 {
-	if (character->IsStunned())
-	{
-		return ;
-	}
 	UE_LOG(LogTemp, Warning, TEXT("Active"));
 
 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Active with %s"), *state->equipmentState);

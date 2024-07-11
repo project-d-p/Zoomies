@@ -9,6 +9,7 @@
 #include "Components/WidgetComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
+#include "proj_a.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -87,6 +88,8 @@ void ABaseMonsterCharacter::BeginPlay()
 
 	if (widgetComponent)
 		widgetComponent->SetVisibility(false);
+
+	GetCapsuleComponent()->SetCollisionObjectType(ECC_MonsterChannel);
 }
 
 void ABaseMonsterCharacter::SyncPosition()

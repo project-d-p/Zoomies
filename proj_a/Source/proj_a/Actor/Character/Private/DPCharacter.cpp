@@ -16,6 +16,7 @@
 #include "MonsterSlotComponent.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "proj_a.h"
 #include "ReturnTriggerVolume.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -25,12 +26,14 @@
 #include "Engine/TextureRenderTarget2D.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerState.h"
+#include "Net/UnrealNetwork.h"
 #include "Serialization/BulkDataRegistry.h"
 
 // Sets default values
 ADPCharacter::ADPCharacter()
 {
 	bReplicates = true;
+	bIsStunned = false;
 	
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -116,7 +119,8 @@ ADPCharacter::ADPCharacter()
 	GetCapsuleComponent()->SetNotifyRigidBodyCollision(true);
     
 	// Bind the hit event
-	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ADPCharacter::OnHit);
+	// Change To Server Logic
+	// GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ADPCharacter::OnHit);
 
 	GetMesh()->SetRenderCustomDepth(true);
 	GetMesh()->CustomDepthStencilValue = 2;
@@ -172,7 +176,6 @@ void ADPCharacter::BeginPlay()
 	hpComponent->IsDead = false;
 	constructionComponent->placeWall = false;
 	constructionComponent->placeturret = false;
-	UE_LOG(LogTemp, Log, TEXT("is it replicaed: %d"), GetCharacterMovement()->GetIsReplicated());
 	bUseControllerRotationYaw = false;
 }
 
@@ -193,7 +196,10 @@ void ADPCharacter::Tick(float DeltaTime)
 		syncer->SyncGunFire(this);
 		syncer->SyncReturnAnimal(this);
 	}
-	syncer->SyncCatch(this);
+	if (!HasAuthority())
+	{
+		syncer->SyncCatch(this);
+	}
 
 	if (bIsStunned)
 	{
@@ -201,6 +207,11 @@ void ADPCharacter::Tick(float DeltaTime)
 		FRotator NewRotation = StunArrow->GetRelativeRotation();
 		NewRotation.Roll += DeltaTime * 180.0f; // Rotate 180 degrees per second
 		StunArrow->SetRelativeRotation(NewRotation);
+	}
+
+	if (HasAuthority())
+	{
+		CheckCollisionWithMonster();
 	}
 }
 
@@ -301,11 +312,46 @@ void ADPCharacter::ClientNotifyAnimalReturn_Implementation(const FString& player
 	FDataHub::PushReturnAnimalDA(player_name, true);
 }
 
+void ADPCharacter::CheckCollisionWithMonster()
+{
+	FHitResult HitResult;
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+
+	TArray<FVector> Direction = {
+		FVector::ForwardVector,
+		-FVector::UpVector,
+	};
+
+	for (int i = 0; i < Direction.Num(); i++)
+	{
+		if (GetWorld()->SweepSingleByChannel(
+			HitResult,
+			GetActorLocation(),
+			GetActorLocation() + Direction[i] * 50.f,
+			GetActorRotation().Quaternion(),
+			ECC_MonsterChannel,
+			GetCapsuleComponent()->GetCollisionShape(),
+			QueryParams
+		))
+		{
+			// FNetLogger::EditerLog(FColor::Cyan, TEXT("Collision Detected"));
+			if (ABaseMonsterCharacter* MC = Cast<ABaseMonsterCharacter>(HitResult.GetActor()))
+			{
+				// 몬스터와 충돌 발생
+				OnServerHit(HitResult);
+			}
+		}
+	}
+}
+
 TArray<EAnimal> ADPCharacter::ReturnMonsters()
 {
 	return monsterSlotComponent->RemoveMonstersFromSlot();
 }
 
+/*
+ * Move To Server Logic
 void ADPCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
@@ -326,7 +372,6 @@ void ADPCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, 
 	{
 		return ;
 	}
-	
 	this->ApplyStunEffect();
 	
 	FTimerDelegate timerCollisionDelegate;
@@ -338,6 +383,7 @@ void ADPCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, 
 	float stunTime = 1.0f;
 	GetWorld()->GetTimerManager().SetTimer(timerCollisionHandle, timerCollisionDelegate, stunTime, false);
 }
+*/
 
 void ADPCharacter::ApplyStunEffect()
 {
@@ -346,10 +392,69 @@ void ADPCharacter::ApplyStunEffect()
 		bIsStunned = true;
 		StunEffectComponent->Activate(true);
 	}
+	if (!HasAuthority())
+	{
+		StunEffectComponent->Activate(true);
+	}
 }
 
 void ADPCharacter::RemoveStunEffect()
 {
-	bIsStunned = false;
+	if (HasAuthority())
+	{
+		bIsStunned = false;
+	}
 	StunEffectComponent->Deactivate();
+}
+
+void ADPCharacter::OnServerHit(const FHitResult& HitResult)
+{
+	if (this->IsStunned())
+	{
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("It's Already Stunned"));
+		return ;
+	}
+	// FNetLogger::EditerLog(FColor::Cyan, TEXT("Collsion Detected"));
+	
+	ABaseMonsterCharacter* monster = Cast<ABaseMonsterCharacter>(HitResult.GetActor());
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Collision Actor: %s"), *HitResult.GetActor()->GetName());
+	if (!monster)
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("Not Monster"));
+		return ;
+	}
+	
+	if (monster->GetState() == EMonsterState::Faint)
+	{
+		return ;
+	}
+	this->ApplyStunEffect();
+	
+	FTimerDelegate timerCollisionDelegate;
+	timerCollisionDelegate.BindLambda([this]()
+	{
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Stun End"));
+		this->RemoveStunEffect();
+	});
+	float stunTime = 1.5f;
+	GetWorld()->GetTimerManager().SetTimer(timerCollisionHandle, timerCollisionDelegate, stunTime, false);
+}
+
+void ADPCharacter::OnRep_SyncStunned()
+{
+	if (bIsStunned)
+	{
+		this->ApplyStunEffect();
+	}
+	else
+	{
+		this->RemoveStunEffect();
+	}
+}
+
+void ADPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ADPCharacter, bIsStunned);
 }

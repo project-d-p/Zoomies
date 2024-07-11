@@ -23,8 +23,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -37,9 +38,12 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ClientNotifyAnimalReturn(const FString& player_name);
 
+	/*
+	 * Move To Server Logic
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
 			   FVector NormalImpulse, const FHitResult& Hit);
+	*/
 	
 	TArray<EAnimal> ReturnMonsters();
 
@@ -72,6 +76,17 @@ public:	// component
 	UPROPERTY(VisibleAnywhere)
 	class UNiagaraComponent* StunEffectComponent;
 
+	UPROPERTY(ReplicatedUsing=OnRep_SyncStunned)
+	bool bIsStunned;
+
+	UFUNCTION()
+	void OnRep_SyncStunned();
+
+	void SetStunned(bool bCond);
+	bool IsStunned() const;
+	void ApplyStunEffect();
+	void RemoveStunEffect();
+
 	void PlayAimAnimation();
 	void StopAimAnimation();
 	void PlayFireAnimation();
@@ -84,17 +99,14 @@ public:	// component
 
 	void SetAtReturnPlace(bool isReturnPlace);
 	bool IsAtReturnPlace() const;
-
 	
-	void SetStunned(bool bCond);
-	bool IsStunned() const;
-	void ApplyStunEffect();
-	void RemoveStunEffect();
-
 protected:
 	void ClientNotifyAnimalReturn_Implementation(const FString& player_name);
 	
 private:
+	void CheckCollisionWithMonster();
+	void OnServerHit(const FHitResult& HitResult);
+
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* springArm;
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -105,7 +117,6 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class  USceneCaptureComponent2D* sceneCapture;
 
-
 	UPROPERTY()
 	UCharacterPositionSync* syncer = nullptr;
 
@@ -113,7 +124,6 @@ private:
 
 	// Collision with monster
 	FTimerHandle timerCollisionHandle;
-	bool bIsStunned{ false };
 	
 public:
 	FVector currentVelocity{ 0.f, 0.f, 0.f };
