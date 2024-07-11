@@ -138,7 +138,7 @@ void ADPWeaponGun::SpawnEffects(FVector location, FRotator rotation)
 		// 방향 설정: 월드 방향을 로컬 방향으로 변환
 		FVector WorldDirection = (location - muzzle->GetComponentLocation()).GetSafeNormal();
 		// FVector LocalDirection = muzzle->GetComponentTransform().InverseTransformVectorNoScale(WorldDirection);
-		trail->SetVectorParameter(FName("Direction_FIRE"), WorldDirection * 100000.f); // 1000.f은 속도 조절을 위한 스칼라 값
+		trail->SetVectorParameter(FName("Direction_FIRE"), WorldDirection * 1'000.f); // 1000.f은 속도 조절을 위한 스칼라 값
 	}
 	
 	if (smokeEffect && muzzle) {
