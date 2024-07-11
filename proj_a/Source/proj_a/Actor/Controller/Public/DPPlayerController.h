@@ -52,9 +52,6 @@ public:
 	
 	void ReleaseMemory();
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "References")
-	class AReturnTriggerVolume* ReturnTriggerVolume; 
-
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;

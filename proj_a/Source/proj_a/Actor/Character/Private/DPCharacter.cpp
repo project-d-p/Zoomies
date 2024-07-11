@@ -16,6 +16,7 @@
 #include "MonsterSlotComponent.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "ReturnTriggerVolume.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -158,6 +159,13 @@ void ADPCharacter::BeginPlay()
 	}
 	if (dynamicMaterialInstance)
 		dynamicMaterialInstance->SetVectorParameterValue(FName("color"), FVector4(0.f, 0.f, 1.f, 1.f));
+
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AReturnTriggerVolume::StaticClass(), FoundActors);
+	if (FoundActors.Num() > 0)
+	{
+		ReturnTriggerVolume = Cast<AReturnTriggerVolume>(FoundActors[0]);
+	}
 
 	stateComponent->currentEquipmentState = 0;
 	hpComponent->Hp = 100.f;

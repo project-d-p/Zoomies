@@ -82,7 +82,7 @@ ADPPlayerController::ADPPlayerController()
 		returnAction = IA_RETURN.Object;
 	
 	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
-	// Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
+	Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
 	CatchRay = CreateDefaultSubobject<UHitScan>(TEXT("Catch Ray"));
 
 	static ConstructorHelpers::FObjectFinder<USoundBase> SoundAsset
@@ -197,13 +197,6 @@ void ADPPlayerController::BeginPlay()
 		FNetLogger::EditerLog(FColor::Red, TEXT("Add Mapping Context [Begin Play]"));
 		SubSystem->AddMappingContext(defaultContext, 0);
 	}
-
-	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AReturnTriggerVolume::StaticClass(), FoundActors);
-	if (FoundActors.Num() > 0)
-	{
-		ReturnTriggerVolume = Cast<AReturnTriggerVolume>(FoundActors[0]);
-	}
 	
 	// GetWorldTimerManager().SetTimer(MovementTimerHandle, this, &ADPPlayerController::SendCompressedMovement, 0.01f, true);
 }
@@ -261,7 +254,7 @@ void ADPPlayerController::Tick(float DeltaSeconds)
 		return ;
 	}
 	Message msg = MessageMaker::MakePositionMessage(this);
-	// Socket->AsyncSendPacket(msg);
+	Socket->AsyncSendPacket(msg);
 }
 
 bool ADPPlayerController::IsCatchable(FHitResult& hit_result)
@@ -322,6 +315,7 @@ void ADPPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(cancelAction, ETriggerEvent::Triggered, this, &ADPPlayerController::ActionCancel);
 		// 포획 (f)
 		EnhancedInputComponent->BindAction(catchAction, ETriggerEvent::Started, this, &ADPPlayerController::Catch);
+		// 동물 반환 (q)
 		EnhancedInputComponent->BindAction(returnAction, ETriggerEvent::Started, this, &ADPPlayerController::ReturningAnimals);
 	}
 }
@@ -408,7 +402,7 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 		Message msg = MessageMaker::MakeFireMessage(this, position, final_direction);
 		if (!HasAuthority())
 		{
-			// Socket->AsyncSendPacket(msg);
+			Socket->AsyncSendPacket(msg);
 		}
 		else
 		{
@@ -416,9 +410,6 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 			this->gun_queue_.push(msg);
 		}
 		character->weaponComponent->SpawnEffects(hit_result, final_direction);
-
-		// TEST
-		this->SimulateGunFire(nullptr);
 	}
 	// if ("WALL" == state->equipmentState) {
 	// 	//if (character->isAim) {
@@ -480,7 +471,7 @@ void ADPPlayerController::Aim(const FInputActionValue& value)
 			Message msg = MessageMaker::MakeAimMessage(this, !character->isAim);
 			if (!HasAuthority())
 			{
-				// Socket->AsyncSendPacket(msg);
+				Socket->AsyncSendPacket(msg);
 			}
 			else
 			{
@@ -511,7 +502,7 @@ void ADPPlayerController::AimReleased(const FInputActionValue& value)
 		Message msg = MessageMaker::MakeAimMessage(this, !character->isAim);
 		if (!HasAuthority())
 		{
-			// Socket->AsyncSendPacket(msg);
+			Socket->AsyncSendPacket(msg);
 		}
 		else
 		{
@@ -559,16 +550,8 @@ void ADPPlayerController::Catch(const FInputActionValue& value)
 	else
 	{
 		FNetLogger::EditerLog(FColor::Cyan, TEXT("Send Catch Message"));
-		// Socket->AsyncSendPacket(msg);
+		Socket->AsyncSendPacket(msg);
 	}
-
-	// TEST
-	this->SimulateCatch(nullptr);
-
-	/* Test */
-	// UClass* class_type = hit_result.GetActor()->GetClass();
-	// FString monster_type = class_type->GetName();
-	// this->character->CatchMonster(monster_type);
 }
 
 void ADPPlayerController::ReturningAnimals(const FInputActionValue& value)
@@ -605,10 +588,9 @@ void ADPPlayerController::ReturningAnimals(const FInputActionValue& value)
 	{
 		this->ServerNotifyReturnAnimals();
 	}
-	
-	if (ReturnTriggerVolume)
+	if (character->ReturnTriggerVolume)
 	{
-		ReturnTriggerVolume->SpawnReturnEffect(animals);
+		character->ReturnTriggerVolume->SpawnReturnEffect(animals);
 	}
 }
 
@@ -694,9 +676,13 @@ void ADPPlayerController::SimulateGunFire(SteamNetworkingSocket* steam_socket)
 			FNetLogger::EditerLog(FColor::Cyan, TEXT("Player %s Attack Success[Simulate]"), *PlayerState->GetPlayerName());
 
 			// Add Particle Effect
-			
+			if (!IsLocalController())
+			{
+				FRotator final_direction = FRotator(fire.gunfire().direction().x(), fire.gunfire().direction().y(), fire.gunfire().direction().z());
+				character->weaponComponent->SpawnEffects(hit_result, final_direction);
+			}
 		}
-		// steam_socket->PushUdpFlushMessage(fire);
+		steam_socket->PushUdpFlushMessage(fire);
 		gun_fire_count_ -= 1;
 	}
 }
@@ -821,7 +807,7 @@ void ADPPlayerController::SimulateCatch(SteamNetworkingSocket* steam_socket)
 		*catch_.mutable_catch_() = reply;
 		FString TestString = UTF8_TO_TCHAR(reply.target().c_str());
 		FNetLogger::EditerLog(FColor::Cyan, TEXT("Catch monster_id: %s"), *TestString);
-		// steam_socket->PushUdpFlushMessage(catch_);
+		steam_socket->PushUdpFlushMessage(catch_);
 	}
 }
 
@@ -843,6 +829,11 @@ void ADPPlayerController::ServerNotifyReturnAnimals_Implementation()
 	if (GM)
 	{
 		GM->ScoreManager->IncreasePlayerScore(this, animals);
+	}
+
+	if (character->ReturnTriggerVolume)
+	{
+		character->ReturnTriggerVolume->SpawnReturnEffect(animals);
 	}
 	
 	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)

@@ -43,6 +43,9 @@ public:
 	
 	TArray<EAnimal> ReturnMonsters();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "References")
+	class AReturnTriggerVolume* ReturnTriggerVolume; 
+
 public:	// component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UDPHpActorComponent* hpComponent;

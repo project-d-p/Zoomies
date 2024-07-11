@@ -6,6 +6,7 @@
 #include "DPCharacter.h"
 #include "DPWeaponActorComponent.h"
 #include "FNetLogger.h"
+#include "ReturnTriggerVolume.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -92,6 +93,9 @@ void UCharacterPositionSync::SyncGunFire(ADPCharacter* character)
 	if (character->weaponComponent->SimulateAttack(character, hit_result, gunfire_))
 	{
 	}
+
+	FRotator direction = FRotator(gunfire_.direction().x(), gunfire_.direction().y(), gunfire_.direction().z());
+	character->weaponComponent->SpawnEffects(hit_result, direction);
 }
 
 void UCharacterPositionSync::SyncCatch(ADPCharacter* character)
@@ -129,7 +133,11 @@ void UCharacterPositionSync::SyncReturnAnimal(ADPCharacter* character)
 	}
 	if (*isReturn)
 	{
-		character->ReturnMonsters();
+		TArray<EAnimal> animals = character->ReturnMonsters();
+		if (character->ReturnTriggerVolume)
+		{
+			character->ReturnTriggerVolume->SpawnReturnEffect(animals);
+		}
 	}
 	FDataHub::returnAnimalData.Remove(PlayerId);
 }

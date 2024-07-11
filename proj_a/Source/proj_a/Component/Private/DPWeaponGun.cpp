@@ -93,7 +93,7 @@ bool ADPWeaponGun::SimulateAttack(ADPCharacter* character, FHitResult& result, c
 {
 	const FVector start = FVector(gunfire.position().x(), gunfire.position().y(), gunfire.position().z());
 	const FRotator aim_direction = FRotator(gunfire.direction().x(), gunfire.direction().y(), gunfire.direction().z());
-	return hitScan->HitDetect(character, start, aim_direction, 100000000.f, result);
+	return hitScan->HitDetect(character, start, aim_direction, 100000000.f, result, false);
 }
 
 FVector ADPWeaponGun::GetFireLocation()
