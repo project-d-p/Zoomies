@@ -40,7 +40,7 @@ AMammothCharacter::AMammothCharacter()
 	
 	/** Set the faint state matrix */
 	FaintStateMtx = FTransform(
-		FRotator(90.f, 0.f, 0.f),
+		FRotator(0.f, 0.f, 90.f),
 		FVector::ZeroVector,
 		FVector::OneVector);
 	CB_FaintStateMtx =  MeshAdjMtx.Inverse() * FaintStateMtx * MeshAdjMtx;

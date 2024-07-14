@@ -46,13 +46,15 @@ void ADPGameModeBase::SendChatToAllClients(const FString& SenderName, const FStr
 void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 {
 	Super::PostLogin(newPlayer);
-	// if (steam_listen_socket_ == nullptr)
-	// {
-	// 	steam_listen_socket_ = new SteamNetworkingSocket();
-	// 	ADPInGameState* game_state_ = Cast<ADPInGameState>(GameState);
-	// 	if (game_state_ != nullptr)
-	// 		game_state_->bServerTraveled = true;
-	// }
+#if UE_BUILD_DEBUG == 0
+	if (steam_listen_socket_ == nullptr)
+	{
+		steam_listen_socket_ = new SteamNetworkingSocket();
+		ADPInGameState* game_state_ = Cast<ADPInGameState>(GameState);
+		if (game_state_ != nullptr)
+			game_state_->bServerTraveled = true;
+	}
+#endif
 	if (!newPlayer)
 	{
 		return ;
@@ -115,8 +117,6 @@ void ADPGameModeBase::StartPlay()
 void ADPGameModeBase::Tick(float delta_time)
 {
 	Super::Tick(delta_time);
-	this->SpawnMonsters(delta_time);
-	this->MonsterMoveSimulate(delta_time);
 	if (steam_listen_socket_ == nullptr)
 	{
 		return;

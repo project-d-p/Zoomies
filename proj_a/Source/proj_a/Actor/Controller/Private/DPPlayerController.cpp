@@ -81,7 +81,9 @@ ADPPlayerController::ADPPlayerController()
 		returnAction = IA_RETURN.Object;
 	
 	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
-	// Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
+#if UE_BUILD_DEBUG == 0
+	Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
+#endif
 	CatchRay = CreateDefaultSubobject<UHitScan>(TEXT("Catch Ray"));
 
 	static ConstructorHelpers::FObjectFinder<USoundBase> SoundAsset
@@ -256,7 +258,7 @@ void ADPPlayerController::Tick(float DeltaSeconds)
 		return ;
 	}
 	Message msg = MessageMaker::MakePositionMessage(this);
-	// Socket->AsyncSendPacket(msg);
+	Socket->AsyncSendPacket(msg);
 }
 
 bool ADPPlayerController::IsCatchable(FHitResult& hit_result)
@@ -370,7 +372,7 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Active"));
 
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Active with %s"), *state->equipmentState);
+	// FNetLogger::EditerLog(FColor::Cyan, TEXT("Active with %s"), *state->equipmentState);
 	if ("NONE" == state->equipmentState) {
 
 	}
@@ -391,7 +393,7 @@ void ADPPlayerController::Active(const FInputActionValue& value)
 		Message msg = MessageMaker::MakeFireMessage(this, position, final_direction);
 		if (!HasAuthority())
 		{
-			// Socket->AsyncSendPacket(msg);
+			Socket->AsyncSendPacket(msg);
 		}
 		else
 		{
@@ -459,7 +461,7 @@ void ADPPlayerController::Aim(const FInputActionValue& value)
 			Message msg = MessageMaker::MakeAimMessage(this, !character->isAim);
 			if (!HasAuthority())
 			{
-				// Socket->AsyncSendPacket(msg);
+				Socket->AsyncSendPacket(msg);
 			}
 			else
 			{
@@ -490,7 +492,7 @@ void ADPPlayerController::AimReleased(const FInputActionValue& value)
 		Message msg = MessageMaker::MakeAimMessage(this, !character->isAim);
 		if (!HasAuthority())
 		{
-			// Socket->AsyncSendPacket(msg);
+			Socket->AsyncSendPacket(msg);
 		}
 		else
 		{
@@ -534,7 +536,7 @@ void ADPPlayerController::Catch(const FInputActionValue& value)
 	else
 	{
 		FNetLogger::EditerLog(FColor::Cyan, TEXT("Send Catch Message"));
-		// Socket->AsyncSendPacket(msg);
+		Socket->AsyncSendPacket(msg);
 	}
 
 	/* Test */

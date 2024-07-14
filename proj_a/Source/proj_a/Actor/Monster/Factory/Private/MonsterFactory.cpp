@@ -47,24 +47,24 @@ ABaseMonsterAIController* UMonsterFactory::RandomMonsterSpawn(int32 idx)
 		ACrabCharacter::StaticClass(),
 		ALobsterCharacter::StaticClass(),
 		AMammothCharacter::StaticClass(),
-		// AOctopusCharacter::StaticClass(),
-		// AStarFishCharacter::StaticClass(),
-		// ASlothCharacter::StaticClass(),
-		// ADolphinCharacter::StaticClass(),
-		// AEelCharacter::StaticClass(),
-		// AFoxCharacter::StaticClass(),
-		// AGiraffeCharacter::StaticClass(),
-		// ALionCharacter::StaticClass(),
-		// APenguinCharacter::StaticClass(),
+		AOctopusCharacter::StaticClass(),
+		AStarFishCharacter::StaticClass(),
+		ASlothCharacter::StaticClass(),
+		ADolphinCharacter::StaticClass(),
+		AEelCharacter::StaticClass(),
+		AFoxCharacter::StaticClass(),
+		AGiraffeCharacter::StaticClass(),
+		ALionCharacter::StaticClass(),
+		APenguinCharacter::StaticClass(),
 		// ARabbitCharacter::StaticClass(),
 		// ASaberToothTigerCharacter::StaticClass(),
-		// ASealCharacter::StaticClass(),
+		ASealCharacter::StaticClass(),
 		// AShepherdCharacter::StaticClass(),
 		// ASkunkCharacter::StaticClass(),
-		// ASquidCharacter::StaticClass(),
-		// AStarFishCharacter::StaticClass(),
-		// AStingRayCharacter::StaticClass(),
-		// AWhaleCharacter::StaticClass()
+		ASquidCharacter::StaticClass(),
+		AStarFishCharacter::StaticClass(),
+		AStingRayCharacter::StaticClass(),
+		AWhaleCharacter::StaticClass()
 	};
 	UClass* SelectedMonsterClass = MonsterClasses[FMath::RandRange(0, MonsterClasses.size() - 1)];
 	
@@ -105,7 +105,7 @@ ABaseMonsterAIController* UMonsterFactory::SpawnMonster(UClass* MonsterClass, co
 		AIController->Destroy();
 		return nullptr;
 	}
-	std::vector ScaleFactors = { 1.f, 1.f, 1.f };
+	std::vector ScaleFactors = { 1.f, 1.5f, 2.f };
 	float SelectedScaleFactor = ScaleFactors[FMath::RandRange(0, ScaleFactors.size() - 1)];
 	SpawnedMonster->ScaleCapsuleSize(SelectedScaleFactor);
 	AIController->index = idx;
