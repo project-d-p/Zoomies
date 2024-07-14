@@ -23,6 +23,7 @@ public:
     };
 	
 	AReturnTriggerVolume();
+	virtual ~AReturnTriggerVolume() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "effects")
 	class UNiagaraSystem* EffectsReturn;
@@ -53,4 +54,5 @@ private:
 	std::map<EAnimal, USkeletalMesh*> monsterMeshMap;
 
 	std::map<USkeletalMeshComponent*, FMeshAnimationData> MeshAnimationMap;
+	TArray<FTimerHandle> SpawnTimerHandles;
 };

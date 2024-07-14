@@ -96,12 +96,10 @@ void ABaseMonsterCharacter::SyncPosition()
 {
 	int32 id = MonsterId;
 	FString MonsterID = FString::FromInt(id);
-	FNetLogger::LogInfo(TEXT("SyncPosition: %s"), *MonsterID);
 	
 	MonsterPosition* MonsterData = FDataHub::monsterData.Find(MonsterID);
 	if (!MonsterData)
 	{
-		FNetLogger::LogInfo(TEXT("Monster data does not contain: %s"), *MonsterID);
 		return ;
 	}
 	

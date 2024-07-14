@@ -5,32 +5,48 @@ ServerMessageHandler::ServerMessageHandler()
 {
 	message_handlers_[Message::kMovement] = FServerMessageDelegate::CreateLambda([](ADPPlayerController* player_controller, const Message& msg, const float& delta)
 	{
-		player_controller->HandleMovement(msg.movement(), delta);
+		// player_controller->HandleMovement(msg.movement(), delta);
 	});
 
 	message_handlers_[Message::kJump] = FServerMessageDelegate::CreateLambda([](ADPPlayerController* player_controller, const Message& msg, const float& /*delta*/)
 	{
-		player_controller->HandleJump(msg.jump());
+		// player_controller->HandleJump(msg.jump());
 	});
 
 	message_handlers_[Message::kGunfire] = FServerMessageDelegate::CreateLambda([](ADPPlayerController* player_controller, const Message& msg, const float& /*delta*/)
 	{
-		player_controller->HandleFire(msg);
+		UMainLevelComponent* MainLevelComponent = Cast<UMainLevelComponent>(player_controller->GetLevelComponent());
+		MainLevelComponent->AddGunMessage(msg);
 	});
 
 	message_handlers_[Message::kAimState] = FServerMessageDelegate::CreateLambda([](ADPPlayerController* player_controller, const Message& msg, const float& /*delta*/)
 	{
-		player_controller->HandleAim(msg.aim_state());
+		UMainLevelComponent* MainLevelComponent = Cast<UMainLevelComponent>(player_controller->GetLevelComponent());
+		if (MainLevelComponent == nullptr)
+		{
+			return ;
+		}
+		MainLevelComponent->AddAimMessage(msg);
 	});
 
 	message_handlers_[Message::kActorPosition] = FServerMessageDelegate::CreateLambda([](ADPPlayerController* player_controller, const Message& msg, const float& /*delta*/)
 	{
-		player_controller->HandlePosition(msg.actor_position());
+		UMainLevelComponent* MainLevelComponent = Cast<UMainLevelComponent>(player_controller->GetLevelComponent());
+		if (MainLevelComponent == nullptr)
+		{
+			return ;
+		}
+		MainLevelComponent->HandlePosition(msg.actor_position());
 	});
 
 	message_handlers_[Message::kCatch] = FServerMessageDelegate::CreateLambda([](ADPPlayerController* player_controller, const Message& msg, const float& /*delta*/)
 	{
-		player_controller->HandleCatch(msg);
+		UMainLevelComponent* MainLevelComponent = Cast<UMainLevelComponent>(player_controller->GetLevelComponent());
+		if (MainLevelComponent == nullptr)
+		{
+			return ;
+		}
+		MainLevelComponent->AddCatchMessage(msg);
 	});
 }
 

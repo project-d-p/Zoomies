@@ -66,7 +66,7 @@ private:
 	void SyncMovement();
 	void SimulateGunFire();
 	void SimulateCatch();
-	void SyncHostAiming();
+	void SimulateAiming();
 	void SyncMonsterMovement();
 	void ProcessData(float delta_time);
 	void MonsterMoveSimulate(float delta_time);

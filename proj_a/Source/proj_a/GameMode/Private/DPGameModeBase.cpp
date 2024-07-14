@@ -11,8 +11,12 @@
 #include "SocketManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "FNetLogger.h"
+#include "ELevelComponentType.h"
 #include <exception>
+
+#include "MainLevelComponent.h"
 #include "MessageMaker.h"
+#include "NetworkMessage.h"
 
 ADPGameModeBase::ADPGameModeBase()
 {
@@ -74,6 +78,7 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 		key = std::string(TCHAR_TO_UTF8(*player_state->GetPlayerName()));
 	}
 	player_controllers_[key] = Cast<ADPPlayerController>(newPlayer);
+	player_controllers_[key]->SwitchLevelComponent(ELevelComponentType::MAIN);
 }
 
 void ADPGameModeBase::Logout(AController* Exiting)
@@ -155,7 +160,7 @@ void ADPGameModeBase::ProcessData(float delta_time)
 		ADPPlayerController* controller = this->player_controllers_[message.player_id()];
 		message_handler_.HandleMessage(message)->ExecuteIfBound(controller, message, delta_time);
 	}
-	this->SyncHostAiming();
+	this->SimulateAiming();
 	this->SimulateGunFire();
 	this->SimulateCatch();
 	this->SyncMovement();
@@ -207,8 +212,13 @@ void ADPGameModeBase::SimulateGunFire()
 {
 	for (auto& pair: player_controllers_)
 	{
-		ADPPlayerController* controller = pair.second;
-		controller->SimulateGunFire(steam_listen_socket_);
+		ADPPlayerController* Controller = pair.second;
+		UMainLevelComponent* MainLevelComponent = Cast<UMainLevelComponent>(Controller->GetLevelComponent());
+		if (MainLevelComponent == nullptr)
+		{
+			continue;
+		}
+		MainLevelComponent->SimulateGunFire(steam_listen_socket_);
 	}
 }
 
@@ -216,24 +226,27 @@ void ADPGameModeBase::SimulateCatch()
 {
 	for (auto& pair: player_controllers_)
 	{
-		ADPPlayerController* controller = pair.second;
-		controller->SimulateCatch(steam_listen_socket_);
+		ADPPlayerController* Controller = pair.second;
+		UMainLevelComponent* MainLevelComponent = Cast<UMainLevelComponent>(Controller->GetLevelComponent());
+		if (MainLevelComponent == nullptr)
+		{
+			continue;
+		}
+		MainLevelComponent->SimulateCatch(steam_listen_socket_);
 	}
 }
 
-void ADPGameModeBase::SyncHostAiming()
+void ADPGameModeBase::SimulateAiming()
 {
-	ADPPlayerController* host_controller = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
-	if (!host_controller)
+	for (auto& pair: player_controllers_)
 	{
-		return ;
-	}
-	while (!host_controller->aim_queue_.empty())
-	{
-		bool aim_state = host_controller->aim_queue_.front();
-		host_controller->aim_queue_.pop();
-		Message msg = MessageMaker::MakeAimMessage(host_controller, aim_state);
-		steam_listen_socket_->PushUdpFlushMessage(msg);
+		ADPPlayerController* Controller = pair.second;
+		UMainLevelComponent* MainLevelComponent = Cast<UMainLevelComponent>(Controller->GetLevelComponent());
+		if (MainLevelComponent == nullptr)
+		{
+			continue;
+		}
+		MainLevelComponent->SimulateAim(steam_listen_socket_);
 	}
 }
 

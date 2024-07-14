@@ -33,6 +33,26 @@ AReturnTriggerVolume::AReturnTriggerVolume()
 	InitializeMonsterMeshes();
 }
 
+AReturnTriggerVolume::~AReturnTriggerVolume()
+{
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		for (auto& Pair : MeshAnimationMap)
+		{
+			FMeshAnimationData& AnimData = Pair.second;
+			World->GetTimerManager().ClearTimer(AnimData.AnimationTimerHandle);
+			World->GetTimerManager().ClearTimer(AnimData.DestroyTimerHandle);
+		}
+		for (FTimerHandle& Handle : SpawnTimerHandles)
+		{
+			World->GetTimerManager().ClearTimer(Handle);
+		}
+	}
+	MeshAnimationMap.clear();
+	SpawnTimerHandles.Empty();
+}
+
 void AReturnTriggerVolume::BeginPlay()
 {
 	Super::BeginPlay();
@@ -215,19 +235,27 @@ void AReturnTriggerVolume::SpawnReturnEffect(TArray<EAnimal> Array)
 		FTimerHandle SpawnTimerHandle;
 		FTimerDelegate SpawnTimerDelegate;
         
-		SpawnTimerDelegate.BindLambda([this, Animal, Index]()
+		TWeakObjectPtr<AReturnTriggerVolume> WeakThis(this);
+        
+		SpawnTimerDelegate.BindLambda([WeakThis, Animal, Index, SpawnTimerHandle]()
 		{
-			SpawnSingleMonster(Animal, Index);
+			if (WeakThis.IsValid())
+			{
+				WeakThis->SpawnSingleMonster(Animal, Index);
+				WeakThis->SpawnTimerHandles.Remove(SpawnTimerHandle);
+			}
 		});
 
-		// Schedule the spawn with a delay based on the index
-		float SpawnDelay = Index * 0.5f; // 0.5 seconds between each spawn, adjust as needed
+		float SpawnDelay = Index * 0.5f;
 		GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, SpawnTimerDelegate, SpawnDelay, false);
+		SpawnTimerHandles.Add(SpawnTimerHandle);
 	}
 }
 
 void AReturnTriggerVolume::SpawnSingleMonster(EAnimal Animal, int32 Index)
 {
+	if (!IsValid(this)) return;
+	
 	auto It = monsterMeshMap.find(Animal);
     if (It != monsterMeshMap.end())
     {
@@ -261,18 +289,19 @@ void AReturnTriggerVolume::SpawnSingleMonster(EAnimal Animal, int32 Index)
             AnimationTimerDelegate.BindUFunction(this, FName("AnimateAnimalMesh"), Mesh);
             GetWorld()->GetTimerManager().SetTimer(AnimData.AnimationTimerHandle, AnimationTimerDelegate, 0.016f, true);
 
-            // Schedule mesh destruction
-            FTimerDelegate DestroyTimerDelegate;
-            DestroyTimerDelegate.BindLambda([this, Mesh]()
-            {
-                if (IsValid(Mesh))
-                {
-                    Mesh->DestroyComponent();
-                }
-                MeshAnimationMap.erase(Mesh);
-            });
-            float DestroyDelay = 2.5f + (Index * 0.5f); // Adjust destroy timing based on spawn order
-            GetWorld()->GetTimerManager().SetTimer(AnimData.DestroyTimerHandle, DestroyTimerDelegate, DestroyDelay, false);
+        	// Schedule mesh destruction
+        	FTimerDelegate DestroyTimerDelegate;
+        	TWeakObjectPtr<AReturnTriggerVolume> WeakThis(this);
+        	DestroyTimerDelegate.BindLambda([WeakThis, Mesh]()
+			{
+				if (WeakThis.IsValid() && IsValid(Mesh))
+				{
+					Mesh->DestroyComponent();
+					WeakThis->MeshAnimationMap.erase(Mesh);
+				}
+			});
+        	float DestroyDelay = 2.5f + (Index * 0.5f);
+        	GetWorld()->GetTimerManager().SetTimer(AnimData.DestroyTimerHandle, DestroyTimerDelegate, DestroyDelay, false);
         }
     }
 }
