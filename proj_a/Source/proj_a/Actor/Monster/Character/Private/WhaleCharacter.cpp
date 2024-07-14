@@ -7,7 +7,7 @@ AWhaleCharacter::AWhaleCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_WHALE
-	(TEXT("/Game/model/animals/whale/Whale.Whale"));
+	(TEXT(PathManager::GetPath(EMonster::WHALE));
 	if (SK_WHALE.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_WHALE.Object);
 	}

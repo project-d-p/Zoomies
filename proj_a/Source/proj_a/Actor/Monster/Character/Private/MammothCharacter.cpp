@@ -7,7 +7,7 @@ AMammothCharacter::AMammothCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH
-	(TEXT("/Game/model/animals/mammoth/low_poly_mammoth.low_poly_mammoth"));
+	(TEXT(PathManager::GetPath(EMonster::MAMMOTH));
 	if (SK_MAMMOTH.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_MAMMOTH.Object);
 	}

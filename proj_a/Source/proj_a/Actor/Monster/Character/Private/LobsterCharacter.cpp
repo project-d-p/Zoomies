@@ -6,7 +6,7 @@
 ALobsterCharacter::ALobsterCharacter()
 {
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_LOBSTER
-	(TEXT("/Game/model/animals/lobstar/Lobster.Lobster"));
+	(TEXT(PathManager::GetPath(EMonster::LOBSTER));
 	/** Loading models */
 	if (SK_LOBSTER.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_LOBSTER.Object);

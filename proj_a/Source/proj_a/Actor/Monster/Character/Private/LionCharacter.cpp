@@ -7,7 +7,7 @@ ALionCharacter::ALionCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_LION
-	(TEXT("/Game/model/animals/lion/low_poly_lion.low_poly_lion"));
+	(TEXT(PathManager::GetPath(EMonster::LION));
 	if (SK_LION.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_LION.Object);
 	}

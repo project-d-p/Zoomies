@@ -7,7 +7,7 @@ AShepherdCharacter::AShepherdCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SHEPHERD
-	(TEXT("/Game/model/animals/shepherd/stylized_low_poly_german_shepherd.stylized_low_poly_german_shepherd"));
+	(TEXT(PathManager::GetPath(EMonster::SHEPHERD));
 	if (SK_SHEPHERD.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_SHEPHERD.Object);
 	}

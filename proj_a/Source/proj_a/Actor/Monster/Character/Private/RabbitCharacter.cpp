@@ -7,7 +7,7 @@ ARabbitCharacter::ARabbitCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_RABBIT
-	(TEXT("/Game/model/animals/rabbit/low_poly_rabbit.low_poly_rabbit"));
+	(TEXT(PathManager::GetPath(EMonster::RABBIT));
 	if (SK_RABBIT.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_RABBIT.Object);
 	}

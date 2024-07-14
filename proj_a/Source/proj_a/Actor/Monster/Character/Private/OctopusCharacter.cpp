@@ -7,7 +7,7 @@ AOctopusCharacter::AOctopusCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_OCTOPUS
-	(TEXT("/Game/model/animals/octopus/Octopus.Octopus"));
+	(TEXT(PathManager::GetPath(EMonster::OCTOPUS));
 	if (SK_OCTOPUS.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_OCTOPUS.Object);
 	}

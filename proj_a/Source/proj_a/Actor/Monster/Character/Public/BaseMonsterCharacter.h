@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "PathManager.h"
 #include "BaseMonsterCharacter.generated.h"
 
 UENUM()
