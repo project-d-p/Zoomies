@@ -2,6 +2,7 @@
 
 #include "DPCharacter.h"
 #include "FNetLogger.h"
+#include "PathManager.h"
 #include "proj_a/Component/InGame/Score/Types/ScoreTypes.h"
 
 UMonsterSlotComponent::UMonsterSlotComponent()
@@ -16,147 +17,147 @@ UMonsterSlotComponent::UMonsterSlotComponent()
 	}
 	
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CRAB
-	(TEXT("/Game/model/animals/crab/crab.crab"));
+	(PathManager::GetPath(EMonster::CRAB));
 	if (SK_CRAB.Succeeded()) {
 		monsterMeshMap["CrabCharacter"] = SK_CRAB.Object;
 		monsterTypeMap["CrabCharacter"] = EAnimal::ANIMAL_CRAB;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_DOLPHIN
-	(TEXT("/Game/model/animals/dolphin/Dolphin.Dolphin"));
+	(PathManager::GetPath(EMonster::DOLPHIN));
 	if (SK_DOLPHIN.Succeeded()) {
 		monsterMeshMap["DolphinCharacter"] = SK_DOLPHIN.Object;
 		monsterTypeMap["DolphinCharacter"] = EAnimal::ANIMAL_DOLPHIN;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_EEL
-	(TEXT("/Game/model/animals/eel/eel.eel"));
+	(PathManager::GetPath(EMonster::EEL));
 	if (SK_EEL.Succeeded()) {
 		monsterMeshMap["EelCharacter"] = SK_EEL.Object;
 		monsterTypeMap["EelCharacter"] = EAnimal::ANIMAL_EEL;
 	}
 	
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_ELEPHANT
-    (TEXT("/Game/model/animals/elephant/low_poly_elephant.low_poly_elephant"));
+    (PathManager::GetPath(EMonster::ELEPHANT));
     if (SK_ELEPHANT.Succeeded()) {
 		monsterMeshMap["ElephantCharacter"] = SK_ELEPHANT.Object;
     	monsterTypeMap["ElephantCharacter"] = EAnimal::ANIMAL_ELEPHANT;
     }
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_FOX
-	(TEXT("/Game/model/animals/fox_2/fox.fox"));
+	(PathManager::GetPath(EMonster::FOX));
 	if (SK_FOX.Succeeded()) {
 		monsterMeshMap["FoxCharacter"] = SK_FOX.Object;
 		monsterTypeMap["FoxCharacter"] = EAnimal::ANIMAL_FOX;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_GIRAFFE
-	(TEXT("/Game/model/animals/giraffe/giraffe-lowpoly.giraffe-lowpoly"));
+	(PathManager::GetPath(EMonster::GIRAFFE));
 	if (SK_GIRAFFE.Succeeded()) {
 		monsterMeshMap["GiraffeCharacter"] = SK_GIRAFFE.Object;
 		monsterTypeMap["GiraffeCharacter"] = EAnimal::ANIMAL_GIRAFFE;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_LION
-	(TEXT("/Game/model/animals/lion/low_poly_lion.low_poly_lion"));
+	(PathManager::GetPath(EMonster::LION));
 	if (SK_LION.Succeeded()) {
 		monsterMeshMap["LionCharacter"] = SK_LION.Object;
 		monsterTypeMap["LionCharacter"] = EAnimal::ANIMAL_LION;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_LOBSTER
-	(TEXT("/Game/model/animals/lobstar/Lobster.Lobster"));
+	(PathManager::GetPath(EMonster::LOBSTER));
 	if (SK_LOBSTER.Succeeded()) {
 		monsterMeshMap["LobsterCharacter"] = SK_LOBSTER.Object;
 		monsterTypeMap["LobsterCharacter"] = EAnimal::ANIMAL_LOBSTER;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH
-	(TEXT("/Game/model/animals/mammoth/low_poly_mammoth.low_poly_mammoth"));
+	(PathManager::GetPath(EMonster::MAMMOTH));
 	if (SK_MAMMOTH.Succeeded()) {
 		monsterMeshMap["MammothCharacter"] = SK_MAMMOTH.Object;
 		monsterTypeMap["MammothCharacter"] = EAnimal::ANIMAL_MAMMOTH;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_OCTOPUS
-	(TEXT("/Game/model/animals/octopus/Octopus.Octopus"));
+	(PathManager::GetPath(EMonster::OCTOPUS));
 	if (SK_OCTOPUS.Succeeded()) {
 		monsterMeshMap["OctopusCharacter"] = SK_OCTOPUS.Object;
 		monsterTypeMap["OctopusCharacter"] = EAnimal::ANIMAL_OCTOPUS;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_PENGUIN
-	(TEXT("/Game/model/animals/penguin/penguin_swimming.penguin_swimming"));
+	(PathManager::GetPath(EMonster::PENGUIN));
 	if (SK_PENGUIN.Succeeded()) {
 		monsterMeshMap["PenguinCharacter"] = SK_PENGUIN.Object;
 		monsterTypeMap["PenguinCharacter"] = EAnimal::ANIMAL_PENGUIN;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_RABBIT
-	(TEXT("/Game/model/animals/rabbit/low_poly_rabbit.low_poly_rabbit"));
+	(PathManager::GetPath(EMonster::RABBIT));
 	if (SK_RABBIT.Succeeded()) {
 		monsterMeshMap["RabbitCharacter"] = SK_RABBIT.Object;
 		monsterTypeMap["RabbitCharacter"] = EAnimal::ANIMAL_RABBIT;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SABERTOOTHTIGER
-	(TEXT("/Game/model/animals/sabertoothTiger/low_poly_sabertooth_tiger.low_poly_sabertooth_tiger"));
+	(PathManager::GetPath(EMonster::SABER_TOOTH_TIGER));
 	if (SK_SABERTOOTHTIGER.Succeeded()) {
 		monsterMeshMap["SaberToothTigerCharacter"] = SK_SABERTOOTHTIGER.Object;
 		monsterTypeMap["SaberToothTigerCharacter"] = EAnimal::ANIMAL_SABER_TOOTH_TIGER;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SEAL
-	(TEXT("/Game/model/animals/seal/Seal.Seal"));
+	(PathManager::GetPath(EMonster::SEAL));
 	if (SK_SEAL.Succeeded()) {
 		monsterMeshMap["SealCharacter"] = SK_SEAL.Object;
 		monsterTypeMap["SealCharacter"] = EAnimal::ANIMAL_SEAL;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SHEPHERD
-	(TEXT("/Game/model/animals/shepherd/stylized_low_poly_german_shepherd.stylized_low_poly_german_shepherd"));
+	(PathManager::GetPath(EMonster::SHEPHERD));
 	if (SK_SHEPHERD.Succeeded()) {
 		monsterMeshMap["ShepherdCharacter"] = SK_SHEPHERD.Object;
 		monsterTypeMap["ShepherdCharacter"] = EAnimal::ANIMAL_SHEPHERD;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SKUNK
-	(TEXT("/Game/model/animals/skunk/low_poly_skunk.low_poly_skunk"));
+	(PathManager::GetPath(EMonster::SKUNK));
 	if (SK_SKUNK.Succeeded()) {
 		monsterMeshMap["SkunkCharacter"] = SK_SKUNK.Object;
 		monsterTypeMap["SkunkCharacter"] = EAnimal::ANIMAL_SKUNK;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SLOTH
-	(TEXT("/Game/model/animals/sloth/low_poly_giant_sloth.low_poly_giant_sloth"));
+	(PathManager::GetPath(EMonster::SLOTH));
 	if (SK_SLOTH.Succeeded()) {
 		monsterMeshMap["SlothCharacter"] = SK_SLOTH.Object;
 		monsterTypeMap["SlothCharacter"] = EAnimal::ANIMAL_SLOTH;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SQUID
-	(TEXT("/Game/model/animals/squid/Squid.Squid"));
+	(PathManager::GetPath(EMonster::SQUID));
 	if (SK_SQUID.Succeeded()) {
 		monsterMeshMap["SquidCharacter"] = SK_SQUID.Object;
 		monsterTypeMap["SquidCharacter"] = EAnimal::ANIMAL_SQUID;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_STARFISH
-	(TEXT("/Game/model/animals/starFish/star_fish.star_fish"));
+	(PathManager::GetPath(EMonster::STAR_FISH));
 	if (SK_STARFISH.Succeeded()) {
 		monsterMeshMap["StarFishCharacter"] = SK_STARFISH.Object;
 		monsterTypeMap["StarFishCharacter"] = EAnimal::ANIMAL_STAR_FISH;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_STINGRAY
-	(TEXT("/Game/model/animals/stingRay/sting_ray.sting_ray"));
+	(PathManager::GetPath(EMonster::STINGRAY));
 	if (SK_STINGRAY.Succeeded()) {
 		monsterMeshMap["StingRayCharacter"] = SK_STINGRAY.Object;
 		monsterTypeMap["StingRayCharacter"] = EAnimal::ANIMAL_STINGRAY;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_WHALE
-	(TEXT("/Game/model/animals/whale/Whale.Whale"));
+	(PathManager::GetPath(EMonster::WHALE));
 	if (SK_WHALE.Succeeded()) {
 		monsterMeshMap["WhaleCharacter"] = SK_WHALE.Object;
 		monsterTypeMap["WhaleCharacter"] = EAnimal::ANIMAL_WHALE;
@@ -169,7 +170,6 @@ bool UMonsterSlotComponent::AddMonsterToSlot(ADPCharacter* character, USkeletalM
 {
 	if (monstersInSlot.size() >= 5)
 	{
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("MonsterSlot is full"));
 		return false;
 	}
 	// monstersInSlot.push_back(monster);
@@ -204,10 +204,8 @@ bool UMonsterSlotComponent::AddMonsterToSlot(ADPCharacter* character, USkeletalM
 
 bool UMonsterSlotComponent::AddMonsterToSlot(ADPCharacter* character, const FString& monster_type)
 {
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("AddMonsterToSlot: %s"), *monster_type);
 	if (!monsterMeshMap.contains(monster_type))
 	{
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("Monster type not found"));
 		return false;
 	}
 	return AddMonsterToSlot(character, monsterMeshMap[monster_type], monster_type);

@@ -7,7 +7,7 @@ ASaberToothTigerCharacter::ASaberToothTigerCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SABERTOOTHTIGER
-	(TEXT("/Game/model/animals/sabertoothTiger/low_poly_sabertooth_tiger.low_poly_sabertooth_tiger"));
+	(PathManager::GetPath(EMonster::SABER_TOOTH_TIGER));
 	if (SK_SABERTOOTHTIGER.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_SABERTOOTHTIGER.Object);
 	}

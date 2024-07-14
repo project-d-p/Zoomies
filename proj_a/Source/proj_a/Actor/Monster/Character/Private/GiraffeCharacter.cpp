@@ -7,7 +7,7 @@ AGiraffeCharacter::AGiraffeCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_GIRAFFE
-	(TEXT("/Game/model/animals/giraffe/giraffe-lowpoly.giraffe-lowpoly"));
+	(PathManager::GetPath(EMonster::GIRAFFE));
 	if (SK_GIRAFFE.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_GIRAFFE.Object);
 	}

@@ -7,7 +7,7 @@ AFoxCharacter::AFoxCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_FOX
-	(TEXT("/Game/model/animals/fox_2/fox.fox"));
+	(PathManager::GetPath(EMonster::FOX));
     if (SK_FOX.Succeeded()) {
     	GetMesh()->SetSkeletalMesh(SK_FOX.Object);
     }

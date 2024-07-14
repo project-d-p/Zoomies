@@ -7,7 +7,7 @@ AStingRayCharacter::AStingRayCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_STINGRAY
-	(TEXT("/Game/model/animals/stingRay/sting_ray.sting_ray"));
+	(PathManager::GetPath(EMonster::STINGRAY));
 	if (SK_STINGRAY.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_STINGRAY.Object);
 	}

@@ -7,7 +7,7 @@ APenguinCharacter::APenguinCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_PENGUIN
-	(TEXT("/Game/model/animals/penguin/penguin_swimming.penguin_swimming"));
+	(PathManager::GetPath(EMonster::PENGUIN));
 	if (SK_PENGUIN.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_PENGUIN.Object);
 	}

@@ -51,13 +51,11 @@ void UChatUI::OnChatBoxCommitted(const FText& Text, ETextCommit::Type CommitMeth
 	{
 		if (World == nullptr)
 		{
-			FNetLogger::EditerLog(FColor::Red, TEXT("World is nullptr"));
 			return;
 		}
 		ADPPlayerController* DPPlayerController = Cast<ADPPlayerController>(World->GetFirstPlayerController());
 		if (DPPlayerController == nullptr)
 		{
-			FNetLogger::EditerLog(FColor::Red, TEXT("PlayerController is nullptr"));
 			return;
 		}
 		if (!Text.IsEmpty())

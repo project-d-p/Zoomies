@@ -48,7 +48,9 @@ public class proj_a : ModuleRules
 		PublicIncludePaths.AddRange(new string[] {
 			"proj_a/GameMode/Public",
 			"proj_a/GameState/Public",
-			"proj_a/Actor/Controller/Public",
+			"proj_a/Actor/Controller/PlayerController/Public",
+			"proj_a/Actor/Controller/PlayerController/Components/InputComponents/Public",
+			"proj_a/Actor/Controller/PlayerController/Components/LevelComponents/Public",
 			"proj_a/Actor/Character/Public",
 			"proj_a/Actor/Character/CharacterPositionSync/Public",
 			"proj_a/Actor/Character/PlayerState/Public",
@@ -64,6 +66,7 @@ public class proj_a : ModuleRules
 			"proj_a/Component/InGame/HitDetection/Public",
 			"proj_a/Component/InGame/Timer/Public",
 			"proj_a/Component/InGame/ReturnPlace/Public",
+			"proj_a/Component/Audio/Public",
 			"proj_a/Component/ClientNetwork/Public",
             "proj_a/Widget/Public",
             "proj_a/Widget/InGame/Public",
