@@ -6,7 +6,7 @@
 ALobsterCharacter::ALobsterCharacter()
 {
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_LOBSTER
-	(TEXT("/Game/model/animals/lobstar/Object_7.Object_7"));
+	(TEXT("/Game/model/animals/lobstar/Lobster.Lobster"));
 	/** Loading models */
 	if (SK_LOBSTER.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_LOBSTER.Object);
@@ -21,11 +21,27 @@ ALobsterCharacter::ALobsterCharacter()
 	}
 
 	/** Set the Capsule size */
-	GetCapsuleComponent()->SetCapsuleRadius(65.f);
-	GetCapsuleComponent()->SetCapsuleHalfHeight(65.f);
+	DefaultCP.Radius = 100.f;
+	DefaultCP.HalfHeight = 100.f;
+	GetCapsuleComponent()->SetCapsuleRadius(DefaultCP.Radius);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(DefaultCP.HalfHeight);
+
+	FaintCP.Radius = 40.f;
+	FaintCP.HalfHeight = 40.f;
 	
 	/** Set the model size and adjust position */
-	GetMesh()->SetRelativeScale3D(FVector(3.f, 3.f, 3.f));
-	GetMesh()->SetRelativeLocationAndRotation(
-		FVector(0.f, 0.f, -20.f), FRotator(0.f, -90.f, 0.f));
+	FVector Scale(FVector::OneVector);
+	FVector Location(0.f, 0.f, 24.f);
+	FRotator Rotation(0.f, 0.f, 0.f);
+	FTransform Transform(Rotation, Location, Scale);
+		
+	MeshAdjMtx = Transform;
+	GetMesh()->SetRelativeTransform(MeshAdjMtx);
+
+	/** Set the faint state matrix */
+	FaintStateMtx = FTransform(
+		FRotator(0.f, 0.f, 90.f),
+		FVector::ZeroVector,
+		FVector::OneVector);
+	CB_FaintStateMtx =  MeshAdjMtx.Inverse() * FaintStateMtx * MeshAdjMtx;
 }

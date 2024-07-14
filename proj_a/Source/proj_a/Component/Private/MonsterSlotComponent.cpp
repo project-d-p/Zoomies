@@ -23,7 +23,7 @@ UMonsterSlotComponent::UMonsterSlotComponent()
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_DOLPHIN
-	(TEXT("/Game/model/animals/dolphin/dolphin1.dolphin1"));
+	(TEXT("/Game/model/animals/dolphin/Dolphin.Dolphin"));
 	if (SK_DOLPHIN.Succeeded()) {
 		monsterMeshMap["DolphinCharacter"] = SK_DOLPHIN.Object;
 		monsterTypeMap["DolphinCharacter"] = EAnimal::ANIMAL_DOLPHIN;
@@ -44,7 +44,7 @@ UMonsterSlotComponent::UMonsterSlotComponent()
     }
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_FOX
-	(TEXT("/Game/model/animals/fox_1/fennec_fox.fennec_fox"));
+	(TEXT("/Game/model/animals/fox_2/fox.fox"));
 	if (SK_FOX.Succeeded()) {
 		monsterMeshMap["FoxCharacter"] = SK_FOX.Object;
 		monsterTypeMap["FoxCharacter"] = EAnimal::ANIMAL_FOX;
@@ -65,21 +65,21 @@ UMonsterSlotComponent::UMonsterSlotComponent()
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_LOBSTER
-	(TEXT("/Game/model/animals/lobstar/Object_7.Object_7"));
+	(TEXT("/Game/model/animals/lobstar/Lobster.Lobster"));
 	if (SK_LOBSTER.Succeeded()) {
 		monsterMeshMap["LobsterCharacter"] = SK_LOBSTER.Object;
 		monsterTypeMap["LobsterCharacter"] = EAnimal::ANIMAL_LOBSTER;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH
-	(TEXT("/Game/model/animals/mammoth/sm_mammoth.sm_mammoth"));
+	(TEXT("/Game/model/animals/mammoth/low_poly_mammoth.low_poly_mammoth"));
 	if (SK_MAMMOTH.Succeeded()) {
 		monsterMeshMap["MammothCharacter"] = SK_MAMMOTH.Object;
 		monsterTypeMap["MammothCharacter"] = EAnimal::ANIMAL_MAMMOTH;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_OCTOPUS
-	(TEXT("/Game/model/animals/octopus/Octopus1.Octopus1"));
+	(TEXT("/Game/model/animals/octopus/Octopus.Octopus"));
 	if (SK_OCTOPUS.Succeeded()) {
 		monsterMeshMap["OctopusCharacter"] = SK_OCTOPUS.Object;
 		monsterTypeMap["OctopusCharacter"] = EAnimal::ANIMAL_OCTOPUS;
@@ -100,14 +100,14 @@ UMonsterSlotComponent::UMonsterSlotComponent()
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SABERTOOTHTIGER
-	(TEXT("/Game/model/animals/sabertoothTiger/sm_sabertoothTiger.sm_sabertoothTiger"));
+	(TEXT("/Game/model/animals/sabertoothTiger/low_poly_sabertooth_tiger.low_poly_sabertooth_tiger"));
 	if (SK_SABERTOOTHTIGER.Succeeded()) {
 		monsterMeshMap["SaberToothTigerCharacter"] = SK_SABERTOOTHTIGER.Object;
 		monsterTypeMap["SaberToothTigerCharacter"] = EAnimal::ANIMAL_SABER_TOOTH_TIGER;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SEAL
-	(TEXT("/Game/model/animals/seal/seal1.seal1"));
+	(TEXT("/Game/model/animals/seal/Seal.Seal"));
 	if (SK_SEAL.Succeeded()) {
 		monsterMeshMap["SealCharacter"] = SK_SEAL.Object;
 		monsterTypeMap["SealCharacter"] = EAnimal::ANIMAL_SEAL;
@@ -128,14 +128,14 @@ UMonsterSlotComponent::UMonsterSlotComponent()
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SLOTH
-	(TEXT("/Game/model/animals/sloth/sm_sloth.sm_sloth"));
+	(TEXT("/Game/model/animals/sloth/low_poly_giant_sloth.low_poly_giant_sloth"));
 	if (SK_SLOTH.Succeeded()) {
 		monsterMeshMap["SlothCharacter"] = SK_SLOTH.Object;
 		monsterTypeMap["SlothCharacter"] = EAnimal::ANIMAL_SLOTH;
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SQUID
-	(TEXT("/Game/model/animals/squid/Squid1.Squid1"));
+	(TEXT("/Game/model/animals/squid/Squid.Squid"));
 	if (SK_SQUID.Succeeded()) {
 		monsterMeshMap["SquidCharacter"] = SK_SQUID.Object;
 		monsterTypeMap["SquidCharacter"] = EAnimal::ANIMAL_SQUID;
@@ -156,7 +156,7 @@ UMonsterSlotComponent::UMonsterSlotComponent()
 	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_WHALE
-	(TEXT("/Game/model/animals/whale/whale1.whale1"));
+	(TEXT("/Game/model/animals/whale/Whale.Whale"));
 	if (SK_WHALE.Succeeded()) {
 		monsterMeshMap["WhaleCharacter"] = SK_WHALE.Object;
 		monsterTypeMap["WhaleCharacter"] = EAnimal::ANIMAL_WHALE;

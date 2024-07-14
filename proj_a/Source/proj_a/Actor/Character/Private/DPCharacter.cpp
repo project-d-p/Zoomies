@@ -136,7 +136,7 @@ ADPCharacter::ADPCharacter()
 	StunArrow->SetupAttachment(GetMesh(), FName("Stun_Pos"));
 	StunArrow->SetRelativeLocation(FVector(0, -20.f, 0));
 	StunArrow->SetHiddenInGame(true);
-
+	
 	StunEffectComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("StunEffectComponent"));
 	StunEffectComponent->SetupAttachment(StunArrow);
 	StunEffectComponent->SetAutoActivate(false);
@@ -340,7 +340,7 @@ void ADPCharacter::CheckCollisionWithMonster()
 		{
 			if (ABaseMonsterCharacter* MC = Cast<ABaseMonsterCharacter>(HitResult.GetActor()))
 			{
-				// ¸ó½ºÅÍ¿Í Ãæµ¹ ¹ß»ý
+				// ï¿½ï¿½ï¿½Í¿ï¿½ ï¿½æµ¹ ï¿½ß»ï¿½
 				OnServerHit(HitResult);
 			}
 		}

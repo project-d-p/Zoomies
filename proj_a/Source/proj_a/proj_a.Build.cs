@@ -19,6 +19,15 @@ public class proj_a : ModuleRules
 		
 		SetProtobuf(thirdPartyDir);
 		
+		if (Target.Configuration == UnrealTargetConfiguration.DebugGame)
+		{
+			PublicDefinitions.Add("UE_BUILD_DEBUG=1");
+		}
+		else
+		{
+			PublicDefinitions.Add("UE_BUILD_DEVELOPMENT=1");
+		}
+		
 		// XXX: 배포시에 컴파일 코드 삭제(혹은 주석 처리)
 		string protocPath = "";
 		if (Target.Platform == UnrealTargetPlatform.Win64)
@@ -32,7 +41,7 @@ public class proj_a : ModuleRules
 		string protoFilesPath = Path.Combine(ModuleDirectory, "Protobuf", "Proto_file");
 		string generatedProtoFilesPath = Path.Combine(ModuleDirectory, "Protobuf", "Pb_File");
 		
-		System.Console.WriteLine("Compiling .proto files...");
+		Console.WriteLine("Compiling .proto files...");
 		CompileProtoFiles(protocPath, protoFilesPath, generatedProtoFilesPath);
 		// XXX: 배포시에 컴파일 코드 삭제(혹은 주석 처리)
 		

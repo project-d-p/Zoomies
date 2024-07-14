@@ -50,6 +50,7 @@ void ADPGameModeBase::SendChatToAllClients(const FString& SenderName, const FStr
 void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 {
 	Super::PostLogin(newPlayer);
+#if UE_BUILD_DEBUG == 0
 	if (steam_listen_socket_ == nullptr)
 	{
 		steam_listen_socket_ = new SteamNetworkingSocket();
@@ -57,6 +58,7 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 		if (game_state_ != nullptr)
 			game_state_->bServerTraveled = true;
 	}
+#endif
 	if (!newPlayer)
 	{
 		return ;

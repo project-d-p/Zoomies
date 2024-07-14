@@ -174,7 +174,7 @@ ADPLobbyActor::ADPLobbyActor()
     turtleComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("turtleComponent"));
 
     static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_TURTLEMESH
-    (TEXT("/Game/model/animals/turtle/turtle1.turtle1"));
+    (TEXT("/Game/model/animals/turtle/Turtle.Turtle"));
     if (SK_TURTLEMESH.Succeeded()) {
         turtleComponent->SetSkeletalMesh(SK_TURTLEMESH.Object);
         turtleComponent->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.5f));
