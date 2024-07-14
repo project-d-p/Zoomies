@@ -6,7 +6,7 @@ ACrabCharacter::ACrabCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CRAB
-	(TEXT(PathMangaer::GetPath(EMonster::CRAB)));
+	(PathManager::GetPath(EMonster::CRAB));
 	if (SK_CRAB.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_CRAB.Object);
 	}

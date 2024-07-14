@@ -7,7 +7,7 @@ ASealCharacter::ASealCharacter()
 	/** Loading models */
 	
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SEAL
-	(TEXT(PathManager::GetPath(EMonster::SEAL));
+	(PathManager::GetPath(EMonster::SEAL));
 	if (SK_SEAL.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_SEAL.Object);
 	}

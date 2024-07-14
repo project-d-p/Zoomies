@@ -7,7 +7,7 @@ APenguinCharacter::APenguinCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_PENGUIN
-	(TEXT(PathManager::GetPath(EMonster::PENGUIN));
+	(PathManager::GetPath(EMonster::PENGUIN));
 	if (SK_PENGUIN.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_PENGUIN.Object);
 	}

@@ -7,7 +7,7 @@ ADolphinCharacter::ADolphinCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_DOLPHIN
-	(TEXT(PathManager::GetPath(EMosnter::Dolphin)));
+	(PathManager::GetPath(EMonster::DOLPHIN));
 	if (SK_DOLPHIN.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_DOLPHIN.Object);
 	}
