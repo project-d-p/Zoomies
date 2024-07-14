@@ -50,6 +50,9 @@ ADPCharacter::ADPCharacter()
 	sceneCaptureSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SCENECAPTURESPRINGARM"));
 	sceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SCENECAPTURE"));
 
+	// tag
+	Tags.Add(FName("player"));
+
 	springArm->SetupAttachment(RootComponent);
 	camera->SetupAttachment(springArm);
 
