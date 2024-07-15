@@ -24,6 +24,11 @@ void ADPInGameState::BeginPlay()
 	Super::BeginPlay();
 
 	ScoreManager->InitScoreUi();
+	ADPCharacter* Character = Cast<ADPCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	if (Character)
+	{
+		Character->SetReplicatingMovement(false);
+	}
 }
 
 void ADPInGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

@@ -67,7 +67,6 @@ UMainInputComponent::UMainInputComponent()
 void UMainInputComponent::Activate(bool bReset)
 {
 	Super::Activate(bReset);
-	FNetLogger::EditerLog(FColor::Green, TEXT("Activate INPUT"));
 	BindMainLevelActions();
 }
 

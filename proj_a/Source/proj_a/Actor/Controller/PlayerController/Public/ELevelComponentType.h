@@ -7,4 +7,6 @@ UENUM()
 enum class ELevelComponentType
 {
 	MAIN = 0,
+	JUDGE = 1,
+	RESULT = 2
 };
