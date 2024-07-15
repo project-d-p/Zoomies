@@ -57,7 +57,7 @@ private:
 	UPROPERTY()
 	UClientSocket* Socket = nullptr;
 	UPROPERTY()
-	TArray<UBaseLevelComponent*> LevelComponents;
+	TMap<uint32, UBaseLevelComponent*> LevelComponents;
 	UPROPERTY()
 	UBaseLevelComponent* ActiveComponent;
 };

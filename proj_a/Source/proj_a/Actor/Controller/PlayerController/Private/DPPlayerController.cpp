@@ -9,6 +9,7 @@
 #include "GameHelper.h"
 #include "BaseInputComponent.h"
 #include "MainLevelComponent.h"
+#include "ResultLevelComponent.h"
 
 DEFINE_LOG_CATEGORY(LogNetwork);
 
@@ -18,10 +19,13 @@ ADPPlayerController::ADPPlayerController()
 	Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
 
 	UBaseLevelComponent* MainLevelComponet = CreateDefaultSubobject<UMainLevelComponent>(TEXT("MainLevelComponent"));
+	UBaseLevelComponent* ResultLevelComponet = CreateDefaultSubobject<UResultLevelComponent>(TEXT("ResultLevelComponent"));
 	MainLevelComponet->InitializeController(this);
-	
-	LevelComponents.Add(MainLevelComponet);
+	ResultLevelComponet->InitializeController(this);
 
+	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::MAIN), MainLevelComponet);
+	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::RESULT), ResultLevelComponet);
+	
 	// TODO: Change to private score manager later
 	PrivateScoreManager = CreateDefaultSubobject<UPrivateScoreManager>(TEXT("PrivateScoreManager"));
 }
@@ -164,7 +168,6 @@ void ADPPlayerController::ActivateComponent(ELevelComponentType Type)
 	UBaseLevelComponent* SelectedComponent = LevelComponents[static_cast<uint32>(Type)];
 	if (SelectedComponent)
 	{
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("ActivateComponent"));
 		SelectedComponent->Activate(true);
 		SelectedComponent->SetComponentTickEnabled(true);
 		
