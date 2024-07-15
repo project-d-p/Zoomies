@@ -18,6 +18,7 @@ public:
 	void SetTimeRemaining();
 
 	void StartTimer(float Duration);
+	bool IsTimeOver() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -26,4 +27,5 @@ private:
 	FTimerHandle TimerHandle;
 	float TimeRemaining;
 	float TimerDuration;
+	bool bIsTimeOver = false;
 };

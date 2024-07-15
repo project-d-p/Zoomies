@@ -131,6 +131,10 @@ void ADPGameModeBase::Tick(float delta_time)
 	{
 		this->ProcessData(delta_time);
 	}
+	if (TimerManager->IsTimeOver())
+	{
+		// 게임 종료
+	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Game is not started yet."));

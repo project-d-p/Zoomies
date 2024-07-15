@@ -2,6 +2,8 @@
 
 #include "CoreMinimal.h"
 #include "BaseInputComponent.h"
+#include "InputActionValue.h"
+#include "InputMappingContext.h"
 #include "BasicInputComponent.generated.h"
 
 UCLASS()
