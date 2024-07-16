@@ -1,4 +1,5 @@
 #pragma once
+
 #include "CoreMinimal.h"
 #include "Components/TextBlock.h"
 #include "Components/WidgetComponent.h"
@@ -22,8 +23,25 @@ class UTimerUI : public UWidgetComponent
 public:
 	UFUNCTION()
 	void UpdateTimerDisplay(float TimeRemaining);
-	UFUNCTION()
-	void initTimerUI(FTimerUiInitializer& Initializer);
+
+	template<typename T>
+	void initTimerUI(FTimerUiInitializer& Initializer)
+	{
+		if (Initializer.InWorld)
+		{
+			World = Initializer.InWorld;
+
+			T* GS = Cast<T>(World->GetGameState());
+			if (GS && GS->TimerManager)
+			{
+				GS->TimerManager->SetTimerUI(this);
+			}
+		}
+		if (Initializer.Time_Text)
+		{
+			Time_Text = Initializer.Time_Text;
+		}
+	}
 private:
 	UPROPERTY()
 	UTextBlock* Time_Text = nullptr;

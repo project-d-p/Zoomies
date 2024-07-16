@@ -108,7 +108,7 @@ ADPCharacter::ADPCharacter()
 	syncer = CreateDefaultSubobject<UCharacterPositionSync>(TEXT("My Syncer"));
 	
 	// disable move replication : set bReplicateMovement to false
-	// AActor::SetReplicatingMovement(false);
+	SetReplicatingMovement(false);
 	// bReplicateMovement
 
 	// Set Mass and Collision Profile

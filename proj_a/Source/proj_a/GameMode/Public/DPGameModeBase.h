@@ -48,7 +48,7 @@ public:
 	UPROPERTY()
 	UScoreManagerComp* ScoreManager;
 	FTimerHandle TimerHandle_SpawnAI;
-
+	
 	// Called when the game starts or when spawned
 	virtual void PostLogin(APlayerController* newPlayer) override;
 	virtual void Logout(AController* Exiting) override;
@@ -61,6 +61,7 @@ public:
 	// Destructor
 	virtual ~ADPGameModeBase() override;
 
+	UServerTimerManager* GetTimerManager() const { return TimerManager; }
 private:
 	// Implementations
 	void SyncMovement();
