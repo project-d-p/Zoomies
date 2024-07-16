@@ -7,7 +7,7 @@ AShepherdCharacter::AShepherdCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SHEPHERD
-	(TEXT("/Game/model/animals/shepherd/stylized_low_poly_german_shepherd.stylized_low_poly_german_shepherd"));
+	(PathManager::GetPath(EMonster::SHEPHERD));
 	if (SK_SHEPHERD.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_SHEPHERD.Object);
 	}
@@ -21,12 +21,17 @@ AShepherdCharacter::AShepherdCharacter()
 	}
 
 	/** Set the Capsule size */
-	GetCapsuleComponent()->SetCapsuleRadius(90.f);
-	GetCapsuleComponent()->SetCapsuleHalfHeight(90.f);
+	DefaultCP.Radius = 70.f;
+	DefaultCP.HalfHeight = 110.f;
+	GetCapsuleComponent()->SetCapsuleRadius(DefaultCP.Radius);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(DefaultCP.HalfHeight);
+
+	FaintCP.Radius = 52.f;
+	FaintCP.HalfHeight = 52.f;
 	
 	/** Set the model size and adjust position */
 	FVector Scale(FVector::OneVector);
-	FVector Location(0.f, 0.f, 0.f);
+	FVector Location(0.f, 0.f, -120.f);
 	FRotator Rotation(0.f, 0.f, 0.f);
 	FTransform Transform(Rotation, Location, Scale);
 		
@@ -35,7 +40,7 @@ AShepherdCharacter::AShepherdCharacter()
 
 	/** Set the faint state matrix */
 	FaintStateMtx = FTransform(
-		FRotator(90.f, 0.f, 0.f),
+		FRotator(90.f, 0.f, 90.f),
 		FVector::ZeroVector,
 		FVector::OneVector);
 	CB_FaintStateMtx =  MeshAdjMtx.Inverse() * FaintStateMtx * MeshAdjMtx;

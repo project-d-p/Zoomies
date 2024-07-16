@@ -7,7 +7,7 @@ ADolphinCharacter::ADolphinCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_DOLPHIN
-	(TEXT("/Game/model/animals/dolphin/dolphin1.dolphin1"));
+	(PathManager::GetPath(EMonster::DOLPHIN));
 	if (SK_DOLPHIN.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_DOLPHIN.Object);
 	}
@@ -19,24 +19,27 @@ ADolphinCharacter::ADolphinCharacter()
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}
-
-	/** Set the Capsule size */
-	GetCapsuleComponent()->SetCapsuleRadius(65.f);
-	GetCapsuleComponent()->SetCapsuleHalfHeight(65.f);
 	
+	/** Set the Capsule size */
+	DefaultCP.Radius = 61.f;
+	DefaultCP.HalfHeight = 133.f;
+	GetCapsuleComponent()->SetCapsuleRadius(DefaultCP.Radius);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(DefaultCP.HalfHeight);
+
+	FaintCP.Radius = 61.f;
+	FaintCP.HalfHeight = 61.f;
+
 	/** Set the model size and adjust position */
-	FVector Scale(FVector::OneVector);
-	FVector Location(0.f, 0.f, 0.f);
+	FVector Location(0.f, 0.f, 20.f);
 	FRotator Rotation(0.f, 0.f, 0.f);
-	FTransform Transform(Rotation, Location, Scale);
+	FTransform Transform(Rotation, Location);
 		
 	MeshAdjMtx = Transform;
 	GetMesh()->SetRelativeTransform(MeshAdjMtx);
 
 	/** Set the faint state matrix */
 	FaintStateMtx = FTransform(
-		FRotator(90.f, 0.f, 0.f),
-		FVector::ZeroVector,
-		FVector::OneVector);
+		FRotator(0.f, 0.f, 90.f),
+		FVector::ZeroVector);
 	CB_FaintStateMtx =  MeshAdjMtx.Inverse() * FaintStateMtx * MeshAdjMtx;
 }

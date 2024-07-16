@@ -9,6 +9,7 @@
 #include "Components/WidgetComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
+#include "proj_a.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -86,18 +87,18 @@ void ABaseMonsterCharacter::BeginPlay()
 
 	if (widgetComponent)
 		widgetComponent->SetVisibility(false);
+
+	GetCapsuleComponent()->SetCollisionObjectType(ECC_MonsterChannel);
 }
 
 void ABaseMonsterCharacter::SyncPosition()
 {
 	int32 id = MonsterId;
 	FString MonsterID = FString::FromInt(id);
-	FNetLogger::LogInfo(TEXT("SyncPosition: %s"), *MonsterID);
 	
 	MonsterPosition* MonsterData = FDataHub::monsterData.Find(MonsterID);
 	if (!MonsterData)
 	{
-		FNetLogger::LogInfo(TEXT("Monster data does not contain: %s"), *MonsterID);
 		return ;
 	}
 	
@@ -124,6 +125,20 @@ void ABaseMonsterCharacter::ScaleCapsuleSize(float ScaleFactor)
 	{
 		FVector Scalar = FVector(ScaleFactor, ScaleFactor, ScaleFactor);
 		LCC->SetRelativeScale3D(Scalar);
+	}
+}
+
+void ABaseMonsterCharacter::SetCatchable(bool bCond)
+{
+	if (bCond)
+	{
+		GetMesh()->CustomDepthStencilValue = 3;
+		widgetComponent->SetVisibility(bCond);
+	}
+	else
+	{
+		GetMesh()->CustomDepthStencilValue = 2;
+		widgetComponent->SetVisibility(bCond);
 	}
 }
 

@@ -7,7 +7,7 @@ ALionCharacter::ALionCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_LION
-	(TEXT("/Game/model/animals/lion/low_poly_lion.low_poly_lion"));
+	(PathManager::GetPath(EMonster::LION));
 	if (SK_LION.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_LION.Object);
 	}
@@ -21,22 +21,25 @@ ALionCharacter::ALionCharacter()
 	}
 
 	/** Set the Capsule size */
-	GetCapsuleComponent()->SetCapsuleRadius(65.f);
-	GetCapsuleComponent()->SetCapsuleHalfHeight(65.f);
+	DefaultCP.Radius = 74.f;
+	DefaultCP.HalfHeight = 127.f;
+	GetCapsuleComponent()->SetCapsuleRadius(DefaultCP.Radius);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(DefaultCP.HalfHeight);
+
+	FaintCP.Radius = 74.f;
+	FaintCP.HalfHeight = 74.f;
 	
 	/** Set the model size and adjust position */
-	FVector Scale(FVector::OneVector);
-	FVector Location(0.f, 0.f, 0.f);
+	FVector Location(0.f, 0.f, 10.f);
 	FRotator Rotation(0.f, 0.f, 0.f);
-	FTransform Transform(Rotation, Location, Scale);
+	FTransform Transform(Rotation, Location);
 		
 	MeshAdjMtx = Transform;
 	GetMesh()->SetRelativeTransform(MeshAdjMtx);
 
 	/** Set the faint state matrix */
 	FaintStateMtx = FTransform(
-		FRotator(90.f, 0.f, 0.f),
-		FVector::ZeroVector,
-		FVector::OneVector);
-	CB_FaintStateMtx =  MeshAdjMtx.Inverse() * FaintStateMtx * MeshAdjMtx;
+		FRotator(0.f, 0.f, 90.f)
+		, FVector::ZeroVector);
+	CB_FaintStateMtx =  FaintStateMtx;
 }

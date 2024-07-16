@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "PathManager.h"
 #include "BaseMonsterCharacter.generated.h"
 
 UENUM()
@@ -30,8 +31,9 @@ public:
 	UFUNCTION()
 	void OnRep_FaintCharacterMotion();
 	void ScaleCapsuleSize(float ScaleFactor);
-	EMonsterState GetState() const { return CurrentState; } 
-	
+	EMonsterState GetState() const { return CurrentState; }
+	void SetCatchable(bool bCond);
+
 	UPROPERTY(Replicated)
 	int32 MonsterId;
 

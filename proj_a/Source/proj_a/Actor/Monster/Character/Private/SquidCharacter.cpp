@@ -7,7 +7,7 @@ ASquidCharacter::ASquidCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SQUID
-	(TEXT("/Game/model/animals/squid/Squid1.Squid1"));
+	(PathManager::GetPath(EMonster::SQUID));
 	if (SK_SQUID.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_SQUID.Object);
 	}
@@ -21,8 +21,13 @@ ASquidCharacter::ASquidCharacter()
 	}
 
 	/** Set the Capsule size */
-	GetCapsuleComponent()->SetCapsuleRadius(90.f);
-	GetCapsuleComponent()->SetCapsuleHalfHeight(90.f);
+	DefaultCP.Radius = 64.f;
+	DefaultCP.HalfHeight = 174.f;
+	GetCapsuleComponent()->SetCapsuleRadius(DefaultCP.Radius);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(DefaultCP.HalfHeight);
+
+	FaintCP.Radius = 64.f;
+	FaintCP.HalfHeight = 64.f;
 	
 	/** Set the model size and adjust position */
 	FVector Scale(FVector::OneVector);
@@ -35,7 +40,7 @@ ASquidCharacter::ASquidCharacter()
 
 	/** Set the faint state matrix */
 	FaintStateMtx = FTransform(
-		FRotator(90.f, 0.f, 0.f),
+		FRotator(0.f, 0.f, 90.f),
 		FVector::ZeroVector,
 		FVector::OneVector);
 	CB_FaintStateMtx =  MeshAdjMtx.Inverse() * FaintStateMtx * MeshAdjMtx;

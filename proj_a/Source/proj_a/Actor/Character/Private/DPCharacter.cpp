@@ -14,6 +14,10 @@
 #include "FDataHub.h"
 #include "FNetLogger.h"
 #include "MonsterSlotComponent.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "proj_a.h"
+#include "ReturnTriggerVolume.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -22,12 +26,14 @@
 #include "Engine/TextureRenderTarget2D.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerState.h"
+#include "Net/UnrealNetwork.h"
 #include "Serialization/BulkDataRegistry.h"
 
 // Sets default values
 ADPCharacter::ADPCharacter()
 {
 	bReplicates = true;
+	bIsStunned = false;
 	
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -109,6 +115,13 @@ ADPCharacter::ADPCharacter()
 	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
+	// Enable hit events
+	GetCapsuleComponent()->SetNotifyRigidBodyCollision(true);
+    
+	// Bind the hit event
+	// Change To Server Logic
+	// GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ADPCharacter::OnHit);
+
 	GetMesh()->SetRenderCustomDepth(true);
 	GetMesh()->CustomDepthStencilValue = 2;
 
@@ -118,15 +131,26 @@ ADPCharacter::ADPCharacter()
 	if (CAMERASHAKE.Succeeded()) {
 		cameraShake = CAMERASHAKE.Class;
 	}
-
-	/*
-	 * °ãÄ¡°Ô ¸¸µå´Â ¿ä¼Ò
-	 * Áï, Ãæµ¹ÇØµµ º¸ÀÌ´Â °ÍÀº ¶Õ°í Áö³ª°¡Áö¸¸ Ãæµ¹ ÀÌº¥Æ®´Â ¹ß»ýµÊ.
-	 */
-	// GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	
-	// GetCapsuleComponent()->SetSimulatePhysics(true);
-	// GetCapsuleComponent()->SetNotifyRigidBodyCollision(true);
+	StunArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("StunArrow"));
+	StunArrow->SetupAttachment(GetMesh(), FName("Stun_Pos"));
+	StunArrow->SetRelativeLocation(FVector(0, -20.f, 0));
+	StunArrow->SetHiddenInGame(true);
+	
+	StunEffectComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("StunEffectComponent"));
+	StunEffectComponent->SetupAttachment(StunArrow);
+	StunEffectComponent->SetAutoActivate(false);
+	
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> STUN
+	(TEXT("/Game/effect/ns_stun.ns_stun"));
+	if (STUN.Succeeded()) {
+		StunEffect = STUN.Object;
+		StunEffectComponent->SetAsset(StunEffect);
+	}
+}
+
+ADPCharacter::~ADPCharacter()
+{
 }
 
 // Called when the game starts or when spawned
@@ -144,12 +168,18 @@ void ADPCharacter::BeginPlay()
 	if (dynamicMaterialInstance)
 		dynamicMaterialInstance->SetVectorParameterValue(FName("color"), FVector4(0.f, 0.f, 1.f, 1.f));
 
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AReturnTriggerVolume::StaticClass(), FoundActors);
+	if (FoundActors.Num() > 0)
+	{
+		ReturnTriggerVolume = Cast<AReturnTriggerVolume>(FoundActors[0]);
+	}
+
 	stateComponent->currentEquipmentState = 0;
 	hpComponent->Hp = 100.f;
 	hpComponent->IsDead = false;
 	constructionComponent->placeWall = false;
 	constructionComponent->placeturret = false;
-	UE_LOG(LogTemp, Log, TEXT("is it replicaed: %d"), GetCharacterMovement()->GetIsReplicated());
 	bUseControllerRotationYaw = false;
 }
 
@@ -170,7 +200,23 @@ void ADPCharacter::Tick(float DeltaTime)
 		syncer->SyncGunFire(this);
 		syncer->SyncReturnAnimal(this);
 	}
-	syncer->SyncCatch(this);
+	if (!HasAuthority())
+	{
+		syncer->SyncCatch(this);
+	}
+
+	if (bIsStunned)
+	{
+		// Rotate the arrow component
+		FRotator NewRotation = StunArrow->GetRelativeRotation();
+		NewRotation.Roll += DeltaTime * 180.0f; // Rotate 180 degrees per second
+		StunArrow->SetRelativeRotation(NewRotation);
+	}
+
+	if (HasAuthority())
+	{
+		CheckCollisionWithMonster();
+	}
 }
 
 // Called to bind functionality to input
@@ -217,7 +263,6 @@ void ADPCharacter::PlayFireAnimation()
 	if (camera && cameraShake) {
 		FVector cameraLocation = camera->GetComponentLocation();
 		UGameplayStatics::PlayWorldCameraShake(this, cameraShake, cameraLocation, 0.0f, 500.0f);
-		FNetLogger::EditerLog(FColor::Magenta, TEXT("CAMERASHAKE"));
 	}
 }
 
@@ -255,12 +300,155 @@ bool ADPCharacter::IsAtReturnPlace() const
 	return this->mIsAtReturnPlace;
 }
 
+void ADPCharacter::SetStunned(bool bCond)
+{
+	this->bIsStunned = bCond;
+}
+
+bool ADPCharacter::IsStunned() const
+{
+	return this->bIsStunned;
+}
+
 void ADPCharacter::ClientNotifyAnimalReturn_Implementation(const FString& player_name)
 {
 	FDataHub::PushReturnAnimalDA(player_name, true);
 }
 
+void ADPCharacter::CheckCollisionWithMonster()
+{
+	FHitResult HitResult;
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+
+	TArray<FVector> Direction = {
+		FVector::ForwardVector,
+		-FVector::UpVector,
+	};
+
+	for (int i = 0; i < Direction.Num(); i++)
+	{
+		if (GetWorld()->SweepSingleByChannel(
+			HitResult,
+			GetActorLocation(),
+			GetActorLocation() + Direction[i] * 50.f,
+			GetActorRotation().Quaternion(),
+			ECC_MonsterChannel,
+			GetCapsuleComponent()->GetCollisionShape(),
+			QueryParams
+		))
+		{
+			if (ABaseMonsterCharacter* MC = Cast<ABaseMonsterCharacter>(HitResult.GetActor()))
+			{
+				// ï¿½ï¿½ï¿½Í¿ï¿½ ï¿½æµ¹ ï¿½ß»ï¿½
+				OnServerHit(HitResult);
+			}
+		}
+	}
+}
+
 TArray<EAnimal> ADPCharacter::ReturnMonsters()
 {
 	return monsterSlotComponent->RemoveMonstersFromSlot();
+}
+
+/*
+ * Move To Server Logic
+void ADPCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (this->IsStunned())
+	{
+		return ;
+	}
+	
+	ABaseMonsterCharacter* monster = Cast<ABaseMonsterCharacter>(OtherActor);
+	if (!monster)
+	{
+		return ;
+	}
+	
+	if (monster->GetState() == EMonsterState::Faint)
+	{
+		return ;
+	}
+	this->ApplyStunEffect();
+	
+	FTimerDelegate timerCollisionDelegate;
+	timerCollisionDelegate.BindLambda([this]()
+	{
+		this->RemoveStunEffect();
+	});
+	float stunTime = 1.0f;
+	GetWorld()->GetTimerManager().SetTimer(timerCollisionHandle, timerCollisionDelegate, stunTime, false);
+}
+*/
+
+void ADPCharacter::ApplyStunEffect()
+{
+	if (!bIsStunned)
+	{
+		bIsStunned = true;
+		StunEffectComponent->Activate(true);
+	}
+	if (!HasAuthority())
+	{
+		StunEffectComponent->Activate(true);
+	}
+}
+
+void ADPCharacter::RemoveStunEffect()
+{
+	if (HasAuthority())
+	{
+		bIsStunned = false;
+	}
+	StunEffectComponent->Deactivate();
+}
+
+void ADPCharacter::OnServerHit(const FHitResult& HitResult)
+{
+	if (this->IsStunned())
+	{
+		return ;
+	}
+	
+	ABaseMonsterCharacter* monster = Cast<ABaseMonsterCharacter>(HitResult.GetActor());
+	if (!monster)
+	{
+		return ;
+	}
+	
+	if (monster->GetState() == EMonsterState::Faint)
+	{
+		return ;
+	}
+	this->ApplyStunEffect();
+	
+	FTimerDelegate timerCollisionDelegate;
+	timerCollisionDelegate.BindLambda([this]()
+	{
+		this->RemoveStunEffect();
+	});
+	float stunTime = 1.5f;
+	GetWorld()->GetTimerManager().SetTimer(timerCollisionHandle, timerCollisionDelegate, stunTime, false);
+}
+
+void ADPCharacter::OnRep_SyncStunned()
+{
+	if (bIsStunned)
+	{
+		this->ApplyStunEffect();
+	}
+	else
+	{
+		this->RemoveStunEffect();
+	}
+}
+
+void ADPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ADPCharacter, bIsStunned);
 }

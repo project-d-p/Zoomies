@@ -7,7 +7,7 @@ AGiraffeCharacter::AGiraffeCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_GIRAFFE
-	(TEXT("/Game/model/animals/giraffe/giraffe-lowpoly.giraffe-lowpoly"));
+	(PathManager::GetPath(EMonster::GIRAFFE));
 	if (SK_GIRAFFE.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_GIRAFFE.Object);
 	}
@@ -21,22 +21,25 @@ AGiraffeCharacter::AGiraffeCharacter()
 	}
 
 	/** Set the Capsule size */
-	GetCapsuleComponent()->SetCapsuleRadius(65.f);
-	GetCapsuleComponent()->SetCapsuleHalfHeight(65.f);
+	DefaultCP.Radius = 56.f;
+	DefaultCP.HalfHeight = 123.f;
+	GetCapsuleComponent()->SetCapsuleRadius(DefaultCP.Radius);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(DefaultCP.HalfHeight);
+
+	FaintCP.Radius = 55.f;
+	FaintCP.HalfHeight = 55.f;
 	
 	/** Set the model size and adjust position */
-	FVector Scale(FVector::OneVector);
 	FVector Location(0.f, 0.f, 0.f);
 	FRotator Rotation(0.f, 0.f, 0.f);
-	FTransform Transform(Rotation, Location, Scale);
+	FTransform Transform(Rotation, Location);
 		
 	MeshAdjMtx = Transform;
 	GetMesh()->SetRelativeTransform(MeshAdjMtx);
 
 	/** Set the faint state matrix */
 	FaintStateMtx = FTransform(
-		FRotator(90.f, 0.f, 0.f),
-		FVector::ZeroVector,
-		FVector::OneVector);
+		FRotator(0.f, 0.f, 90.f),
+		FVector::ZeroVector);
 	CB_FaintStateMtx =  MeshAdjMtx.Inverse() * FaintStateMtx * MeshAdjMtx;
 }

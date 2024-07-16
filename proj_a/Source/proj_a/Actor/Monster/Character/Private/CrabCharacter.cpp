@@ -6,7 +6,7 @@ ACrabCharacter::ACrabCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CRAB
-	(TEXT("/Game/model/animals/crab/crab.crab"));
+	(PathManager::GetPath(EMonster::CRAB));
 	if (SK_CRAB.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_CRAB.Object);
 	}
@@ -18,7 +18,7 @@ ACrabCharacter::ACrabCharacter()
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}
-	
+
 	/** Set the Capsule size */
 	DefaultCP.Radius = 91.f;
 	DefaultCP.HalfHeight = 91.f;
@@ -27,20 +27,19 @@ ACrabCharacter::ACrabCharacter()
 
 	FaintCP.Radius = 91.f;
 	FaintCP.HalfHeight = 91.f;
-	
+
 	/** Set the model size and adjust position */
-	FVector Scale(FVector::OneVector);
-	FVector Location(0.f, 0.f, 0.f);
-	FRotator Rotation(0.f, 90.f, 0.f);
-	FTransform Transform(Rotation, Location, Scale);
-		
-	MeshAdjMtx = Transform;
-	GetMesh()->SetRelativeTransform(MeshAdjMtx);
+	FVector Location(FVector::ZeroVector);
+	FQuat Rotation = FQuat(FRotator(0.f, 90.f, 0.f));
+	GetMesh()->SetRelativeLocationAndRotation(Location, Rotation);
 	
+	FTransform AdjMtx = FTransform(
+		FQuat(FRotator(0.f, 0.f, 0.f)),
+		Location);
+
 	/** Set the faint state matrix */
 	FaintStateMtx = FTransform(
-		FRotator(90.f, 0.f, 0.f),
-		FVector::ZeroVector,
-		FVector::OneVector);
-	CB_FaintStateMtx =  MeshAdjMtx.Inverse() * FaintStateMtx * MeshAdjMtx;
+		FQuat(FRotator(90.f, 90.f, 0.f)),
+		FVector::ZeroVector);
+	CB_FaintStateMtx = AdjMtx.Inverse() * FaintStateMtx * AdjMtx;
 }

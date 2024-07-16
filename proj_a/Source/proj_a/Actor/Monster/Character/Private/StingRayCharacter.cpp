@@ -7,7 +7,7 @@ AStingRayCharacter::AStingRayCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_STINGRAY
-	(TEXT("/Game/model/animals/stingRay/sting_ray.sting_ray"));
+	(PathManager::GetPath(EMonster::STINGRAY));
 	if (SK_STINGRAY.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_STINGRAY.Object);
 	}
@@ -21,8 +21,13 @@ AStingRayCharacter::AStingRayCharacter()
 	}
 
 	/** Set the Capsule size */
-	GetCapsuleComponent()->SetCapsuleRadius(65.f);
-	GetCapsuleComponent()->SetCapsuleHalfHeight(65.f);
+	DefaultCP.Radius = 65.f;
+	DefaultCP.HalfHeight = 77.f;
+	GetCapsuleComponent()->SetCapsuleRadius(DefaultCP.Radius);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(DefaultCP.HalfHeight);
+
+	FaintCP.Radius = 34.f;
+	FaintCP.HalfHeight = 77.f;
 	
 	/** Set the model size and adjust position */
 	FVector Scale(FVector::OneVector);
@@ -35,7 +40,7 @@ AStingRayCharacter::AStingRayCharacter()
 
 	/** Set the faint state matrix */
 	FaintStateMtx = FTransform(
-		FRotator(90.f, 0.f, 0.f),
+		FRotator(0.f, 0.f, 90.f),
 		FVector::ZeroVector,
 		FVector::OneVector);
 	CB_FaintStateMtx =  MeshAdjMtx.Inverse() * FaintStateMtx * MeshAdjMtx;

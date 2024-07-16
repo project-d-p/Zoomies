@@ -32,6 +32,8 @@ public:
 	virtual bool SimulateAttack(ADPCharacter* character, FHitResult& result, const Gunfire& gunfire);
 	virtual FVector GetFireLocation();
 
+	virtual void SpawnEffects(const FHitResult& location, const FRotator& rotation);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	int maxBullet{};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")

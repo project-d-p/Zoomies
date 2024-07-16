@@ -7,7 +7,7 @@ ARabbitCharacter::ARabbitCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_RABBIT
-	(TEXT("/Game/model/animals/rabbit/low_poly_rabbit.low_poly_rabbit"));
+	(PathManager::GetPath(EMonster::RABBIT));
 	if (SK_RABBIT.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_RABBIT.Object);
 	}
@@ -21,12 +21,17 @@ ARabbitCharacter::ARabbitCharacter()
 	}
 
 	/** Set the Capsule size */
-	GetCapsuleComponent()->SetCapsuleRadius(90.f);
-	GetCapsuleComponent()->SetCapsuleHalfHeight(90.f);
+	DefaultCP.Radius = 90.f;
+	DefaultCP.HalfHeight = 130.f;
+	GetCapsuleComponent()->SetCapsuleRadius(DefaultCP.Radius);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(DefaultCP.HalfHeight);
+
+	FaintCP.Radius = 35.f;
+	FaintCP.HalfHeight = 35.f;
 	
 	/** Set the model size and adjust position */
 	FVector Scale(FVector::OneVector);
-	FVector Location(0.f, 0.f, 0.f);
+	FVector Location(0.f, 0.f, 40.f);
 	FRotator Rotation(0.f, 0.f, 0.f);
 	FTransform Transform(Rotation, Location, Scale);
 		
@@ -35,7 +40,7 @@ ARabbitCharacter::ARabbitCharacter()
 
 	/** Set the faint state matrix */
 	FaintStateMtx = FTransform(
-		FRotator(90.f, 0.f, 0.f),
+		FRotator(0.f, 0.f, 90.f),
 		FVector::ZeroVector,
 		FVector::OneVector);
 	CB_FaintStateMtx =  MeshAdjMtx.Inverse() * FaintStateMtx * MeshAdjMtx;
