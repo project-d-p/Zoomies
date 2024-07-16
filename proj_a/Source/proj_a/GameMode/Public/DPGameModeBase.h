@@ -71,8 +71,7 @@ private:
 	void ProcessData(float delta_time);
 	void MonsterMoveSimulate(float delta_time);
 	void SpawnMonsters(float delta_time);
-	
-private:
+
 	// Member variables
 	enum { NUM_OF_MAX_CLIENTS = 2 };
 	// FListenSocketRunnable* listen_socket_ = nullptr;

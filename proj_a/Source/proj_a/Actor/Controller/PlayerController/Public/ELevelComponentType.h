@@ -8,5 +8,6 @@ enum class ELevelComponentType
 {
 	MAIN = 0,
 	JUDGE = 1,
-	RESULT = 2
+	RESULT = 2,
+	NONE = 3
 };

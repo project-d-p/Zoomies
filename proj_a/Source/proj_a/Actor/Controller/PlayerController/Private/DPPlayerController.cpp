@@ -25,9 +25,15 @@ ADPPlayerController::ADPPlayerController()
 
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::MAIN), MainLevelComponet);
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::RESULT), ResultLevelComponet);
+	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::NONE), nullptr);
 	
 	// TODO: Change to private score manager later
 	PrivateScoreManager = CreateDefaultSubobject<UPrivateScoreManager>(TEXT("PrivateScoreManager"));
+}
+
+ADPPlayerController::~ADPPlayerController()
+{
+	FNetLogger::EditerLog(FColor::Red, TEXT("ADPPlayerController::~ADPPlayerController"));
 }
 
 void ADPPlayerController::SendChatMessageToServer(const FString& Message)
@@ -92,16 +98,19 @@ void ADPPlayerController::ReleaseMemory()
 	{
 		Socket->DestoryInstance();
 		Socket->DestroyComponent();
+		Socket = nullptr;
 	}
 	if (ChatManager)
 	{
 		ChatManager->DestroyComponent();
+		ChatManager = nullptr;
 	}
 }
 
 void ADPPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	Cast<UMainLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::MAIN)])->SetStateComponent();
 }
 
@@ -113,6 +122,18 @@ void ADPPlayerController::Tick(float DeltaSeconds)
 void ADPPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+
+	if (Socket)
+	{
+		Socket->DestoryInstance();
+		Socket->DestroyComponent();
+		Socket = nullptr;
+	}
+	if (ChatManager)
+	{
+		ChatManager->DestroyComponent();
+		ChatManager = nullptr;
+	}
 }
 
 void ADPPlayerController::OnPossess(APawn* InPawn)
@@ -137,7 +158,6 @@ void ADPPlayerController::SwitchLevelComponent(ELevelComponentType Type)
 	}
 	else
 	{
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("ActiveComponent is null"));
 		ActivateComponent(Type);
 	}
 }
@@ -151,14 +171,17 @@ void ADPPlayerController::DeactiveCurrentComponent()
 {
 	if (ActiveComponent)
 	{
-		ActiveComponent->Deactivate();
-		ActiveComponent->SetComponentTickEnabled(false);
-        
 		// 입력 컴포넌트 비활성화
 		if (UBaseInputComponent* InputComp = ActiveComponent->GetInputComponent())
 		{
 			InputComp->Deactivate();
 		}
+		
+		ActiveComponent->Deactivate();
+		ActiveComponent->SetComponentTickEnabled(false);
+		ActiveComponent->PrimaryComponentTick.bCanEverTick = false;
+		ActiveComponent->RegisterComponent();
+		
 		ActiveComponent = nullptr;
 	}
 }
@@ -168,13 +191,14 @@ void ADPPlayerController::ActivateComponent(ELevelComponentType Type)
 	UBaseLevelComponent* SelectedComponent = LevelComponents[static_cast<uint32>(Type)];
 	if (SelectedComponent)
 	{
+		SelectedComponent->PrimaryComponentTick.bCanEverTick = true;
 		SelectedComponent->Activate(true);
 		SelectedComponent->SetComponentTickEnabled(true);
+		SelectedComponent->RegisterComponent();
 		
 		// 입력 컴포넌트 활성화
 		if (UBaseInputComponent* InputComp = SelectedComponent->GetInputComponent())
 		{
-			FNetLogger::EditerLog(FColor::Cyan, TEXT("Activate InputComponent"));
 			InputComp->Activate(true);
 		}
 		ActiveComponent = SelectedComponent;

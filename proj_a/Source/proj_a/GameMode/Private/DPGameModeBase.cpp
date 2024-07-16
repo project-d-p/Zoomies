@@ -71,12 +71,10 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 		return;
 	}
 	FString name = player_state->GetPlayerName();
-	FNetLogger::EditerLog(FColor::Blue, TEXT("Player name: %s"), *name);
 	std::string key(TCHAR_TO_UTF8(*name));
 	if (player_controllers_.find(key) != player_controllers_.end())
 	{
 		player_state->SetPlayerName(name + "1");
-		FNetLogger::EditerLog(FColor::Red, TEXT("Player name: %s"), *player_state->GetPlayerName());
 		key = std::string(TCHAR_TO_UTF8(*player_state->GetPlayerName()));
 	}
 	player_controllers_[key] = Cast<ADPPlayerController>(newPlayer);
@@ -133,7 +131,21 @@ void ADPGameModeBase::Tick(float delta_time)
 	}
 	if (TimerManager->IsTimeOver())
 	{
-		// 게임 종료
+		if (steam_listen_socket_)
+		{
+			steam_listen_socket_->DestoryInstance();
+			delete steam_listen_socket_;
+			steam_listen_socket_ = nullptr;
+		}
+
+		for (auto& pair: player_controllers_)
+		{
+			ADPPlayerController* controller = pair.second;
+			FNetLogger::EditerLog(FColor::Red, TEXT("Player name: %s || Score: %d"), *controller->PlayerState->GetPlayerName(), controller->GetPrivateScoreManagerComponent()->GetPrivatePlayerScore());
+			controller->SwitchLevelComponent(ELevelComponentType::NONE);
+		}
+		
+		GetWorld()->ServerTravel(TEXT("calculateLevel?listen"), true);
 	}
 	else
 	{
@@ -149,6 +161,7 @@ void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	UE_LOG(LogTemp, Warning, TEXT("Call end play."));
 	if (steam_listen_socket_)
 	{
+		steam_listen_socket_->DestoryInstance();
 		delete steam_listen_socket_;
 		steam_listen_socket_ = nullptr;
 	}
@@ -203,6 +216,12 @@ void ADPGameModeBase::SpawnMonsters(float delta_time)
 
 ADPGameModeBase::~ADPGameModeBase()
 {
+	if (steam_listen_socket_)
+	{
+		steam_listen_socket_->DestoryInstance();
+		delete steam_listen_socket_;
+		steam_listen_socket_ = nullptr;
+	}
 }
 
 void ADPGameModeBase::SyncMovement()

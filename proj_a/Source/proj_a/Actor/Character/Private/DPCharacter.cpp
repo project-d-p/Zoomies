@@ -106,11 +106,21 @@ ADPCharacter::ADPCharacter()
 	}
 
 	syncer = CreateDefaultSubobject<UCharacterPositionSync>(TEXT("My Syncer"));
-	
-	// disable move replication : set bReplicateMovement to false
-	// AActor::SetReplicatingMovement(false);
-	// bReplicateMovement
 
+
+	// disable move replication : set bReplicateMovement to false
+	if (UWorld* World = GetWorld())
+	{
+		FString CurrentLevelName = World->GetMapName();
+		if (CurrentLevelName.Contains("mainLevel"))
+		{
+			AActor::SetReplicatingMovement(false);
+		}
+		else
+		{
+			AActor::SetReplicatingMovement(true);
+		}
+	}
 	// Set Mass and Collision Profile
 	GetCharacterMovement()->Mass = 0.1f;
 
@@ -127,7 +137,6 @@ ADPCharacter::ADPCharacter()
 
 	GetMesh()->SetRenderCustomDepth(true);
 	GetMesh()->CustomDepthStencilValue = 2;
-
 
 	static ConstructorHelpers::FClassFinder<UCameraShakeBase> CAMERASHAKE
 	(TEXT("/Game/etc/bp_cameraShake.bp_cameraShake_C"));
@@ -197,6 +206,16 @@ void ADPCharacter::Tick(float DeltaTime)
 	}
 	else
 		UE_LOG(LogTemp, Warning, TEXT("null GetCharacterMovement"));
+
+	if (UWorld* World = GetWorld())
+	{
+		FString CurrentLevelName = World->GetMapName();
+		if (CurrentLevelName.Contains("mainLevel") == false)
+		{
+			return ;
+		}
+	}
+	
 	if (this->GetLocalRole() == ROLE_SimulatedProxy)
 	{
 		syncer->SyncWithServer(this);
@@ -343,7 +362,6 @@ void ADPCharacter::CheckCollisionWithMonster()
 		{
 			if (ABaseMonsterCharacter* MC = Cast<ABaseMonsterCharacter>(HitResult.GetActor()))
 			{
-				// ���Ϳ� �浹 �߻�
 				OnServerHit(HitResult);
 			}
 		}
@@ -402,6 +420,7 @@ void ADPCharacter::ApplyStunEffect()
 
 void ADPCharacter::RemoveStunEffect()
 {
+	if (!IsValid(this)) return;
 	if (HasAuthority())
 	{
 		bIsStunned = false;
@@ -409,6 +428,7 @@ void ADPCharacter::RemoveStunEffect()
 	StunEffectComponent->Deactivate();
 }
 
+// 끝날때 없애야 함.
 void ADPCharacter::OnServerHit(const FHitResult& HitResult)
 {
 	if (this->IsStunned())
@@ -429,9 +449,14 @@ void ADPCharacter::OnServerHit(const FHitResult& HitResult)
 	this->ApplyStunEffect();
 	
 	FTimerDelegate timerCollisionDelegate;
-	timerCollisionDelegate.BindLambda([this]()
+
+	TWeakObjectPtr<ADPCharacter> WeakThis(this);
+	timerCollisionDelegate.BindLambda([WeakThis, this]()
 	{
-		this->RemoveStunEffect();
+		if (WeakThis.IsValid())
+		{
+			this->RemoveStunEffect();
+		}
 	});
 	float stunTime = 1.5f;
 	GetWorld()->GetTimerManager().SetTimer(timerCollisionHandle, timerCollisionDelegate, stunTime, false);

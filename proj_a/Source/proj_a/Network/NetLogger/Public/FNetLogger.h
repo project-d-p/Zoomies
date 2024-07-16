@@ -44,11 +44,11 @@ public:
 		va_end(ArgPtr);
 		if (GEngine)
 		{
-			// GEngine->AddOnScreenDebugMessage(
-			// 	-1,
-			// 	15.f,
-			// 	color,
-			// 	FString::Printf(TEXT("%s"), buffer));
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				15.f,
+				color,
+				FString::Printf(TEXT("%s"), buffer));
 		}
 	}
 

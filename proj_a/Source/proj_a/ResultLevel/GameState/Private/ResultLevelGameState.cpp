@@ -19,7 +19,7 @@ void AResultLevelGameState::BeginPlay()
 	ADPPlayerController* Controller = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
 	if (Controller)
 	{
-		// Set PlayerController Level Component
+		Controller->SwitchLevelComponent(ELevelComponentType::RESULT);
 	}
 	ADPCharacter* Character = Cast<ADPCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	if (Character)

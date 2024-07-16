@@ -21,6 +21,7 @@ class PROJ_A_API ADPPlayerController : public APlayerController
 
 public:
 	ADPPlayerController();
+	virtual ~ADPPlayerController() override;
 	
 	virtual void Tick(float DeltaSeconds) override;
 	
@@ -50,7 +51,7 @@ private:
 	void DeactiveCurrentComponent();
 	void ActivateComponent(ELevelComponentType Type);
 	
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	UPrivateScoreManager* PrivateScoreManager;
 	UPROPERTY()
 	UChatManager* ChatManager = nullptr;
