@@ -1,6 +1,7 @@
 #include "PrivateScoreManager.h"
 #include "CalculateScoreByJobs.h"
 #include "ScoreUiPrivate.h"
+#include "proj_a/GameInstance/GI_Zoomies.h"
 
 UPrivateScoreManager::UPrivateScoreManager()
 {
@@ -61,4 +62,14 @@ void UPrivateScoreManager::SetScoreUI_Private(UScoreUiPrivate* pScoreUI_Private)
 		return	;
 	}
 	ScoreUI_Private = pScoreUI_Private;
+}
+
+void UPrivateScoreManager::SendPlayerDataToGameInstance()
+{
+	// UGI_Zoomies* MyGameInstance = GetGameInstance<UGI_Zoomies>();
+	// if (MyGameInstance)
+	// {
+	// 	int32 PlayerId = GetUniqueID();
+	// 	MyGameInstance->StorePlayerData(PlayerId, CapturedAnimals, ScoreDatas);
+	// }
 }

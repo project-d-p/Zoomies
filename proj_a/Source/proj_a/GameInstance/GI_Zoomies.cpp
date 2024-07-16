@@ -248,8 +248,8 @@ void UGI_Zoomies::InitOnlineSubsystemSteam()
 {
 	if (!is_online_session_steam_init)
 	{
-		online_subsystem_ = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
-		// online_subsystem_ = IOnlineSubsystem::Get();
+		// online_subsystem_ = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
+		online_subsystem_ = IOnlineSubsystem::Get();
 		if (online_subsystem_)
 		{
 			session_interface_ = online_subsystem_->GetSessionInterface();
@@ -317,4 +317,29 @@ void UGI_Zoomies::OnDestroyComplete(FName session_name, bool bWasSuccessful)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Failed to destroy session"));
 	}
+}
+void UGI_Zoomies::StorePlayerData(int32 PlayerId, const TArray<TArray<EAnimal>>& CapturedAnimals, const TArray<FScoreData>& ScoreDatas)
+{
+	if (PlayerDataMap.Contains(PlayerId))
+	{
+		FPlayerData& PlayerData = PlayerDataMap[PlayerId];
+		PlayerData.CapturedAnimals = CapturedAnimals;
+		PlayerData.ScoreDatas = ScoreDatas;
+	}
+	else
+	{
+		FPlayerData NewPlayerData;
+		NewPlayerData.CapturedAnimals = CapturedAnimals;
+		NewPlayerData.ScoreDatas = ScoreDatas;
+		PlayerDataMap.Add(PlayerId, NewPlayerData);
+	}
+}
+
+FPlayerData* UGI_Zoomies::GetPlayerData(int32 PlayerId)
+{
+	if (PlayerDataMap.Contains(PlayerId))
+	{
+		return &PlayerDataMap[PlayerId];
+	}
+	return nullptr;
 }

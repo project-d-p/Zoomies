@@ -21,6 +21,8 @@ public:
 	void IncreasePrivatePlayerScoreByServer(const EPlayerJob& playerJob, const TArray<EAnimal>& animals);
 	void UpdatePrivatePlayerScoreUI();
 	void SetScoreUI_Private(UScoreUiPrivate* ScoreUI_Private);
+	void SendPlayerDataToGameInstance();
+	
 	
 	UPROPERTY(BlueprintReadWrite, Category = "UI")
 	UTextBlock* ScoreTextPrivate;

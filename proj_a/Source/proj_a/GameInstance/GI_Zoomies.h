@@ -6,7 +6,18 @@
 #include "Engine/GameInstance.h"
 #include "OnlineSubsystem.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include "proj_a/Component/InGame/Score/Types/ScoreTypes.h"
 #include "GI_Zoomies.generated.h"
+
+
+USTRUCT(BlueprintType)
+struct FPlayerData
+{
+	GENERATED_BODY()
+
+	TArray<TArray<EAnimal>> CapturedAnimals;
+	TArray<FScoreData> ScoreDatas;
+};
 
 UCLASS()
 class PROJ_A_API UGI_Zoomies : public UGameInstance
@@ -43,14 +54,12 @@ private:
 	void onCreateComplete(FName session_name, bool bWasSuccessful);
 	FDelegateHandle dh_on_create_complete;
 	FOnCreateSessionComplete on_create_complete_event;
-
 	FDelegateHandle dh_on_session_failure;
 	void OnSessionFailure(const FUniqueNetId& NetId, ESessionFailure::Type FailureType);
-	
 	void OnDestroyComplete(FName session_name, bool bWasSuccessful);
 	FDelegateHandle dh_on_destroy_complete;
-	
 
+	// Param that is used to check if the steamAPI is initialized
 	int count = 0;
 	int max_count = 5;
 	bool is_steamAPI_init = false;
@@ -59,4 +68,10 @@ private:
 	void CheckSteamInit();
 	void InitSteamAPI();
 	void InitOnlineSubsystemSteam();
+
+	// StoreInGameData
+	UPROPERTY()
+	TMap<int32, FPlayerData> PlayerDataMap;
+	void StorePlayerData(int32 PlayerId, const TArray<TArray<EAnimal>>& CapturedAnimals, const TArray<FScoreData>& ScoreDatas);
+	FPlayerData* GetPlayerData(int32 PlayerId);
 };
