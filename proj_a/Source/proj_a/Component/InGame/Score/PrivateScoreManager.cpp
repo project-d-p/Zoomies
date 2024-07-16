@@ -63,13 +63,3 @@ void UPrivateScoreManager::SetScoreUI_Private(UScoreUiPrivate* pScoreUI_Private)
 	}
 	ScoreUI_Private = pScoreUI_Private;
 }
-
-void UPrivateScoreManager::SendPlayerDataToGameInstance()
-{
-	// UGI_Zoomies* MyGameInstance = GetGameInstance<UGI_Zoomies>();
-	// if (MyGameInstance)
-	// {
-	// 	int32 PlayerId = GetUniqueID();
-	// 	MyGameInstance->StorePlayerData(PlayerId, CapturedAnimals, ScoreDatas);
-	// }
-}

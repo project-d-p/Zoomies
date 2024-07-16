@@ -17,6 +17,7 @@ struct FPlayerData
 
 	TArray<TArray<EAnimal>> CapturedAnimals;
 	TArray<FScoreData> ScoreDatas;
+	bool bIsJob = false;
 };
 
 UCLASS()
@@ -31,7 +32,6 @@ public:
 	// Matching starting function
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void StartMatchMaking();
-	
 	void ResetSession();
 
 private:
@@ -68,10 +68,4 @@ private:
 	void CheckSteamInit();
 	void InitSteamAPI();
 	void InitOnlineSubsystemSteam();
-
-	// StoreInGameData
-	UPROPERTY()
-	TMap<int32, FPlayerData> PlayerDataMap;
-	void StorePlayerData(int32 PlayerId, const TArray<TArray<EAnimal>>& CapturedAnimals, const TArray<FScoreData>& ScoreDatas);
-	FPlayerData* GetPlayerData(int32 PlayerId);
 };

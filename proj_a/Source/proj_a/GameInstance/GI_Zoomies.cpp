@@ -318,28 +318,3 @@ void UGI_Zoomies::OnDestroyComplete(FName session_name, bool bWasSuccessful)
 		UE_LOG(LogTemp, Error, TEXT("Failed to destroy session"));
 	}
 }
-void UGI_Zoomies::StorePlayerData(int32 PlayerId, const TArray<TArray<EAnimal>>& CapturedAnimals, const TArray<FScoreData>& ScoreDatas)
-{
-	if (PlayerDataMap.Contains(PlayerId))
-	{
-		FPlayerData& PlayerData = PlayerDataMap[PlayerId];
-		PlayerData.CapturedAnimals = CapturedAnimals;
-		PlayerData.ScoreDatas = ScoreDatas;
-	}
-	else
-	{
-		FPlayerData NewPlayerData;
-		NewPlayerData.CapturedAnimals = CapturedAnimals;
-		NewPlayerData.ScoreDatas = ScoreDatas;
-		PlayerDataMap.Add(PlayerId, NewPlayerData);
-	}
-}
-
-FPlayerData* UGI_Zoomies::GetPlayerData(int32 PlayerId)
-{
-	if (PlayerDataMap.Contains(PlayerId))
-	{
-		return &PlayerDataMap[PlayerId];
-	}
-	return nullptr;
-}

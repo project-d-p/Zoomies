@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "CHAR_MatchingLobby.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "DPHpActorComponent.h"
@@ -21,7 +19,6 @@ ACHAR_MatchingLobby::ACHAR_MatchingLobby()
 {
 	bReplicates = true;
 	
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	weaponComponent = CreateDefaultSubobject<UDPWeaponActorComponent>(TEXT("WeaponComponent"));
@@ -98,7 +95,8 @@ void ACHAR_MatchingLobby::StopAimAnimation()
 {
 	if (characterMontage) {
 		isAim = false;
-		StopAnimMontage(characterMontage); UE_LOG(LogTemp, Warning, TEXT("StopAimAnimation"));
+		StopAnimMontage(characterMontage);
+		UE_LOG(LogTemp, Warning, TEXT("StopAimAnimation"));
 	}
 }
 
