@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -9,24 +7,11 @@
 #include "proj_a/Component/InGame/Score/Types/ScoreTypes.h"
 #include "GI_Zoomies.generated.h"
 
-
-USTRUCT(BlueprintType)
-struct FPlayerData
-{
-	GENERATED_BODY()
-
-	TArray<TArray<EAnimal>> CapturedAnimals;
-	TArray<FScoreData> ScoreDatas;
-	bool bIsJob = false;
-};
-
 UCLASS()
 class PROJ_A_API UGI_Zoomies : public UGameInstance
 {
 	GENERATED_BODY()
 public:
-	void OnHostDisconnected();
-	void HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type Arg, const FString& String);
 	virtual void Init() override;
 
 	// Matching starting function
