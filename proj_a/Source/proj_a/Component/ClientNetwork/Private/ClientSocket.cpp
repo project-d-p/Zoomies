@@ -28,7 +28,6 @@ void UClientSocket::Connect(const char* /*ip*/, uint16 port)
 	connection_ = SteamNetworkingSockets()->ConnectByIPAddress(server_address_, 1, &opt_);
 	if (connection_ == k_HSteamNetConnection_Invalid)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Failed to connect to server"));
 		FNetLogger::EditerLog(FColor::Cyan, TEXT("Failed to connect to server"));
 	}
 	else
@@ -160,10 +159,7 @@ void UClientSocket::OnSteamNetConnectionStatusChanged(SteamNetConnectionStatusCh
 	case k_ESteamNetworkingConnectionState_Connected:
 		break ;
 	case k_ESteamNetworkingConnectionState_ClosedByPeer:
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("Closed By Peer: %s"), UTF8_TO_TCHAR(info->m_info.m_szEndDebug));
-		UE_LOG(LogTemp, Error, TEXT("Connection closed by peer. Reason: %d, Info: %hs"), info->m_info.m_eEndReason, UTF8_TO_TCHAR(info->m_info.m_szEndDebug));
 	case k_ESteamNetworkingConnectionState_ProblemDetectedLocally:
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("Client Disconnected"));
 		SteamNetworkingSockets()->CloseConnection(connection_, 0, nullptr, false);
 		break ;
 	default:

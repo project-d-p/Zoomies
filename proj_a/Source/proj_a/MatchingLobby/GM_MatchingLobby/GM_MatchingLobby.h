@@ -15,5 +15,6 @@ public:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	void CheckReadyToStart();
 private:
+	void SetPlayerIdMap() const;
 	void StartGame_t() const;
 };

@@ -25,6 +25,7 @@ public:
 	std::queue<Message> GetReadBuffer();
 	bool IsGameStarted() const;
 	void PushUdpFlushMessage(Message& msg);
+	void DestoryInstance();
 	// void OnSteamNetConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t* info);
 	
 	STEAM_CALLBACK(SteamNetworkingSocket, OnSteamNetConnectionStatusChanged, SteamNetConnectionStatusChangedCallback_t);

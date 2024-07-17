@@ -10,11 +10,14 @@
 #include "BaseInputComponent.h"
 #include "MainLevelComponent.h"
 #include "ResultLevelComponent.h"
+#include "proj_a/GameInstance/GI_Zoomies.h"
 
 DEFINE_LOG_CATEGORY(LogNetwork);
 
 ADPPlayerController::ADPPlayerController()
 {
+	FNetLogger::LogError(TEXT("CREATED ADPPlayerController: %d"), this->GetUniqueID());
+	FNetLogger::EditerLog(FColor::Red, TEXT("CREATED ADPPlayerController: %d"), this->GetUniqueID());
 	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
 	Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
 
@@ -25,9 +28,16 @@ ADPPlayerController::ADPPlayerController()
 
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::MAIN), MainLevelComponet);
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::RESULT), ResultLevelComponet);
+	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::NONE), nullptr);
 	
 	// TODO: Change to private score manager later
 	PrivateScoreManager = CreateDefaultSubobject<UPrivateScoreManager>(TEXT("PrivateScoreManager"));
+}
+
+ADPPlayerController::~ADPPlayerController()
+{
+	FNetLogger::EditerLog(FColor::Red, TEXT("ADPPlayerController::~ADPPlayerController"));
+	FNetLogger::LogError(TEXT("PlayerController ID[~Destructor]: %d"), this->GetUniqueID());
 }
 
 void ADPPlayerController::SendChatMessageToServer(const FString& Message)
@@ -86,22 +96,51 @@ UClientSocket* ADPPlayerController::GetClientSocket() const
 	return Socket;
 }
 
+void ADPPlayerController::AcknowledgePossession(APawn* P)
+{
+	Super::AcknowledgePossession(P);
+
+	// 클라이언트 측에서 추가 초기화 작업 수행
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		ADPCharacter* DPCharacter = Cast<ADPCharacter>(P);
+		if (!DPCharacter)
+		{
+			return ;
+		}
+		
+		// disable move replication : set bReplicateMovement to false
+		if (UWorld* World = GetWorld())
+		{
+			FString CurrentLevelName = World->GetMapName();
+			if (CurrentLevelName.Contains("resultLevel"))
+			{
+				DPCharacter->SetReplicatingMovement(true);
+				SwitchLevelComponent(ELevelComponentType::RESULT);
+			}
+		}
+	}
+}
+
 void ADPPlayerController::ReleaseMemory()
 {
 	if (Socket)
 	{
 		Socket->DestoryInstance();
 		Socket->DestroyComponent();
+		Socket = nullptr;
 	}
 	if (ChatManager)
 	{
 		ChatManager->DestroyComponent();
+		ChatManager = nullptr;
 	}
 }
 
 void ADPPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	Cast<UMainLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::MAIN)])->SetStateComponent();
 }
 
@@ -113,6 +152,18 @@ void ADPPlayerController::Tick(float DeltaSeconds)
 void ADPPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+
+	if (Socket)
+	{
+		Socket->DestoryInstance();
+		Socket->DestroyComponent();
+		Socket = nullptr;
+	}
+	if (ChatManager)
+	{
+		ChatManager->DestroyComponent();
+		ChatManager = nullptr;
+	}
 }
 
 void ADPPlayerController::OnPossess(APawn* InPawn)
@@ -120,6 +171,14 @@ void ADPPlayerController::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 
 	// Set StateComponet in MainLevel
+	for (auto& Pair : LevelComponents)
+	{
+		if (Pair.Value)
+		{
+			Pair.Value->SetPlayerCharacter(InPawn);
+			Pair.Value->GetInputComponent()->SetPlayerCharacter(InPawn);
+		}
+	}
 	Cast<UMainLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::MAIN)])->SetStateComponent();
 }
 
@@ -137,7 +196,6 @@ void ADPPlayerController::SwitchLevelComponent(ELevelComponentType Type)
 	}
 	else
 	{
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("ActiveComponent is null"));
 		ActivateComponent(Type);
 	}
 }
@@ -151,14 +209,17 @@ void ADPPlayerController::DeactiveCurrentComponent()
 {
 	if (ActiveComponent)
 	{
-		ActiveComponent->Deactivate();
-		ActiveComponent->SetComponentTickEnabled(false);
-        
 		// 입력 컴포넌트 비활성화
 		if (UBaseInputComponent* InputComp = ActiveComponent->GetInputComponent())
 		{
 			InputComp->Deactivate();
 		}
+		
+		ActiveComponent->Deactivate();
+		ActiveComponent->SetComponentTickEnabled(false);
+		ActiveComponent->PrimaryComponentTick.bCanEverTick = false;
+		ActiveComponent->RegisterComponent();
+		
 		ActiveComponent = nullptr;
 	}
 }
@@ -168,15 +229,33 @@ void ADPPlayerController::ActivateComponent(ELevelComponentType Type)
 	UBaseLevelComponent* SelectedComponent = LevelComponents[static_cast<uint32>(Type)];
 	if (SelectedComponent)
 	{
+		SelectedComponent->PrimaryComponentTick.bCanEverTick = true;
 		SelectedComponent->Activate(true);
 		SelectedComponent->SetComponentTickEnabled(true);
+		SelectedComponent->RegisterComponent();
 		
 		// 입력 컴포넌트 활성화
 		if (UBaseInputComponent* InputComp = SelectedComponent->GetInputComponent())
 		{
-			FNetLogger::EditerLog(FColor::Cyan, TEXT("Activate InputComponent"));
 			InputComp->Activate(true);
 		}
 		ActiveComponent = SelectedComponent;
 	}
+}
+
+// Local PlayerController && Local PlayerState (Server && Client) Automatically Saved && Called Right Before Seamless Travel
+void ADPPlayerController::GetSeamlessTravelActorList(bool bToTransitionMap, TArray<AActor*>& ActorList)
+{
+	Super::GetSeamlessTravelActorList(bToTransitionMap, ActorList);
+
+	if (IsLocalPlayerController())
+	{
+		UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+		if (!GameInstance)
+		{
+			return ;
+		}
+		GameInstance->LocalController = this;
+	}
+	this->SwitchLevelComponent(ELevelComponentType::NONE);
 }

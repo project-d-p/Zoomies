@@ -128,7 +128,9 @@ void UMainInputComponent::UnbindMainLevelActions()
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 	{
 		if (MainLevelContext)
+		{
 			SubSystem->RemoveMappingContext(MainLevelContext);
+		}
 	}
 }
 
@@ -406,6 +408,9 @@ void UMainInputComponent::ReturningAnimals(const FInputActionValue& value)
 	if (PlayerState)
 	{
 		PlayerController->GetPrivateScoreManagerComponent()->IncreasePrivatePlayerScore(PlayerState->GetPlayerJob(), animals);
+		uint32 score = PlayerController->GetPrivateScoreManagerComponent()->GetPrivatePlayerScore();
+		FString playerName = PlayerState->GetPlayerName();
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Score[%s] : %d"), *playerName, score);
 	}
 	if (PlayerController->HasAuthority())
 	{

@@ -79,6 +79,11 @@ void UMainLevelComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (PrimaryComponentTick.bCanEverTick == false)
+	{
+		return ;
+	}
+
 	ADPPlayerController* PlayerController = GetPlayerController();
 	if (PlayerController == nullptr)
 	{
@@ -168,6 +173,11 @@ void UMainLevelComponent::ServerNotifyReturnAnimals_Implementation()
 	TArray<EAnimal> animals = Character->ReturnMonsters();
 
 	PlayerController->GetPrivateScoreManagerComponent()->IncreasePrivatePlayerScoreByServer(PlayerState->GetPlayerJob(), animals);
+
+	uint32 score = PlayerController->GetPrivateScoreManagerComponent()->GetPrivatePlayerScore();
+	FString playerName = PlayerState->GetPlayerName();
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Score[%s] : %d"), *playerName, score);
+	
 	ADPGameModeBase* GM = GetWorld()->GetAuthGameMode<ADPGameModeBase>();
 	if (GM)
 	{

@@ -21,8 +21,11 @@ class PROJ_A_API ADPPlayerController : public APlayerController
 
 public:
 	ADPPlayerController();
+	virtual ~ADPPlayerController() override;
 	
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void GetSeamlessTravelActorList(bool bToTransitionMap, TArray<AActor*>& ActorList) override;
+	virtual void AcknowledgePossession(APawn* P) override;
 	
 	void SendChatMessageToServer(const FString& Message);
 	void ReceiveChatMessage(const FString& SenderName, const FString& Message);
@@ -50,7 +53,7 @@ private:
 	void DeactiveCurrentComponent();
 	void ActivateComponent(ELevelComponentType Type);
 	
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	UPrivateScoreManager* PrivateScoreManager;
 	UPROPERTY()
 	UChatManager* ChatManager = nullptr;
