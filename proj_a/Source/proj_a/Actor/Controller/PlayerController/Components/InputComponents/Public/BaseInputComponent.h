@@ -18,6 +18,7 @@ public:
 	
 	void InitializeController(ADPPlayerController* AdpPlayerController);
 	void SetLevelComponent(UBaseLevelComponent* MainLevelComponent);
+	void SetPlayerCharacter(APawn* Pawn);
 
 protected:
 	ADPPlayerController* GetPlayerController() const;

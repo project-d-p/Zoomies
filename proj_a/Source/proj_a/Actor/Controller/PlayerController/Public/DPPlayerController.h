@@ -24,6 +24,8 @@ public:
 	virtual ~ADPPlayerController() override;
 	
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void GetSeamlessTravelActorList(bool bToTransitionMap, TArray<AActor*>& ActorList) override;
+	virtual void AcknowledgePossession(APawn* P) override;
 	
 	void SendChatMessageToServer(const FString& Message);
 	void ReceiveChatMessage(const FString& SenderName, const FString& Message);

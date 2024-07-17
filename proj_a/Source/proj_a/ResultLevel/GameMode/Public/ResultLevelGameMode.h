@@ -12,11 +12,12 @@ class PROJ_A_API AResultLevelGameMode : public AGameModeBase
 public:
 	AResultLevelGameMode();
 	virtual ~AResultLevelGameMode() override;
+
+	/* Seamless Travel : Reuse PlayerController for Client */
+	virtual void HandleSeamlessTravelPlayer(AController*& C) override;
+	/* Seamless Travel : Reuse PlayerController for Server */
+	virtual void PostSeamlessTravel() override;
 	
 protected:
-	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void Logout(AController* Exiting) override;
-
-private:
-	
 };

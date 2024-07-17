@@ -22,6 +22,11 @@ void UBaseInputComponent::SetLevelComponent(UBaseLevelComponent* MainLevelCompon
 	OwningLevelComponent = MainLevelComponent;
 }
 
+void UBaseInputComponent::SetPlayerCharacter(APawn* Pawn)
+{
+	CachedCharacter = Pawn;
+}
+
 ADPPlayerController* UBaseInputComponent::GetPlayerController() const
 {
 	return CachedPlayerController;

@@ -17,9 +17,15 @@
 #include "MainLevelComponent.h"
 #include "MessageMaker.h"
 #include "NetworkMessage.h"
+#include "OnlineSubsystem.h"
+#include "proj_a/GameInstance/GI_Zoomies.h"
 
 ADPGameModeBase::ADPGameModeBase()
 {
+	bUseSeamlessTravel = true;
+	bReplicates = true;
+	PrimaryActorTick.bCanEverTick = true;
+	
 	DefaultPawnClass = ADPCharacter::StaticClass();
 	PlayerControllerClass = ADPPlayerController::StaticClass();
 	PlayerStateClass = ADPPlayerState::StaticClass();
@@ -30,8 +36,6 @@ ADPGameModeBase::ADPGameModeBase()
 	ScoreManager = CreateDefaultSubobject<UScoreManagerComp>(TEXT("ScoreManager"));
 	MonsterFactory = CreateDefaultSubobject<UMonsterFactory>(TEXT("MonsterFactory"));
 
-	PrimaryActorTick.bCanEverTick = true;
-	// PrimaryActorTick.TickGroup = TG_PostPhysics;
 	monster_controllers_.resize(NUM_OF_MAX_MONSTERS, nullptr);
 	empty_monster_slots_.reserve(NUM_OF_MAX_MONSTERS);
 
@@ -39,7 +43,26 @@ ADPGameModeBase::ADPGameModeBase()
 	{
 		empty_monster_slots_.push_back(i);
 	}
-	bReplicates = true;
+}
+
+// Only Called in Server : PlayerController && PlayerState Automatically Travel
+void ADPGameModeBase::GetSeamlessTravelActorList(bool bToTransition, TArray<AActor*>& ActorList)
+{
+	Super::GetSeamlessTravelActorList(bToTransition, ActorList);
+
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (!GameInstance)
+		return ;
+	
+	for (FConstPlayerControllerIterator IT = GetWorld()->GetPlayerControllerIterator(); IT; ++IT)
+	{
+		ADPPlayerController* PlayerController = Cast<ADPPlayerController>(*IT);
+		if (PlayerController)
+		{
+			PlayerController->SwitchLevelComponent(ELevelComponentType::NONE);
+			GameInstance->PlayerCharacters.Add(PlayerController, PlayerController->GetPrivateScoreManagerComponent()->GetPrivatePlayerScore());
+		}
+	}
 }
 
 void ADPGameModeBase::SendChatToAllClients(const FString& SenderName, const FString& Message)
@@ -72,6 +95,7 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 	}
 	FString name = player_state->GetPlayerName();
 	std::string key(TCHAR_TO_UTF8(*name));
+	
 	if (player_controllers_.find(key) != player_controllers_.end())
 	{
 		player_state->SetPlayerName(name + "1");
@@ -114,7 +138,7 @@ void ADPGameModeBase::StartPlay()
 	UE_LOG(LogTemp, Log, TEXT("Number of ADPCharacters in the world: %d"), NumberOfCharacters);
 	UE_LOG(LogTemp, Log, TEXT("Number of Players in this Session: %d"), GetNumPlayers());
 
-	TimerManager->StartTimer(60.0f);
+	TimerManager->StartTimer(30.0f);
 }
 
 void ADPGameModeBase::Tick(float delta_time)
@@ -138,13 +162,6 @@ void ADPGameModeBase::Tick(float delta_time)
 			steam_listen_socket_ = nullptr;
 		}
 
-		for (auto& pair: player_controllers_)
-		{
-			ADPPlayerController* controller = pair.second;
-			FNetLogger::EditerLog(FColor::Red, TEXT("Player name: %s || Score: %d"), *controller->PlayerState->GetPlayerName(), controller->GetPrivateScoreManagerComponent()->GetPrivatePlayerScore());
-			controller->SwitchLevelComponent(ELevelComponentType::NONE);
-		}
-		
 		GetWorld()->ServerTravel(TEXT("calculateLevel?listen"), true);
 	}
 	else

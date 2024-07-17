@@ -74,7 +74,6 @@ void UMainInputComponent::Deactivate()
 {
 	Super::Deactivate();
 	UnbindMainLevelActions();
-	FNetLogger::LogError(TEXT("bbbbbbbbbbbbbbbbbbbbbbbb"));
 }
 
 void UMainInputComponent::BindMainLevelActions()

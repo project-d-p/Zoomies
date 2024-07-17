@@ -23,11 +23,11 @@ UDPWeaponActorComponent::UDPWeaponActorComponent()
 
 UDPWeaponActorComponent::~UDPWeaponActorComponent()
 {
-	if (weapons.Num() > 0) {
-		for (ADPWeapon* weapon : weapons) {
-			weapon->Destroy();
-		}
-	}
+	// if (weapons.Num() > 0) {
+	// 	for (ADPWeapon* weapon : weapons) {
+	// 		weapon->Destroy();
+	// 	}
+	// }
 }
 
 

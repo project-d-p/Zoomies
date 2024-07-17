@@ -6,6 +6,7 @@
 #include "proj_a/MatchingLobby/GS_MachingLobby/GS_MatchingLobby.h"
 #include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
 #include "Kismet/GameplayStatics.h"
+#include "proj_a/GameInstance/GI_Zoomies.h"
 
 AGM_MatchingLobby::AGM_MatchingLobby() {
 	// DefaultPawnClass = ADPCharacter::StaticClass();

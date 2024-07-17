@@ -28,6 +28,8 @@ public:
 	// Sets default values for this character's properties
 	ADPGameModeBase();
 
+	virtual void GetSeamlessTravelActorList(bool bToTransition, TArray<AActor*>& ActorList) override;
+
 	// for test
 	void SpawnAndPossessAI();
 

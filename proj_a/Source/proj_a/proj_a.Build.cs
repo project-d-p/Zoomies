@@ -66,6 +66,7 @@ public class proj_a : ModuleRules
 			"proj_a/Component/InGame/HitDetection/Public",
 			"proj_a/Component/InGame/Timer/Public",
 			"proj_a/Component/InGame/ReturnPlace/Public",
+			"proj_a/Component/InGame/Score/Types",
 			"proj_a/Component/Audio/Public",
 			"proj_a/Component/ClientNetwork/Public",
 			"proj_a/ResultLevel/GameMode/Public",

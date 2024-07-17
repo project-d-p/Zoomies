@@ -14,7 +14,7 @@ class PROJ_A_API UBaseLevelComponent : public UActorComponent
 protected:
 	ADPPlayerController* GetPlayerController() const;
 	APawn* GetPlayerCharacter();
-	
+
 	UPROPERTY()
 	UBaseInputComponent* InputComponent;
 	UPROPERTY()
@@ -26,9 +26,9 @@ protected:
 public:
 	virtual void Activate(bool bReset=false) override;
 	virtual void Deactivate() override;
-
 	
 	void InitializeController(ADPPlayerController* AdpPlayerController);
+	void SetPlayerCharacter(APawn* InCharacter);
 	
 	UBaseInputComponent* GetInputComponent() const;
 	USoundComponent* GetSoundComponent() const;
