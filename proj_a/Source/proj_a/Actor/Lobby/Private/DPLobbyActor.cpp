@@ -20,8 +20,8 @@ ADPLobbyActor::ADPLobbyActor()
     (TEXT("/Game/model/animals/fox_2/fox.fox"));
     if (SK_FOXMESH.Succeeded()) {
         foxComponent->SetSkeletalMesh(SK_FOXMESH.Object);
-        foxComponent->SetRelativeScale3D(FVector(0.2f, 0.2f, 0.2f));
-        foxComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+        foxComponent->SetRelativeScale3D(FVector(0.3f, 0.3f, 0.3f));
+        foxComponent->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
     }
 
     foxComponent->SetAnimationMode(EAnimationMode::AnimationSingleNode);
@@ -35,8 +35,8 @@ ADPLobbyActor::ADPLobbyActor()
 
     arrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("arrowComponent"));
     arrowComponent->SetupAttachment(foxComponent);
-    arrowComponent->SetRelativeLocation(FVector(0.f, 400.f, 0.f));
-    arrowComponent->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
+    arrowComponent->SetRelativeLocation(FVector(400.f, 0.f, 0.f));
+    arrowComponent->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
     arrowComponent->SetRelativeScale3D(FVector(2.5f, 2.5f, 2.5f));
 
     //foxAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("audioComponent"));
@@ -57,9 +57,7 @@ ADPLobbyActor::ADPLobbyActor()
 
     FAnimalData foxData;
     foxData.meshComponent = foxComponent;
-    foxData.offset = FVector(arrowComponent->GetForwardVector().Y,
-        arrowComponent->GetForwardVector().X,
-        arrowComponent->GetForwardVector().Z) * 20;
+    foxData.offset = arrowComponent->GetForwardVector() * 20;
     animalComponents.Add(foxData);
 
     /* -------------------------- giraffe ---------------------------- */
@@ -69,8 +67,8 @@ ADPLobbyActor::ADPLobbyActor()
     (TEXT("/Game/model/animals/giraffe/giraffe-lowpoly.giraffe-lowpoly"));
     if (SK_GIRAFFEMESH.Succeeded()) {
         giraffeComponent->SetSkeletalMesh(SK_GIRAFFEMESH.Object);
-        //giraffeComponent->SetRelativeScale3D(FVector(0.2f, 0.2f, 0.2f));
-        giraffeComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+        giraffeComponent->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.5f));
+        giraffeComponent->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
     }
 
     giraffeComponent->SetAnimationMode(EAnimationMode::AnimationSingleNode);
@@ -84,9 +82,7 @@ ADPLobbyActor::ADPLobbyActor()
 
     FAnimalData giraffeData;
     giraffeData.meshComponent = giraffeComponent;
-    giraffeData.offset = FVector(arrowComponent->GetForwardVector().Y,
-        arrowComponent->GetForwardVector().X,
-        arrowComponent->GetForwardVector().Z) * 10;
+    giraffeData.offset = arrowComponent->GetForwardVector() * 10;
     animalComponents.Add(giraffeData);
 
     /* -------------------------- racoon ---------------------------- */
@@ -96,8 +92,8 @@ ADPLobbyActor::ADPLobbyActor()
     (TEXT("/Game/model/animals/racoon/low-poly_racoon_run_animation.low-poly_racoon_run_animation"));
     if (SK_RACOONMESH.Succeeded()) {
         racoonComponent->SetSkeletalMesh(SK_RACOONMESH.Object);
-        racoonComponent->SetRelativeScale3D(FVector(0.025f, 0.025f, 0.025f));
-        racoonComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+        racoonComponent->SetRelativeScale3D(FVector(0.2f, 0.2f, 0.2f));
+        racoonComponent->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
     }
 
     racoonComponent->SetAnimationMode(EAnimationMode::AnimationSingleNode);
@@ -111,9 +107,7 @@ ADPLobbyActor::ADPLobbyActor()
 
     FAnimalData racconData;
     racconData.meshComponent = racoonComponent;
-    racconData.offset = FVector(arrowComponent->GetForwardVector().Y,
-        arrowComponent->GetForwardVector().X,
-        arrowComponent->GetForwardVector().Z) * 21;
+    racconData.offset = arrowComponent->GetForwardVector() * 17.5;
     animalComponents.Add(racconData);
 
     /* -------------------------- rabbit ---------------------------- */
@@ -123,8 +117,8 @@ ADPLobbyActor::ADPLobbyActor()
     (TEXT("/Game/model/animals/rabbit/low_poly_rabbit.low_poly_rabbit"));
     if (SK_RABBITMESH.Succeeded()) {
         rabbitComponent->SetSkeletalMesh(SK_RABBITMESH.Object);
-        rabbitComponent->SetRelativeScale3D(FVector(0.003f, 0.003f, 0.003f));
-        rabbitComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+        rabbitComponent->SetRelativeScale3D(FVector(0.13f, 0.13f, 0.13f));
+        rabbitComponent->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
     }
 
     rabbitComponent->SetAnimationMode(EAnimationMode::AnimationSingleNode);
@@ -138,9 +132,7 @@ ADPLobbyActor::ADPLobbyActor()
 
     FAnimalData rabbitData;
     rabbitData.meshComponent = rabbitComponent;
-    rabbitData.offset = FVector(arrowComponent->GetForwardVector().Y,
-        arrowComponent->GetForwardVector().X,
-        arrowComponent->GetForwardVector().Z) * 15;
+    rabbitData.offset = arrowComponent->GetForwardVector() * 15;
     animalComponents.Add(rabbitData);
 
     /* -------------------------- crab ---------------------------- */
@@ -151,7 +143,7 @@ ADPLobbyActor::ADPLobbyActor()
     if (SK_CRABMESH.Succeeded()) {
         crabComponent->SetSkeletalMesh(SK_CRABMESH.Object);
         crabComponent->SetRelativeScale3D(FVector(0.15f, 0.15f, 0.15f));
-        crabComponent->SetRelativeRotation(FRotator(0.f, -180.f, 0.f));
+        crabComponent->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
     }
 
     crabComponent->SetAnimationMode(EAnimationMode::AnimationSingleNode);
@@ -165,9 +157,7 @@ ADPLobbyActor::ADPLobbyActor()
 
     FAnimalData crabData;
     crabData.meshComponent = crabComponent;
-    crabData.offset = FVector((-1 * arrowComponent->GetForwardVector().X),
-        arrowComponent->GetForwardVector().Y,
-        arrowComponent->GetForwardVector().Z) * 3;
+    crabData.offset = arrowComponent->GetForwardVector() * 3;
     animalComponents.Add(crabData);
 
     /* -------------------------- turtle ---------------------------- */
@@ -177,8 +167,8 @@ ADPLobbyActor::ADPLobbyActor()
     (TEXT("/Game/model/animals/turtle/Turtle.Turtle"));
     if (SK_TURTLEMESH.Succeeded()) {
         turtleComponent->SetSkeletalMesh(SK_TURTLEMESH.Object);
-        turtleComponent->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.5f));
-        turtleComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+        turtleComponent->SetRelativeScale3D(FVector(0.3f, 0.3f, 0.3f));
+        turtleComponent->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
     }
 
     turtleComponent->SetAnimationMode(EAnimationMode::AnimationSingleNode);
@@ -192,9 +182,7 @@ ADPLobbyActor::ADPLobbyActor()
 
     FAnimalData turtleData;
     turtleData.meshComponent = turtleComponent;
-    turtleData.offset = FVector(arrowComponent->GetForwardVector().Y,
-        arrowComponent->GetForwardVector().X,
-        arrowComponent->GetForwardVector().Z) * 8;
+    turtleData.offset = arrowComponent->GetForwardVector() * 8;
     animalComponents.Add(turtleData);
 
     /* -------------------------- lion ---------------------------- */
@@ -204,8 +192,8 @@ ADPLobbyActor::ADPLobbyActor()
     (TEXT("/Game/model/animals/lion/low_poly_lion.low_poly_lion"));
     if (SK_LIONMESH.Succeeded()) {
         lionComponent->SetSkeletalMesh(SK_LIONMESH.Object);
-        lionComponent->SetRelativeScale3D(FVector(0.006f, 0.006f, 0.006f));
-        lionComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+        lionComponent->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.5f));
+        lionComponent->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
     }
 
     lionComponent->SetAnimationMode(EAnimationMode::AnimationSingleNode);
@@ -219,15 +207,13 @@ ADPLobbyActor::ADPLobbyActor()
 
     FAnimalData lionData;
     lionData.meshComponent = lionComponent;
-    lionData.offset = FVector(arrowComponent->GetForwardVector().Y,
-        arrowComponent->GetForwardVector().X,
-        arrowComponent->GetForwardVector().Z) * 23;
+    lionData.offset = arrowComponent->GetForwardVector() * 23;
     animalComponents.Add(lionData);
 
     /* -------------------------- box ---------------------------- */
     boxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("boxComponent"));
     boxComponent->SetupAttachment(RootComponent);
-    boxComponent->SetRelativeLocation(FVector(2000.f, 0.f, 0.f));
+    boxComponent->SetRelativeLocation(FVector(0.f, 500.f, 0.f));
 }
 
 // Called when the game starts or when spawned
@@ -259,19 +245,19 @@ void ADPLobbyActor::CheckReach()
             FVector newLocation = initialLocation;
             newLocation.X = FMath::RandRange(-2000.f, 10.f);
             if (foxComponent == animal.meshComponent)
-                newLocation.Z = 68.f;
+                newLocation.Z = 38.f;
             if (giraffeComponent == animal.meshComponent)
-                newLocation.Z = 3.f;
+                newLocation.Z = 55.f;
             if (racoonComponent == animal.meshComponent)
-                newLocation.Z = 70.f;
+                newLocation.Z = 22.f;
             if (rabbitComponent == animal.meshComponent)
-                newLocation.Z = 36.f;
+                newLocation.Z = 15.f;
             if (crabComponent == animal.meshComponent)
-                newLocation.Z = 8.f;
+                newLocation.Z = 10.f;
             if (turtleComponent == animal.meshComponent)
                 newLocation.Z = 28.f;
             if (lionComponent == animal.meshComponent)
-                newLocation.Z = 9.f;
+                newLocation.Z = 55.f;
             animal.meshComponent->SetRelativeLocation(newLocation);
         }
     }

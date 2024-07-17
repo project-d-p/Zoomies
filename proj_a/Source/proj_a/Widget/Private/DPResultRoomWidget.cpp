@@ -18,12 +18,12 @@ void UDPResultRoomWidget::NativeConstruct()
 	//}
 }
 
-void UDPResultRoomWidget::UpdateScores(const TArray<FString>& names, const TArray<int32>& scores)
+TArray<int32> UDPResultRoomWidget::UpdateScores(/*const TArray<FString>& names, */const TArray<int32>& scores)
 {
-	if (!scoresVerticalBox)
-		return;
+	//if (!scoresVerticalBox)
+	//	return;
 
-	scoresVerticalBox->ClearChildren();
+	//scoresVerticalBox->ClearChildren();
 
 	TArray<int32> sortedIndices;
 	for (int32 i = 0; i < scores.Num(); i++)
@@ -33,13 +33,14 @@ void UDPResultRoomWidget::UpdateScores(const TArray<FString>& names, const TArra
 		return scores[a] > scores[b];
 	});
 
-	for (int32 i : sortedIndices) {
-		UHorizontalBox* playerBox = NewObject<UHorizontalBox>(this);
+	return sortedIndices;
+	//for (int32 i : sortedIndices) {
+		//UHorizontalBox* playerBox = NewObject<UHorizontalBox>(this);
 
-		UTextBlock* nameText = NewObject<UTextBlock>(this);
-		UTextBlock* scoreText = NewObject<UTextBlock>(this);
+		//UTextBlock* nameText = NewObject<UTextBlock>(this);
+		//UTextBlock* scoreText = NewObject<UTextBlock>(this);
 
-		if (nameText && scoreText && playerBox) {
+		/*if (nameText && scoreText && playerBox) {
 			nameText->SetText(FText::FromString(names[i]));
 			scoreText->SetText(FText::AsNumber(scores[i]));
 
@@ -66,9 +67,9 @@ void UDPResultRoomWidget::UpdateScores(const TArray<FString>& names, const TArra
 				scoreSlot->SetVerticalAlignment(EVerticalAlignment::VAlign_Fill);
 				scoreSlot->SetSize(ESlateSizeRule::Automatic);
 				scoreSlot->SetPadding(FMargin(0.0f));
-			}
+			}*/
 
-			scoresVerticalBox->AddChild(playerBox);
-		}
-	}
+			//scoresVerticalBox->AddChild(playerBox);
+		//}
+	//}
 }

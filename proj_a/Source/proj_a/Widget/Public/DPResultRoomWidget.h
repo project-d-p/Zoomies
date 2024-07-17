@@ -18,11 +18,11 @@ protected:
     virtual void NativeConstruct() override;
 
 public:
-    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-    class UVerticalBox* scoresVerticalBox;
+    //UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+    //class UVerticalBox* scoresVerticalBox;
 
     UFUNCTION(BlueprintCallable, Category = "UI")
-    void UpdateScores(const TArray<FString>& names, const TArray<int32>& scores);
+    TArray<int32> UpdateScores(/*const TArray<FString>& names, */const TArray<int32>& scores);
 
     //UFont* loadFont;
 };
