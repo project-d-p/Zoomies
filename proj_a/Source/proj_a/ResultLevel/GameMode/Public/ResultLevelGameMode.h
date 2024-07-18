@@ -21,7 +21,7 @@ struct FPlayerScore
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadWrite, Category = "PlayerName")
-	FString PlayerName = "";
+	FString PlayerName;
 	
 	UPROPERTY(BlueprintReadWrite, Category = "PlayerJob")
 	EPlayerJob PlayerJob = EPlayerJob::JOB_ARCHAEOLOGIST;
@@ -50,7 +50,12 @@ class PROJ_A_API AResultLevelGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSimpleEvent);
+
+	UPROPERTY(BlueprintAssignable, Category = "EventsResult")
+	FOnSimpleEvent OnSimpleEvent;
 	AResultLevelGameMode();
+
 	virtual ~AResultLevelGameMode() override;
 
 	/* Seamless Travel : Reuse PlayerController for Client */
@@ -58,7 +63,7 @@ public:
 	/* Seamless Travel : Reuse PlayerController for Server */
 	virtual void PostSeamlessTravel() override;
 
-	virtual void StartPlay() override;
+	virtual void BeginPlay() override;
 
 	// index displays as player index
 	UPROPERTY(BlueprintReadWrite, Category = "PlayerScores")

@@ -47,10 +47,8 @@ void AResultLevelGameMode::PostSeamlessTravel()
 	}
 }
 
-void AResultLevelGameMode::StartPlay()
+void AResultLevelGameMode::BeginPlay()
 {
-	Super::StartPlay();
-
 	this->SetPlayerScores();
 	
 	// for (auto& PlayerScore : PlayerScores)
@@ -60,6 +58,10 @@ void AResultLevelGameMode::StartPlay()
 	// 	FNetLogger::LogError(TEXT("Scores: %d, %d, %d, %d, %d"), PlayerScore.Scores[0], PlayerScore.Scores[1], PlayerScore.Scores[2], PlayerScore.Scores[3], PlayerScore.Scores[4]);
 	// 	FNetLogger::LogError(TEXT("bIsDetected: %d"), PlayerScore.bIsDetected);
 	// }
+
+	OnSimpleEvent.Broadcast();
+
+	Super::BeginPlay();
 }
 
 void AResultLevelGameMode::Logout(AController* Exiting)
@@ -129,26 +131,31 @@ void AResultLevelGameMode::SetPlayerScores()
 {
 	FString PlayerName("TEST");
 	EPlayerJob PlayerJob = EPlayerJob::JOB_ARCHAEOLOGIST;
-	TArray<int32> Scores = {0, 0, 0, 0, 0};
+	TArray<int32> Scores[5] = {
+		{0, 100, 500, 200, 10},
+		{500, 200, 100, 8000, 900000},
+		{300, 200, 100, 800, 400},
+		{200, 100, 800, 100, 200000}
+	};
 	TArray<FAnimalList> CapturedAnimals;
 	bool bIsDetected = false;
-	
+
 	// for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	// {
-	// 	ADPPlayerController* PlayerController = Cast<ADPPlayerController>(*Iterator);
-	// 	if (!PlayerController)
-	// 	{
-	// 		return ;
-	// 	}
-	// 	ADPPlayerState* PlayerState = Cast<ADPPlayerState>(PlayerController->PlayerState);
-	// 	if (!PlayerState)
-	// 	{
-	// 		return ;
-	// 	}
+	//     ADPPlayerController* PlayerController = Cast<ADPPlayerController>(*Iterator);
+	//     if (!PlayerController)
+	//     {
+	//         return ;
+	//     }
+	//     ADPPlayerState* PlayerState = Cast<ADPPlayerState>(PlayerController->PlayerState);
+	//     if (!PlayerState)
+	//     {
+	//         return ;
+	//     }
 
 	for (int i = 0; i < 4; i++) {
 		FPlayerScore PlayerScore;
-		
+
 		// PlayerScore.PlayerName = PlayerState->GetPlayerName();
 		// PlayerScore.PlayerJob = PlayerState->GetPlayerJob();
 		// PlayerScore.Scores = this->CalculateScores(PlayerController);
@@ -159,17 +166,11 @@ void AResultLevelGameMode::SetPlayerScores()
 		PlayerScore.PlayerName = PlayerName;
 		PlayerName += "_";
 		PlayerScore.PlayerJob = PlayerJob;
-		PlayerScore.Scores = Scores;
+		PlayerScore.Scores = Scores[i];
 
-		Scores[0] += 100;
-		Scores[1] += 100;
-		Scores[2] += 100;
-		Scores[3] += 100;
-		Scores[4] += 100;
-		
 		// PlayerScore.CapturedAnimals = this->GetCapturedAnimals(PlayerController);
 		PlayerScore.bIsDetected = false;
-		
+
 		PlayerScores.Add(PlayerScore);
 	}
 }
