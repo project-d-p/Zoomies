@@ -29,8 +29,8 @@ void AResultLevelGameMode::PostSeamlessTravel()
 	if (!GameInstance) return;
 
 	FVector Location[2] = {
-		{377.379388,44.683849,87.312484},
-		{377.379388,75.275560,87.312482}
+		{-527.514681,-128.409500,85.462503},
+		{-527.514681,138.648437,85.462503}
 	};
 
 	ADPCharacter* NewCharacter = GetWorld()->SpawnActor<ADPCharacter>(DefaultPawnClass, Location[0], FRotator::ZeroRotator);
@@ -73,16 +73,18 @@ void AResultLevelGameMode::HandleSeamlessTravelPlayer(AController*& C)
 			i = 0;
 		}
 		FVector Location[2] = {
-			{377.379388,44.683849,87.312484},
-			{377.379388,75.275560,87.312482}
+			{-527.514681,-128.409500,85.462503},
+			{-527.514681,138.648437,85.462503}
 		};
 
 		FVector SpawnLocation = Location[i++];  // 적절한 스폰 위치 설정
+
 		ADPCharacter* NewCharacter = GetWorld()->SpawnActor<ADPCharacter>(DefaultPawnClass, SpawnLocation, FRotator::ZeroRotator);
 		if (NewCharacter)
 		{
 			PC->Possess(NewCharacter);
 		}
+
 		ADPPlayerController* PlayerController = Cast<ADPPlayerController>(PC);
 		if (PlayerController)
 		{
