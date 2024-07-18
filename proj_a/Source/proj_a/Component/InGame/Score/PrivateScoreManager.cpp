@@ -17,6 +17,16 @@ int32 UPrivateScoreManager::GetPrivatePlayerScore() const
 	return PrivatePlayerScore;
 }
 
+TArray<TArray<EAnimal>> UPrivateScoreManager::GetCapturedAnimals() const
+{
+	return CapturedAnimals;
+}
+
+TArray<FScoreData> UPrivateScoreManager::GetScoreDatas() const
+{
+	return ScoreDatas;
+}
+
 void UPrivateScoreManager::IncreasePrivatePlayerScore(const EPlayerJob& playerJob, const TArray<EAnimal>& animals)
 {
 	FScoreData newScore = UCalculateScoreByJobs::CalculateScoreByJobs(playerJob, animals);
