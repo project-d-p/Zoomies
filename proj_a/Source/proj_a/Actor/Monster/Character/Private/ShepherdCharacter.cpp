@@ -31,7 +31,7 @@ AShepherdCharacter::AShepherdCharacter()
 	
 	/** Set the model size and adjust position */
 	FVector Scale(FVector::OneVector);
-	FVector Location(0.f, 0.f, -120.f);
+	FVector Location(0.f, 0.f, 30.f);
 	FRotator Rotation(0.f, 0.f, 0.f);
 	FTransform Transform(Rotation, Location, Scale);
 		

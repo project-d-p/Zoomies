@@ -44,28 +44,28 @@ ABaseMonsterAIController* UMonsterFactory::RandomMonsterSpawn(int32 idx)
 	FVector Location = FVector(-5000.f, RandomY, 300.f);
 	
 	std::vector MonsterClasses = {
-		ACrabCharacter::StaticClass(),
-		ALobsterCharacter::StaticClass(),
-		AMammothCharacter::StaticClass(),
-		AOctopusCharacter::StaticClass(),
-		AStarFishCharacter::StaticClass(),
-		ASlothCharacter::StaticClass(),
-		ADolphinCharacter::StaticClass(),
-		AEelCharacter::StaticClass(),
-		AFoxCharacter::StaticClass(),
-		AGiraffeCharacter::StaticClass(),
-		ALionCharacter::StaticClass(),
-		APenguinCharacter::StaticClass(),
+		// ACrabCharacter::StaticClass(),
+		// ALobsterCharacter::StaticClass(),
+		// AMammothCharacter::StaticClass(),
+		// AOctopusCharacter::StaticClass(),
+		// AStarFishCharacter::StaticClass(),
+		// ASlothCharacter::StaticClass(),
+		// ADolphinCharacter::StaticClass(),
+		// AEelCharacter::StaticClass(),
+		// AFoxCharacter::StaticClass(),
+		// AGiraffeCharacter::StaticClass(),
+		// ALionCharacter::StaticClass(),
+		// APenguinCharacter::StaticClass(),
 		ARabbitCharacter::StaticClass(),
-		ASaberToothTigerCharacter::StaticClass(),
-		ASealCharacter::StaticClass(),
+		// ASaberToothTigerCharacter::StaticClass(),
+		// ASealCharacter::StaticClass(),
 		AShepherdCharacter::StaticClass(),
-		ASkunkCharacter::StaticClass(),
-		ASquidCharacter::StaticClass(),
-		AStarFishCharacter::StaticClass(),
-		AStingRayCharacter::StaticClass(),
-		AWhaleCharacter::StaticClass()
-	};
+		// ASkunkCharacter::StaticClass(),
+		// ASquidCharacter::StaticClass(),
+		// AStarFishCharacter::StaticClass(),
+		// AStingRayCharacter::StaticClass(),
+		// AWhaleCharacter::StaticClass()
+	}; 
 	UClass* SelectedMonsterClass = MonsterClasses[FMath::RandRange(0, MonsterClasses.size() - 1)];
 	
 	return SpawnMonster(SelectedMonsterClass, Location, idx);
