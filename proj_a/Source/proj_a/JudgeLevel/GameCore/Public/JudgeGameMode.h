@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "ServerTimerManager.h"
+#include "ServerChatManager.h"
 #include "GameFramework/GameMode.h"
 #include "JudgeGameMode.generated.h"
 
@@ -13,16 +14,20 @@ class PROJ_A_API AJudgeGameMode : public AGameMode
 public:
     AJudgeGameMode();
 
-    virtual void PostLogin(APlayerController* NewPlayer) override;
-    virtual void Logout(AController* Exiting) override;
-    virtual void StartPlay() override;
-    virtual void Tick(float DeltaSeconds) override;
-    
+    UServerChatManager* GetChatManager() const { return ChatManager; }
+
+private:
+    void EndTimer();
     void SetExpectedPlayerCount(int32 Count);
     bool AreAllPlayersConnected() const;
-
-    UServerTimerManager* GetTimerManager() const { return TimerManager; }
+    
 protected:
+    virtual void StartPlay() override;
+    virtual void BeginPlay() override;
+    virtual void Tick(float DeltaSeconds) override;
+    virtual void PostLogin(APlayerController* NewPlayer) override;
+    virtual void Logout(AController* Exiting) override;
+    
     int32 ExpectedPlayerCount;
     int32 ConnectedPlayerCount;
 
@@ -30,6 +35,8 @@ protected:
     bool bGameInProgress;
     UPROPERTY()
     UServerTimerManager* TimerManager;
+    UPROPERTY()
+    UServerChatManager* ChatManager;
     
     void CheckAllPlayersConnected();
     void OnAllPlayersConnected();

@@ -3,11 +3,10 @@
 #include "DPPlayerController.h"
 
 #include "DPCharacter.h"
-#include "DPGameModeBase.h"
 #include "DPPlayerState.h"
 #include "FNetLogger.h"
-#include "GameHelper.h"
 #include "BaseInputComponent.h"
+#include "JudgeGameMode.h"
 #include "MainLevelComponent.h"
 #include "ResultLevelComponent.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
@@ -42,39 +41,20 @@ ADPPlayerController::~ADPPlayerController()
 
 void ADPPlayerController::SendChatMessageToServer(const FString& Message)
 {
-	if (ChatManager == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("ChatManager is null"));
-		return;
-	}
+	check(ChatManager)
 
 	// XXX: Change to client Steam nickname later
 	FString SenderName = "Unknown";
 	if (HasAuthority())
 	{
-		ADPGameModeBase* GM = UGameHelper::GetInGameMode(GetWorld());
-		if (GM)
-		{
-			GM->SendChatToAllClients(SenderName, Message);
-		}
+		AJudgeGameMode* GM = Cast<AJudgeGameMode>(GetWorld()->GetAuthGameMode());
+		check(GM && GM->GetChatManager())
+		GM->GetChatManager()->BroadcastChatMessage(SenderName, Message);
 	}
 	else
 	{
 		ChatManager->ServerSendChatMessage(SenderName, Message);
 	}
-}
-
-void ADPPlayerController::ReceiveChatMessage(const FString& SenderName, const FString& Message)
-{
-	if (ChatManager)
-	{
-		ChatManager->ClientReceiveChatMessage(SenderName, Message);
-	}
-}
-
-void ADPPlayerController::InitChatManager(UChatUI* ChatUI)
-{
-	ChatManager->setChatUI(ChatUI);
 }
 
 UPlayerScoreComp* ADPPlayerController::GetScoreManagerComponent() const

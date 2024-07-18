@@ -32,10 +32,8 @@ public:
 			World = Initializer.InWorld;
 
 			T* GS = Cast<T>(World->GetGameState());
-			if (GS && GS->TimerManager)
-			{
-				GS->TimerManager->SetTimerUI(this);
-			}
+			check(GS && GS->TimerManager)
+			GS->TimerManager->SetTimerUI(this);
 		}
 		if (Initializer.Time_Text)
 		{

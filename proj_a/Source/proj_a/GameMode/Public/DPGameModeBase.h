@@ -29,12 +29,9 @@ public:
 	ADPGameModeBase();
 
 	virtual void GetSeamlessTravelActorList(bool bToTransition, TArray<AActor*>& ActorList) override;
-
-	// for test
-	void SpawnAndPossessAI();
-
-	void SendChatToAllClients(const FString& SenderName, const FString& Message);
-
+	
+	UServerChatManager* GetChatManager() const { return ChatManager; }
+	
 	// monster
 	enum { NUM_OF_MAX_MONSTERS = 10 };
 	std::vector<ABaseMonsterAIController*> monster_controllers_;
@@ -55,6 +52,7 @@ public:
 	virtual void PostLogin(APlayerController* newPlayer) override;
 	virtual void Logout(AController* Exiting) override;
 	virtual void StartPlay() override;
+	void EndGame();
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	// Called every frame

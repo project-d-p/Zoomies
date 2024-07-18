@@ -6,10 +6,8 @@
 void UChatManager::ServerSendChatMessage_Implementation(const FString& SenderName, const FString& Message)
 {
 	ADPGameModeBase* DPGameMode = UGameHelper::GetInGameMode(GetWorld());
-	if (DPGameMode)
-	{
-		DPGameMode->SendChatToAllClients(SenderName, Message);
-	}
+	check(DPGameMode && DPGameMode->GetChatManager())
+	DPGameMode->GetChatManager()->BroadcastChatMessage(SenderName, Message);
 }
 
 bool UChatManager::ServerSendChatMessage_Validate(const FString& SenderName, const FString& Message)
@@ -19,16 +17,11 @@ bool UChatManager::ServerSendChatMessage_Validate(const FString& SenderName, con
 
 void UChatManager::ClientReceiveChatMessage_Implementation(const FString& SenderName, const FString& Message)
 {
-	if (ChatUI)
-	{
-		ChatUI->AddChatMessage(SenderName, Message);
-	}
+	check(ChatUI)
+	ChatUI->AddChatMessage(SenderName, Message);
 }
 
 void UChatManager::setChatUI(UChatUI* InChatUI)
 {
-	if (ChatUI == nullptr)
-	{
-		ChatUI = InChatUI;
-	}
+	ChatUI = InChatUI;
 }

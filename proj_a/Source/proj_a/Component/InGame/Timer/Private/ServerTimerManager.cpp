@@ -16,9 +16,3 @@ void UServerTimerManager::BeginPlay()
 {
 	Super::BeginPlay();
 }
-
-
-bool UServerTimerManager::IsTimeOver() const
-{
-	return bIsTimeOver;
-}

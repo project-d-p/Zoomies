@@ -28,8 +28,7 @@ public:
 	virtual void AcknowledgePossession(APawn* P) override;
 	
 	void SendChatMessageToServer(const FString& Message);
-	void ReceiveChatMessage(const FString& SenderName, const FString& Message);
-	void InitChatManager(UChatUI* ChatUI);
+	UChatManager* GetChatManager() const { return ChatManager; }
 
 	/* Switch level component Called By GameMode & GameState */
 	void SwitchLevelComponent(ELevelComponentType Type);

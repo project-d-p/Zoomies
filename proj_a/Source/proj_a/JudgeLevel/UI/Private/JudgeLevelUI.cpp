@@ -1,5 +1,6 @@
 ﻿#include "JudgeLevelUI.h"
 
+#include "DPInGameState.h"
 #include "FNetLogger.h"
 #include "JudgeGameState.h"
 
@@ -13,20 +14,20 @@ void UJudgeLevelUI::NativeConstruct()
 		FTimerUiInitializer TimerUiInitializer;
 		TimerUiInitializer.Time_Text = Time_Text;
 		TimerUiInitializer.InWorld = GetWorld();
-		TimerUI->initTimerUI<AJudgeGameState>(TimerUiInitializer);
+		TimerUI->initTimerUI<ADPInGameState>(TimerUiInitializer);
 	}
 	
-	// ScoreUI = NewObject<UScoreUI>(this);
-	// if (ScoreUI)
-	// {
-	// 	FScoreUiInitializer ScoreUiInitializer;
-	// 	ScoreUiInitializer.InWorld = GetWorld();
-	// 	ScoreUiInitializer.ScoreText = score_Text;
-	// 	ScoreUiInitializer.Player1ScoreText = player1Score_Text;
-	// 	ScoreUiInitializer.Player2ScoreText = player2Score_Text;
-	// 	ScoreUiInitializer.Player3ScoreText = player3Score_Text;
-	// 	ScoreUI->InitScoreUi(ScoreUiInitializer);
-	// }
+	ScoreUI = NewObject<UScoreUI>(this);
+	if (ScoreUI)
+	{
+		FScoreUiInitializer ScoreUiInitializer;
+		ScoreUiInitializer.InWorld = GetWorld();
+		ScoreUiInitializer.ScoreText = player1scoreText;
+		ScoreUiInitializer.Player1ScoreText = player2ScoreText;
+		ScoreUiInitializer.Player2ScoreText = player3ScoreText;
+		ScoreUiInitializer.Player3ScoreText = player4ScoreText;
+		ScoreUI->InitScoreUi(ScoreUiInitializer);
+	}
 	//
 	// ScoreUI_Private = NewObject<UScoreUiPrivate>(this);
 	// if (ScoreUI_Private)

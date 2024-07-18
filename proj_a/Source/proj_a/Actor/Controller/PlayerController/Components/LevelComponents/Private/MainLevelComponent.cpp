@@ -5,6 +5,7 @@
 #include "DPStateActorComponent.h"
 #include "BaseMonsterCharacter.h"
 #include "DPGameModeBase.h"
+#include "DPInGameState.h"
 #include "DPWeaponActorComponent.h"
 #include "HitScan.h"
 #include "MainInputComponent.h"
@@ -162,14 +163,14 @@ void UMainLevelComponent::ServerNotifyReturnAnimals_Implementation()
 	ADPPlayerController* PlayerController = GetPlayerController();
 	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
 	if (!Character) return;
-	// °³ÀÎ Á¡¼ö Áõ°¡
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	ADPPlayerState* PlayerState = Cast<ADPPlayerState>(PlayerController->PlayerState);
 	if (!PlayerState)
 	{
 		return ;
 	}
 	
-	// Å¬¶óÀÌ¾ðÆ®ÀÇ µ¿¹° ¹ÝÈ¯ Ã³¸®¸¦ Ã³¸®ÇÑ´Ù.
+	// Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯ Ã³ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Ñ´ï¿½.
 	TArray<EAnimal> animals = Character->ReturnMonsters();
 
 	PlayerController->GetPrivateScoreManagerComponent()->IncreasePrivatePlayerScoreByServer(PlayerState->GetPlayerJob(), animals);
@@ -192,7 +193,7 @@ void UMainLevelComponent::ServerNotifyReturnAnimals_Implementation()
 	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 	{
 		ADPPlayerController* PC = Cast<ADPPlayerController>(It->Get());
-		if (PC && PC != PlayerController) // ÀÚ±â ÀÚ½ÅÀ» Á¦¿ÜÇÑ ¸ðµç Å¬¶óÀÌ¾ðÆ®
+		if (PC && PC != PlayerController) // ï¿½Ú±ï¿½ ï¿½Ú½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®
 		{
 			ADPCharacter* OtherCharacter = Cast<ADPCharacter>(PC->GetPawn());
 			OtherCharacter->ClientNotifyAnimalReturn(PlayerState->GetPlayerName());
@@ -202,8 +203,8 @@ void UMainLevelComponent::ServerNotifyReturnAnimals_Implementation()
 
 bool UMainLevelComponent::ServerNotifyReturnAnimals_Validate()
 {
-	// È£ÃâÀÌ À¯È¿ÇÑÁö È®ÀÎÇÏ´Â ·ÎÁ÷À» ±¸Çö
-	return true; // À¯È¿¼º °ËÁõÀÌ Ç×»ó ÂüÀÎ °æ¿ì
+	// È£ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¿ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	return true; // ï¿½ï¿½È¿ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×»ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 }
 
 void UMainLevelComponent::HandlePosition(const ActorPosition& ActorPosition)

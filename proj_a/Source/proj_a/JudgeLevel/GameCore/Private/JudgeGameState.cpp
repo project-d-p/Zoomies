@@ -6,6 +6,7 @@ AJudgeGameState::AJudgeGameState()
 {
 	bReplicates = true;
 	TimerManager = CreateDefaultSubobject<UClientTimerManager>(TEXT("TimerManager"));
+	ScoreManager = CreateDefaultSubobject<UClientScoreMananger>(TEXT("ScoreManager"));
 }
 
 void AJudgeGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -13,4 +14,5 @@ void AJudgeGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AJudgeGameState, TimerManager);
+	DOREPLIFETIME(AJudgeGameState, ScoreManager);
 }

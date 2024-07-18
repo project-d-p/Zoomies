@@ -12,35 +12,21 @@ UClientScoreMananger::UClientScoreMananger()
 
 void UClientScoreMananger::InitScoreUi()
 {
-	ADPPlayerState* MyPlayerState = GetWorld()->GetFirstPlayerController()->GetPlayerState<ADPPlayerState>();
-	if (MyPlayerState == nullptr)
-	{
-		// FNetLogger::EditerLog(FColor::Red, TEXT("PlayerState is not found!"));
-		return;
-	}
+	ADPPlayerState* PS = GetWorld()->GetFirstPlayerController()->GetPlayerState<ADPPlayerState>();
+	check(PS);
 	TArray<TObjectPtr<APlayerState>> PlayerStates = Cast<ADPInGameState>(GetOwner())->PlayerArray;
-	//
 	for (APlayerState* PlayerState : PlayerStates)
 	{
-		// FNetLogger::EditerLog(FColor::Blue, TEXT("PlayerState: %d"), PlayerState->GetPlayerId());
 		UTextBlock* TextBlock;
-		if (ScoreUI == nullptr)
-		{
-			FNetLogger::EditerLog(FColor::Red, TEXT("ScoreUI is not found!"));
-			return;
-		}
-		if (Cast<ADPPlayerState>(PlayerState)->GetUniqueID() == MyPlayerState->GetUniqueID())
+		check(ScoreUI)
+		if (Cast<ADPPlayerState>(PlayerState)->GetUniqueID() == PS->GetUniqueID())
 		{
 			Cast<ADPPlayerState>(PlayerState)->GetPlayerScoreComp()->PlayerScore_Text = ScoreUI->GetPlayerScoreTexts();
 		}
 		else
 		{
 			TextBlock = ScoreUI->FindEmptyTextBlock();
-			if (TextBlock == nullptr)
-			{
-				FNetLogger::EditerLog(FColor::Red, TEXT("TextBlock is not found!"));
-				return;
-			}
+			check(TextBlock)
 			Cast<ADPPlayerState>(PlayerState)->GetPlayerScoreComp()->PlayerScore_Text = TextBlock;
 		}
 	}

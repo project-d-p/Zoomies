@@ -21,7 +21,6 @@ public:
 	bool bServerTraveled;
 protected:
 	virtual void AddPlayerState(APlayerState* PlayerState) override;
-	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION()

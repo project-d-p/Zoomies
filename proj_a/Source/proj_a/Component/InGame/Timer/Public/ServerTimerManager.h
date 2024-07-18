@@ -16,38 +16,12 @@ class PROJ_A_API UServerTimerManager : public UActorComponent
 public:    
 	UServerTimerManager();
 
-	template<typename T>
-	void TimerFunction()
+	template<typename T, typename UserClass>
+	void StartTimer(float Duration, void (UserClass::*Callback)(), UserClass* UserObject)
 	{
-		if (TimeRemaining > 0)
-		{
-			TimeRemaining -= INTERVAL;
-			SetTimeRemaining<T>();
-		}
-		else
-		{
-			GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
-			UE_LOG(LogTemp, Warning, TEXT("Timer ended"));
-			bIsTimeOver = true;
-		}
-	}
-
-	template<typename T>
-	void SetTimeRemaining()
-	{
-		if (T* GS = GetWorld()->GetGameState<T>())
-		{
-			if (GS->GetTimerManager())
-			{
-				GS->GetTimerManager()->SetTimeRemaining(TimeRemaining);
-				GS->GetTimerManager()->OnRep_TimeRemaining();
-			}
-		}
-	}
-
-	template<typename T>
-	void StartTimer(float Duration)
-	{
+		TimerDelegate = FTimerDelegate::CreateUObject(UserObject, Callback);
+		check(TimerDelegate.IsBound());
+		
 		bIsTimeOver = false;
 		TimerDuration = Duration;
 		TimeRemaining = TimerDuration;
@@ -59,14 +33,39 @@ public:
 			INTERVAL,
 			true);
 	}
-	
-	bool IsTimeOver() const;
 
 protected:
 	virtual void BeginPlay() override;
 
 private:
+	template<typename T>
+	void TimerFunction()
+	{
+		if (TimeRemaining > 0)
+		{
+			TimeRemaining -= INTERVAL;
+			TimeRemaining = FMath::Max(TimeRemaining, 0.0f);
+			SetTimeRemaining<T>();
+		}
+		else
+		{
+			GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+			TimerDelegate.Execute();
+		}
+	}
+
+	template<typename T>
+	void SetTimeRemaining()
+	{
+		T* GS = GetWorld()->GetGameState<T>();
+		check(GS)
+		check(GS->TimerManager)
+		GS->TimerManager->SetTimeRemaining(TimeRemaining);
+		GS->TimerManager->OnRep_TimeRemaining();
+	}
+	
 	FTimerHandle TimerHandle;
+	FTimerDelegate TimerDelegate;
 	float TimeRemaining;
 	float TimerDuration;
 	bool bIsTimeOver = false;

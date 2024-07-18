@@ -7,9 +7,7 @@ void UServerChatManager::BroadcastChatMessage_Implementation(const FString& Send
 	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 	{
 		ADPPlayerController* PC = Cast<ADPPlayerController>(*It);
-		if (PC)
-		{
-			PC->ReceiveChatMessage(SenderName, Message);
-		}
+		check(PC && PC->GetChatManager())
+		PC->GetChatManager()->ClientReceiveChatMessage(SenderName, Message);
 	}
 }

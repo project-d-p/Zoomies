@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "ClientTimerManager.h"
+#include "ClientScoreMananger.h"
 #include "GameFramework/GameStateBase.h"
 #include "JudgeGameState.generated.h"
 
@@ -13,4 +14,6 @@ public:
 
 	UPROPERTY(Replicated)
 	UClientTimerManager* TimerManager;
+	UPROPERTY(Replicated)
+	UClientScoreMananger* ScoreManager;
 };

@@ -65,11 +65,6 @@ void ADPGameModeBase::GetSeamlessTravelActorList(bool bToTransition, TArray<AAct
 	}
 }
 
-void ADPGameModeBase::SendChatToAllClients(const FString& SenderName, const FString& Message)
-{
-	ChatManager->BroadcastChatMessage(SenderName, Message);
-}
-
 void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 {
 	Super::PostLogin(newPlayer);
@@ -124,6 +119,19 @@ void ADPGameModeBase::Logout(AController* Exiting)
 	}
 }
 
+void ADPGameModeBase::EndGame()
+{
+	FNetLogger::EditerLog(FColor::Green, TEXT("Game Ended."));
+
+	if (steam_listen_socket_)
+	{
+		steam_listen_socket_->DestoryInstance();
+		delete steam_listen_socket_;
+		steam_listen_socket_ = nullptr;
+	}
+	GetWorld()->ServerTravel("judgeLevel?listen");
+}
+
 void ADPGameModeBase::StartPlay()
 {
 	Super::StartPlay();
@@ -138,7 +146,7 @@ void ADPGameModeBase::StartPlay()
 	UE_LOG(LogTemp, Log, TEXT("Number of ADPCharacters in the world: %d"), NumberOfCharacters);
 	UE_LOG(LogTemp, Log, TEXT("Number of Players in this Session: %d"), GetNumPlayers());
 
-	TimerManager->StartTimer(30.0f);
+	TimerManager->StartTimer<ADPInGameState>(5.0f, &ADPGameModeBase::EndGame, this);
 }
 
 void ADPGameModeBase::Tick(float delta_time)
@@ -152,17 +160,6 @@ void ADPGameModeBase::Tick(float delta_time)
 	if (steam_listen_socket_->IsGameStarted())
 	{
 		this->ProcessData(delta_time);
-	}
-	if (TimerManager->IsTimeOver())
-	{
-		if (steam_listen_socket_)
-		{
-			steam_listen_socket_->DestoryInstance();
-			delete steam_listen_socket_;
-			steam_listen_socket_ = nullptr;
-		}
-
-		GetWorld()->ServerTravel(TEXT("calculateLevel?listen"), true);
 	}
 	else
 	{
