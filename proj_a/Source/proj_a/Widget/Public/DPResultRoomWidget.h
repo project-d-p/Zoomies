@@ -13,16 +13,7 @@ UCLASS()
 class PROJ_A_API UDPResultRoomWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
-protected:
-    virtual void NativeConstruct() override;
-
 public:
-    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-    class UVerticalBox* scoresVerticalBox;
-
     UFUNCTION(BlueprintCallable, Category = "UI")
-    void UpdateScores(const TArray<FString>& names, const TArray<int32>& scores);
-
-    //UFont* loadFont;
+    TArray<int32> UpdateScores(const TArray<int32>& scores);
 };
