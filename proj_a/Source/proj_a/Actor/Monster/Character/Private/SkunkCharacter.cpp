@@ -7,7 +7,7 @@ ASkunkCharacter::ASkunkCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SKUNK
-	(PathManager::GetPath(EMonster::SKUNK));
+	(PathManager::GetMonsterPath(EMonster::SKUNK));
 	if (SK_SKUNK.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_SKUNK.Object);
 	}

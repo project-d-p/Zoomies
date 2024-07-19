@@ -7,7 +7,7 @@ AStarFishCharacter::AStarFishCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_STARFISH
-	(PathManager::GetPath(EMonster::STAR_FISH));
+	(PathManager::GetMonsterPath(EMonster::STAR_FISH));
 	if (SK_STARFISH.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_STARFISH.Object);
 	}

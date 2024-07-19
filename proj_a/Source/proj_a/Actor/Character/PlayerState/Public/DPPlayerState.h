@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-// #include "PlayerScoreComp.h"
+#include "PlayerScoreComp.h"
 #include "GameFramework/PlayerState.h"
 #include "proj_a/Component/InGame/Score/Types/ScoreTypes.h"
 #include "DPPlayerState.generated.h"
@@ -19,6 +19,7 @@ public:
 	UFUNCTION()
 	EPlayerJob GetPlayerJob() const;
 
+	int32 GetScore() const { return PlayerScoreComp->PlayerScores; };
 private:
 	UPROPERTY()
 	UPlayerScoreComp* PlayerScoreComp = nullptr;

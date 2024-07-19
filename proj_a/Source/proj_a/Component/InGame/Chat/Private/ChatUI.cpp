@@ -1,6 +1,11 @@
 #include "ChatUI.h"
 #include "DPPlayerController.h"
-#include "FNetLogger.h"
+#include "IChatGameMode.h"
+#include "IChatGameState.h"
+#include "JudgePlayerController.h"
+#include "ServerChatManager.h"
+#include "GameFramework/GameStateBase.h"
+#include "GameFramework/GameModeBase.h"
 #include "Components/EditableTextBox.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBoxSlot.h"
@@ -21,9 +26,9 @@ void UChatUI::InitializeChatBox(FChatUiInitializer& Initializer)
 	{
 		World = Initializer.InWorld;
 
-		ADPPlayerController* PC = Cast<ADPPlayerController>(World->GetFirstPlayerController());
-		check(PC && PC->GetChatManager())
-		PC->GetChatManager()->setChatUI(this);
+		IChatGameState* GS = Cast<IChatGameState>(World->GetGameState());
+		check(GS && GS->GetChatManager())
+		GS->GetChatManager()->setChatUI(this);
 	}
 	if (Initializer.ChatEditableTextBox)
 	{
@@ -48,18 +53,39 @@ void UChatUI::OnChatBoxCommitted(const FText& Text, ETextCommit::Type CommitMeth
 	if (CommitMethod == ETextCommit::OnEnter)
 	{
 		check(World);
-		ADPPlayerController* DPPlayerController = Cast<ADPPlayerController>(World->GetFirstPlayerController());
-		check(DPPlayerController)
+		APlayerController* PC = Cast<APlayerController>(World->GetFirstPlayerController());
+		// AJudgePlayerController* PC = Cast<AJudgePlayerController>(World->GetFirstPlayerController());
+		check(PC)
 		if (!Text.IsEmpty())
 		{
 			FString Message = Text.ToString();
 			
 			ChatBox->SetText(FText::GetEmpty());
-			DPPlayerController->SendChatMessageToServer(Message);
+			FString SenderName = PC->PlayerState->GetPlayerName();
+			IChatGameMode* GM = Cast<IChatGameMode>(World->GetAuthGameMode());
+			if (GM)
+			{
+				check(GM->GetChatManager())
+				GM->GetChatManager()->BroadcastChatMessage(SenderName, Message);
+			}
+			else
+			{
+				// TODO: Refactor needed - current implementation is suboptimal
+				if (Cast<ADPPlayerController>(PC))
+				{
+					ADPPlayerController* DP = Cast<ADPPlayerController>(PC);
+					DP->ServerSendChatMessage(SenderName, Message);
+				}
+				else if (Cast<AJudgePlayerController>(PC))
+				{
+					AJudgePlayerController* Judge = Cast<AJudgePlayerController>(PC);
+					Judge->ServerSendChatMessage(SenderName, Message);
+				}
+			}
 		}
 		FInputModeGameOnly InputMode;
-		DPPlayerController->SetInputMode(InputMode);
-		DPPlayerController->bShowMouseCursor = false;
+		PC->SetInputMode(InputMode);
+		// DPPlayerController->bShowMouseCursor = false;
 	}
 }
 

@@ -28,10 +28,6 @@ EPlayerJob ADPPlayerState::GetPlayerJob() const
 void ADPPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
-
-	ADPInGameState* GS = Cast<ADPInGameState>(GetWorld()->GetGameState());
-	check(GS)
-	GS->ScoreManager->InitScoreUi();
 }
 
 void ADPPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

@@ -7,7 +7,7 @@ ARabbitCharacter::ARabbitCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_RABBIT
-	(PathManager::GetPath(EMonster::RABBIT));
+	(PathManager::GetMonsterPath(EMonster::RABBIT));
 	if (SK_RABBIT.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_RABBIT.Object);
 	}

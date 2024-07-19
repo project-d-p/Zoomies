@@ -59,9 +59,10 @@ private:
 	{
 		T* GS = GetWorld()->GetGameState<T>();
 		check(GS)
-		check(GS->TimerManager)
-		GS->TimerManager->SetTimeRemaining(TimeRemaining);
-		GS->TimerManager->OnRep_TimeRemaining();
+		check(GS->GetTimerManager());
+		// GS Must Implement GetTimerManager() !!!
+		GS->GetTimerManager()->SetTimeRemaining(TimeRemaining);
+		GS->GetTimerManager()->OnRep_TimeRemaining();
 	}
 	
 	FTimerHandle TimerHandle;

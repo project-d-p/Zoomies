@@ -7,7 +7,7 @@ ASquidCharacter::ASquidCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SQUID
-	(PathManager::GetPath(EMonster::SQUID));
+	(PathManager::GetMonsterPath(EMonster::SQUID));
 	if (SK_SQUID.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_SQUID.Object);
 	}

@@ -10,6 +10,7 @@
 #include "message.pb.h"
 #include "ServerMessageHandler.h"
 #include "DPPlayerController.h"
+#include "IChatGameMode.h"
 #include "ServerTimerManager.h"
 #include "MonsterFactory.h"
 #include "SteamNetworkingSocket.h"
@@ -19,7 +20,7 @@
  * 
  */
 UCLASS()
-class PROJ_A_API ADPGameModeBase : public AGameModeBase
+class PROJ_A_API ADPGameModeBase : public AGameModeBase, public IChatGameMode
 {
 	GENERATED_BODY()
 public:
@@ -29,8 +30,8 @@ public:
 	ADPGameModeBase();
 
 	virtual void GetSeamlessTravelActorList(bool bToTransition, TArray<AActor*>& ActorList) override;
-	
-	UServerChatManager* GetChatManager() const { return ChatManager; }
+
+	virtual UServerChatManager* GetChatManager() const override { return ChatManager; }
 	
 	// monster
 	enum { NUM_OF_MAX_MONSTERS = 10 };
@@ -54,7 +55,7 @@ public:
 	virtual void StartPlay() override;
 	void EndGame();
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
+	
 	// Called every frame
 	virtual void Tick(float delta_time) override;
 
@@ -62,6 +63,7 @@ public:
 	virtual ~ADPGameModeBase() override;
 
 	UServerTimerManager* GetTimerManager() const { return TimerManager; }
+
 private:
 	// Implementations
 	void SyncMovement();

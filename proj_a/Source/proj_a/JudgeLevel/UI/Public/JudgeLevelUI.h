@@ -4,34 +4,48 @@
 #include "ScoreUI.h"
 #include "TimerUI.h"
 #include "Blueprint/UserWidget.h"
-#include "proj_a/Component/InGame/Score/ScoreUiPrivate.h"
+#include "Components/VerticalBox.h"
 #include "JudgeLevelUI.generated.h"
+
+UENUM()
+enum class ETextBlockType : uint8
+{
+	Id,
+	Score,
+	Occupation
+};
 
 UCLASS()
 class PROJ_A_API UJudgeLevelUI : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	virtual void NativeConstruct() override;
+	void SetBlockContent(ETextBlockType BlockType, int32 Index, const FString& Content);
+
 protected:
+	void InitTextBlocksFromContainer(UPanelWidget* Container, TArray<UTextBlock*>& OutTextBlocks);
+	virtual void NativeConstruct() override;
+	
 	UPROPERTY()
 	UTimerUI* TimerUI = nullptr;
 	UPROPERTY()
 	UScoreUI* ScoreUI = nullptr;
-	// UPROPERTY()
-	// UScoreUiPrivate* ScoreUI_Private = nullptr;
 	
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* Time_Text;
+	UPROPERTY(meta = (BindWidget))
+	UVerticalBox* IdContainer;
+	UPROPERTY(meta = (BindWidget))
+	UVerticalBox* ScoreContainer;
+	UPROPERTY(meta = (BindWidget))
+	UVerticalBox* OccupationContainer;
 
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* player1scoreText;
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* player2ScoreText;
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* player3ScoreText;
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* player4ScoreText;
-	// UPROPERTY(meta = (BindWidget))
-	// UTextBlock* score_Text_Private;
+	UPROPERTY()
+	TArray<UTextBlock*> IdBlocks;
+	UPROPERTY()
+	TArray<UTextBlock*> ScoreBlocks;
+	UPROPERTY()
+	TArray<UTextBlock*> OccupationBlocks;
+
+	TMap<ETextBlockType, TArray<UTextBlock*>> TextBlockMap;
 };

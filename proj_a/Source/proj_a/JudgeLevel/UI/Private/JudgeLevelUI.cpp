@@ -1,40 +1,49 @@
 ﻿#include "JudgeLevelUI.h"
 
-#include "DPInGameState.h"
 #include "FNetLogger.h"
 #include "JudgeGameState.h"
+
+void UJudgeLevelUI::SetBlockContent(ETextBlockType BlockType, int32 Index, const FString& Content)
+{
+	TArray<UTextBlock*>* Blocks = TextBlockMap.Find(BlockType);
+	checkf(Blocks, TEXT("Invalid BlockType"));
+	checkf(Blocks->IsValidIndex(Index) && (*Blocks)[Index], TEXT("Invalid index or null TextBlock"));
+	(*Blocks)[Index]->SetText(FText::FromString(Content));
+}
+
+void UJudgeLevelUI::InitTextBlocksFromContainer(UPanelWidget* Container, TArray<UTextBlock*>& OutTextBlocks)
+{
+	checkf(Container, TEXT("Input Container is nullptr"));
+
+	for (UWidget* Child : Container->GetAllChildren())
+	{
+		if (UTextBlock* TextBlock = Cast<UTextBlock>(Child))
+		{
+			OutTextBlocks.Add(TextBlock);
+		}
+	}
+}
 
 void UJudgeLevelUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("JudgeLevelUI Constructed"));
+	
 	TimerUI = NewObject<UTimerUI>(Time_Text);
 	if (TimerUI)
 	{
 		FTimerUiInitializer TimerUiInitializer;
 		TimerUiInitializer.Time_Text = Time_Text;
 		TimerUiInitializer.InWorld = GetWorld();
-		TimerUI->initTimerUI<ADPInGameState>(TimerUiInitializer);
+		TimerUI->initTimerUI<AJudgeGameState>(TimerUiInitializer);
 	}
 	
-	ScoreUI = NewObject<UScoreUI>(this);
-	if (ScoreUI)
-	{
-		FScoreUiInitializer ScoreUiInitializer;
-		ScoreUiInitializer.InWorld = GetWorld();
-		ScoreUiInitializer.ScoreText = player1scoreText;
-		ScoreUiInitializer.Player1ScoreText = player2ScoreText;
-		ScoreUiInitializer.Player2ScoreText = player3ScoreText;
-		ScoreUiInitializer.Player3ScoreText = player4ScoreText;
-		ScoreUI->InitScoreUi(ScoreUiInitializer);
-	}
-	//
-	// ScoreUI_Private = NewObject<UScoreUiPrivate>(this);
-	// if (ScoreUI_Private)
-	// {
-	// 	FPrivateScoreUiInitializer PrivateScoreUiInitializer;
-	// 	PrivateScoreUiInitializer.InWorld = GetWorld();
-	// 	PrivateScoreUiInitializer.ScoreTextPrivate = score_Text_Private;
-	// 	ScoreUI_Private->InitScoreUiPrivate(PrivateScoreUiInitializer);
-	// }
+	InitTextBlocksFromContainer(IdContainer, IdBlocks);
+	InitTextBlocksFromContainer(ScoreContainer, ScoreBlocks);
+	InitTextBlocksFromContainer(OccupationContainer, OccupationBlocks);
+	
+	TextBlockMap.Add(ETextBlockType::Id, IdBlocks);
+	TextBlockMap.Add(ETextBlockType::Score, ScoreBlocks);
+	TextBlockMap.Add(ETextBlockType::Occupation, OccupationBlocks);
 }

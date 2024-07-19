@@ -1,19 +1,26 @@
 ﻿#pragma once
 
 #include "ClientTimerManager.h"
-#include "ClientScoreMananger.h"
+#include "IChatGameState.h"
+#include "ChatManager.h"
 #include "GameFramework/GameStateBase.h"
 #include "JudgeGameState.generated.h"
 
 UCLASS()
-class PROJ_A_API AJudgeGameState : public AGameStateBase
+class PROJ_A_API AJudgeGameState : public AGameStateBase, public IChatGameState
 {
 	GENERATED_BODY()
 public:
 	AJudgeGameState();
 
+	virtual UChatManager* GetChatManager() const override { return ChatManager; }
+	UClientTimerManager* GetTimerManager() const { return TimerManager; }
+protected:
+	virtual void BeginPlay() override;
+	
+private:
 	UPROPERTY(Replicated)
 	UClientTimerManager* TimerManager;
-	UPROPERTY(Replicated)
-	UClientScoreMananger* ScoreManager;
+	UPROPERTY()
+	UChatManager* ChatManager;
 };

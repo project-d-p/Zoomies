@@ -7,7 +7,7 @@ ALionCharacter::ALionCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_LION
-	(PathManager::GetPath(EMonster::LION));
+	(PathManager::GetMonsterPath(EMonster::LION));
 	if (SK_LION.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_LION.Object);
 	}

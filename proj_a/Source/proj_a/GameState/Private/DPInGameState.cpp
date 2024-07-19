@@ -10,6 +10,7 @@ ADPInGameState::ADPInGameState()
 	bReplicates = true;
 	TimerManager = CreateDefaultSubobject<UClientTimerManager>(TEXT("TimerManager"));
 	ScoreManager = CreateDefaultSubobject<UClientScoreMananger>(TEXT("ScoreManager"));
+	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
 }
 
 void ADPInGameState::AddPlayerState(APlayerState* PlayerState)

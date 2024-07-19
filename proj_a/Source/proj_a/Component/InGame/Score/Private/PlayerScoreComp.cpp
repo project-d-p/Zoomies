@@ -1,5 +1,6 @@
 #include "PlayerScoreComp.h"
 
+#include "DPInGameState.h"
 #include "Components/TextBlock.h"
 #include "Net/UnrealNetwork.h"
 
@@ -10,8 +11,16 @@ UPlayerScoreComp::UPlayerScoreComp()
 
 void UPlayerScoreComp::OnRep_PlayerScores()
 {
-	check(PlayerScore_Text)
-	PlayerScore_Text->SetText(FText::AsNumber(PlayerScores));
+	if (PlayerScore_Text)
+	{
+		PlayerScore_Text->SetText(FText::AsNumber(PlayerScores));
+	}
+	else
+	{
+		ADPInGameState* GS = Cast<ADPInGameState>(GetWorld()->GetGameState());
+		check(GS)
+		GS->ScoreManager->InitScoreUi();
+	}
 }
 
 void UPlayerScoreComp::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

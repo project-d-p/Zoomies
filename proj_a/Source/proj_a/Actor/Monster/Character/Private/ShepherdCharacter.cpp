@@ -7,7 +7,7 @@ AShepherdCharacter::AShepherdCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SHEPHERD
-	(PathManager::GetPath(EMonster::SHEPHERD));
+	(PathManager::GetMonsterPath(EMonster::SHEPHERD));
 	if (SK_SHEPHERD.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_SHEPHERD.Object);
 	}

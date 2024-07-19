@@ -7,7 +7,7 @@ AEelCharacter::AEelCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_EEL
-	(PathManager::GetPath(EMonster::EEL));
+	(PathManager::GetMonsterPath(EMonster::EEL));
 	if (SK_EEL.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_EEL.Object);
 	}
