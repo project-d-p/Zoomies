@@ -7,11 +7,12 @@
 #include "JudgeGameState.h"
 #include "JudgeLevelComponent.h"
 #include "JudgePlayerController.h"
+#include "JudgePlayerState.h"
 #include "Camera/CameraActor.h"
 
 AJudgeGameMode::AJudgeGameMode()
 {
-    PlayerStateClass = ADPPlayerState::StaticClass();
+    PlayerStateClass = AJudgePlayerState::StaticClass();
     PlayerControllerClass = AJudgePlayerController::StaticClass();
     GameStateClass = AJudgeGameState::StaticClass();
     
@@ -52,10 +53,4 @@ void AJudgeGameMode::HandleStartingNewPlayer_Implementation(APlayerController* N
     AJudgePlayerController* PC = Cast<AJudgePlayerController>(NewPlayer);
     check(PC)
     PC->SetViewTarget(CamAct);
-    
-    // ADPPlayerState* PS = Cast<ADPPlayerState>(PC->PlayerState);
-    // FString PlayerName = PS->GetPlayerName();
-    // FNetLogger::EditerLog(FColor::Emerald, TEXT("Player Name: %s"), *PlayerName);
-    // UPrivateScoreManager* PSM = PC->GetPrivateScoreManagerComponent();
-    // FNetLogger::EditerLog(FColor::Emerald, TEXT("Player Score: %d"), PSM->GetPrivatePlayerScore());
 }

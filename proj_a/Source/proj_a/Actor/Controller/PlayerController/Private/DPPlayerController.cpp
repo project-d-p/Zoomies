@@ -16,9 +16,6 @@ DEFINE_LOG_CATEGORY(LogNetwork);
 
 ADPPlayerController::ADPPlayerController()
 {
-	FNetLogger::LogError(TEXT("CREATED ADPPlayerController: %d"), this->GetUniqueID());
-	FNetLogger::EditerLog(FColor::Red, TEXT("CREATED ADPPlayerController: %d"), this->GetUniqueID());
-
 	Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
 	PrivateScoreManager = CreateDefaultSubobject<UPrivateScoreManager>(TEXT("PrivateScoreManager"));
 	
@@ -104,7 +101,6 @@ void ADPPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FNetLogger::EditerLog(FColor::Blue, TEXT("ADPPlayerController::BeginPlay"));
 	Cast<UMainLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::MAIN)])->SetStateComponent();
 }
 

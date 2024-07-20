@@ -35,20 +35,13 @@ public:
 		UE_LOG(LogNetwork, Log, TEXT("%s"), buffer);
 	}
 
-	static void EditerLog(FColor color, const TCHAR* format, ...)
+	template<typename... Args>
+	static void EditerLog(FColor color, const TCHAR* format, Args&&... args)
 	{
-		va_list ArgPtr;
-		va_start(ArgPtr, format);
-		TCHAR buffer[256];
-		FCString::GetVarArgs(buffer, sizeof(buffer), format, ArgPtr);
-		va_end(ArgPtr);
+		FString message = FString::Printf(format, std::forward<Args>(args)...);
 		if (GEngine)
 		{
-			GEngine->AddOnScreenDebugMessage(
-				-1,
-				15.f,
-				color,
-				FString::Printf(TEXT("%s"), buffer));
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, color, message);
 		}
 	}
 
