@@ -44,8 +44,8 @@ private:
     USkeletalMeshComponent* giraffeComponent;
     UPROPERTY(VisibleAnywhere)
     USkeletalMeshComponent* racoonComponent;   
-    UPROPERTY(VisibleAnywhere)
-    USkeletalMeshComponent* rabbitComponent;    
+    //UPROPERTY(VisibleAnywhere)
+    //USkeletalMeshComponent* rabbitComponent;    
     UPROPERTY(VisibleAnywhere)
     USkeletalMeshComponent* crabComponent;    
     UPROPERTY(VisibleAnywhere)
@@ -65,8 +65,8 @@ private:
     UAnimSequence* giraffeAnim;
     UPROPERTY(EditAnywhere, Category = "Animation")
     UAnimSequence* racoonAnim;
-    UPROPERTY(EditAnywhere, Category = "Animation")
-    UAnimSequence* rabbitAnim;
+    //UPROPERTY(EditAnywhere, Category = "Animation")
+    //UAnimSequence* rabbitAnim;
     UPROPERTY(EditAnywhere, Category = "Animation")
     UAnimSequence* crabAnim;
     UPROPERTY(EditAnywhere, Category = "Animation")
