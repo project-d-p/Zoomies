@@ -6,9 +6,14 @@
 #include "DelayedExecutionSystem.h"
 #include "JudgePlayerController.generated.h"
 
-enum EOccupationType : uint8
+UENUM()
+enum EOccupation : uint8
 {
-	
+	Archaeologist
+	, Poacher
+	, Ringmaster
+	, Terrorist
+	, Environmentalist
 };
 
 UCLASS()
@@ -17,37 +22,28 @@ class PROJ_A_API AJudgePlayerController : public APlayerController
 	GENERATED_BODY()
 public:
 	AJudgePlayerController();
-	~AJudgePlayerController();
-
+	void InitConstUI();
+	
 	UFUNCTION(Server, Reliable)
 	void ServerSendChatMessage(const FString& SenderName, const FString& Message);
 
 	UFUNCTION(Client, Reliable)
-	void InitConstUI(const TArray<FString>& Ids, const TArray<int32>& Scores);
-
-	// UFUNCTION(Client, Reliable)
-	// void SetUiVoteCandidateName(const FString& Name);
-	//
-	// UFUNCTION(Client, Reliable)
-	// void SetUiConfirmedVoteOccupation(EOccupationType Occupation);
-	//
-	// UFUNCTION(NetMulticast, Reliable)
-	// void NotifyTimerEnd();
-	//
-	// UFUNCTION(Server, Reliable)
-	// void ReturnVoteResult();
-
-	// void WaitForVoteResults();
+	void SetOccupationeName(int index, const FString& Name);
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void NotifyTimerEnd();
+	
+	UFUNCTION(Server, Reliable)
+	void ReturnVote(EOccupation Type);
 
 	UJudgeLevelUI* GetJudgeLevelUI() const { return JudgeLevelUI; }
 protected:
 	virtual void BeginPlay() override;
 	virtual void SeamlessTravelFrom(APlayerController* OldPC) override;
-	
 private:
+	bool IsBeginPlay = false;
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UJudgeLevelUI> JudgeLevelUI_BP;
 	UPROPERTY()
 	UJudgeLevelUI* JudgeLevelUI;
-	DelayedExecutionSystem* DES;
 };

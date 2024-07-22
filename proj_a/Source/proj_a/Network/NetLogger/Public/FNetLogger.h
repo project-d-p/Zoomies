@@ -35,8 +35,8 @@ public:
 		UE_LOG(LogNetwork, Log, TEXT("%s"), buffer);
 	}
 
-	template<typename... Args>
-	static void EditerLog(FColor color, const TCHAR* format, Args&&... args)
+	template<typename FmtType, typename... Args>
+	static void EditerLog(FColor color, const FmtType& format, Args&&... args)
 	{
 		FString message = FString::Printf(format, std::forward<Args>(args)...);
 		if (GEngine)

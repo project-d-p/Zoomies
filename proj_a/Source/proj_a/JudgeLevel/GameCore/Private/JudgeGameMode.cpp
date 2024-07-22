@@ -8,6 +8,7 @@
 #include "JudgeLevelComponent.h"
 #include "JudgePlayerController.h"
 #include "JudgePlayerState.h"
+#include "Algo/MaxElement.h"
 #include "Camera/CameraActor.h"
 
 AJudgeGameMode::AJudgeGameMode()
@@ -22,17 +23,55 @@ AJudgeGameMode::AJudgeGameMode()
     bUseSeamlessTravel = true;
 }
 
+EOccupation AJudgeGameMode::CollateVotingResults()
+{
+    TMap<EOccupation, int32> VoteCounts;
+
+    FNetLogger::EditerLog(FColor::Emerald, TEXT("PlayerVotes.Num(): %d"), PlayerVotes.Num());
+    for (const EOccupation& Vote : PlayerVotes)
+    {
+        VoteCounts.FindOrAdd(Vote)++;
+    }
+    auto MostVotedPair = Algo::MaxElementBy(VoteCounts, [](const auto& Pair) { return Pair.Value; });
+
+    // For now, if vote same, choose first one.
+    return MostVotedPair->Key;
+}
+
+void AJudgeGameMode::ProcessVotingResults()
+{
+    EOccupation MostVotedOccupation = CollateVotingResults();
+    FNetLogger::EditerLog(FColor::Emerald, TEXT("MostVotedOccupation: %d"), static_cast<int>(MostVotedOccupation));
+    TimerManager->StartTimer<AJudgeGameState>(10.0f, &AJudgeGameMode::EndTimer, this);
+}
+
 void AJudgeGameMode::EndTimer()
 {
     FNetLogger::EditerLog(FColor::Emerald, TEXT("EndTimer"));
-    // GetWorld()->ServerTravel("calculateLevel?listen");
+
+    constexpr int TOTAL_PLAYER = 2;
+    if (CurrentPlayerIndex++ < TOTAL_PLAYER)
+    {
+        AJudgePlayerController* PC = Cast<AJudgePlayerController>(GetWorld()->GetFirstPlayerController());
+        check(PC)
+        PC->NotifyTimerEnd();
+        SetVote(EOccupation::Archaeologist);
+
+        FTimerHandle VoteCollationTimerHandle;
+        GetWorldTimerManager().SetTimer(VoteCollationTimerHandle, this, &AJudgeGameMode::ProcessVotingResults, 1.0f, false);
+    }
+    else
+    {
+        FNetLogger::EditerLog(FColor::Emerald, TEXT("EndTimer: ServerTravel"));
+        // GetWorld()->ServerTravel("calculateLevel?listen");   
+    }
 }
 
 void AJudgeGameMode::StartPlay()
 {
     Super::StartPlay();
     
-    TimerManager->StartTimer<AJudgeGameState>(60.0f, &AJudgeGameMode::EndTimer, this);
+    TimerManager->StartTimer<AJudgeGameState>(10.0f, &AJudgeGameMode::EndTimer, this);
 }
 
 void AJudgeGameMode::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)

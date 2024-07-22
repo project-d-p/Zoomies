@@ -2,6 +2,7 @@
 
 #include "DPPlayerController.h"
 #include "IChatGameMode.h"
+#include "JudgeGameMode.h"
 #include "JudgeGameState.h"
 #include "JudgeLevelUI.h"
 #include "JudgePlayerState.h"
@@ -21,21 +22,31 @@ AJudgePlayerController::AJudgePlayerController()
 	}
 }
 
-AJudgePlayerController::~AJudgePlayerController()
+void AJudgePlayerController::InitConstUI()
 {
-	if (DES)
-		delete DES;
+	AJudgeGameState* GM = Cast<AJudgeGameState>(GetWorld()->GetGameState());
+	checkf(GM, TEXT("Failed to get JudgeGameState"))
+	TArray<TObjectPtr<APlayerState>> PA = GM->PlayerArray;
+	checkf(PA.Num() <= 4, TEXT("The number of players is more than 4"))
+	FNetLogger::LogInfo(TEXT("PA.Num(): %d"), PA.Num());
+	for (int i = 0; i < PA.Num(); i++)
+	{
+		JudgeLevelUI->SetBlockContent(ETextBlockType::Id, i, PA[i]->GetPlayerName());
+		JudgeLevelUI->SetBlockContent(ETextBlockType::Score, i, FString::FromInt(PA[i]->GetScore()));
+		SetOccupationeName_Implementation(i, TEXT("BackSoo"));
+	}
 }
 
-void AJudgePlayerController::InitConstUI_Implementation(const TArray<FString>& Ids, const TArray<int32>& Scores)
+void AJudgePlayerController::NotifyTimerEnd_Implementation()
 {
-	constexpr int32 PLAYER_NUMBER = 4;
-	checkf(Ids.Num() == PLAYER_NUMBER && Scores.Num() == PLAYER_NUMBER, TEXT("Invalid Ids or Scores"))
-	for (int i = 0; i < PLAYER_NUMBER; i++)
-	{
-		JudgeLevelUI->SetBlockContent(ETextBlockType::Id, i, Ids[i]);
-		JudgeLevelUI->SetBlockContent(ETextBlockType::Score, i, FString::FromInt(Scores[i]));
-	}
+	// TODO: 내가 선정한거로 변경해야한다.
+	ReturnVote_Implementation(EOccupation::Archaeologist);
+}
+
+void AJudgePlayerController::SetOccupationeName_Implementation(int index, const FString& Name)
+{
+	checkf(JudgeLevelUI, TEXT("JudgeLevelUI is nullptr"))
+	JudgeLevelUI->SetBlockContent(ETextBlockType::Occupation, index, Name);
 }
 
 void AJudgePlayerController::ServerSendChatMessage_Implementation(const FString& SenderName, const FString& Message)
@@ -43,6 +54,12 @@ void AJudgePlayerController::ServerSendChatMessage_Implementation(const FString&
 	IChatGameMode* GM = GetWorld()->GetAuthGameMode<IChatGameMode>();
 	check(GM && GM->GetChatManager())
 	GM->GetChatManager()->BroadcastChatMessage(SenderName, Message);
+}
+
+void AJudgePlayerController::ReturnVote_Implementation(EOccupation Type)
+{
+	AJudgeGameMode* GM = Cast<AJudgeGameMode>(GetWorld()->GetAuthGameMode());
+	GM->SetVote(Type);
 }
 
 void AJudgePlayerController::BeginPlay()
@@ -55,13 +72,17 @@ void AJudgePlayerController::BeginPlay()
 		JudgeLevelUI = CreateWidget<UJudgeLevelUI>(this, JudgeLevelUI_BP);
 		checkf(JudgeLevelUI, TEXT("Failed to create JudgeLevelUI"));
 		JudgeLevelUI->AddToViewport();
+		IsBeginPlay = true;
+
+		FTimerHandle UIUpdateTimerHandle;
+		GetWorldTimerManager().SetTimer(UIUpdateTimerHandle, this, &AJudgePlayerController::InitConstUI, 1.0f, false);
 	}
 }
 
 void AJudgePlayerController::SeamlessTravelFrom(APlayerController* OldPC)
 {
 	Super::SeamlessTravelFrom(OldPC);
-
+	
 	ADPPlayerController* MainPC = Cast<ADPPlayerController>(OldPC);
 	checkf(MainPC, TEXT("OldPC is not ADPPlayerController"))
 	AJudgePlayerState* GS = GetPlayerState<AJudgePlayerState>();

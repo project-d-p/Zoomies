@@ -14,10 +14,6 @@ AJudgeGameState::AJudgeGameState()
 void AJudgeGameState::BeginPlay()
 {
 	Super::BeginPlay();
-
-	ADPPlayerController* PC = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
-	checkf(PC, TEXT("Failed to get player controller"));
-	PC->SetLevelComponent(NewObject<UJudgeLevelComp>(PC));
 }
 
 void AJudgeGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
