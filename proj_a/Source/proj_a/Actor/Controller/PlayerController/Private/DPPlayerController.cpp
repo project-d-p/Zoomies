@@ -50,28 +50,8 @@ void ADPPlayerController::SendChatMessageToServer(const FString& Message)
 		return;
 	}
 
-	// XXX: Change to client Steam nickname later
-	FString SenderName = "Unknown";
-	// if (HasAuthority())
-	// {
-	// 	ADPGameModeBase* GM = UGameHelper::GetInGameMode(GetWorld());
-	// 	if (GM)
-	// 	{
-	// 		GM->SendChatToAllClients(SenderName, Message);
-	// 	}
-	// 	else
-	// 	{
-	// 		AGameMode* DefaultGM = Cast<AGameMode>(GetWorld()->GetAuthGameMode());
-	// 		if (DefaultGM)
-	// 		{
-	// 			DefaultGM->Broadcast(this, Message);
-	// 		}
-	// 	}
-	// }
-	// else
-	// {
-		ChatManager->ServerSendChatMessage(SenderName, Message);
-	// }
+	FString SenderName = PlayerState->GetPlayerName();
+	ChatManager->ServerSendChatMessage(SenderName, Message);
 }
 
 void ADPPlayerController::ReceiveChatMessage(const FString& SenderName, const FString& Message)

@@ -42,6 +42,9 @@ struct FPlayerScore
 
 	UPROPERTY(BlueprintReadWrite, Category = "bIsDetected")
 	bool bIsDetected = false;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Rank")
+	int Rank = 0;
 };
 
 class ADPPlayerController;
@@ -65,5 +68,7 @@ protected:
 	
 	TArray<int32> CalculateScores(ADPPlayerController* Controller);
 	TArray<FAnimalList> GetCapturedAnimals(ADPPlayerController* Controller);
+	
+	void SetMyRank();
 	void SetPlayerScores();
 };

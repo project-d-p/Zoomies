@@ -34,6 +34,33 @@ TArray<FAnimalList> AResultLevelGameState::GetCapturedAnimals(ADPPlayerControlle
 	return CapturedAnimals;
 }
 
+void AResultLevelGameState::SetMyRank()
+{
+	PlayerScores.Sort([](const FPlayerScore& A, const FPlayerScore& B) {
+		return A.Scores[4] > B.Scores[4];
+	});
+
+	int rank = 1;
+	PlayerScores[0].Rank = rank;
+	if (PlayerScores[0].PlayerName == GetWorld()->GetFirstPlayerController()->PlayerState->GetPlayerName())
+	{
+		GetWorld()->GetFirstPlayerController()->PlayerState->SetScore(rank);
+	}
+	
+	for (int i = 1; i < PlayerScores.Num(); i++)
+	{
+		if (PlayerScores[i - 1].Scores[4] != PlayerScores[i].Scores[4])
+		{
+			rank += 1;
+		}
+		if (PlayerScores[i].PlayerName == GetWorld()->GetFirstPlayerController()->PlayerState->GetPlayerName())
+		{
+			GetWorld()->GetFirstPlayerController()->PlayerState->SetScore(rank);
+		}
+		PlayerScores[i].Rank = rank;
+	}
+}
+
 void AResultLevelGameState::SetPlayerScores()
 {
 	FPlayerScore PlayerScore;
@@ -117,6 +144,7 @@ void AResultLevelGameState::BeginPlay()
 	if (HasAuthority())
 	{
 		this->SetPlayerScores();
+		this->SetMyRank();
 	}
 	
 	for (auto& PlayerScore : PlayerScores)
