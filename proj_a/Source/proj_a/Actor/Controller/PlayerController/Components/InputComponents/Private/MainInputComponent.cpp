@@ -67,7 +67,6 @@ UMainInputComponent::UMainInputComponent()
 void UMainInputComponent::Activate(bool bReset)
 {
 	Super::Activate(bReset);
-	FNetLogger::EditerLog(FColor::Green, TEXT("Activate INPUT"));
 	BindMainLevelActions();
 }
 
@@ -117,7 +116,7 @@ void UMainInputComponent::BindMainLevelActions()
 void UMainInputComponent::UnbindMainLevelActions()
 {
 	ADPPlayerController* PlayerController = GetPlayerController();
-	if (PlayerController) return ;
+	if (!PlayerController) return ;
 
 	// Enhanced Input Component 바인딩 제거
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
@@ -129,7 +128,9 @@ void UMainInputComponent::UnbindMainLevelActions()
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 	{
 		if (MainLevelContext)
+		{
 			SubSystem->RemoveMappingContext(MainLevelContext);
+		}
 	}
 }
 
@@ -407,6 +408,9 @@ void UMainInputComponent::ReturningAnimals(const FInputActionValue& value)
 	if (PlayerState)
 	{
 		PlayerController->GetPrivateScoreManagerComponent()->IncreasePrivatePlayerScore(PlayerState->GetPlayerJob(), animals);
+		uint32 score = PlayerController->GetPrivateScoreManagerComponent()->GetPrivatePlayerScore();
+		FString playerName = PlayerState->GetPlayerName();
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Score[%s] : %d"), *playerName, score);
 	}
 	if (PlayerController->HasAuthority())
 	{

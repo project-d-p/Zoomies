@@ -3,10 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DPCharacter.h"
 #include "Engine/GameInstance.h"
 #include "OnlineSubsystem.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include "ScoreTypes.h"
 #include "GI_Zoomies.generated.h"
+
+USTRUCT(BlueprintType)
+struct FPlayerData
+{
+	GENERATED_BODY()
+
+	TArray<TArray<EAnimal>> CapturedAnimals;
+	TArray<FScoreData> ScoreDatas;
+	bool bJobDetected = false;
+};
 
 UCLASS()
 class PROJ_A_API UGI_Zoomies : public UGameInstance
@@ -20,6 +32,15 @@ public:
 	// Matching starting function
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void StartMatchMaking();
+	
+	UPROPERTY()
+	TMap<APlayerController*, int> PlayerCharacters;
+	UPROPERTY()
+	APlayerController* LocalController;
+	// UPROPERTY()
+	// TMap<APlayerController*, APawn*> PlayerCharacters;
+	UPROPERTY()
+	TMap<APlayerController*, FPlayerData> PlayersData;
 
 private:
 	// Online subsystem & session interface pointers
@@ -48,8 +69,13 @@ private:
 	int max_count = 5;
 	bool is_steamAPI_init = false;
 	bool is_online_session_steam_init =false;
+	
 	FTimerHandle UnusedHandle;
 	void CheckSteamInit();
 	void InitSteamAPI();
 	void InitOnlineSubsystemSteam();
+
+	/* Player Data Map */
+	// TMap<FString, FPlayerData> player_data_map_;
+	// TMap<FString, FString> steam_id_to_player_id_map_;
 };

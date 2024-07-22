@@ -48,7 +48,7 @@ ADPWeaponGun::ADPWeaponGun()
 	}
 	
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> PARTICLE
-	(TEXT("/Game/effect/ns_animalHit.ns_animalHit"));
+	(TEXT("/Game/effect/ns_animalHitScrew.ns_animalHitScrew"));
 	if (PARTICLE.Succeeded()) {
 		particleEffect = PARTICLE.Object;
 	}
@@ -124,13 +124,19 @@ void ADPWeaponGun::SpawnEffects(const FHitResult& HitResult, const FRotator& rot
 			muzzle->GetComponentLocation(),
 			FRotator::ZeroRotator
 		);
+
+		USoundComponent* SoundComponent = OwningLevelComponent->GetSoundComponent();
+		if (SoundComponent) {
+			SoundComponent->PlayShotSound();
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("weaponGun"));
+		}
 	}
 	if (trail)
 	{
 		// 방향 설정: 월드 방향을 로컬 방향으로 변환
 		FVector WorldDirection = (ImpactPoint - muzzle->GetComponentLocation()).GetSafeNormal();
 		// FVector LocalDirection = muzzle->GetComponentTransform().InverseTransformVectorNoScale(WorldDirection);
-		trail->SetVectorParameter(FName("Direction_FIRE"), WorldDirection * 100000.f); // 1000.f은 속도 조절을 위한 스칼라 값
+		trail->SetVectorParameter(FName("Direction_FIRE"), WorldDirection * 7'000.f); // 1000.f은 속도 조절을 위한 스칼라 값
 	}
 	
 	if (smokeEffect && muzzle) {

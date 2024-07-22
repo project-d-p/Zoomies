@@ -17,6 +17,11 @@ APawn* UBaseLevelComponent::GetPlayerCharacter()
 	return CachedCharacter;
 }
 
+void UBaseLevelComponent::SetPlayerCharacter(APawn* InCharacter)
+{
+	CachedCharacter = InCharacter;
+}
+
 void UBaseLevelComponent::Activate(bool bReset)
 {
 	Super::Activate(bReset);

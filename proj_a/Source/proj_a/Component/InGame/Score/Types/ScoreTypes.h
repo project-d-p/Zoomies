@@ -52,4 +52,5 @@ struct FScoreData
 
 	UPROPERTY(BlueprintReadWrite, Category = "Score")
 	float mulMulScore = 1;
+
 };
