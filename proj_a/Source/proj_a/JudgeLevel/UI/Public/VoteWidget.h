@@ -13,76 +13,26 @@ UCLASS()
 class PROJ_A_API UVoteWidget : public UUserWidget
 {
     GENERATED_BODY()
-
 public:
-    virtual void NativeConstruct() override;
-
+    // void SetVoterName(const FString& VoterName);
+    
 protected:
     UPROPERTY(meta = (BindWidget))
-    UButton* Player1Button;
-
+    UButton* OpenVoteListButton;
     UPROPERTY(meta = (BindWidget))
-    UButton* Player2Button;
-
+    UTextBlock* VoterName;
     UPROPERTY(meta = (BindWidget))
-    UButton* Player3Button;
-
-    UPROPERTY(meta = (BindWidget))
-    UButton* Player4Button;
-
-    UPROPERTY(meta = (BindWidget))
-    UCanvasPanel* Player1CanvasPanel;
-
-    UPROPERTY(meta = (BindWidget))
-    UCanvasPanel* Player2CanvasPanel;
-
-    UPROPERTY(meta = (BindWidget))
-    UCanvasPanel* Player3CanvasPanel;
-
-    UPROPERTY(meta = (BindWidget))
-    UCanvasPanel* Player4CanvasPanel;
-
-    UPROPERTY(meta = (BindWidget))
-    UImage* Player1OccupationImage;
-
-    UPROPERTY(meta = (BindWidget))
-    UImage* Player2OccupationImage;
-
-    UPROPERTY(meta = (BindWidget))
-    UImage* Player3OccupationImage;
-
-    UPROPERTY(meta = (BindWidget))
-    UImage* Player4OccupationImage;
-
-    UPROPERTY(meta = (BindWidget))
-    UTextBlock* Player1NameText;
-
-    UPROPERTY(meta = (BindWidget))
-    UTextBlock* Player2NameText;
-
-    UPROPERTY(meta = (BindWidget))
-    UTextBlock* Player3NameText;
-
-    UPROPERTY(meta = (BindWidget))
-    UTextBlock* Player4NameText;
-
-    UFUNCTION()
-    void OnPlayer1ButtonClicked();
-
-    UFUNCTION()
-    void OnPlayer2ButtonClicked();
-
-    UFUNCTION()
-    void OnPlayer3ButtonClicked();
-
-    UFUNCTION()
-    void OnPlayer4ButtonClicked();
-
-    void SetPlayerOccupation(int32 PlayerIndex, const FString& OccupationName, UTexture2D* OccupationImage);
+    UCanvasPanel* VotableListPannel;
+    
+    virtual void NativeConstruct() override;
 
 private:
     TArray<FString> OccupationNames;
+    UPROPERTY()
     TArray<UTexture2D*> OccupationImages;
-    
+
+    void SetPlayerOccupation(int32 PlayerIndex, const FString& OccupationName, UTexture2D* OccupationImage);
     void InitializeOccupations();
+    UFUNCTION()
+    void OnOpenVoteListButtonClicked();
 };

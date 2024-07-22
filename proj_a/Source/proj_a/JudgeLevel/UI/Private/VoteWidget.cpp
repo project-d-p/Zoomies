@@ -4,13 +4,9 @@
 void UVoteWidget::NativeConstruct()
 {
     Super::NativeConstruct();
-
+    
     InitializeOccupations();
-
-    if (Player1Button) Player1Button->OnClicked.AddDynamic(this, &UVoteWidget::OnPlayer1ButtonClicked);
-    if (Player2Button) Player2Button->OnClicked.AddDynamic(this, &UVoteWidget::OnPlayer2ButtonClicked);
-    if (Player3Button) Player3Button->OnClicked.AddDynamic(this, &UVoteWidget::OnPlayer3ButtonClicked);
-    if (Player4Button) Player4Button->OnClicked.AddDynamic(this, &UVoteWidget::OnPlayer4ButtonClicked);
+    if (OpenVoteListButton) OpenVoteListButton->OnClicked.AddDynamic(this, &UVoteWidget::OnOpenVoteListButtonClicked);
 }
 
 void UVoteWidget::InitializeOccupations()
@@ -27,32 +23,16 @@ void UVoteWidget::InitializeOccupations()
     OccupationImages.Add(LoadObject<UTexture2D>(nullptr, TEXT("/Game/image/ui/cross")));
 }
 
-void UVoteWidget::OnPlayer1ButtonClicked()
-{
-    static int32 CurrentIndex = 0;
-    SetPlayerOccupation(1, OccupationNames[CurrentIndex], OccupationImages[CurrentIndex]);
-    CurrentIndex = (CurrentIndex + 1) % OccupationNames.Num();
-}
+// void UVoteWidget::SetVoterName(const FString& VoterName)
+// {
+//     
+// }
 
-void UVoteWidget::OnPlayer2ButtonClicked()
+void UVoteWidget::OnOpenVoteListButtonClicked()
 {
-    static int32 CurrentIndex = 0;
-    SetPlayerOccupation(2, OccupationNames[CurrentIndex], OccupationImages[CurrentIndex]);
-    CurrentIndex = (CurrentIndex + 1) % OccupationNames.Num();
-}
-
-void UVoteWidget::OnPlayer3ButtonClicked()
-{
-    static int32 CurrentIndex = 0;
-    SetPlayerOccupation(3, OccupationNames[CurrentIndex], OccupationImages[CurrentIndex]);
-    CurrentIndex = (CurrentIndex + 1) % OccupationNames.Num();
-}
-
-void UVoteWidget::OnPlayer4ButtonClicked()
-{
-    static int32 CurrentIndex = 0;
-    SetPlayerOccupation(4, OccupationNames[CurrentIndex], OccupationImages[CurrentIndex]);
-    CurrentIndex = (CurrentIndex + 1) % OccupationNames.Num();
+    VotableListPannel->SetIsEnabled(true);
+    VotableListPannel->SetRenderOpacity(1.0f);
+    VotableListPannel->SetVisibility(ESlateVisibility::Visible);
 }
 
 void UVoteWidget::SetPlayerOccupation(int32 PlayerIndex, const FString& OccupationName, UTexture2D* OccupationImage)
@@ -60,30 +40,6 @@ void UVoteWidget::SetPlayerOccupation(int32 PlayerIndex, const FString& Occupati
     UCanvasPanel* TargetCanvas = nullptr;
     UImage* TargetImage = nullptr;
     UTextBlock* TargetText = nullptr;
-
-    switch (PlayerIndex)
-    {
-        case 1:
-            TargetCanvas = Player1CanvasPanel;
-            TargetImage = Player1OccupationImage;
-            TargetText = Player1NameText;
-            break;
-        case 2:
-            TargetCanvas = Player2CanvasPanel;
-            TargetImage = Player2OccupationImage;
-            TargetText = Player2NameText;
-            break;
-        case 3:
-            TargetCanvas = Player3CanvasPanel;
-            TargetImage = Player3OccupationImage;
-            TargetText = Player3NameText;
-            break;
-        case 4:
-            TargetCanvas = Player4CanvasPanel;
-            TargetImage = Player4OccupationImage;
-            TargetText = Player4NameText;
-            break;
-    }
 
     if (TargetCanvas && TargetImage && TargetText)
     {
