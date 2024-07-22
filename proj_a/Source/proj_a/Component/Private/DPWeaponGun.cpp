@@ -124,6 +124,12 @@ void ADPWeaponGun::SpawnEffects(const FHitResult& HitResult, const FRotator& rot
 			muzzle->GetComponentLocation(),
 			FRotator::ZeroRotator
 		);
+
+		USoundComponent* SoundComponent = OwningLevelComponent->GetSoundComponent();
+		if (SoundComponent) {
+			SoundComponent->PlayShotSound();
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("weaponGun"));
+		}
 	}
 	if (trail)
 	{

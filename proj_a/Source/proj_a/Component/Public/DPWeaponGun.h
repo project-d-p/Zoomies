@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "DPWeapon.h"
+#include "BaseInputComponent.h"
 #include "Components/ArrowComponent.h"
 #include "DPWeaponGun.generated.h"
 
@@ -44,6 +45,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "effects")
 	class UNiagaraSystem* particleEffect;
 	
+	UPROPERTY()
+	class UBaseLevelComponent* OwningLevelComponent = nullptr;
+
 private:
 	void SpawnHitEffect(const FHitResult& HitResult);
 };
