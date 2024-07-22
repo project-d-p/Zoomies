@@ -3,6 +3,7 @@
 #include "DPCharacter.h"
 #include "DPPlayerController.h"
 #include "Net/UnrealNetwork.h"
+#include "proj_a/GameInstance/GI_Zoomies.h"
 
 AResultLevelGameState::AResultLevelGameState()
 {
@@ -138,6 +139,22 @@ void AResultLevelGameState::BeginPlay()
 	{
 		Character->SetReplicatingMovement(true);
 	}
+}
+
+void AResultLevelGameState::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	// 게임 인스턴스를 통해 세션 제거
+    UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+    if (GameInstance)
+    {
+    	IOnlineSessionPtr SessionInt = GameInstance->GetOnlineSessionInterface();
+    	if (SessionInt.IsValid())
+    	{
+    		SessionInt->DestroySession(NAME_GameSession);
+    	}
+    }
 }
 
 void AResultLevelGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

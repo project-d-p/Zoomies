@@ -54,6 +54,7 @@ void UChatUI::OnChatBoxCommitted(const FText& Text, ETextCommit::Type CommitMeth
 			return;
 		}
 		ADPPlayerController* DPPlayerController = Cast<ADPPlayerController>(World->GetFirstPlayerController());
+		bool bOldShowMouseCursor = DPPlayerController->bShowMouseCursor;
 		if (DPPlayerController == nullptr)
 		{
 			return;
@@ -65,9 +66,21 @@ void UChatUI::OnChatBoxCommitted(const FText& Text, ETextCommit::Type CommitMeth
 			ChatBox->SetText(FText::GetEmpty());
 			DPPlayerController->SendChatMessageToServer(Message);
 		}
-		FInputModeGameOnly InputMode;
-		DPPlayerController->SetInputMode(InputMode);
-		DPPlayerController->bShowMouseCursor = false;
+
+		if (bOldShowMouseCursor)
+		{
+			FInputModeGameAndUI InputMode;
+			InputMode.SetWidgetToFocus(ChatBox->TakeWidget());
+			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			InputMode.SetHideCursorDuringCapture(false);
+			DPPlayerController->SetInputMode(InputMode);
+		}
+		else
+		{
+			FInputModeGameOnly InputMode;
+			DPPlayerController->SetInputMode(InputMode);
+		}
+		DPPlayerController->bShowMouseCursor = bOldShowMouseCursor;
 	}
 }
 

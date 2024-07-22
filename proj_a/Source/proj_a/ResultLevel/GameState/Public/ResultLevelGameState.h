@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "ScoreTypes.h"
+#include "GameFramework/GameState.h"
 #include "GameFramework/GameStateBase.h"
 #include "ResultLevelGameState.generated.h"
 
@@ -46,7 +47,7 @@ struct FPlayerScore
 class ADPPlayerController;
 
 UCLASS()
-class AResultLevelGameState : public AGameStateBase
+class AResultLevelGameState : public AGameState
 {
 	GENERATED_BODY()
 public:
@@ -59,6 +60,7 @@ public:
 protected:
 	virtual void AddPlayerState(APlayerState* PlayerState) override;
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	TArray<int32> CalculateScores(ADPPlayerController* Controller);

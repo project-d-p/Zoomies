@@ -43,6 +43,9 @@ public:
 
 	void ReleaseMemory();
 
+	UFUNCTION(Client, Reliable)
+	void ClientDestroySession();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -52,15 +55,20 @@ protected:
 private:
 	void DeactiveCurrentComponent();
 	void ActivateComponent(ELevelComponentType Type);
-	
+
+	// Move To PlayerState
 	UPROPERTY(VisibleAnywhere)
 	UPrivateScoreManager* PrivateScoreManager;
+	
 	UPROPERTY()
 	UChatManager* ChatManager = nullptr;
+
 	UPROPERTY()
 	UClientSocket* Socket = nullptr;
+
 	UPROPERTY()
 	TMap<uint32, UBaseLevelComponent*> LevelComponents;
+
 	UPROPERTY()
 	UBaseLevelComponent* ActiveComponent;
 };

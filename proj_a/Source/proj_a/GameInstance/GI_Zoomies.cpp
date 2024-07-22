@@ -33,10 +33,20 @@ void UGI_Zoomies::Init()
 	CheckSteamInit();
 }
 
+void UGI_Zoomies::ReturnToMainMenu()
+{
+	Super::ReturnToMainMenu();
+}
+
 // matching session Functions
 void UGI_Zoomies::StartMatchMaking()
 {
 	FindSession_t();
+}
+
+IOnlineSessionPtr UGI_Zoomies::GetOnlineSessionInterface() const
+{
+	return session_interface_;
 }
 
 void UGI_Zoomies::FindSession_t()
@@ -74,7 +84,7 @@ void UGI_Zoomies::OnFindComplete(bool bWasSuccessful)
 	if (bWasSuccessful && session_search_.IsValid())
 	{
 		if (session_search_->SearchResults.Num() > 0)
-		{	
+		{
 			JoinSession_t(session_search_->SearchResults[0]);
 		}
 		else

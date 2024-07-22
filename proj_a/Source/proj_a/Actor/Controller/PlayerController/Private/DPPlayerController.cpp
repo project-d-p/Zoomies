@@ -10,6 +10,7 @@
 #include "BaseInputComponent.h"
 #include "MainLevelComponent.h"
 #include "ResultLevelComponent.h"
+#include "GameFramework/GameMode.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 DEFINE_LOG_CATEGORY(LogNetwork);
@@ -23,13 +24,14 @@ ADPPlayerController::ADPPlayerController()
 
 	UBaseLevelComponent* MainLevelComponet = CreateDefaultSubobject<UMainLevelComponent>(TEXT("MainLevelComponent"));
 	UBaseLevelComponent* ResultLevelComponet = CreateDefaultSubobject<UResultLevelComponent>(TEXT("ResultLevelComponent"));
+
 	MainLevelComponet->InitializeController(this);
 	ResultLevelComponet->InitializeController(this);
-
+	
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::MAIN), MainLevelComponet);
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::RESULT), ResultLevelComponet);
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::NONE), nullptr);
-	
+
 	// TODO: Change to private score manager later
 	PrivateScoreManager = CreateDefaultSubobject<UPrivateScoreManager>(TEXT("PrivateScoreManager"));
 }
@@ -50,18 +52,26 @@ void ADPPlayerController::SendChatMessageToServer(const FString& Message)
 
 	// XXX: Change to client Steam nickname later
 	FString SenderName = "Unknown";
-	if (HasAuthority())
-	{
-		ADPGameModeBase* GM = UGameHelper::GetInGameMode(GetWorld());
-		if (GM)
-		{
-			GM->SendChatToAllClients(SenderName, Message);
-		}
-	}
-	else
-	{
+	// if (HasAuthority())
+	// {
+	// 	ADPGameModeBase* GM = UGameHelper::GetInGameMode(GetWorld());
+	// 	if (GM)
+	// 	{
+	// 		GM->SendChatToAllClients(SenderName, Message);
+	// 	}
+	// 	else
+	// 	{
+	// 		AGameMode* DefaultGM = Cast<AGameMode>(GetWorld()->GetAuthGameMode());
+	// 		if (DefaultGM)
+	// 		{
+	// 			DefaultGM->Broadcast(this, Message);
+	// 		}
+	// 	}
+	// }
+	// else
+	// {
 		ChatManager->ServerSendChatMessage(SenderName, Message);
-	}
+	// }
 }
 
 void ADPPlayerController::ReceiveChatMessage(const FString& SenderName, const FString& Message)
@@ -134,6 +144,22 @@ void ADPPlayerController::ReleaseMemory()
 	{
 		ChatManager->DestroyComponent();
 		ChatManager = nullptr;
+	}
+}
+
+void ADPPlayerController::ClientDestroySession_Implementation()
+{
+	// 게임 인스턴스를 통해 세션 제거
+	FNetLogger::LogError(TEXT("ClientDestroySession_Implementation Before"));
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (GameInstance)
+	{
+		IOnlineSessionPtr SessionInt = GameInstance->GetOnlineSessionInterface();
+		if (SessionInt.IsValid())
+		{
+			FNetLogger::LogError(TEXT("ClientDestroySession_Implementation After"));
+			SessionInt->DestroySession(NAME_GameSession);
+		}
 	}
 }
 
