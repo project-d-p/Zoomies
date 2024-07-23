@@ -6,8 +6,25 @@
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
 #include "Components/Image.h"
+#include "Components/UniformGridPanel.h"
 #include "Components/TextBlock.h"
 #include "VoteWidget.generated.h"
+
+// refer PathManager.h
+// enum EOccupation : uint8
+
+USTRUCT()
+struct FOccupationButton
+{
+    GENERATED_BODY()
+
+    EOccupation Occupation;
+    UPROPERTY()
+    UButton* Button;
+
+    FOccupationButton() = delete;
+    FOccupationButton(EOccupation Occ) : Occupation(Occ), Button(nullptr) {}
+};
 
 UCLASS()
 class PROJ_A_API UVoteWidget : public UUserWidget
@@ -23,15 +40,18 @@ protected:
     UTextBlock* VoterName;
     UPROPERTY(meta = (BindWidget))
     UCanvasPanel* VotableListPannel;
+    UPROPERTY(meta = (BindWidget))
+    UUniformGridPanel* VoteButtonsGrid;
     
     virtual void NativeConstruct() override;
 
 private:
-    TArray<FString> OccupationNames;
+    TArray<EOccupation> OccupationTypes;
     UPROPERTY()
     TArray<UTexture2D*> OccupationImages;
-
-    void SetPlayerOccupation(int32 PlayerIndex, const FString& OccupationName, UTexture2D* OccupationImage);
+    TArray<FOccupationButton> OBA;
+    
+    void InitializeButtons();
     void InitializeOccupations();
     UFUNCTION()
     void OnOpenVoteListButtonClicked();

@@ -76,6 +76,7 @@ void AJudgePlayerController::BeginPlay()
 
 		FTimerHandle UIUpdateTimerHandle;
 		GetWorldTimerManager().SetTimer(UIUpdateTimerHandle, this, &AJudgePlayerController::InitConstUI, 1.0f, false);
+		bShowMouseCursor = true;
 	}
 }
 

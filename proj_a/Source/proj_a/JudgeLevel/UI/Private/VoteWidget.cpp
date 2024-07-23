@@ -1,26 +1,29 @@
 ﻿// VoteWidget.cpp
 #include "VoteWidget.h"
 
+#include "PathManager.h"
+
 void UVoteWidget::NativeConstruct()
 {
     Super::NativeConstruct();
     
     InitializeOccupations();
+    InitializeButtons();
     if (OpenVoteListButton) OpenVoteListButton->OnClicked.AddDynamic(this, &UVoteWidget::OnOpenVoteListButtonClicked);
 }
 
 void UVoteWidget::InitializeOccupations()
 {
-    OccupationNames = {"Archaeologist", "Poacher", "Environmentalist", "Ringmaster", "Terrorist", "Check", "Cross"};
+    OccupationTypes = { ARCHAEOLOGIST, POACHER, ENVIRONMENTALIST, RINGMASTER, TERRORIST, CHECK, CROSS };
     
     // Load occupation images
-    OccupationImages.Add(LoadObject<UTexture2D>(nullptr, TEXT("/Game/image/character/pickaxe")));
-    OccupationImages.Add(LoadObject<UTexture2D>(nullptr, TEXT("/Game/image/character/gun")));
-    OccupationImages.Add(LoadObject<UTexture2D>(nullptr, TEXT("/Game/image/character/earth")));
-    OccupationImages.Add(LoadObject<UTexture2D>(nullptr, TEXT("/Game/image/character/circus")));
-    OccupationImages.Add(LoadObject<UTexture2D>(nullptr, TEXT("/Game/image/character/bomb")));
-    OccupationImages.Add(LoadObject<UTexture2D>(nullptr, TEXT("/Game/image/ui/check")));
-    OccupationImages.Add(LoadObject<UTexture2D>(nullptr, TEXT("/Game/image/ui/cross")));
+    OccupationImages.Add(LoadObject<UTexture2D>(nullptr, PathManager::GetOccupationImagePath(OccupationTypes[0])));
+    OccupationImages.Add(LoadObject<UTexture2D>(nullptr, PathManager::GetOccupationImagePath(OccupationTypes[1])));
+    OccupationImages.Add(LoadObject<UTexture2D>(nullptr, PathManager::GetOccupationImagePath(OccupationTypes[2])));
+    OccupationImages.Add(LoadObject<UTexture2D>(nullptr, PathManager::GetOccupationImagePath(OccupationTypes[3])));
+    OccupationImages.Add(LoadObject<UTexture2D>(nullptr, PathManager::GetOccupationImagePath(OccupationTypes[4])));
+    OccupationImages.Add(LoadObject<UTexture2D>(nullptr, PathManager::GetOccupationImagePath(OccupationTypes[5])));
+    OccupationImages.Add(LoadObject<UTexture2D>(nullptr, PathManager::GetOccupationImagePath(OccupationTypes[6])));
 }
 
 // void UVoteWidget::SetVoterName(const FString& VoterName)
@@ -30,24 +33,26 @@ void UVoteWidget::InitializeOccupations()
 
 void UVoteWidget::OnOpenVoteListButtonClicked()
 {
-    VotableListPannel->SetIsEnabled(true);
-    VotableListPannel->SetRenderOpacity(1.0f);
-    VotableListPannel->SetVisibility(ESlateVisibility::Visible);
+    VotableListPannel->SetVisibility(
+        VotableListPannel->GetVisibility() == ESlateVisibility::Visible
+        ? ESlateVisibility::Hidden
+        : ESlateVisibility::Visible
+    );
 }
 
-void UVoteWidget::SetPlayerOccupation(int32 PlayerIndex, const FString& OccupationName, UTexture2D* OccupationImage)
+void UVoteWidget::InitializeButtons()
 {
-    UCanvasPanel* TargetCanvas = nullptr;
-    UImage* TargetImage = nullptr;
-    UTextBlock* TargetText = nullptr;
-
-    if (TargetCanvas && TargetImage && TargetText)
+    for (EOccupation& type : OccupationTypes)
     {
-        TargetCanvas->SetIsEnabled(true);
-        TargetCanvas->SetRenderOpacity(1.0f);
-        TargetCanvas->SetVisibility(ESlateVisibility::Visible);
+        OBA.Add(FOccupationButton(type));
+    }
 
-        TargetImage->SetBrushFromTexture(OccupationImage);
-        TargetText->SetText(FText::FromString(OccupationName));
+    checkf(VoteButtonsGrid, TEXT("VoteButtonsGrid is nullptr"))
+    for (int32 i = 0; i < VoteButtonsGrid->GetChildrenCount(); ++i)
+    {
+        UButton* Button = Cast<UButton>(VoteButtonsGrid->GetChildAt(i));
+
+        checkf(Button && i < OBA.Num(), TEXT("Invalid Button or OBA index"))
+        OBA[i].Button = Button;
     }
 }

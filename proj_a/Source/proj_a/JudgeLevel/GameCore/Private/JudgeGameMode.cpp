@@ -32,6 +32,7 @@ EOccupation AJudgeGameMode::CollateVotingResults()
     {
         VoteCounts.FindOrAdd(Vote)++;
     }
+    PlayerVotes.Empty();
     auto MostVotedPair = Algo::MaxElementBy(VoteCounts, [](const auto& Pair) { return Pair.Value; });
 
     // For now, if vote same, choose first one.
