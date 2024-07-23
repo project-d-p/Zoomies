@@ -40,7 +40,7 @@ void AJudgePlayerController::InitConstUI()
 void AJudgePlayerController::NotifyTimerEnd_Implementation()
 {
 	// TODO: 내가 선정한거로 변경해야한다.
-	ReturnVote_Implementation(EOccupation::Archaeologist);
+	ReturnVote_Implementation(EOccupation::ARCHAEOLOGIST);
 }
 
 void AJudgePlayerController::SetOccupationeName_Implementation(int index, const FString& Name)

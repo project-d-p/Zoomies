@@ -5,6 +5,7 @@
 #include "JudgePlayerController.h"
 #include "ServerTimerManager.h"
 #include "ServerChatManager.h"
+#include "EnumTypes.h"
 #include "GameFramework/GameModeBase.h"
 #include "JudgeGameMode.generated.h"
 

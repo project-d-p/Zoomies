@@ -3,18 +3,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "JudgeLevelUI.h"
+#include "EnumTypes.h"
 #include "DelayedExecutionSystem.h"
 #include "JudgePlayerController.generated.h"
-
-UENUM()
-enum EOccupation : uint8
-{
-	Archaeologist
-	, Poacher
-	, Ringmaster
-	, Terrorist
-	, Environmentalist
-};
 
 UCLASS()
 class PROJ_A_API AJudgePlayerController : public APlayerController

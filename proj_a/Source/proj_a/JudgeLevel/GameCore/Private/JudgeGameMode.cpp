@@ -56,7 +56,7 @@ void AJudgeGameMode::EndTimer()
         AJudgePlayerController* PC = Cast<AJudgePlayerController>(GetWorld()->GetFirstPlayerController());
         check(PC)
         PC->NotifyTimerEnd();
-        SetVote(EOccupation::Archaeologist);
+        SetVote(EOccupation::ARCHAEOLOGIST);
 
         FTimerHandle VoteCollationTimerHandle;
         GetWorldTimerManager().SetTimer(VoteCollationTimerHandle, this, &AJudgeGameMode::ProcessVotingResults, 1.0f, false);

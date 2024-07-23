@@ -1,45 +1,6 @@
 ﻿#pragma once
 
-enum class EMonster : uint8
-{
-	CRAB,
-	LOBSTER,
-	MAMMOTH,
-	OCTOPUS,
-	STAR_FISH,
-	SLOTH,
-	FOX,
-	GIRAFFE,
-	LION,
-	RABBIT,
-	ELEPHANT,
-	SABER_TOOTH_TIGER,
-	SHEPHERD,
-	SKUNK,
-	SQUID,
-	DOLPHIN,
-	EEL,
-	PENGUIN,
-	SEAL,
-	WHALE,
-	STINGRAY,
-};
-
-enum class EWidget : uint8
-{
-	JUDGE_LEVEL,
-};
-
-enum EOccupation : uint8
-{
-	ARCHAEOLOGIST,
-	POACHER,
-	ENVIRONMENTALIST,
-	RINGMASTER,
-	TERRORIST,
-	CHECK,
-	CROSS,
-};
+#include "EnumTypes.h"
 
 class PathManager 
 {
