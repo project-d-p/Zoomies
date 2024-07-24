@@ -16,8 +16,10 @@ class PROJ_A_API UPrivateScoreManager : public UActorComponent
 public:	
 	UPrivateScoreManager();
 
-	int32 GetPrivatePlayerScore() const { return PrivatePlayerScore; }
-	void SetPrivatePlayerScore(const int Score) { PrivatePlayerScore = Score; }
+	int32 GetPrivatePlayerScore() const;
+	TArray<TArray<EAnimal>> GetCapturedAnimals() const;
+	TArray<FScoreData> GetScoreDatas() const;
+	
 	void IncreasePrivatePlayerScore(const EPlayerJob& playerJob,const TArray<EAnimal>& animals);
 	void IncreasePrivatePlayerScoreByServer(const EPlayerJob& playerJob, const TArray<EAnimal>& animals);
 	void UpdatePrivatePlayerScoreUI();
@@ -25,10 +27,12 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite, Category = "UI")
 	UTextBlock* ScoreTextPrivate;
+	
 protected:
 	virtual void BeginPlay() override;
+	
 private:
-	int PrivatePlayerScore = 0;
+	int32 PrivatePlayerScore = 0;
 	int32 PrivatePlayerBaseScore = 0;
 	float PrivatePlayerMulScore = 1;
 	TArray<TArray<EAnimal>> CapturedAnimals;

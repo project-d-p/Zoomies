@@ -10,6 +10,7 @@
 #include "JudgeLevelComponent.h"
 #include "MainLevelComponent.h"
 #include "ResultLevelComponent.h"
+#include "GameFramework/GameMode.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 DEFINE_LOG_CATEGORY(LogNetwork);
@@ -21,9 +22,10 @@ ADPPlayerController::ADPPlayerController()
 	
 	UBaseLevelComponent* MainLevelComponet = CreateDefaultSubobject<UMainLevelComponent>(TEXT("MainLevelComponent"));
 	UBaseLevelComponent* ResultLevelComponet = CreateDefaultSubobject<UResultLevelComponent>(TEXT("ResultLevelComponent"));
+
 	MainLevelComponet->InitializeController(this);
 	ResultLevelComponet->InitializeController(this);
-
+	
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::MAIN), MainLevelComponet);
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::RESULT), ResultLevelComponet);
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::NONE), nullptr);
@@ -58,33 +60,26 @@ void ADPPlayerController::AcknowledgePossession(APawn* P)
 {
 	Super::AcknowledgePossession(P);
 
-	// // 클라이언트 측에서 추가 초기화 작업 수행
-	// if (GetLocalRole() < ROLE_Authority)
-	// {
-	// 	ADPCharacter* DPCharacter = Cast<ADPCharacter>(P);
-	// 	if (!DPCharacter)
-	// 	{
-	// 		return ;
-	// 	}
-	// 	
-	// 	// disable move replication : set bReplicateMovement to false
-	// 	if (UWorld* World = GetWorld())
-	// 	{
-	// 		FString CurrentLevelName = World->GetMapName();
-	// 		if (CurrentLevelName.Contains("resultLevel"))
-	// 		{
-	// 			DPCharacter->SetReplicatingMovement(true);
-	// 			SwitchLevelComponent(ELevelComponentType::RESULT);
-	// 		}
-	// 	}
-	// }
-}
-
-void ADPPlayerController::ServerSendChatMessage_Implementation(const FString& SenderName, const FString& Message)
-{
-	IChatGameMode* GM = GetWorld()->GetAuthGameMode<IChatGameMode>();
-	check(GM && GM->GetChatManager())
-	GM->GetChatManager()->BroadcastChatMessage(SenderName, Message);
+	// 클라이언트 측에서 추가 초기화 작업 수행
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		ADPCharacter* DPCharacter = Cast<ADPCharacter>(P);
+		if (!DPCharacter)
+		{
+			return ;
+		}
+		
+		// disable move replication : set bReplicateMovement to false
+		if (UWorld* World = GetWorld())
+		{
+			FString CurrentLevelName = World->GetMapName();
+			if (CurrentLevelName.Contains("resultLevel"))
+			{
+				DPCharacter->SetReplicatingMovement(true);
+				SwitchLevelComponent(ELevelComponentType::RESULT);
+			}
+		}
+	}
 }
 
 void ADPPlayerController::ReleaseMemory()
@@ -94,6 +89,22 @@ void ADPPlayerController::ReleaseMemory()
 		Socket->DestoryInstance();
 		Socket->DestroyComponent();
 		Socket = nullptr;
+	}
+}
+
+void ADPPlayerController::ClientDestroySession_Implementation()
+{
+	// 게임 인스턴스를 통해 세션 제거
+	FNetLogger::LogError(TEXT("ClientDestroySession_Implementation Before"));
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (GameInstance)
+	{
+		IOnlineSessionPtr SessionInt = GameInstance->GetOnlineSessionInterface();
+		if (SessionInt.IsValid())
+		{
+			FNetLogger::LogError(TEXT("ClientDestroySession_Implementation After"));
+			SessionInt->DestroySession(NAME_GameSession);
+		}
 	}
 }
 
@@ -136,14 +147,6 @@ void ADPPlayerController::OnPossess(APawn* InPawn)
 	}
 	Cast<UMainLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::MAIN)])->SetStateComponent();
 }
-
-// void ADPPlayerController::SeamlessTravelFrom(APlayerController* OldPC)
-// {
-// 	Super::SeamlessTravelFrom(OldPC);
-//
-// 	UPrivateScoreManager* PSM = Cast<ADPPlayerController>(OldPC)->GetPrivateScoreManagerComponent();
-// 	PrivateScoreManager->SetPrivatePlayerScore(PSM->GetPrivatePlayerScore());
-// }
 
 void ADPPlayerController::SetupInputComponent()
 {

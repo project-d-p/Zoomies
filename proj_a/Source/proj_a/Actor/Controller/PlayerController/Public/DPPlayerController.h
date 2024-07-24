@@ -35,7 +35,6 @@ public:
 
 	/* Get Level Component */
 	UBaseLevelComponent* GetLevelComponent() const;
-	void SetLevelComponent(UBaseLevelComponent* Component) { ActiveComponent = Component; };
 
 	UPlayerScoreComp* GetScoreManagerComponent() const;
 	UPrivateScoreManager* GetPrivateScoreManagerComponent() const;
@@ -43,23 +42,28 @@ public:
 
 	void ReleaseMemory();
 
+	UFUNCTION(Client, Reliable)
+	void ClientDestroySession();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void OnPossess(APawn* InPawn) override;
-	// virtual void SeamlessTravelFrom(APlayerController* OldPC) override;
 	
 private:
 	void DeactiveCurrentComponent();
 	void ActivateComponent(ELevelComponentType Type);
-	
+
+	// Move To PlayerState
 	UPROPERTY(VisibleAnywhere)
 	UPrivateScoreManager* PrivateScoreManager;
 	UPROPERTY()
 	UClientSocket* Socket = nullptr;
+
 	UPROPERTY()
 	TMap<uint32, UBaseLevelComponent*> LevelComponents;
+
 	UPROPERTY()
 	UBaseLevelComponent* ActiveComponent;
 };

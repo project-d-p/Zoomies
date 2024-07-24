@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PlayerScoreComp.h"
+// #include "PlayerScoreComp.h"
 #include "GameFramework/PlayerState.h"
 #include "proj_a/Component/InGame/Score/Types/ScoreTypes.h"
 #include "DPPlayerState.generated.h"
@@ -19,14 +19,22 @@ public:
 	UFUNCTION()
 	EPlayerJob GetPlayerJob() const;
 
-	int32 GetScore() const { return PlayerScoreComp->PlayerScores; };
+	UPROPERTY(ReplicatedUsing = OnRep_Rank, BlueprintReadWrite, Category = "PlayerRank")
+	int Rank;
+
+	UFUNCTION()
+	void OnRep_Rank();
+
+	UFUNCTION(Server, Reliable)
+	void ServerSetRank(int InRank);
+	
 private:
 	UPROPERTY()
 	UPlayerScoreComp* PlayerScoreComp = nullptr;
 
 	UPROPERTY(Replicated)
 	EPlayerJob PlayerJob = EPlayerJob::JOB_ARCHAEOLOGIST;
-	
+
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

@@ -1,6 +1,7 @@
 #include "ResultLevelComponent.h"
 
 #include "BasicInputComponent.h"
+#include "MainInputComponent.h"
 
 UResultLevelComponent::UResultLevelComponent()
 {

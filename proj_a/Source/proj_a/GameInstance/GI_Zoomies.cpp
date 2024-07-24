@@ -33,10 +33,20 @@ void UGI_Zoomies::Init()
 	CheckSteamInit();
 }
 
+void UGI_Zoomies::ReturnToMainMenu()
+{
+	Super::ReturnToMainMenu();
+}
+
 // matching session Functions
 void UGI_Zoomies::StartMatchMaking()
 {
 	FindSession_t();
+}
+
+IOnlineSessionPtr UGI_Zoomies::GetOnlineSessionInterface() const
+{
+	return session_interface_;
 }
 
 void UGI_Zoomies::FindSession_t()
@@ -61,10 +71,12 @@ void UGI_Zoomies::FindSession_t()
 	session_interface_->FindSessions(
 		*local_player->GetPreferredUniqueNetId(),
 		session_search_.ToSharedRef());
+	FNetLogger::LogError(TEXT("FindSession_t"));
 }
 
 void UGI_Zoomies::OnFindComplete(bool bWasSuccessful)
 {
+	FNetLogger::LogError(TEXT("OnFindComplete"));
 	// unregister the delegate
 	session_interface_->ClearOnFindSessionsCompleteDelegate_Handle(
 		dh_on_find_complete
@@ -74,18 +86,21 @@ void UGI_Zoomies::OnFindComplete(bool bWasSuccessful)
 	if (bWasSuccessful && session_search_.IsValid())
 	{
 		if (session_search_->SearchResults.Num() > 0)
-		{	
+		{
 			JoinSession_t(session_search_->SearchResults[0]);
+			FNetLogger::LogError(TEXT("FindSession_t[Join]"));
 		}
 		else
 		{
 			CreateSession_t();
+			FNetLogger::LogError(TEXT("FindSession_t[Create]"));
 		}
 	}
 }
 
 void UGI_Zoomies::CreateSession_t()
 {
+	FNetLogger::LogError(TEXT("CreateSession_t"));
 	// session settings
 	session_settings_ = MakeShareable(new FOnlineSessionSettings());
 	session_settings_->bIsLANMatch = true;
@@ -126,6 +141,7 @@ void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
 	if (bWasSuccessful)
 	{
 		// travel to lobby level
+		FNetLogger::LogError(TEXT("onCreateComplete"));
 		GetWorld()->ServerTravel(TEXT("matchLobby?listen"), true);
 	}
 	else

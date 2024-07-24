@@ -8,7 +8,7 @@
 
 ADPPlayerState::ADPPlayerState()
 {
-	// bReplicates = true;
+	bReplicates = true;
 	
 	PlayerScoreComp = CreateDefaultSubobject<UPlayerScoreComp>(TEXT("PlayerScore"));
 	FString PlayerName = FGuid::NewGuid().ToString();
@@ -25,6 +25,17 @@ EPlayerJob ADPPlayerState::GetPlayerJob() const
 	return PlayerJob;
 }
 
+void ADPPlayerState::OnRep_Rank()
+{
+}
+
+void ADPPlayerState::ServerSetRank_Implementation(int InRank)
+{
+	Rank = InRank;
+
+	OnRep_Rank();
+}
+
 void ADPPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
@@ -34,7 +45,6 @@ void ADPPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	// DOREPLIFETIME(ADPPlayerState, PlayerScoreComp);
-	// DOREPLIFETIME(ADPPlayerState, APlayerState::PlayerName);
 	DOREPLIFETIME(ADPPlayerState, PlayerJob);
+	DOREPLIFETIME(ADPPlayerState, Rank);
 }

@@ -54,7 +54,7 @@ void UChatUI::OnChatBoxCommitted(const FText& Text, ETextCommit::Type CommitMeth
 	{
 		check(World);
 		APlayerController* PC = Cast<APlayerController>(World->GetFirstPlayerController());
-		// AJudgePlayerController* PC = Cast<AJudgePlayerController>(World->GetFirstPlayerController());
+		// bool bOldShowMouseCursor = PC->bShowMouseCursor;
 		check(PC)
 		if (!Text.IsEmpty())
 		{

@@ -8,5 +8,13 @@ void UChatManager::ClientReceiveChatMessage_Implementation(const FString& Sender
 
 void UChatManager::setChatUI(UChatUI* InChatUI)
 {
-	ChatUI = InChatUI;
+	if (ChatUI)
+	{
+		ChatUI->DestroyComponent();
+		ChatUI = InChatUI;
+	}
+	else
+	{
+		ChatUI = InChatUI;
+	}
 }

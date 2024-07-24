@@ -1,16 +1,30 @@
 #include "PrivateScoreManager.h"
 #include "CalculateScoreByJobs.h"
-#include "FNetLogger.h"
 #include "ScoreUiPrivate.h"
 
 UPrivateScoreManager::UPrivateScoreManager()
 {
-	FNetLogger::LogInfo(TEXT("UPrivateScoreManager::UPrivateScoreManager"));
+	PrimaryComponentTick.bCanEverTick = true;
 }
 
 void UPrivateScoreManager::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+int32 UPrivateScoreManager::GetPrivatePlayerScore() const
+{
+	return PrivatePlayerScore;
+}
+
+TArray<TArray<EAnimal>> UPrivateScoreManager::GetCapturedAnimals() const
+{
+	return CapturedAnimals;
+}
+
+TArray<FScoreData> UPrivateScoreManager::GetScoreDatas() const
+{
+	return ScoreDatas;
 }
 
 void UPrivateScoreManager::IncreasePrivatePlayerScore(const EPlayerJob& playerJob, const TArray<EAnimal>& animals)

@@ -28,11 +28,13 @@ public:
 	void OnHostDisconnected();
 	void HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type Arg, const FString& String);
 	virtual void Init() override;
+	virtual void ReturnToMainMenu() override;
 
 	// Matching starting function
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void StartMatchMaking();
-	
+	IOnlineSessionPtr GetOnlineSessionInterface() const;
+
 	UPROPERTY()
 	TMap<APlayerController*, int> PlayerCharacters;
 	UPROPERTY()

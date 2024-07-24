@@ -48,7 +48,7 @@ ADPWeaponGun::ADPWeaponGun()
 	}
 	
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> PARTICLE
-	(TEXT("/Game/effect/ns_animalHit.ns_animalHit"));
+	(TEXT("/Game/effect/ns_animalHitScrew.ns_animalHitScrew"));
 	if (PARTICLE.Succeeded()) {
 		particleEffect = PARTICLE.Object;
 	}
