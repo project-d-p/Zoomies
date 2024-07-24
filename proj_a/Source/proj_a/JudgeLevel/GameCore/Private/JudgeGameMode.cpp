@@ -1,11 +1,7 @@
 ﻿#include "JudgeGameMode.h"
 
-#include "DPCharacter.h"
-#include "DPInGameState.h"
-#include "DPPlayerController.h"
 #include "FNetLogger.h"
 #include "JudgeGameState.h"
-#include "JudgeLevelComponent.h"
 #include "JudgePlayerController.h"
 #include "JudgePlayerState.h"
 #include "Algo/MaxElement.h"
@@ -42,21 +38,23 @@ EOccupation AJudgeGameMode::CollateVotingResults()
 void AJudgeGameMode::ProcessVotingResults()
 {
     EOccupation MostVotedOccupation = CollateVotingResults();
-    FNetLogger::EditerLog(FColor::Emerald, TEXT("MostVotedOccupation: %d"), static_cast<int>(MostVotedOccupation));
-    TimerManager->StartTimer<AJudgeGameState>(10.0f, &AJudgeGameMode::EndTimer, this);
+    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+    {
+        AJudgePlayerController* PC = Cast<AJudgePlayerController>(*It);
+        check(PC)
+        PC->SetOccupationeName(CurrentPlayerIndex, OccupationToString(MostVotedOccupation));
+    }
+    TimerManager->StartTimer<AJudgeGameState>(WAIT_TIME, &AJudgeGameMode::EndTimer, this);
 }
 
 void AJudgeGameMode::EndTimer()
 {
-    FNetLogger::EditerLog(FColor::Emerald, TEXT("EndTimer"));
-
     constexpr int TOTAL_PLAYER = 2;
-    if (CurrentPlayerIndex++ < TOTAL_PLAYER)
+    if (++CurrentPlayerIndex < TOTAL_PLAYER)
     {
         AJudgePlayerController* PC = Cast<AJudgePlayerController>(GetWorld()->GetFirstPlayerController());
         check(PC)
         PC->NotifyTimerEnd();
-        SetVote(EOccupation::ARCHAEOLOGIST);
 
         FTimerHandle VoteCollationTimerHandle;
         GetWorldTimerManager().SetTimer(VoteCollationTimerHandle, this, &AJudgeGameMode::ProcessVotingResults, 1.0f, false);
@@ -72,7 +70,7 @@ void AJudgeGameMode::StartPlay()
 {
     Super::StartPlay();
     
-    TimerManager->StartTimer<AJudgeGameState>(10.0f, &AJudgeGameMode::EndTimer, this);
+    TimerManager->StartTimer<AJudgeGameState>(WAIT_TIME, &AJudgeGameMode::EndTimer, this);
 }
 
 void AJudgeGameMode::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)

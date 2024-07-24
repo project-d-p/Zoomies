@@ -1,7 +1,6 @@
 ﻿#include "JudgeGameState.h"
 
 #include "DPPlayerController.h"
-#include "JudgeLevelComponent.h"
 #include "Net/UnrealNetwork.h"
 
 AJudgeGameState::AJudgeGameState()

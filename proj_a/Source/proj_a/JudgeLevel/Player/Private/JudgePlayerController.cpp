@@ -33,19 +33,18 @@ void AJudgePlayerController::InitConstUI()
 	{
 		JudgeLevelUI->SetBlockContent(ETextBlockType::Id, i, PA[i]->GetPlayerName());
 		JudgeLevelUI->SetBlockContent(ETextBlockType::Score, i, FString::FromInt(PA[i]->GetScore()));
-		SetOccupationeName_Implementation(i, TEXT("BackSoo"));
+		SetOccupationeName_Implementation(i, TEXT("None"));
 	}
 }
 
 void AJudgePlayerController::NotifyTimerEnd_Implementation()
 {
-	// TODO: 내가 선정한거로 변경해야한다.
-	ReturnVote_Implementation(EOccupation::ARCHAEOLOGIST);
+	ReturnVote_Implementation(JudgeLevelUI->GetVote());
 }
 
 void AJudgePlayerController::SetOccupationeName_Implementation(int index, const FString& Name)
 {
-	checkf(JudgeLevelUI, TEXT("JudgeLevelUI is nullptr"))
+	check(JudgeLevelUI)
 	JudgeLevelUI->SetBlockContent(ETextBlockType::Occupation, index, Name);
 }
 

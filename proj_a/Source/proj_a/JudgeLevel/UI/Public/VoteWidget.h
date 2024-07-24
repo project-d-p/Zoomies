@@ -32,7 +32,9 @@ UCLASS()
 class PROJ_A_API UVoteWidget : public UUserWidget
 {
     GENERATED_BODY()
-    
+
+public:
+    EOccupation GetVote() const { return CurrentVoterOcc; }
 protected:
     UPROPERTY(meta = (BindWidget))
     UButton* OpenVoteListButton;

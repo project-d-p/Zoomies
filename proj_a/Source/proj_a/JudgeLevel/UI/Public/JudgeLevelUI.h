@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "ScoreUI.h"
 #include "TimerUI.h"
+#include "VoteWidget.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/VerticalBox.h"
 #include "JudgeLevelUI.generated.h"
@@ -21,6 +22,7 @@ class PROJ_A_API UJudgeLevelUI : public UUserWidget
 	GENERATED_BODY()
 public:
 	void SetBlockContent(ETextBlockType BlockType, int32 Index, const FString& Content);
+	EOccupation GetVote() const { return widget_vote->GetVote(); }
 
 protected:
 	void InitTextBlocksFromContainer(UPanelWidget* Container, TArray<UTextBlock*>& OutTextBlocks);
@@ -39,6 +41,8 @@ protected:
 	UVerticalBox* ScoreContainer;
 	UPROPERTY(meta = (BindWidget))
 	UVerticalBox* OccupationContainer;
+	UPROPERTY(meta = (BindWidget))
+	UVoteWidget* widget_vote = nullptr;
 
 	UPROPERTY()
 	TArray<UTextBlock*> IdBlocks;
