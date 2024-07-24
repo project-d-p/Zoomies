@@ -59,6 +59,9 @@ public:
 	// index displays as player index
 	UPROPERTY(Replicated, BlueprintReadWrite, Category = "PlayerScores")
 	TArray<FPlayerScore> PlayerScores;
+
+	UPROPERTY(BlueprintReadOnly)
+	int MyRank = 0;
 	
 protected:
 	virtual void AddPlayerState(APlayerState* PlayerState) override;

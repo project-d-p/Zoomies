@@ -42,22 +42,43 @@ void AResultLevelGameState::SetMyRank()
 
 	int rank = 1;
 	PlayerScores[0].Rank = rank;
-	if (PlayerScores[0].PlayerName == GetWorld()->GetFirstPlayerController()->PlayerState->GetPlayerName())
-	{
-		GetWorld()->GetFirstPlayerController()->PlayerState->SetScore(rank);
-	}
-	
+
 	for (int i = 1; i < PlayerScores.Num(); i++)
 	{
 		if (PlayerScores[i - 1].Scores[4] != PlayerScores[i].Scores[4])
 		{
 			rank += 1;
 		}
-		if (PlayerScores[i].PlayerName == GetWorld()->GetFirstPlayerController()->PlayerState->GetPlayerName())
-		{
-			GetWorld()->GetFirstPlayerController()->PlayerState->SetScore(rank);
-		}
 		PlayerScores[i].Rank = rank;
+	}
+
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		ADPPlayerController* PlayerController = Cast<ADPPlayerController>(*Iterator);
+		if (!PlayerController)
+		{
+			continue;
+		}	
+		ADPPlayerState* PlayerState = Cast<ADPPlayerState>(PlayerController->PlayerState);
+		if (!PlayerState)
+		{
+			continue;
+		}
+		FPlayerScore* PlayerScore = PlayerScores.FindByPredicate([PlayerState](const FPlayerScore& Score) {
+			return Score.PlayerName == PlayerState->GetPlayerName();
+		});
+		if (!PlayerScore)
+		{
+			continue;
+		}
+		// PlayerState->Rank = PlayerScore->Rank;
+		// FNetLogger::EditerLog(FColor::Cyan, TEXT("PlayerName: %s, Rank: %d"), *PlayerState->GetPlayerName(), PlayerState->Rank);
+		// PlayerState->ServerSetRank(PlayerScore->Rank);
+		PlayerState->Rank = PlayerScore->Rank;
+		if (PlayerController->IsLocalController())
+		{
+			MyRank = PlayerScore->Rank;
+		}
 	}
 }
 
@@ -112,7 +133,6 @@ TArray<int32> AResultLevelGameState::CalculateScores(ADPPlayerController* Contro
 	{
 		return Scores;
 	}
-	FNetLogger::LogError(TEXT("ScoreManager is valid"));
 
 	TArray<TArray<EAnimal>> CapturedAnimals = ScoreManager->GetCapturedAnimals();
 	TArray<FScoreData> ScoreDatas = ScoreManager->GetScoreDatas();
@@ -144,18 +164,11 @@ void AResultLevelGameState::BeginPlay()
 	if (HasAuthority())
 	{
 		this->SetPlayerScores();
-		this->SetMyRank();
 	}
-	
-	for (auto& PlayerScore : PlayerScores)
-	{
-		FNetLogger::LogError(TEXT("PlayerName: %s"), *PlayerScore.PlayerName);
-		FNetLogger::LogError(TEXT("PlayerJob: %d"), (int32)PlayerScore.PlayerJob);
-		FNetLogger::LogError(TEXT("Scores: %d, %d, %d, %d, %d"), PlayerScore.Scores[0], PlayerScore.Scores[1], PlayerScore.Scores[2], PlayerScore.Scores[3], PlayerScore.Scores[4]);
-		FNetLogger::LogError(TEXT("bIsDetected: %d"), PlayerScore.bIsDetected);
-	}
-	
+
 	Super::BeginPlay();
+	
+	this->SetMyRank();
 
 	ADPPlayerController* Controller = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
 	if (Controller)

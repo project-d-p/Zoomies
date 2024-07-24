@@ -24,6 +24,9 @@ void ADPInGameState::BeginPlay()
 	Super::BeginPlay();
 
 	ScoreManager->InitScoreUi();
+
+	FNetLogger::LogError(TEXT("[Game]Controller ID: %d, Number of Controllers: %d"), GetWorld()->GetFirstPlayerController()->GetUniqueID(), GetWorld()->GetNumPlayerControllers());
+	
 	// ADPCharacter* Character = Cast<ADPCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	// if (Character)
 	// {
