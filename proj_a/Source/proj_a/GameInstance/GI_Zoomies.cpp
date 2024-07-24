@@ -1,5 +1,6 @@
 #include "GI_Zoomies.h"
 #include "DPPlayerController.h"
+#include "FNetLogger.h"
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
 #include "steam_api.h"
@@ -248,8 +249,8 @@ void UGI_Zoomies::InitSteamAPI()
 		if (steam_id.IsValid() && !steam_username.IsEmpty())
 		{
 			UE_LOG(LogTemp, Log, TEXT("SteamAPI INIT SUCCESS || ID: %llu, Username: %s"), steam_id.ConvertToUint64(), *steam_username);
+			SteamNetworkingUtils()->InitRelayNetworkAccess();
 		}
-		// SteamNetworkingUtils()->InitRelayNetworkAccess();
 	}
 	
 	if (!is_steamAPI_init)

@@ -11,7 +11,7 @@ SteamNetworkingSocket::SteamNetworkingSocket()
 	{
 		throw std::runtime_error("Failed to create poll group.");
 	}
-	// steam_listen_socket_ = SteamNetworkingSockets()->CreateListenSocketP2P(n_local_virtual_port, 0, &opt);
+	
 	local_address_.Clear();
 	local_address_.m_port = 4242;
 
