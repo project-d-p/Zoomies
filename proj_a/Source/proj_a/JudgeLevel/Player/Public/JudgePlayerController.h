@@ -24,12 +24,14 @@ public:
 	void NotifyTimerEnd();
 	
 	UFUNCTION(Server, Reliable)
-	void ReturnVote(EOccupation Type);
+	void ReturnVote(EPlayerJob Type);
 
 	UJudgeLevelUI* GetJudgeLevelUI() const { return JudgeLevelUI; }
 protected:
 	virtual void BeginPlay() override;
 	virtual void SeamlessTravelFrom(APlayerController* OldPC) override;
+	virtual void SeamlessTravelTo(APlayerController* NewPC) override;
+	
 private:
 	bool IsBeginPlay = false;
 	UPROPERTY(EditDefaultsOnly, Category = "UI")

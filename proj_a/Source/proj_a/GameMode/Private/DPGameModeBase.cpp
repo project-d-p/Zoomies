@@ -130,6 +130,7 @@ void ADPGameModeBase::EndGame()
 		steam_listen_socket_ = nullptr;
 	}
 	GetWorld()->ServerTravel("judgeLevel?listen");
+	// GetWorld()->ServerTravel("calculateLevel?listen");
 }
 
 void ADPGameModeBase::StartPlay()

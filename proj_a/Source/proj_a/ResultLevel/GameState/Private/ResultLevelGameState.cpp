@@ -7,6 +7,7 @@
 
 AResultLevelGameState::AResultLevelGameState()
 {
+	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
 }
 
 void AResultLevelGameState::AddPlayerState(APlayerState* PlayerState)
@@ -14,17 +15,17 @@ void AResultLevelGameState::AddPlayerState(APlayerState* PlayerState)
 	Super::AddPlayerState(PlayerState);
 }
 
-TArray<FAnimalList> AResultLevelGameState::GetCapturedAnimals(ADPPlayerController* Controller)
+TArray<FAnimalList> AResultLevelGameState::GetCapturedAnimals(/*ADPPlayerController* Controller*/ TArray<TArray<EAnimal>> InCapturedAnimals)
 {
 	TArray<FAnimalList> CapturedAnimals;
-
-	UPrivateScoreManager* ScoreManager = Controller->GetPrivateScoreManagerComponent();
-	if (!ScoreManager)
-	{
-		return CapturedAnimals;
-	}
 	
-	for (const TArray<EAnimal>& Animals : ScoreManager->GetCapturedAnimals())
+	// UPrivateScoreManager* ScoreManager = Controller->GetPrivateScoreManagerComponent();
+	// if (!ScoreManager)
+	// {
+	// 	return CapturedAnimals;
+	// }
+	
+	for (const TArray<EAnimal>& Animals : InCapturedAnimals)
 	{
 		FAnimalList AnimalList;
 		AnimalList.Animals = Animals;
@@ -85,24 +86,28 @@ void AResultLevelGameState::SetMyRank()
 void AResultLevelGameState::SetPlayerScores()
 {
 	FPlayerScore PlayerScore;
-	
+
+	FNetLogger::LogInfo(TEXT("SetPlayerScores"));
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
 		ADPPlayerController* PlayerController = Cast<ADPPlayerController>(*Iterator);
+		check(PlayerController)
 		if (!PlayerController)
 		{
 			return ;
 		}
 		ADPPlayerState* PlayerState = Cast<ADPPlayerState>(PlayerController->PlayerState);
+		check(PlayerState)
 		if (!PlayerState)
 		{
 			return ;
 		}
 		PlayerScore.PlayerName = PlayerState->GetPlayerName();
-		PlayerScore.PlayerJob = PlayerState->GetPlayerJob();
-		PlayerScore.Scores = this->CalculateScores(PlayerController);
-		PlayerScore.CapturedAnimals = this->GetCapturedAnimals(PlayerController);
-		PlayerScore.bIsDetected = false;
+		PlayerScore.PlayerJob = EPlayerJob::JOB_ARCHAEOLOGIST /*PlayerState->GetPlayerJob()*/;
+		FFinalScoreData FD = PlayerState->GetFinalScoreData();
+		PlayerScore.Scores = this->CalculateScores(FD.CapturedAnimals, FD.ScoreDatas /*PlayerController*/);
+		PlayerScore.CapturedAnimals = this->GetCapturedAnimals(FD.CapturedAnimals/*PlayerController*/);
+		PlayerScore.bIsDetected = FD.bIsDetected;
 		PlayerScores.Add(PlayerScore);
 	}
 
@@ -122,20 +127,20 @@ void AResultLevelGameState::SetPlayerScores()
 	}
 }
 
-TArray<int32> AResultLevelGameState::CalculateScores(ADPPlayerController* Controller)
+TArray<int32> AResultLevelGameState::CalculateScores(/* ADPPlayerController* Controller */ TArray<TArray<EAnimal>> InCapturedAnimals, TArray<FScoreData> InScores)
 {
 	TArray<int32> Scores;
 
 	Scores.SetNum(5);
 
-	UPrivateScoreManager* ScoreManager = Controller->GetPrivateScoreManagerComponent();
-	if (!ScoreManager)
-	{
-		return Scores;
-	}
+	// UPrivateScoreManager* ScoreManager = Controller->GetPrivateScoreManagerComponent();
+	// if (!ScoreManager)
+	// {
+	// 	return Scores;
+	// }
 
-	TArray<TArray<EAnimal>> CapturedAnimals = ScoreManager->GetCapturedAnimals();
-	TArray<FScoreData> ScoreDatas = ScoreManager->GetScoreDatas();
+	TArray<TArray<EAnimal>> CapturedAnimals = InCapturedAnimals /*ScoreManager->GetCapturedAnimals()*/;
+	TArray<FScoreData> ScoreDatas = InScores /*ScoreManager->GetScoreDatas()*/;
 
 	int BaseScore = 0;
 	int BaseScoreAlpha = 0;
@@ -186,7 +191,7 @@ void AResultLevelGameState::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	// °ÔÀÓ ÀÎ½ºÅÏ½º¸¦ ÅëÇØ ¼¼¼Ç Á¦°Å
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½Î½ï¿½ï¿½Ï½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
     if (GameInstance)
     {

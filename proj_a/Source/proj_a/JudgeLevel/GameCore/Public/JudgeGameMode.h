@@ -4,29 +4,29 @@
 #include "IChatGameMode.h"
 #include "ServerTimerManager.h"
 #include "ServerChatManager.h"
-#include "EnumTypes.h"
+#include "ScoreTypes.h"
 #include "GameFramework/GameModeBase.h"
 #include "JudgeGameMode.generated.h"
 
 
 // 추후 변경
-inline FString OccupationToString(EOccupation Occupation)
+inline FString OccupationToString(EPlayerJob Occupation)
 {
     switch(Occupation)
     {
-    case EOccupation::ARCHAEOLOGIST:
+    case EPlayerJob::JOB_ARCHAEOLOGIST:
         return FString("ARCHAEOLOGIST");
-    case EOccupation::POACHER:
+    case EPlayerJob::JOB_POACHER:
         return FString("POACHER");
-    case EOccupation::ENVIRONMENTALIST:
+    case EPlayerJob::JOB_ENVIRONMENTALIST:
         return FString("ENVIRONMENTALIST");
-    case EOccupation::RINGMASTER:
+    case EPlayerJob::JOB_RINGMASTER:
         return FString("RINGMASTER");
-    case EOccupation::TERRORIST:
+    case EPlayerJob::JOB_TERRORIST:
         return FString("TERRORIST");
-    case EOccupation::CHECK:
+    case EPlayerJob::JOB_CHECK:
         return FString("CHECK");
-    case EOccupation::CROSS:
+    case EPlayerJob::JOB_CROSS:
         return FString("CROSS");
     default:
         return FString("UNKNOWN");
@@ -41,17 +41,17 @@ class PROJ_A_API AJudgeGameMode : public AGameModeBase, public IChatGameMode
 public:
     AJudgeGameMode();
 
-    void SetVote(EOccupation Occupation) { PlayerVotes.Add(Occupation); }
+    void AddVote(EPlayerJob Occupation) { PlayerVotes.Add(Occupation); }
     virtual UServerChatManager* GetChatManager() const override { return ChatManager; }
 
 private:
-    EOccupation CollateVotingResults();
+    EPlayerJob CollateVotingResults();
     void ProcessVotingResults();
     void EndTimer();
 
-    int CurrentPlayerIndex = -1;
+    int CurrentPlayerIndex = 0;
     const float WAIT_TIME = 10.f;
-    TArray<EOccupation> PlayerVotes;
+    TArray<EPlayerJob> PlayerVotes;
     
 protected:
     virtual void StartPlay() override;

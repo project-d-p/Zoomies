@@ -1,21 +1,22 @@
 ﻿#pragma once
 
 #include "EnumTypes.h"
+#include "ScoreTypes.h"
 
 class PathManager 
 {
 public:
-	static constexpr const TCHAR* GetOccupationImagePath(EOccupation OType)
+	static constexpr const TCHAR* GetOccupationImagePath(EPlayerJob OType)
 	{
 		switch (OType)
 		{
-		case EOccupation::ARCHAEOLOGIST: return TEXT("/Game/image/character/pickaxe");
-		case EOccupation::POACHER: return TEXT("/Game/image/character/gun");
-		case EOccupation::ENVIRONMENTALIST: return TEXT("/Game/image/character/earth");
-		case EOccupation::RINGMASTER: return TEXT("/Game/image/character/circus");
-		case EOccupation::TERRORIST: return TEXT("/Game/image/character/bomb");
-		case EOccupation::CHECK: return TEXT("/Game/image/ui/check");
-		case EOccupation::CROSS: return TEXT("/Game/image/ui/cross");
+		case EPlayerJob::JOB_ARCHAEOLOGIST: return TEXT("/Game/image/character/pickaxe");
+		case EPlayerJob::JOB_POACHER: return TEXT("/Game/image/character/gun");
+		case EPlayerJob::JOB_ENVIRONMENTALIST: return TEXT("/Game/image/character/earth");
+		case EPlayerJob::JOB_RINGMASTER: return TEXT("/Game/image/character/circus");
+		case EPlayerJob::JOB_TERRORIST: return TEXT("/Game/image/character/bomb");
+		case EPlayerJob::JOB_CHECK: return TEXT("/Game/image/ui/check");
+		case EPlayerJob::JOB_CROSS: return TEXT("/Game/image/ui/cross");
 			default: check(false) return nullptr;;
 		}
 	}

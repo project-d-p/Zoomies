@@ -5,14 +5,14 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
-#include "EnumTypes.h"
 #include "Components/Image.h"
 #include "Components/UniformGridPanel.h"
+#include "ScoreTypes.h"
 #include "Components/TextBlock.h"
 #include "VoteWidget.generated.h"
 
-// refer PathManager.h
-// enum EOccupation : uint8
+// refer ScoreTypes.h
+// enum EPlayerJob : uint8
 
 USTRUCT()
 struct FOccupationData
@@ -20,12 +20,12 @@ struct FOccupationData
     GENERATED_BODY()
 
     UPROPERTY()
-    EOccupation Occupation;
+    EPlayerJob Occupation;
     UPROPERTY()
     UButton* Button;
 
     FOccupationData() : Occupation(), Button(nullptr) {}
-    FOccupationData(EOccupation Occ) : Occupation(Occ), Button(nullptr) {}
+    FOccupationData(EPlayerJob Occ) : Occupation(Occ), Button(nullptr) {}
 };
 
 UCLASS()
@@ -34,7 +34,7 @@ class PROJ_A_API UVoteWidget : public UUserWidget
     GENERATED_BODY()
 
 public:
-    EOccupation GetVote() const { return CurrentVoterOcc; }
+    EPlayerJob GetVote() const { return CurrentVoterOcc; }
 protected:
     UPROPERTY(meta = (BindWidget))
     UButton* OpenVoteListButton;
@@ -50,10 +50,10 @@ protected:
     virtual void NativeConstruct() override;
 
 private:
-    TArray<EOccupation> OccupationTypes;
-    EOccupation CurrentVoterOcc;
+    TArray<EPlayerJob> OccupationTypes;
+    EPlayerJob CurrentVoterOcc;
 
-    void InitializeOccupations();
+    void InitializEPlayerJobs();
     UFUNCTION()
     void OnOpenVoteListButtonClicked();
 };

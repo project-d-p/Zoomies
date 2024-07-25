@@ -19,12 +19,12 @@ AJudgeGameMode::AJudgeGameMode()
     bUseSeamlessTravel = true;
 }
 
-EOccupation AJudgeGameMode::CollateVotingResults()
+EPlayerJob AJudgeGameMode::CollateVotingResults()
 {
-    TMap<EOccupation, int32> VoteCounts;
+    TMap<EPlayerJob, int32> VoteCounts;
 
     FNetLogger::EditerLog(FColor::Emerald, TEXT("PlayerVotes.Num(): %d"), PlayerVotes.Num());
-    for (const EOccupation& Vote : PlayerVotes)
+    for (const EPlayerJob& Vote : PlayerVotes)
     {
         VoteCounts.FindOrAdd(Vote)++;
     }
@@ -37,12 +37,20 @@ EOccupation AJudgeGameMode::CollateVotingResults()
 
 void AJudgeGameMode::ProcessVotingResults()
 {
-    EOccupation MostVotedOccupation = CollateVotingResults();
+    EPlayerJob MostVotedOccupation = CollateVotingResults();
+
+    AJudgePlayerState* PS = Cast<AJudgePlayerState>(GetWorld()->GetGameState<AJudgeGameState>()->PlayerArray[CurrentPlayerIndex - 1]);
+    check(PS)
+    if (PS->GetPlayerJob() == MostVotedOccupation)
+    {
+        PS->SetIsDetected(true);
+    }
+    
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         AJudgePlayerController* PC = Cast<AJudgePlayerController>(*It);
         check(PC)
-        PC->SetOccupationeName(CurrentPlayerIndex, OccupationToString(MostVotedOccupation));
+        PC->SetOccupationeName(CurrentPlayerIndex - 1, OccupationToString(MostVotedOccupation));
     }
     TimerManager->StartTimer<AJudgeGameState>(WAIT_TIME, &AJudgeGameMode::EndTimer, this);
 }
@@ -61,8 +69,7 @@ void AJudgeGameMode::EndTimer()
     }
     else
     {
-        FNetLogger::EditerLog(FColor::Emerald, TEXT("EndTimer: ServerTravel"));
-        // GetWorld()->ServerTravel("calculateLevel?listen");   
+        GetWorld()->ServerTravel("calculateLevel?listen");   
     }
 }
 

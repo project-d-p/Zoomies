@@ -55,10 +55,10 @@ void AJudgePlayerController::ServerSendChatMessage_Implementation(const FString&
 	GM->GetChatManager()->BroadcastChatMessage(SenderName, Message);
 }
 
-void AJudgePlayerController::ReturnVote_Implementation(EOccupation Type)
+void AJudgePlayerController::ReturnVote_Implementation(EPlayerJob Type)
 {
 	AJudgeGameMode* GM = Cast<AJudgeGameMode>(GetWorld()->GetAuthGameMode());
-	GM->SetVote(Type);
+	GM->AddVote(Type);
 }
 
 void AJudgePlayerController::BeginPlay()
@@ -89,4 +89,20 @@ void AJudgePlayerController::SeamlessTravelFrom(APlayerController* OldPC)
 	checkf(GS, TEXT("Failed to get JudgePlayerState"))
 	checkf(MainPC->GetPrivateScoreManagerComponent(), TEXT("Failed to get PrivateScoreManagerComponent"))
 	GS->SetScore(MainPC->GetPrivateScoreManagerComponent()->GetPrivatePlayerScore());
+
+	GS->SetCapturedAnimals(MainPC->GetPrivateScoreManagerComponent()->GetCapturedAnimals());
+	GS->SetScoreDatas(MainPC->GetPrivateScoreManagerComponent()->GetScoreDatas());
+}
+
+void AJudgePlayerController::SeamlessTravelTo(APlayerController* NewPC)
+{
+	Super::SeamlessTravelTo(NewPC);
+
+	ADPPlayerController* NPC = Cast<ADPPlayerController>(NewPC);
+	check(NPC)
+	ADPPlayerState* NGS = NPC->GetPlayerState<ADPPlayerState>();
+	check(NGS)
+	AJudgePlayerState* GS = GetPlayerState<AJudgePlayerState>();
+	check(GS)
+	NGS->SetFinalScoreData(GS->GetFinalScoreData());
 }

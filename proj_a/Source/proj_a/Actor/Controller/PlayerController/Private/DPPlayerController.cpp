@@ -82,6 +82,13 @@ void ADPPlayerController::AcknowledgePossession(APawn* P)
 	}
 }
 
+void ADPPlayerController::ServerSendChatMessage_Implementation(const FString& SenderName, const FString& Message)
+{
+	IChatGameMode* GM = GetWorld()->GetAuthGameMode<IChatGameMode>();
+	check(GM && GM->GetChatManager())
+	GM->GetChatManager()->BroadcastChatMessage(SenderName, Message);
+}
+
 void ADPPlayerController::ReleaseMemory()
 {
 	if (Socket)

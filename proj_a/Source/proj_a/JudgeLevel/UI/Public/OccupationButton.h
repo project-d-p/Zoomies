@@ -3,8 +3,8 @@
 #include <functional>
 
 #include "CoreMinimal.h"
+#include "ScoreTypes.h"
 #include "Components/Button.h"
-#include "EnumTypes.h"
 #include "OccupationButton.generated.h"
 
 UCLASS(BlueprintType, meta=(DisplayName="Occupation Button"))
@@ -14,11 +14,11 @@ class PROJ_A_API UOccupationButton : public UButton
 
 public:
 	UOccupationButton();
-	void SetLambda(const std::function<void(EOccupation)>& InOnClickedCallback) {OnClickedCallback = InOnClickedCallback; }
-	void SetOccupation(EOccupation InOccupation) { Occupation = InOccupation; }
+	void SetLambda(const std::function<void(EPlayerJob)>& InOnClickedCallback) {OnClickedCallback = InOnClickedCallback; }
+	void SetOccupation(EPlayerJob InOccupation) { Occupation = InOccupation; }
 private:
-	EOccupation Occupation;
-	std::function<void(EOccupation)> OnClickedCallback;
+	EPlayerJob Occupation;
+	std::function<void(EPlayerJob)> OnClickedCallback;
 	UFUNCTION()
 	void InternalOnClicked();
 };

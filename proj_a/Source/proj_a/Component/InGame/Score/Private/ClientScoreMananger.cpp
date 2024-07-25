@@ -1,6 +1,7 @@
 #include "ClientScoreMananger.h"
 
 #include "DPInGameState.h"
+#include "DPPlayerState.h"
 #include "FNetLogger.h"
 #include "PlayerScoreComp.h"
 #include "Net/UnrealNetwork.h"

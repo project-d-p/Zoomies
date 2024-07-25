@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "ScoreTypes.h"
 #include "GameFramework/GameState.h"
+#include "ChatManager.h"
+#include "IChatGameState.h"
 #include "GameFramework/GameStateBase.h"
 #include "ResultLevelGameState.generated.h"
 
@@ -50,16 +52,17 @@ struct FPlayerScore
 class ADPPlayerController;
 
 UCLASS()
-class AResultLevelGameState : public AGameState
+class AResultLevelGameState : public AGameState, public IChatGameState
 {
 	GENERATED_BODY()
 public:
 	AResultLevelGameState();
-
+	UChatManager* GetChatManager() const { return ChatManager; }
+	
 	// index displays as player index
 	UPROPERTY(Replicated, BlueprintReadWrite, Category = "PlayerScores")
 	TArray<FPlayerScore> PlayerScores;
-
+	
 	UPROPERTY(BlueprintReadOnly)
 	int MyRank = 0;
 	
@@ -69,8 +72,11 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
-	TArray<int32> CalculateScores(ADPPlayerController* Controller);
-	TArray<FAnimalList> GetCapturedAnimals(ADPPlayerController* Controller);
+	TArray<int32> CalculateScores(/* ADPPlayerController* Controller */ TArray<TArray<EAnimal>> InCapturedAnimals, TArray<FScoreData> InScores);
+	TArray<FAnimalList> GetCapturedAnimals(/*ADPPlayerController* Controller*/ TArray<TArray<EAnimal>> InCapturedAnimals);
+	
+	UPROPERTY()
+	UChatManager* ChatManager;
 	
 	void SetMyRank();
 	void SetPlayerScores();

@@ -32,14 +32,14 @@ enum class EWidget : uint8
 	JUDGE_LEVEL,
 };
 
-UENUM()
-enum class EOccupation : uint8
-{
-	ARCHAEOLOGIST,
-	POACHER,
-	ENVIRONMENTALIST,
-	RINGMASTER,
-	TERRORIST,
-	CHECK,
-	CROSS,
-};
+// UENUM()
+// enum class EOccupation : uint8
+// {
+// 	ARCHAEOLOGIST,
+// 	POACHER,
+// 	ENVIRONMENTALIST,
+// 	RINGMASTER,
+// 	TERRORIST,
+// 	CHECK,
+// 	CROSS,
+// };

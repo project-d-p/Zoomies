@@ -2,6 +2,7 @@
 
 #include "DPInGameState.h"
 #include "FNetLogger.h"
+#include "JudgePlayerState.h"
 #include "PlayerName.h"
 #include "PlayerScoreComp.h"
 #include "Net/UnrealNetwork.h"
@@ -27,6 +28,17 @@ EPlayerJob ADPPlayerState::GetPlayerJob() const
 
 void ADPPlayerState::OnRep_Rank()
 {
+}
+
+void ADPPlayerState::CopyProperties(APlayerState* PlayerState)
+{
+	Super::CopyProperties(PlayerState);
+	
+	AJudgePlayerState* JPS = Cast<AJudgePlayerState>(PlayerState);
+	if (JPS)
+	{
+		JPS->SetPlayerJob(PlayerJob);
+	}
 }
 
 void ADPPlayerState::ServerSetRank_Implementation(int InRank)
