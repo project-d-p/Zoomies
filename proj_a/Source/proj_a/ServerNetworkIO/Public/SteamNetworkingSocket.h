@@ -35,15 +35,19 @@ private:
 	void Stop();
 
 private:
+
 	enum { MAX_CLIENTS = 1 };
+
 	int n_local_virtual_port = 0;
 	SteamNetworkingConfigValue_t opt_;
 	HSteamListenSocket steam_listen_socket_;
 	HSteamNetPollGroup poll_group_;
-	DoubleBuffer recieve_buffer_;
-	DoubleBuffer send_buffer_;
 	std::vector<HSteamNetConnection> steam_connections_;
 	FRunnableThread* this_thread_ = nullptr;
+	
+	DoubleBuffer recieve_buffer_;
+	DoubleBuffer send_buffer_;
+
 	bool b_is_game_stated = false;
 	int num_clients_ = 0;
 	bool bStop = false;

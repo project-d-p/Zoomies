@@ -2,6 +2,7 @@
 
 #include "DPCharacter.h"
 #include "DPPlayerController.h"
+#include "FNetLogger.h"
 #include "ResultLevelGameState.h"
 
 AResultLevelGameMode::AResultLevelGameMode()
