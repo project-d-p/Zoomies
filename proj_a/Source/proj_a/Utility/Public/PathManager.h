@@ -56,6 +56,8 @@ public:
 		case EMonster::STAR_FISH: return TEXT("/Game/model/animals/starFish/star_fish.star_fish");
 		case EMonster::STINGRAY: return TEXT("/Game/model/animals/stingRay/sting_ray.sting_ray");
 		case EMonster::WHALE: return TEXT("/Game/model/animals/whale/Whale.Whale");
+		case EMonster::HORSE: return TEXT("/Game/model/animals/horse/low_poly_western_horse.low_poly_western_horse");
+		case EMonster::CHAMALEON: return TEXT("/Game/model/animals/chamaleon/lowpoly_animated_chamaleon_game_ready.lowpoly_animated_chamaleon_game_ready");
 		default:
 			checkf(false, TEXT("Invalid monster type: %d"), static_cast<int>(MType)) return nullptr;;
 		}
