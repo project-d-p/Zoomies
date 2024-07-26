@@ -228,7 +228,6 @@ void ADPPlayerController::GetSeamlessTravelActorList(bool bToTransitionMap, TArr
 		{
 			return ;
 		}
-		GameInstance->LocalController = this;
 	}
 	this->SwitchLevelComponent(ELevelComponentType::NONE);
 }

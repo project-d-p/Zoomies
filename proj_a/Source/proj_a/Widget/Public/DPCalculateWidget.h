@@ -4,18 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "DPResultRoomWidget.generated.h"
+#include "DPCalculateWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJ_A_API UDPResultRoomWidget : public UUserWidget
+class PROJ_A_API UDPCalculateWidget : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	// virtual void NativeConstruct() override;
+	virtual void NativeConstruct() override;
 	
     UFUNCTION(BlueprintCallable, Category = "UI")
     TArray<int32> UpdateScores(const TArray<int32>& scores);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnScoresUpdated();
 };

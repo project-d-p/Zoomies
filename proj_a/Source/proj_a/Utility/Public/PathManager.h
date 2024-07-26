@@ -26,6 +26,9 @@ public:
 		switch(WType)
 		{
 		case EWidget::JUDGE_LEVEL: return TEXT("/Game/widget/widget_judge.widget_judge_C");
+		case EWidget::CALCULATE_WIDGET: return TEXT("/Game/widget/widget_calculate.widget_calculate_C");
+		case EWidget::RESULT_WIDGET: return TEXT("/Game/widget/widget_result.widget_result_C");
+		case EWidget::BOARD_ACTOR: return TEXT("/Game/widget/resultWidgetActor.resultWidgetActor_C");
 		default: 
 			checkf(false, TEXT("Invalid widget type: %d"), static_cast<int>(WType)) return nullptr;;
 		}

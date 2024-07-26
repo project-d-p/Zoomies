@@ -1,13 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "DPResultRoomWidget.h"
-#include "Components/VerticalBox.h"
+#include "DPCalculateWidget.h"
 #include "Components/HorizontalBox.h"
-#include "Components/HorizontalBoxSlot.h"
-#include "Components/TextBlock.h"
 
-TArray<int32> UDPResultRoomWidget::UpdateScores(const TArray<int32>& scores)
+void UDPCalculateWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+}
+
+TArray<int32> UDPCalculateWidget::UpdateScores(const TArray<int32>& scores)
 {
 	TArray<int32> sortedIndices;
 	for (int32 i = 0; i < scores.Num(); i++)

@@ -287,7 +287,7 @@ void AReturnTriggerVolume::SpawnSingleMonster(EAnimal Animal, int32 Index)
 
             // Start the ascension animation
             FTimerDelegate AnimationTimerDelegate;
-            AnimationTimerDelegate.BindUFunction(this, FName("AnimateAnimalMesh"), Mesh);
+			AnimationTimerDelegate.BindUFunction(this, FName("AnimateAnimalMesh"), Mesh);
             GetWorld()->GetTimerManager().SetTimer(AnimData.AnimationTimerHandle, AnimationTimerDelegate, 0.016f, true);
 
         	// Schedule mesh destruction

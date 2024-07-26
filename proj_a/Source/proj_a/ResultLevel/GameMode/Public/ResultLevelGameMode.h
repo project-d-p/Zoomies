@@ -30,7 +30,12 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 private:
+	void CheckPlayersAllTraveled();
 	void SpawnNewPlayerPawn(AController* PC);
+	
 	UPROPERTY()
 	UServerChatManager* ChatManager;
+	int CurrentPlayerCount = 0;
+
+	bool bStart = false;
 };
