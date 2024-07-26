@@ -24,6 +24,8 @@ enum class EMonster : uint8
 	SEAL,
 	WHALE,
 	STINGRAY,
+	HORSE,
+	CHAMALEON,
 };
 
 UENUM()
