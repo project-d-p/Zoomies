@@ -46,6 +46,9 @@ public class proj_a : ModuleRules
 		// XXX: 배포시에 컴파일 코드 삭제(혹은 주석 처리)
 		
 		PublicIncludePaths.AddRange(new string[] {
+			"proj_a/JudgeLevel/GameCore/Public",
+			"proj_a/JudgeLevel/Player/Public",
+			"proj_a/JudgeLevel/UI/Public",
 			"proj_a/GameMode/Public",
 			"proj_a/GameState/Public",
 			"proj_a/Actor/Controller/PlayerController/Public",

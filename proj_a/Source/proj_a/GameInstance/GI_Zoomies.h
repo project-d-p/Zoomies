@@ -10,16 +10,6 @@
 #include "ScoreTypes.h"
 #include "GI_Zoomies.generated.h"
 
-USTRUCT(BlueprintType)
-struct FPlayerData
-{
-	GENERATED_BODY()
-
-	TArray<TArray<EAnimal>> CapturedAnimals;
-	TArray<FScoreData> ScoreDatas;
-	bool bJobDetected = false;
-};
-
 UCLASS()
 class PROJ_A_API UGI_Zoomies : public UGameInstance
 {
@@ -35,14 +25,8 @@ public:
 	void StartMatchMaking();
 	IOnlineSessionPtr GetOnlineSessionInterface() const;
 
-	UPROPERTY()
-	TMap<APlayerController*, int> PlayerCharacters;
-	UPROPERTY()
-	APlayerController* LocalController;
-	// UPROPERTY()
-	// TMap<APlayerController*, APawn*> PlayerCharacters;
-	UPROPERTY()
-	TMap<APlayerController*, FPlayerData> PlayersData;
+	/* Number of players before Seamless Travel */
+	int player_count = 0;
 
 private:
 	// Online subsystem & session interface pointers
@@ -71,13 +55,11 @@ private:
 	int max_count = 5;
 	bool is_steamAPI_init = false;
 	bool is_online_session_steam_init =false;
+
 	
 	FTimerHandle UnusedHandle;
 	void CheckSteamInit();
 	void InitSteamAPI();
 	void InitOnlineSubsystemSteam();
 
-	/* Player Data Map */
-	// TMap<FString, FPlayerData> player_data_map_;
-	// TMap<FString, FString> steam_id_to_player_id_map_;
 };

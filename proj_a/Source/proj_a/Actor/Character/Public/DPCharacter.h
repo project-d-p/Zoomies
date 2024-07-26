@@ -98,8 +98,11 @@ public:	// component
 
 	bool CatchMonster(const FString& monster_type);
 
+	
 	void SetAtReturnPlace(bool isReturnPlace);
 	bool IsAtReturnPlace() const;
+
+	void RemoveSpringArm();
 	
 protected:
 	void ClientNotifyAnimalReturn_Implementation(const FString& player_name);

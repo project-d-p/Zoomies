@@ -7,7 +7,7 @@ AElephantCharacter::AElephantCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_ELEPHANT
-	(PathManager::GetPath(EMonster::ELEPHANT));
+	(PathManager::GetMonsterPath(EMonster::ELEPHANT));
 	if (SK_ELEPHANT.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_ELEPHANT.Object);
 	}

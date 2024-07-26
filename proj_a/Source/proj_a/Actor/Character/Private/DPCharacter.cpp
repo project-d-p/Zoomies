@@ -322,6 +322,11 @@ bool ADPCharacter::IsAtReturnPlace() const
 	return this->mIsAtReturnPlace;
 }
 
+void ADPCharacter::RemoveSpringArm()
+{
+	camera->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+}
+
 void ADPCharacter::SetStunned(bool bCond)
 {
 	this->bIsStunned = bCond;
@@ -428,7 +433,6 @@ void ADPCharacter::RemoveStunEffect()
 	StunEffectComponent->Deactivate();
 }
 
-// 끝날때 없애야 함.
 void ADPCharacter::OnServerHit(const FHitResult& HitResult)
 {
 	if (this->IsStunned())

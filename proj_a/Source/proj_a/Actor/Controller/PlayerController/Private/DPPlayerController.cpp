@@ -6,6 +6,8 @@
 #include "DPPlayerState.h"
 #include "FNetLogger.h"
 #include "BaseInputComponent.h"
+#include "JudgeGameMode.h"
+#include "JudgeLevelComponent.h"
 #include "MainLevelComponent.h"
 #include "ResultLevelComponent.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
@@ -14,11 +16,9 @@ DEFINE_LOG_CATEGORY(LogNetwork);
 
 ADPPlayerController::ADPPlayerController()
 {
-	FNetLogger::LogError(TEXT("CREATED ADPPlayerController: %d"), this->GetUniqueID());
-	FNetLogger::EditerLog(FColor::Red, TEXT("CREATED ADPPlayerController: %d"), this->GetUniqueID());
-	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
 	Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
-
+	PrivateScoreManager = CreateDefaultSubobject<UPrivateScoreManager>(TEXT("PrivateScoreManager"));
+	
 	UBaseLevelComponent* MainLevelComponet = CreateDefaultSubobject<UMainLevelComponent>(TEXT("MainLevelComponent"));
 	UBaseLevelComponent* ResultLevelComponet = CreateDefaultSubobject<UResultLevelComponent>(TEXT("ResultLevelComponent"));
 
@@ -28,40 +28,12 @@ ADPPlayerController::ADPPlayerController()
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::MAIN), MainLevelComponet);
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::RESULT), ResultLevelComponet);
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::NONE), nullptr);
-
-	// TODO: Change to private score manager later
-	PrivateScoreManager = CreateDefaultSubobject<UPrivateScoreManager>(TEXT("PrivateScoreManager"));
 }
 
 ADPPlayerController::~ADPPlayerController()
 {
 	FNetLogger::EditerLog(FColor::Red, TEXT("ADPPlayerController::~ADPPlayerController"));
 	FNetLogger::LogError(TEXT("PlayerController ID[~Destructor]: %d"), this->GetUniqueID());
-}
-
-void ADPPlayerController::SendChatMessageToServer(const FString& Message)
-{
-	if (ChatManager == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("ChatManager is null"));
-		return;
-	}
-
-	FString SenderName = PlayerState->GetPlayerName();
-	ChatManager->ServerSendChatMessage(SenderName, Message);
-}
-
-void ADPPlayerController::ReceiveChatMessage(const FString& SenderName, const FString& Message)
-{
-	if (ChatManager)
-	{
-		ChatManager->ClientReceiveChatMessage(SenderName, Message);
-	}
-}
-
-void ADPPlayerController::InitChatManager(UChatUI* ChatUI)
-{
-	ChatManager->setChatUI(ChatUI);
 }
 
 UPlayerScoreComp* ADPPlayerController::GetScoreManagerComponent() const
@@ -109,6 +81,13 @@ void ADPPlayerController::AcknowledgePossession(APawn* P)
 	}
 }
 
+void ADPPlayerController::ServerSendChatMessage_Implementation(const FString& SenderName, const FString& Message)
+{
+	IChatGameMode* GM = GetWorld()->GetAuthGameMode<IChatGameMode>();
+	check(GM && GM->GetChatManager())
+	GM->GetChatManager()->BroadcastChatMessage(SenderName, Message);
+}
+
 void ADPPlayerController::ReleaseMemory()
 {
 	if (Socket)
@@ -116,11 +95,6 @@ void ADPPlayerController::ReleaseMemory()
 		Socket->DestoryInstance();
 		Socket->DestroyComponent();
 		Socket = nullptr;
-	}
-	if (ChatManager)
-	{
-		ChatManager->DestroyComponent();
-		ChatManager = nullptr;
 	}
 }
 
@@ -143,7 +117,7 @@ void ADPPlayerController::ClientDestroySession_Implementation()
 void ADPPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	Cast<UMainLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::MAIN)])->SetStateComponent();
 }
 
@@ -161,11 +135,6 @@ void ADPPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		Socket->DestoryInstance();
 		Socket->DestroyComponent();
 		Socket = nullptr;
-	}
-	if (ChatManager)
-	{
-		ChatManager->DestroyComponent();
-		ChatManager = nullptr;
 	}
 }
 
@@ -258,7 +227,6 @@ void ADPPlayerController::GetSeamlessTravelActorList(bool bToTransitionMap, TArr
 		{
 			return ;
 		}
-		GameInstance->LocalController = this;
 	}
 	this->SwitchLevelComponent(ELevelComponentType::NONE);
 }

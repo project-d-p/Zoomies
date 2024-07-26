@@ -3,6 +3,10 @@
 #include "CoreMinimal.h"
 #include "ScoreTypes.h"
 #include "GameFramework/GameState.h"
+#include "ChatManager.h"
+#include "DPCalculateWidget.h"
+#include "DPResultWidget.h"
+#include "IChatGameState.h"
 #include "GameFramework/GameStateBase.h"
 #include "ResultLevelGameState.generated.h"
 
@@ -50,28 +54,54 @@ struct FPlayerScore
 class ADPPlayerController;
 
 UCLASS()
-class AResultLevelGameState : public AGameState
+class AResultLevelGameState : public AGameState, public IChatGameState
 {
 	GENERATED_BODY()
 public:
 	AResultLevelGameState();
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastPlayersAllTraveled();
+	
+	UFUNCTION(Client, Reliable)
+	void NotifyPlayersAllTraveled();
+
 	// index displays as player index
 	UPROPERTY(Replicated, BlueprintReadWrite, Category = "PlayerScores")
 	TArray<FPlayerScore> PlayerScores;
-
+	UPROPERTY(ReplicatedUsing=OnRep_IsAllSet)
+	bool isAllSet = false;
+	
 	UPROPERTY(BlueprintReadOnly)
 	int MyRank = 0;
 	
+
+	UChatManager* GetChatManager() const { return ChatManager; }
 protected:
 	virtual void AddPlayerState(APlayerState* PlayerState) override;
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	
-	TArray<int32> CalculateScores(ADPPlayerController* Controller);
-	TArray<FAnimalList> GetCapturedAnimals(ADPPlayerController* Controller);
+
+	UFUNCTION()
+	void OnRep_IsAllSet();
 	
 	void SetMyRank();
 	void SetPlayerScores();
+	
+
+	TArray<int32> CalculateScores(/* ADPPlayerController* Controller */ TArray<TArray<EAnimal>> InCapturedAnimals, TArray<FScoreData> InScores);
+	TArray<FAnimalList> GetCapturedAnimals(/*ADPPlayerController* Controller*/ TArray<TArray<EAnimal>> InCapturedAnimals);
+	
+	UPROPERTY()
+	UChatManager* ChatManager;
+	
+	TSubclassOf<UDPCalculateWidget> CalculateWidget;
+	TSubclassOf<UDPResultWidget> ResultWidget;
+	TSubclassOf<AActor> BoardActor;
+
+	UPROPERTY()
+	UDPCalculateWidget* CalculateWidgetInstance;
+	UPROPERTY()
+	UDPResultWidget* ResultWidgetInstance;
 };

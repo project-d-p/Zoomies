@@ -82,33 +82,33 @@ void UMainInputComponent::BindMainLevelActions()
 	if (!PlayerController) return ;
 	if (!PlayerController->IsLocalController()) return ;
 	
-	// Mapping Context Ãß°¡
+	// Mapping Context ï¿½ß°ï¿½
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 	{
 		SubSystem->AddMappingContext(MainLevelContext, 0);
 	}
 
-	// Enhanced Input Component °¡Á®¿À±â ¹× ¹ÙÀÎµù
+	// Enhanced Input Component ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½Îµï¿½
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 	{
-		// ÇÃ·¹ÀÌ¾î ÀÌµ¿ ( w, a, d, s )
+		// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½Ìµï¿½ ( w, a, d, s )
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &UMainInputComponent::Move);
-		// ÇÃ·¹ÀÌ¾î Á¡ÇÁ ( space )
+		// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½ ( space )
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &UMainInputComponent::Jump);
-		// ½ÃÁ¡ º¯È¯ ( ¸¶¿ì½º È¸Àü )
+		// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯ ( ï¿½ï¿½ï¿½ì½º È¸ï¿½ï¿½ )
 		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &UMainInputComponent::Rotate);
-		//	Çàµ¿, ÃÑ ¹ß»ç/º® ¼³Ä¡/ÅÍ·¿ ¼³Ä¡ ( ¸¶¿ì½º ÁÂÅ¬¸¯ )
+		//	ï¿½àµ¿, ï¿½ï¿½ ï¿½ß»ï¿½/ï¿½ï¿½ ï¿½ï¿½Ä¡/ï¿½Í·ï¿½ ï¿½ï¿½Ä¡ ( ï¿½ï¿½ï¿½ì½º ï¿½ï¿½Å¬ï¿½ï¿½ )
 		EnhancedInputComponent->BindAction(ActiveAction, ETriggerEvent::Triggered, this, &UMainInputComponent::Active);
-		//	º¯°æ, ¹«±â º¯°æ/º® È¸Àü ( ¸¶¿ì½º ½ºÅ©·Ñ )
+		//	ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ È¸ï¿½ï¿½ ( ï¿½ï¿½ï¿½ì½º ï¿½ï¿½Å©ï¿½ï¿½ )
 		EnhancedInputComponent->BindAction(AdditionalSettingAction, ETriggerEvent::Triggered, this, &UMainInputComponent::AdditionalSetting);
-		//	¿¡ÀÓ ( ¸¶¿ì½º ¿ìÅ¬¸¯ )
+		//	ï¿½ï¿½ï¿½ï¿½ ( ï¿½ï¿½ï¿½ì½º ï¿½ï¿½Å¬ï¿½ï¿½ )
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &UMainInputComponent::Aim);	// 	key down
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &UMainInputComponent::AimReleased);
-		//	Ãë¼Ò, Ã¤ÆÃ ²ô±â ( esc - UE ¿¡µðÅÍ¿¡¼­ ±âº» ´ÜÃàÅ° º¯°æ ÇÊ¿ä )
+		//	ï¿½ï¿½ï¿½, Ã¤ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ( esc - UE ï¿½ï¿½ï¿½ï¿½ï¿½Í¿ï¿½ï¿½ï¿½ ï¿½âº» ï¿½ï¿½ï¿½ï¿½Å° ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ )
 		EnhancedInputComponent->BindAction(CancelAction, ETriggerEvent::Triggered, this, &UMainInputComponent::ActionCancel);
-		// Æ÷È¹ (f)
+		// ï¿½ï¿½È¹ (f)
 		EnhancedInputComponent->BindAction(CatchAction, ETriggerEvent::Started, this, &UMainInputComponent::CatchAnimals);
-		// µ¿¹° ¹ÝÈ¯ (q)
+		// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯ (q)
 		EnhancedInputComponent->BindAction(ReturnAction, ETriggerEvent::Started, this, &UMainInputComponent::ReturningAnimals);
 	}
 }
@@ -118,13 +118,13 @@ void UMainInputComponent::UnbindMainLevelActions()
 	ADPPlayerController* PlayerController = GetPlayerController();
 	if (!PlayerController) return ;
 
-	// Enhanced Input Component ¹ÙÀÎµù Á¦°Å
+	// Enhanced Input Component ï¿½ï¿½ï¿½Îµï¿½ ï¿½ï¿½ï¿½ï¿½
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 	{
 		EnhancedInputComponent->ClearActionBindings();
 	}
 
-	// Mapping Context Á¦°Å
+	// Mapping Context ï¿½ï¿½ï¿½ï¿½
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 	{
 		if (MainLevelContext)
@@ -196,7 +196,7 @@ void UMainInputComponent::Rotate(const FInputActionValue& value)
 	}
 }
 
-// TODO: ÃÑ ½î´Â ·ÎÁ÷ ¼öÁ¤ ÇÊ¿ä
+// TODO: ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½
 void UMainInputComponent::Active(const FInputActionValue& value)
 {
 	ADPPlayerController* PlayerController = GetPlayerController();
@@ -216,7 +216,7 @@ void UMainInputComponent::Active(const FInputActionValue& value)
 		}
 		FHitResult hit_result;
 		Character->PlayFireAnimation();
-		// ÃÖÁ¾ ¹ß»ç À§Ä¡¿Í, ¹æÇâÀ» ¾Ë¾Æ¾ß ÇÔ.
+		// ï¿½ï¿½ï¿½ï¿½ ï¿½ß»ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ë¾Æ¾ï¿½ ï¿½ï¿½.
 		FRotator final_direction;
 		if (Character->weaponComponent->Attack(PlayerController, hit_result, final_direction))
 		{
@@ -239,7 +239,7 @@ void UMainInputComponent::Active(const FInputActionValue& value)
 	// 		character->GetCharacterMovement()->DisableMovement();
 	// 		construction->MakeWall({ 0, 0, 0 }, { 0, 0, 0 });
 	// 		character->constructionComponent->placeWall = true;
-	// 		// ´ÙÀ½ Æ½¿¡ false·Î ¹Ù²Þ
+	// 		// ï¿½ï¿½ï¿½ï¿½ Æ½ï¿½ï¿½ falseï¿½ï¿½ ï¿½Ù²ï¿½
 	// 		auto resetPlaceWall = [this]() {
 	// 			character->constructionComponent->placeWall = false;
 	// 		};
@@ -403,7 +403,7 @@ void UMainInputComponent::ReturningAnimals(const FInputActionValue& value)
 		return ;
 	}
 	TArray<EAnimal> animals = Character->ReturnMonsters();
-	// °³ÀÎ Á¡¼ö Áõ°¡
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	ADPPlayerState* PlayerState = Cast<ADPPlayerState>(PlayerController->PlayerState);
 	if (PlayerState)
 	{
@@ -423,7 +423,7 @@ void UMainInputComponent::ReturningAnimals(const FInputActionValue& value)
 		for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 		{
 			ADPPlayerController* PC = Cast<ADPPlayerController>(It->Get());
-			if (PC && PC != PlayerController) // ÀÚ±â ÀÚ½ÅÀ» Á¦¿ÜÇÑ ¸ðµç Å¬¶óÀÌ¾ðÆ®
+			if (PC && PC != PlayerController) // ï¿½Ú±ï¿½ ï¿½Ú½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®
 			{
 				ADPCharacter* OtherCharacter = Cast<ADPCharacter>(PC->GetPawn());
 				OtherCharacter->ClientNotifyAnimalReturn(PlayerState->GetPlayerName());

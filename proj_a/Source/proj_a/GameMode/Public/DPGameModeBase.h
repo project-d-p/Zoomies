@@ -10,6 +10,7 @@
 #include "message.pb.h"
 #include "ServerMessageHandler.h"
 #include "DPPlayerController.h"
+#include "IChatGameMode.h"
 #include "ServerTimerManager.h"
 #include "MonsterFactory.h"
 #include "SteamNetworkingSocket.h"
@@ -19,7 +20,7 @@
  * 
  */
 UCLASS()
-class PROJ_A_API ADPGameModeBase : public AGameModeBase
+class PROJ_A_API ADPGameModeBase : public AGameModeBase, public IChatGameMode
 {
 	GENERATED_BODY()
 public:
@@ -30,11 +31,8 @@ public:
 
 	virtual void GetSeamlessTravelActorList(bool bToTransition, TArray<AActor*>& ActorList) override;
 
-	// for test
-	void SpawnAndPossessAI();
-
-	void SendChatToAllClients(const FString& SenderName, const FString& Message);
-
+	virtual UServerChatManager* GetChatManager() const override { return ChatManager; }
+	
 	// monster
 	enum { NUM_OF_MAX_MONSTERS = 10 };
 	std::vector<ABaseMonsterAIController*> monster_controllers_;
@@ -50,18 +48,21 @@ public:
 	UPROPERTY()
 	UScoreManagerComp* ScoreManager;
 	FTimerHandle TimerHandle_SpawnAI;
-
+	
 	// Called when the game starts or when spawned
 	virtual void PostLogin(APlayerController* newPlayer) override;
 	virtual void Logout(AController* Exiting) override;
 	virtual void StartPlay() override;
+	void EndGame();
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
+	
 	// Called every frame
 	virtual void Tick(float delta_time) override;
 
 	// Destructor
 	virtual ~ADPGameModeBase() override;
+
+	UServerTimerManager* GetTimerManager() const { return TimerManager; }
 
 private:
 	// Implementations

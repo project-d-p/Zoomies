@@ -7,7 +7,7 @@ ASlothCharacter::ASlothCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SLOTH
-	(PathManager::GetPath(EMonster::SLOTH));
+	(PathManager::GetMonsterPath(EMonster::SLOTH));
 	if (SK_SLOTH.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_SLOTH.Object);
 	}

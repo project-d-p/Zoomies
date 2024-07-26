@@ -3,6 +3,7 @@
 #include "AvoidPlayerMonsterAIController.h"
 #include "BaseMonsterAIController.h"
 #include "BaseMonsterCharacter.h"
+#include "ChamalionCharacter.h"
 #include "ChasePlayerMonsterAIController.h"
 #include "CrabCharacter.h"
 #include "DolphinCharacter.h"
@@ -15,10 +16,9 @@
 #include "MammothCharacter.h"
 #include "OctopusCharacter.h"
 #include "PenguinCharacter.h"
-#include "RabbitCharacter.h"
 #include "SaberToothTigerCharacter.h"
 #include "SealCharacter.h"
-#include "ShepherdCharacter.h"
+#include "HorseCharacter.h"
 #include "SkunkCharacter.h"
 #include "SlothCharacter.h"
 #include "SquidCharacter.h"
@@ -56,16 +56,16 @@ ABaseMonsterAIController* UMonsterFactory::RandomMonsterSpawn(int32 idx)
 		AGiraffeCharacter::StaticClass(),
 		ALionCharacter::StaticClass(),
 		APenguinCharacter::StaticClass(),
-		ARabbitCharacter::StaticClass(),
+		AHorseCharacter::StaticClass(),
+		AChamalionCharacter::StaticClass(),
 		ASaberToothTigerCharacter::StaticClass(),
 		ASealCharacter::StaticClass(),
-		AShepherdCharacter::StaticClass(),
 		ASkunkCharacter::StaticClass(),
 		ASquidCharacter::StaticClass(),
 		AStarFishCharacter::StaticClass(),
 		AStingRayCharacter::StaticClass(),
 		AWhaleCharacter::StaticClass()
-	};
+	}; 
 	UClass* SelectedMonsterClass = MonsterClasses[FMath::RandRange(0, MonsterClasses.size() - 1)];
 	
 	return SpawnMonster(SelectedMonsterClass, Location, idx);

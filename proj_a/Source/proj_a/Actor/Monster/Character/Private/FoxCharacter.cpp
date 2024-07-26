@@ -7,7 +7,7 @@ AFoxCharacter::AFoxCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_FOX
-	(PathManager::GetPath(EMonster::FOX));
+	(PathManager::GetMonsterPath(EMonster::FOX));
     if (SK_FOX.Succeeded()) {
     	GetMesh()->SetSkeletalMesh(SK_FOX.Object);
     }

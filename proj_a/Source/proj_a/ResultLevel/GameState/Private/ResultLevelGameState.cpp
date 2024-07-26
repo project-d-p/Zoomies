@@ -2,11 +2,61 @@
 
 #include "DPCharacter.h"
 #include "DPPlayerController.h"
+#include "EnumTypes.h"
+#include "PathManager.h"
+#include "ResultWidgetActor.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 AResultLevelGameState::AResultLevelGameState()
 {
+	bReplicates = true;
+	
+	static ConstructorHelpers::FClassFinder<UUserWidget> RESULT_WIDGET
+	(PathManager::GetWidgetPath(EWidget::RESULT_WIDGET));
+	if (RESULT_WIDGET.Succeeded())
+	{
+		CalculateWidget = RESULT_WIDGET.Class;
+	}
+	
+	static ConstructorHelpers::FClassFinder<UUserWidget> CALCULATE_WIDGET
+	(PathManager::GetWidgetPath(EWidget::CALCULATE_WIDGET));
+	if (CALCULATE_WIDGET.Succeeded())
+	{
+		ResultWidget = CALCULATE_WIDGET.Class;
+	}
+	
+	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
+}
+
+void AResultLevelGameState::MulticastPlayersAllTraveled_Implementation()
+{
+	NotifyPlayersAllTraveled();
+}
+
+void AResultLevelGameState::NotifyPlayersAllTraveled_Implementation()
+{
+	if (HasAuthority())
+	{
+		this->SetPlayerScores();
+		this->SetMyRank();
+		this->isAllSet = true;
+		this->OnRep_IsAllSet();
+	}
+	
+	ADPPlayerController* Controller = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (Controller)
+	{
+		Controller->SwitchLevelComponent(ELevelComponentType::RESULT);
+	}
+	ADPCharacter* Character = Cast<ADPCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	if (Character)
+	{
+		Character->SetReplicatingMovement(true);
+	}
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("NotifyPlayersAllTraveled"));
 }
 
 void AResultLevelGameState::AddPlayerState(APlayerState* PlayerState)
@@ -14,17 +64,11 @@ void AResultLevelGameState::AddPlayerState(APlayerState* PlayerState)
 	Super::AddPlayerState(PlayerState);
 }
 
-TArray<FAnimalList> AResultLevelGameState::GetCapturedAnimals(ADPPlayerController* Controller)
+TArray<FAnimalList> AResultLevelGameState::GetCapturedAnimals(/*ADPPlayerController* Controller*/ TArray<TArray<EAnimal>> InCapturedAnimals)
 {
 	TArray<FAnimalList> CapturedAnimals;
-
-	UPrivateScoreManager* ScoreManager = Controller->GetPrivateScoreManagerComponent();
-	if (!ScoreManager)
-	{
-		return CapturedAnimals;
-	}
 	
-	for (const TArray<EAnimal>& Animals : ScoreManager->GetCapturedAnimals())
+	for (const TArray<EAnimal>& Animals : InCapturedAnimals)
 	{
 		FAnimalList AnimalList;
 		AnimalList.Animals = Animals;
@@ -52,6 +96,8 @@ void AResultLevelGameState::SetMyRank()
 		PlayerScores[i].Rank = rank;
 	}
 
+	FNetLogger::LogError(TEXT("Number of PlayerControllers[server] : %d"), GetWorld()->GetNumPlayerControllers());
+	
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
 		ADPPlayerController* PlayerController = Cast<ADPPlayerController>(*Iterator);
@@ -71,9 +117,6 @@ void AResultLevelGameState::SetMyRank()
 		{
 			continue;
 		}
-		// PlayerState->Rank = PlayerScore->Rank;
-		// FNetLogger::EditerLog(FColor::Cyan, TEXT("PlayerName: %s, Rank: %d"), *PlayerState->GetPlayerName(), PlayerState->Rank);
-		// PlayerState->ServerSetRank(PlayerScore->Rank);
 		PlayerState->Rank = PlayerScore->Rank;
 		if (PlayerController->IsLocalController())
 		{
@@ -85,24 +128,27 @@ void AResultLevelGameState::SetMyRank()
 void AResultLevelGameState::SetPlayerScores()
 {
 	FPlayerScore PlayerScore;
-	
+
+	FNetLogger::LogInfo(TEXT("SetPlayerScores"));
+	FNetLogger::LogError(TEXT("Number of PlayerControllers[server] : %d"), GetWorld()->GetNumPlayerControllers());
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
 		ADPPlayerController* PlayerController = Cast<ADPPlayerController>(*Iterator);
 		if (!PlayerController)
 		{
-			return ;
+			continue ;
 		}
 		ADPPlayerState* PlayerState = Cast<ADPPlayerState>(PlayerController->PlayerState);
 		if (!PlayerState)
 		{
-			return ;
+			continue ;
 		}
 		PlayerScore.PlayerName = PlayerState->GetPlayerName();
-		PlayerScore.PlayerJob = PlayerState->GetPlayerJob();
-		PlayerScore.Scores = this->CalculateScores(PlayerController);
-		PlayerScore.CapturedAnimals = this->GetCapturedAnimals(PlayerController);
-		PlayerScore.bIsDetected = false;
+		PlayerScore.PlayerJob = EPlayerJob::JOB_ARCHAEOLOGIST /*PlayerState->GetPlayerJob()*/;
+		FFinalScoreData FD = PlayerState->GetFinalScoreData();
+		PlayerScore.Scores = this->CalculateScores(FD.CapturedAnimals, FD.ScoreDatas /*PlayerController*/);
+		PlayerScore.CapturedAnimals = this->GetCapturedAnimals(FD.CapturedAnimals/*PlayerController*/);
+		PlayerScore.bIsDetected = FD.bIsDetected;
 		PlayerScores.Add(PlayerScore);
 	}
 
@@ -122,20 +168,20 @@ void AResultLevelGameState::SetPlayerScores()
 	}
 }
 
-TArray<int32> AResultLevelGameState::CalculateScores(ADPPlayerController* Controller)
+TArray<int32> AResultLevelGameState::CalculateScores(/* ADPPlayerController* Controller */ TArray<TArray<EAnimal>> InCapturedAnimals, TArray<FScoreData> InScores)
 {
 	TArray<int32> Scores;
 
 	Scores.SetNum(5);
 
-	UPrivateScoreManager* ScoreManager = Controller->GetPrivateScoreManagerComponent();
-	if (!ScoreManager)
-	{
-		return Scores;
-	}
+	// UPrivateScoreManager* ScoreManager = Controller->GetPrivateScoreManagerComponent();
+	// if (!ScoreManager)
+	// {
+	// 	return Scores;
+	// }
 
-	TArray<TArray<EAnimal>> CapturedAnimals = ScoreManager->GetCapturedAnimals();
-	TArray<FScoreData> ScoreDatas = ScoreManager->GetScoreDatas();
+	TArray<TArray<EAnimal>> CapturedAnimals = InCapturedAnimals /*ScoreManager->GetCapturedAnimals()*/;
+	TArray<FScoreData> ScoreDatas = InScores /*ScoreManager->GetScoreDatas()*/;
 
 	int BaseScore = 0;
 	int BaseScoreAlpha = 0;
@@ -161,32 +207,16 @@ TArray<int32> AResultLevelGameState::CalculateScores(ADPPlayerController* Contro
 
 void AResultLevelGameState::BeginPlay()
 {
-	if (HasAuthority())
-	{
-		this->SetPlayerScores();
-	}
-
 	Super::BeginPlay();
 	
-	this->SetMyRank();
-
-	ADPPlayerController* Controller = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
-	if (Controller)
-	{
-		Controller->SwitchLevelComponent(ELevelComponentType::RESULT);
-	}
-	ADPCharacter* Character = Cast<ADPCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
-	if (Character)
-	{
-		Character->SetReplicatingMovement(true);
-	}
+	// this->SetMyRank();
 }
 
 void AResultLevelGameState::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	// °ÔÀÓ ÀÎ½ºÅÏ½º¸¦ ÅëÇØ ¼¼¼Ç Á¦°Å
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½Î½ï¿½ï¿½Ï½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
     if (GameInstance)
     {
@@ -203,4 +233,20 @@ void AResultLevelGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AResultLevelGameState, PlayerScores);
+	DOREPLIFETIME(AResultLevelGameState, isAllSet);
+}
+
+void AResultLevelGameState::OnRep_IsAllSet()
+{
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AResultWidgetActor::StaticClass(), FoundActors);
+
+	if (FoundActors.Num() > 0)
+	{
+		AResultWidgetActor* ResultActor = Cast<AResultWidgetActor>(FoundActors[0]);
+		if (ResultActor)
+		{
+			ResultActor->StartWidget();
+		}
+	}
 }

@@ -51,10 +51,10 @@ void UDPStateActorComponent::ChangeCharacterState(int value)
 	if (4 == currentCharacterState) {
 		characterState = "JUMP";
 	}
-	if (5 == currentCharacterState) {	// Çàµ¿
+	if (5 == currentCharacterState) {	// í–‰ë™
 		characterState = "INTERACTION";
 	}
-	if (6 == currentCharacterState) {	// Ã¤ÆÃ »óÁ¡ µî
+	if (6 == currentCharacterState) {	// ì±„íŒ… ìƒì  ë“±
 		characterState = "OUT_FOCUS";
 	}
 	if (7 == currentCharacterState) {

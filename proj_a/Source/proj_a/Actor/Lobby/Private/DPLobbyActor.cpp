@@ -111,29 +111,29 @@ ADPLobbyActor::ADPLobbyActor()
     animalComponents.Add(racconData);
 
     /* -------------------------- rabbit ---------------------------- */
-    rabbitComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("rabbitComponent"));
+    //rabbitComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("rabbitComponent"));
 
-    static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_RABBITMESH
-    (TEXT("/Game/model/animals/rabbit/low_poly_rabbit.low_poly_rabbit"));
-    if (SK_RABBITMESH.Succeeded()) {
-        rabbitComponent->SetSkeletalMesh(SK_RABBITMESH.Object);
-        rabbitComponent->SetRelativeScale3D(FVector(0.13f, 0.13f, 0.13f));
-        rabbitComponent->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
-    }
+    //static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_RABBITMESH
+    //(TEXT("/Game/model/animals/rabbit/low_poly_rabbit.low_poly_rabbit"));
+    //if (SK_RABBITMESH.Succeeded()) {
+    //    rabbitComponent->SetSkeletalMesh(SK_RABBITMESH.Object);
+    //    rabbitComponent->SetRelativeScale3D(FVector(0.13f, 0.13f, 0.13f));
+    //    rabbitComponent->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
+    //}
 
-    rabbitComponent->SetAnimationMode(EAnimationMode::AnimationSingleNode);
-    static ConstructorHelpers::FObjectFinder<UAnimSequence> RABBITANIMATION
-    (TEXT("/Game/model/animals/rabbit/Armature_001_Run.Armature_001_Run"));
-    if (RABBITANIMATION.Succeeded()) {
-        rabbitAnim = RABBITANIMATION.Object;
-        rabbitComponent->AnimationData.AnimToPlay = rabbitAnim;
-        //rabbitComponent->AnimationData.SavedPlayRate = 1.f;
-    }
+    //rabbitComponent->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+    //static ConstructorHelpers::FObjectFinder<UAnimSequence> RABBITANIMATION
+    //(TEXT("/Game/model/animals/rabbit/Armature_001_Run.Armature_001_Run"));
+    //if (RABBITANIMATION.Succeeded()) {
+    //    rabbitAnim = RABBITANIMATION.Object;
+    //    rabbitComponent->AnimationData.AnimToPlay = rabbitAnim;
+    //    //rabbitComponent->AnimationData.SavedPlayRate = 1.f;
+    //}
 
-    FAnimalData rabbitData;
-    rabbitData.meshComponent = rabbitComponent;
-    rabbitData.offset = arrowComponent->GetForwardVector() * 15;
-    animalComponents.Add(rabbitData);
+    //FAnimalData rabbitData;
+    //rabbitData.meshComponent = rabbitComponent;
+    //rabbitData.offset = arrowComponent->GetForwardVector() * 15;
+    //animalComponents.Add(rabbitData);
 
     /* -------------------------- crab ---------------------------- */
     crabComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("crabComponent"));
@@ -250,8 +250,8 @@ void ADPLobbyActor::CheckReach()
                 newLocation.Z = 55.f;
             if (racoonComponent == animal.meshComponent)
                 newLocation.Z = 22.f;
-            if (rabbitComponent == animal.meshComponent)
-                newLocation.Z = 15.f;
+            //if (rabbitComponent == animal.meshComponent)
+             //   newLocation.Z = 15.f;
             if (crabComponent == animal.meshComponent)
                 newLocation.Z = 10.f;
             if (turtleComponent == animal.meshComponent)

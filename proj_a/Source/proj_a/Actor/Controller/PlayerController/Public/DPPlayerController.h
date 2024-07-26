@@ -27,14 +27,15 @@ public:
 	virtual void GetSeamlessTravelActorList(bool bToTransitionMap, TArray<AActor*>& ActorList) override;
 	virtual void AcknowledgePossession(APawn* P) override;
 	
-	void SendChatMessageToServer(const FString& Message);
-	void ReceiveChatMessage(const FString& SenderName, const FString& Message);
-	void InitChatManager(UChatUI* ChatUI);
+	UFUNCTION(Server, Reliable)
+	void ServerSendChatMessage(const FString& SenderName, const FString& Message);
 
 	/* Switch level component Called By GameMode & GameState */
+	// UFUNCTION(Client, Reliable)
 	void SwitchLevelComponent(ELevelComponentType Type);
 
 	/* Get Level Component */
+	UFUNCTION(BlueprintCallable)
 	UBaseLevelComponent* GetLevelComponent() const;
 
 	UPlayerScoreComp* GetScoreManagerComponent() const;
@@ -59,10 +60,6 @@ private:
 	// Move To PlayerState
 	UPROPERTY(VisibleAnywhere)
 	UPrivateScoreManager* PrivateScoreManager;
-	
-	UPROPERTY()
-	UChatManager* ChatManager = nullptr;
-
 	UPROPERTY()
 	UClientSocket* Socket = nullptr;
 

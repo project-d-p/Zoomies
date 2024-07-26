@@ -1,6 +1,11 @@
 #include "ChatUI.h"
 #include "DPPlayerController.h"
-#include "FNetLogger.h"
+#include "IChatGameMode.h"
+#include "IChatGameState.h"
+#include "JudgePlayerController.h"
+#include "ServerChatManager.h"
+#include "GameFramework/GameStateBase.h"
+#include "GameFramework/GameModeBase.h"
 #include "Components/EditableTextBox.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBoxSlot.h"
@@ -21,11 +26,9 @@ void UChatUI::InitializeChatBox(FChatUiInitializer& Initializer)
 	{
 		World = Initializer.InWorld;
 
-		ADPPlayerController* PC = Cast<ADPPlayerController>(World->GetFirstPlayerController());
-		if (PC)
-		{
-			PC->InitChatManager(this);
-		}
+		IChatGameState* GS = Cast<IChatGameState>(World->GetGameState());
+		check(GS && GS->GetChatManager())
+		GS->GetChatManager()->setChatUI(this);
 	}
 	if (Initializer.ChatEditableTextBox)
 	{
@@ -49,88 +52,67 @@ void UChatUI::OnChatBoxCommitted(const FText& Text, ETextCommit::Type CommitMeth
 {
 	if (CommitMethod == ETextCommit::OnEnter)
 	{
-		if (World == nullptr)
-		{
-			return;
-		}
-		ADPPlayerController* DPPlayerController = Cast<ADPPlayerController>(World->GetFirstPlayerController());
-		bool bOldShowMouseCursor = DPPlayerController->bShowMouseCursor;
-		if (DPPlayerController == nullptr)
-		{
-			return;
-		}
+		check(World);
+		APlayerController* PC = Cast<APlayerController>(World->GetFirstPlayerController());
+		// bool bOldShowMouseCursor = PC->bShowMouseCursor;
+		check(PC)
 		if (!Text.IsEmpty())
 		{
 			FString Message = Text.ToString();
 			
 			ChatBox->SetText(FText::GetEmpty());
-			DPPlayerController->SendChatMessageToServer(Message);
+			FString SenderName = PC->PlayerState->GetPlayerName();
+			IChatGameMode* GM = Cast<IChatGameMode>(World->GetAuthGameMode());
+			if (GM)
+			{
+				check(GM->GetChatManager())
+				GM->GetChatManager()->BroadcastChatMessage(SenderName, Message);
+			}
+			else
+			{
+				// TODO: Refactor needed - current implementation is suboptimal
+				if (Cast<ADPPlayerController>(PC))
+				{
+					ADPPlayerController* DP = Cast<ADPPlayerController>(PC);
+					DP->ServerSendChatMessage(SenderName, Message);
+				}
+				else if (Cast<AJudgePlayerController>(PC))
+				{
+					AJudgePlayerController* Judge = Cast<AJudgePlayerController>(PC);
+					Judge->ServerSendChatMessage(SenderName, Message);
+				}
+			}
 		}
-
-		if (bOldShowMouseCursor)
-		{
-			FInputModeGameAndUI InputMode;
-			InputMode.SetWidgetToFocus(ChatBox->TakeWidget());
-			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-			InputMode.SetHideCursorDuringCapture(false);
-			DPPlayerController->SetInputMode(InputMode);
-		}
-		else
-		{
-			FInputModeGameOnly InputMode;
-			DPPlayerController->SetInputMode(InputMode);
-		}
-		DPPlayerController->bShowMouseCursor = bOldShowMouseCursor;
+		FInputModeGameOnly InputMode;
+		PC->SetInputMode(InputMode);
+		// DPPlayerController->bShowMouseCursor = false;
 	}
 }
 
 void UChatUI::AddChatMessage(const FString& SenderName, const FString& Message)
 {
-	if (ChatLogBox)
-	{
-		UTextBlock* ChatMessage = NewObject<UTextBlock>(ChatLogBox);
-		if (ChatMessage)
-		{
-			FString FullMessage = FString::Printf(TEXT("%s: %s"), *SenderName, *Message);
-			ChatMessage->SetText(FText::FromString(FullMessage));
-			UVerticalBoxSlot* NewSlot = ChatLogBox->AddChildToVerticalBox(ChatMessage);
-			NewSlot->SetPadding(FMargin(5.0f, 5.0f));
+	check(ChatLogBox)
+	UTextBlock* ChatMessage = NewObject<UTextBlock>(ChatLogBox);
 
-			if (ChatScrollBox)
-			{
-				ChatScrollBox->ScrollToEnd();
-			}
-		}
-		else
-		{
-			FNetLogger::EditerLog(FColor::Red, TEXT("ChatMessage is nullptr"));
-		}
-	}
-	else
-	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("ChatLogBox is nullptr"));
-	}
+	check(ChatMessage)
+	FString FullMessage = FString::Printf(TEXT("%s: %s"), *SenderName, *Message);
+	ChatMessage->SetText(FText::FromString(FullMessage));
+	UVerticalBoxSlot* NewSlot = ChatLogBox->AddChildToVerticalBox(ChatMessage);
+	NewSlot->SetPadding(FMargin(5.0f, 5.0f));
+
+	check(ChatScrollBox)
+	ChatScrollBox->ScrollToEnd();
 }
 
 void UChatUI::ShowChat()
 {
-	if (World)
-	{
-		APlayerController* PlayerController = World->GetFirstPlayerController();
-		if (PlayerController)
-		{
-			FInputModeUIOnly InputMode;
-			InputMode.SetWidgetToFocus(ChatBox->TakeWidget());
-			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-			PlayerController->SetInputMode(InputMode);
-		}
-		else
-		{
-			FNetLogger::EditerLog(FColor::Red, TEXT("PlayerController is nullptr"));
-		}
-	}
-	else
-	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("World is nullptr"));
-	}
+	check(World)
+
+	APlayerController* PlayerController = World->GetFirstPlayerController();
+	check(PlayerController)
+	
+	FInputModeUIOnly InputMode;
+	InputMode.SetWidgetToFocus(ChatBox->TakeWidget());
+	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	PlayerController->SetInputMode(InputMode);
 }

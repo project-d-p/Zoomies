@@ -11,6 +11,9 @@ class UResultLevelComponent : public UBaseLevelComponent
 public:
 	UResultLevelComponent();
 
+	UFUNCTION(BlueprintCallable)
+	void SetFixedCameraView();
+	
 	/* Activate and Deactivate this Component */
 	virtual void Activate(bool bReset=false) override;
 	virtual void Deactivate() override;

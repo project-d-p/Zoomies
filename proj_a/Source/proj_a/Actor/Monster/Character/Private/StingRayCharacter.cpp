@@ -7,7 +7,7 @@ AStingRayCharacter::AStingRayCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_STINGRAY
-	(PathManager::GetPath(EMonster::STINGRAY));
+	(PathManager::GetMonsterPath(EMonster::STINGRAY));
 	if (SK_STINGRAY.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_STINGRAY.Object);
 	}
