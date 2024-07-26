@@ -3,6 +3,7 @@
 #include "AvoidPlayerMonsterAIController.h"
 #include "BaseMonsterAIController.h"
 #include "BaseMonsterCharacter.h"
+#include "ChamalionCharacter.h"
 #include "ChasePlayerMonsterAIController.h"
 #include "CrabCharacter.h"
 #include "DolphinCharacter.h"
@@ -15,10 +16,9 @@
 #include "MammothCharacter.h"
 #include "OctopusCharacter.h"
 #include "PenguinCharacter.h"
-#include "RabbitCharacter.h"
 #include "SaberToothTigerCharacter.h"
 #include "SealCharacter.h"
-#include "ShepherdCharacter.h"
+#include "HorseCharacter.h"
 #include "SkunkCharacter.h"
 #include "SlothCharacter.h"
 #include "SquidCharacter.h"
@@ -44,27 +44,27 @@ ABaseMonsterAIController* UMonsterFactory::RandomMonsterSpawn(int32 idx)
 	FVector Location = FVector(-5000.f, RandomY, 300.f);
 	
 	std::vector MonsterClasses = {
-		// ACrabCharacter::StaticClass(),
-		// ALobsterCharacter::StaticClass(),
-		// AMammothCharacter::StaticClass(),
-		// AOctopusCharacter::StaticClass(),
-		// AStarFishCharacter::StaticClass(),
-		// ASlothCharacter::StaticClass(),
-		// ADolphinCharacter::StaticClass(),
-		// AEelCharacter::StaticClass(),
-		// AFoxCharacter::StaticClass(),
-		// AGiraffeCharacter::StaticClass(),
-		// ALionCharacter::StaticClass(),
-		// APenguinCharacter::StaticClass(),
-		ARabbitCharacter::StaticClass(),
-		// ASaberToothTigerCharacter::StaticClass(),
-		// ASealCharacter::StaticClass(),
-		AShepherdCharacter::StaticClass(),
-		// ASkunkCharacter::StaticClass(),
-		// ASquidCharacter::StaticClass(),
-		// AStarFishCharacter::StaticClass(),
-		// AStingRayCharacter::StaticClass(),
-		// AWhaleCharacter::StaticClass()
+		ACrabCharacter::StaticClass(),
+		ALobsterCharacter::StaticClass(),
+		AMammothCharacter::StaticClass(),
+		AOctopusCharacter::StaticClass(),
+		AStarFishCharacter::StaticClass(),
+		ASlothCharacter::StaticClass(),
+		ADolphinCharacter::StaticClass(),
+		AEelCharacter::StaticClass(),
+		AFoxCharacter::StaticClass(),
+		AGiraffeCharacter::StaticClass(),
+		ALionCharacter::StaticClass(),
+		APenguinCharacter::StaticClass(),
+		AHorseCharacter::StaticClass(),
+		AChamalionCharacter::StaticClass(),
+		ASaberToothTigerCharacter::StaticClass(),
+		ASealCharacter::StaticClass(),
+		ASkunkCharacter::StaticClass(),
+		ASquidCharacter::StaticClass(),
+		AStarFishCharacter::StaticClass(),
+		AStingRayCharacter::StaticClass(),
+		AWhaleCharacter::StaticClass()
 	}; 
 	UClass* SelectedMonsterClass = MonsterClasses[FMath::RandRange(0, MonsterClasses.size() - 1)];
 	

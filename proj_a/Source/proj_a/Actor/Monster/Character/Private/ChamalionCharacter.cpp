@@ -1,39 +1,37 @@
-#include "RabbitCharacter.h"
+﻿#include "ChamalionCharacter.h"
 
 #include "Components/CapsuleComponent.h"
 
-
-ARabbitCharacter::ARabbitCharacter()
+AChamalionCharacter::AChamalionCharacter()
 {
 	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_RABBIT
-	(PathManager::GetPath(EMonster::RABBIT));
-	if (SK_RABBIT.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_RABBIT.Object);
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK
+	(PathManager::GetPath(EMonster::CHAMALEON));
+	if (SK.Succeeded()) {
+		GetMesh()->SetSkeletalMesh(SK.Object);
 	}
 
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(TEXT("/Game/animation/animals/rabbitAnimation.rabbitAnimation_C"));
+	(TEXT("/Game/animation/animals/chamalionAnimation.chamalionAnimation_C"));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}
 
 	/** Set the Capsule size */
-	DefaultCP.Radius = 90.f;
-	DefaultCP.HalfHeight = 130.f;
+	DefaultCP.Radius = 88.f;
+	DefaultCP.HalfHeight = 34.f;
 	GetCapsuleComponent()->SetCapsuleRadius(DefaultCP.Radius);
 	GetCapsuleComponent()->SetCapsuleHalfHeight(DefaultCP.HalfHeight);
 
-	FaintCP.Radius = 35.f;
-	FaintCP.HalfHeight = 35.f;
-	
+	FaintCP.Radius = 42.f;
+	FaintCP.HalfHeight = 42.f;
+
 	/** Set the model size and adjust position */
-	FVector Scale(FVector::OneVector);
-	FVector Location(0.f, 0.f, 40.f);
+	FVector Location(0.f, 0.f, 0.f);
 	FRotator Rotation(0.f, 0.f, 0.f);
-	FTransform Transform(Rotation, Location, Scale);
+	FTransform Transform(Rotation, Location);
 		
 	MeshAdjMtx = Transform;
 	GetMesh()->SetRelativeTransform(MeshAdjMtx);
@@ -41,7 +39,6 @@ ARabbitCharacter::ARabbitCharacter()
 	/** Set the faint state matrix */
 	FaintStateMtx = FTransform(
 		FRotator(0.f, 0.f, 90.f),
-		FVector::ZeroVector,
-		FVector::OneVector);
+		FVector::ZeroVector);
 	CB_FaintStateMtx =  MeshAdjMtx.Inverse() * FaintStateMtx * MeshAdjMtx;
 }

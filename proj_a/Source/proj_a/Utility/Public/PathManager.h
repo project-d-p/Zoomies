@@ -23,6 +23,8 @@ enum class EMonster : uint8
 	SEAL,
 	WHALE,
 	STINGRAY,
+	HORSE,
+	CHAMALEON,
 };
 
 class PathManager 
@@ -77,6 +79,9 @@ public:
 		case EMonster::STAR_FISH: return FileNamePairs[18].second;
 		case EMonster::STINGRAY: return FileNamePairs[19].second;
 		case EMonster::WHALE: return FileNamePairs[20].second;
+		case EMonster::HORSE: return TEXT("/Game/model/animals/horse/low_poly_western_horse.low_poly_western_horse");
+		case EMonster::CHAMALEON: return TEXT("/Game/model/animals/chamaleon/lowpoly_animated_chamaleon_game_ready.lowpoly_animated_chamaleon_game_ready");
+			
 			default: check(0);
 		}
 		return nullptr;
