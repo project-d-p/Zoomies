@@ -20,7 +20,7 @@ void UClientSocket::Connect(const char* /*ip*/, uint16 port)
 	server_address_.Clear();
 	// local address
 
-	server_address_.SetIPv4(0x7f000001, port);
+	server_address_.SetIPv4(/*0x7f000001*/ 0x0A13E17C, port);
 
 	opt_.m_eValue = k_ESteamNetworkingConfig_IP_AllowWithoutAuth;
 	opt_.m_eDataType = k_ESteamNetworkingConfig_Int32;
@@ -58,7 +58,7 @@ uint32 UClientSocket::Run()
 		}
 		this->HandleRecieveMessages();
 		this->HandleSendMessages();
-		FPlatformProcess::Sleep(0.01f); // ÀÛÀº µô·¹ÀÌ Ãß°¡
+		FPlatformProcess::Sleep(0.01f); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
 	}
 	return 0;
 }
@@ -73,7 +73,7 @@ void UClientSocket::DestoryInstance()
 	Stop();
 	if (this_thread_)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Client Socket Thread is being destroyed"));
+		UE_LOG(LogTemp, Warning, TEXT("Client Socket Thread is being destroyed in DestoryInstance"));
 		this_thread_->Kill(true);
 		this_thread_->WaitForCompletion();
 		delete this_thread_;
@@ -92,7 +92,7 @@ UClientSocket::~UClientSocket()
 	this->UClientSocket::Stop();
 	if (this_thread_)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Client Socket Thread is being destroyed"));
+		UE_LOG(LogTemp, Warning, TEXT("Client Socket Thread is being destroyed in ~UClientSocket"));
 		this_thread_->Kill(true);
 		this_thread_->WaitForCompletion();
 		delete this_thread_;
@@ -160,7 +160,9 @@ void UClientSocket::OnSteamNetConnectionStatusChanged(SteamNetConnectionStatusCh
 		break ;
 	case k_ESteamNetworkingConnectionState_ClosedByPeer:
 	case k_ESteamNetworkingConnectionState_ProblemDetectedLocally:
+		FNetLogger::LogInfo(TEXT("-=Connection Closed=-"));
 		SteamNetworkingSockets()->CloseConnection(connection_, 0, nullptr, false);
+		this->Stop();
 		break ;
 	default:
 		break;
