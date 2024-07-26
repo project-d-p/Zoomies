@@ -34,6 +34,7 @@ public:
 	void SwitchLevelComponent(ELevelComponentType Type);
 
 	/* Get Level Component */
+	UFUNCTION(BlueprintCallable)
 	UBaseLevelComponent* GetLevelComponent() const;
 
 	UPlayerScoreComp* GetScoreManagerComponent() const;

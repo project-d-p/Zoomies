@@ -91,13 +91,13 @@ void AResultLevelGameState::SetPlayerScores()
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
 		ADPPlayerController* PlayerController = Cast<ADPPlayerController>(*Iterator);
-		check(PlayerController)
+		// check(PlayerController)
 		if (!PlayerController)
 		{
 			return ;
 		}
 		ADPPlayerState* PlayerState = Cast<ADPPlayerState>(PlayerController->PlayerState);
-		check(PlayerState)
+		// check(PlayerState)
 		if (!PlayerState)
 		{
 			return ;
@@ -173,7 +173,7 @@ void AResultLevelGameState::BeginPlay()
 
 	Super::BeginPlay();
 	
-	this->SetMyRank();
+	// this->SetMyRank();
 
 	ADPPlayerController* Controller = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
 	if (Controller)

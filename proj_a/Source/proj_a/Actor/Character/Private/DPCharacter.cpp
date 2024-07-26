@@ -322,6 +322,11 @@ bool ADPCharacter::IsAtReturnPlace() const
 	return this->mIsAtReturnPlace;
 }
 
+void ADPCharacter::RemoveSpringArm()
+{
+	camera->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+}
+
 void ADPCharacter::SetStunned(bool bCond)
 {
 	this->bIsStunned = bCond;

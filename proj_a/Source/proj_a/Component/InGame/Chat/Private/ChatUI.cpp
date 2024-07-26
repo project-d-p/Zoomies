@@ -110,7 +110,7 @@ void UChatUI::ShowChat()
 
 	APlayerController* PlayerController = World->GetFirstPlayerController();
 	check(PlayerController)
-
+	
 	FInputModeUIOnly InputMode;
 	InputMode.SetWidgetToFocus(ChatBox->TakeWidget());
 	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);

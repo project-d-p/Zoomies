@@ -37,11 +37,6 @@ void AJudgePlayerController::InitConstUI()
 	}
 }
 
-void AJudgePlayerController::NotifyTimerEnd_Implementation()
-{
-	ReturnVote_Implementation(JudgeLevelUI->GetVote());
-}
-
 void AJudgePlayerController::SetOccupationeName_Implementation(int index, const FString& Name)
 {
 	check(JudgeLevelUI)

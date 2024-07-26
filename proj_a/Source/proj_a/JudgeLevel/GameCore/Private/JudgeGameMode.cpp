@@ -31,7 +31,7 @@ EPlayerJob AJudgeGameMode::CollateVotingResults()
     PlayerVotes.Empty();
     auto MostVotedPair = Algo::MaxElementBy(VoteCounts, [](const auto& Pair) { return Pair.Value; });
 
-    // For now, if vote same, choose first one.
+    // For now, if the votes are the same, choose the first one. may be the server's vote is first.
     return MostVotedPair->Key;
 }
 
@@ -58,11 +58,11 @@ void AJudgeGameMode::ProcessVotingResults()
 void AJudgeGameMode::EndTimer()
 {
     constexpr int TOTAL_PLAYER = 2;
-    if (++CurrentPlayerIndex < TOTAL_PLAYER)
+    if (++CurrentPlayerIndex < TOTAL_PLAYER + 1)
     {
-        AJudgePlayerController* PC = Cast<AJudgePlayerController>(GetWorld()->GetFirstPlayerController());
-        check(PC)
-        PC->NotifyTimerEnd();
+        AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
+        check(GS)
+        GS->NotifyTimerEnd();
 
         FTimerHandle VoteCollationTimerHandle;
         GetWorldTimerManager().SetTimer(VoteCollationTimerHandle, this, &AJudgeGameMode::ProcessVotingResults, 1.0f, false);

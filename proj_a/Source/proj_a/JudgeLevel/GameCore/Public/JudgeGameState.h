@@ -15,6 +15,10 @@ public:
 
 	virtual UChatManager* GetChatManager() const override { return ChatManager; }
 	UClientTimerManager* GetTimerManager() const { return TimerManager; }
+
+	UFUNCTION(NetMulticast, Reliable)
+	void NotifyTimerEnd();
+	
 protected:
 	virtual void BeginPlay() override;
 	

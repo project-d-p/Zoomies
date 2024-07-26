@@ -21,7 +21,7 @@ public:
 	virtual void HandleSeamlessTravelPlayer(AController*& C) override;
 	virtual void PostSeamlessTravel() override;
 	UServerChatManager* GetChatManager() const { return ChatManager; }
-
+	
 	// UFUNCTION(NetMulticast, Reliable)
 	// virtual void Broadcast(AActor* Sender, const FString& Msg, FName Type) override;
 	

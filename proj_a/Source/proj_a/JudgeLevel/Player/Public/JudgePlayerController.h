@@ -20,9 +20,6 @@ public:
 	UFUNCTION(Client, Reliable)
 	void SetOccupationeName(int index, const FString& Name);
 	
-	UFUNCTION(NetMulticast, Reliable)
-	void NotifyTimerEnd();
-	
 	UFUNCTION(Server, Reliable)
 	void ReturnVote(EPlayerJob Type);
 

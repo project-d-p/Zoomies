@@ -88,6 +88,7 @@ void AResultLevelGameMode::HandleSeamlessTravelPlayer(AController*& C)
 	SpawnNewPlayerPawn(C);
 }
 
+
 void AResultLevelGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
