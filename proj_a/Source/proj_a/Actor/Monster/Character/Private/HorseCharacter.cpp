@@ -6,7 +6,7 @@ AHorseCharacter::AHorseCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK
-	(PathManager::GetPath(EMonster::HORSE));
+	(PathManager::GetMonsterPath(EMonster::HORSE));
 	if (SK.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK.Object);
 	}

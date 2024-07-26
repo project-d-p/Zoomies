@@ -6,7 +6,7 @@ AChamalionCharacter::AChamalionCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK
-	(PathManager::GetPath(EMonster::CHAMALEON));
+	(PathManager::GetMonsterPath(EMonster::CHAMALEON));
 	if (SK.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK.Object);
 	}
