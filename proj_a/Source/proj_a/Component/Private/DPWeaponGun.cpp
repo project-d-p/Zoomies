@@ -125,11 +125,10 @@ void ADPWeaponGun::SpawnEffects(const FHitResult& HitResult, const FRotator& rot
 			FRotator::ZeroRotator
 		);
 
-		// USoundComponent* SoundComponent = OwningLevelComponent->GetSoundComponent();
-		// if (SoundComponent) {
-		// 	SoundComponent->PlayShotSound();
-		// 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("weaponGun"));
-		// }
+		if (SoundComponent) {
+			SoundComponent->PlayShotSound();
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("weaponGun"));
+		}
 	}
 	if (trail)
 	{

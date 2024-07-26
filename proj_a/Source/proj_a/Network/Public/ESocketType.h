@@ -6,7 +6,7 @@
 UENUM()
 enum ESocketType
 {
-	GENERATED_BODY()
-public:
-	
+	SOCKET_NONE,
+	SOCKET_STEAM_LAN,
+	SOCKET_STEAM_P2P,
 };
