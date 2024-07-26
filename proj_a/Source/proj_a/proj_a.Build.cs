@@ -4,6 +4,7 @@ using UnrealBuildTool;
 using System.IO;
 using System;
 using System.Diagnostics;
+using UnrealBuildBase;
 
 public class proj_a : ModuleRules
 {
@@ -32,14 +33,16 @@ public class proj_a : ModuleRules
 		string protoFilesPath = Path.Combine(ModuleDirectory, "Protobuf", "Proto_file");
 		string generatedProtoFilesPath = Path.Combine(ModuleDirectory, "Protobuf", "Pb_File");
 		
-		System.Console.WriteLine("Compiling .proto files...");
+		Console.WriteLine("Compiling .proto files...");
 		CompileProtoFiles(protocPath, protoFilesPath, generatedProtoFilesPath);
 		// XXX: 배포시에 컴파일 코드 삭제(혹은 주석 처리)
 		
 		PublicIncludePaths.AddRange(new string[] {
 			"proj_a/GameMode/Public",
 			"proj_a/GameState/Public",
-			"proj_a/Actor/Controller/Public",
+			"proj_a/Actor/Controller/PlayerController/Public",
+			"proj_a/Actor/Controller/PlayerController/Components/InputComponents/Public",
+			"proj_a/Actor/Controller/PlayerController/Components/LevelComponents/Public",
 			"proj_a/Actor/Character/Public",
 			"proj_a/Actor/Character/CharacterPositionSync/Public",
 			"proj_a/Actor/Character/PlayerState/Public",
@@ -55,7 +58,11 @@ public class proj_a : ModuleRules
 			"proj_a/Component/InGame/HitDetection/Public",
 			"proj_a/Component/InGame/Timer/Public",
 			"proj_a/Component/InGame/ReturnPlace/Public",
+			"proj_a/Component/InGame/Score/Types",
+			"proj_a/Component/Audio/Public",
 			"proj_a/Component/ClientNetwork/Public",
+			"proj_a/ResultLevel/GameMode/Public",
+			"proj_a/ResultLevel/GameState/Public",
             "proj_a/Widget/Public",
             "proj_a/Widget/InGame/Public",
             "proj_a/DataHub/Public",
@@ -63,7 +70,6 @@ public class proj_a : ModuleRules
 			"proj_a/Network/NetLogger/Public",
 			"proj_a/Network/ReceiveTask/Public",
 			"proj_a/Network/SendTask/Public",
-			"proj_a/GameInstance/Public",
 			"proj_a/SteamGameManager/Public",
 			"proj_a/ServerNetworkIO/Public",
 			"proj_a/ServerMessageHandler/Public",
@@ -71,6 +77,7 @@ public class proj_a : ModuleRules
 			"proj_a/Core/Public",
 			"proj_a/Utility/Public",
 			"proj_a/Protobuf/Pb_File",
+			Unreal.EngineDirectory.ToString() + "/Source/Editor/PropertyEditor/Public/",
 		});
 		
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
@@ -94,6 +101,7 @@ public class proj_a : ModuleRules
 			"Niagara",
             "GameplayCameras"
         });
+		PrivateDependencyModuleNames.AddRange(new string[] { "CinematicCamera", "SessionServices" });
 
 		string SteamSDKPath = Path.Combine(ModuleDirectory, "Steam");
 		if (Directory.Exists(SteamSDKPath))
@@ -101,13 +109,23 @@ public class proj_a : ModuleRules
 			PublicIncludePaths.Add(Path.Combine(SteamSDKPath, "public"));
 			if (Target.Platform == UnrealTargetPlatform.Win64)
 			{
-				PublicAdditionalLibraries.Add(Path.Combine(SteamSDKPath, "redistributable_bin", "win64", "steam_api64.lib"));
-				RuntimeDependencies.Add("$(ProjectDir)/Binaries/Win64/steam_api64.dll", Path.Combine(SteamSDKPath, "redistributable_bin", "win64", "steam_api64.dll"));
+				// PublicAdditionalLibraries.Add(Path.Combine(SteamSDKPath, "redistributable_bin", "win64", "steam_api64.lib"));
+				// RuntimeDependencies.Add("$(ProjectDir)/Binaries/Win64/steam_api64.dll", Path.Combine(SteamSDKPath, "redistributable_bin", "win64", "steam_api64.dll"));
+				string EngineSteamSDKPath = Path.Combine(
+					Unreal.EngineDirectory.ToString(), 
+					"Source", "ThirdParty", "Steamworks", "Steamv153", "sdk", "redistributable_bin", "win64"
+				);
+
+				PublicAdditionalLibraries.Add(Path.Combine(EngineSteamSDKPath, "steam_api64.lib"));
 			}
 			else if (Target.Platform == UnrealTargetPlatform.Mac)
 			{
-				PublicAdditionalLibraries.Add(Path.Combine(SteamSDKPath, "redistributable_bin", "osx", "libsteam_api.dylib"));
-				RuntimeDependencies.Add("$(ProjectDir)/Binaries/Mac/libsteam_api.dylib", Path.Combine(SteamSDKPath,"redistributable_bin", "osx", "libsteam_api.dylib"));
+				string EngineSteamSDKPath = Path.Combine(
+					Unreal.EngineDirectory.ToString(), 
+					"Source", "ThirdParty", "Steamworks", "Steamv153", "sdk", "redistributable_bin", "osx"
+				);
+				
+				PublicAdditionalLibraries.Add(Path.Combine(EngineSteamSDKPath, "libsteam_api.dylib"));
 			}
 		}
     }
@@ -147,6 +165,10 @@ public class proj_a : ModuleRules
 		{
 			PublicIncludePaths.Add(Path.Combine(protobufPath, "include"));
 			AddAllLibrariesFromPath(Path.Combine(protobufPath, "lib"));
+			RuntimeDependencies.Add("$(ProjectDir)/Binaries/Win64/libprotobuf.dll", Path.Combine(protobufPath, "tools", "protobuf","libprotobuf.dll"));
+			RuntimeDependencies.Add("$(ProjectDir)/Binaries/Win64/libprotoc.dll", Path.Combine(protobufPath, "tools", "protobuf","libprotoc.dll"));
+			RuntimeDependencies.Add("$(ProjectDir)/Binaries/Win64/zlib1.dll", Path.Combine(protobufPath, "tools", "protobuf","zlib1.dll"));
+			RuntimeDependencies.Add("$(ProjectDir)/Binaries/Win64/libprotobuf-lite.dll", Path.Combine(protobufPath, "bin", "libprotobuf-lite.dll"));
 		}
 		else
 		{
