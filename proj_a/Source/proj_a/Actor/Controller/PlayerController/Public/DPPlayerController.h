@@ -31,6 +31,7 @@ public:
 	void ServerSendChatMessage(const FString& SenderName, const FString& Message);
 
 	/* Switch level component Called By GameMode & GameState */
+	// UFUNCTION(Client, Reliable)
 	void SwitchLevelComponent(ELevelComponentType Type);
 
 	/* Get Level Component */

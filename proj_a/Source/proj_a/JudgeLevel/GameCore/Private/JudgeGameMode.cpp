@@ -6,6 +6,7 @@
 #include "JudgePlayerState.h"
 #include "Algo/MaxElement.h"
 #include "Camera/CameraActor.h"
+#include "proj_a/GameInstance/GI_Zoomies.h"
 
 AJudgeGameMode::AJudgeGameMode()
 {
@@ -69,6 +70,9 @@ void AJudgeGameMode::EndTimer()
     }
     else
     {
+        UGI_Zoomies* GI = Cast<UGI_Zoomies>(GetGameInstance());
+        check(GI)
+        GI->player_count = GetWorld()->GetNumControllers();
         GetWorld()->ServerTravel("calculateLevel?listen");   
     }
 }

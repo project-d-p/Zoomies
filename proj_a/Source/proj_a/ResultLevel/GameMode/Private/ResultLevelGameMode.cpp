@@ -4,6 +4,7 @@
 #include "DPPlayerController.h"
 #include "IChatGameState.h"
 #include "ResultLevelGameState.h"
+#include "proj_a/GameInstance/GI_Zoomies.h"
 
 AResultLevelGameMode::AResultLevelGameMode()
 {
@@ -42,6 +43,7 @@ void AResultLevelGameMode::SpawnNewPlayerPawn(AController* PC)
 	{
 		i = 0;
 	}
+	
 	FVector Location[2] = {
 		{-527.514681,-128.409500,85.462503},
 		{-527.514681,138.648437,85.462503}
@@ -86,9 +88,33 @@ void AResultLevelGameMode::HandleSeamlessTravelPlayer(AController*& C)
 	Super::HandleSeamlessTravelPlayer(C);
 
 	SpawnNewPlayerPawn(C);
+	this->CurrentPlayerCount += 1;
+	CheckPlayersAllTraveled();
 }
 
 void AResultLevelGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+}
+
+void AResultLevelGameMode::CheckPlayersAllTraveled()
+{
+	UGI_Zoomies* GI = Cast<UGI_Zoomies>(GetGameInstance());
+	check(GI)
+
+	AResultLevelGameState* GS = Cast<AResultLevelGameState>(GetWorld()->GetGameState());
+	check(GS)
+
+	FNetLogger::LogError(TEXT("CurrentPlayerCount : %d, GI->player_count : %d"), CurrentPlayerCount, GI->player_count);
+	if (CurrentPlayerCount == GI->player_count)
+	{
+		FTimerHandle StartTimerHandle;
+		FTimerDelegate StartTimerDelegate;
+
+		StartTimerDelegate.BindLambda([this, GS]()
+		{
+			GS->MulticastPlayersAllTraveled();
+		});
+		GetWorld()->GetTimerManager().SetTimer(StartTimerHandle, StartTimerDelegate, 1.0f, false);
+	}
 }
