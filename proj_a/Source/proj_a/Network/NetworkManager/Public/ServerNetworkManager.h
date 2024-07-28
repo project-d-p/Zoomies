@@ -22,3 +22,4 @@ private:
 	UNetworkWorker* Worker = nullptr;
 	FRunnableThread* WorkerThread = nullptr;
 };
+

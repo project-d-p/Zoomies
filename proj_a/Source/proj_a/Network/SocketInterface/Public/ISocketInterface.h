@@ -5,7 +5,6 @@
 
 /*
  * TODO: Add Children for SteamSockets and WinSockets etc.
- * this is gonna be changed to a base class for SteamSockets
  */
 class ISocketInterface {
 public:
