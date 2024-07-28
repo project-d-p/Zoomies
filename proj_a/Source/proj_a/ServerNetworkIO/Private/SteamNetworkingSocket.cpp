@@ -169,3 +169,26 @@ void SteamNetworkingSocket::PushUdpFlushMessage(Message& msg)
 	send_buffer_.Push(msg);
 }
 
+void SteamNetworkingSocket::DestoryInstance()
+{
+	Stop();
+	if (this_thread_)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Server Socket Thread is being Destroyed"));
+		this_thread_->Kill(true);
+		this_thread_->WaitForCompletion();
+		delete this_thread_;
+		this_thread_ = nullptr;
+	}
+	for (auto& conn : steam_connections_)
+	{
+		SteamNetworkingSockets()->CloseConnection(conn, 0, nullptr, false);
+	}
+	if (steam_listen_socket_ != k_HSteamListenSocket_Invalid)
+	{
+		SteamNetworkingSockets()->CloseListenSocket(steam_listen_socket_);
+	}
+	if (poll_group_ != k_HSteamNetPollGroup_Invalid)
+		SteamNetworkingSockets()->DestroyPollGroup(poll_group_);
+}
+

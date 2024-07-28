@@ -14,7 +14,7 @@ bool UHitScan::HitDetect(const ADPCharacter* character, const FVector& start, co
 	if (bDebugLine)
 	{
 		UWorld *World = GetWorld();
-		DrawDebugLine(World, start, end, FColor::Blue, false, 4.0f, 0, 5.0f);
+		//DrawDebugLine(World, start, end, FColor::Blue, false, 4.0f, 0, 5.0f);
 	}
 	// ------------
 	

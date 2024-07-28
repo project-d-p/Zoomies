@@ -7,7 +7,7 @@ ASkunkCharacter::ASkunkCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SKUNK
-	(TEXT("/Game/model/animals/skunk/low_poly_skunk.low_poly_skunk"));
+	(PathManager::GetPath(EMonster::SKUNK));
 	if (SK_SKUNK.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_SKUNK.Object);
 	}
@@ -21,11 +21,27 @@ ASkunkCharacter::ASkunkCharacter()
 	}
 
 	/** Set the Capsule size */
-	GetCapsuleComponent()->SetCapsuleRadius(90.f);
-	GetCapsuleComponent()->SetCapsuleHalfHeight(90.f);
+	DefaultCP.Radius = 90.f;
+	DefaultCP.HalfHeight = 90.f;
+	GetCapsuleComponent()->SetCapsuleRadius(DefaultCP.Radius);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(DefaultCP.HalfHeight);
+
+	FaintCP.Radius = 60.f;
+	FaintCP.HalfHeight = 60.f;
 	
 	/** Set the model size and adjust position */
-	GetMesh()->SetRelativeScale3D(FVector(1.f, 1.f, 1.f));
-	GetMesh()->SetRelativeLocationAndRotation(
-		FVector(0.f, 0.f, -87.f), FRotator(0.f, 90.f, 0.f));
+	FVector Scale(FVector::OneVector);
+	FVector Location(0.f, 0.f, 30.f);
+	FRotator Rotation(0.f, 0.f, 0.f);
+	FTransform Transform(Rotation, Location, Scale);
+		
+	MeshAdjMtx = Transform;
+	GetMesh()->SetRelativeTransform(MeshAdjMtx);
+
+	/** Set the faint state matrix */
+	FaintStateMtx = FTransform(
+		FRotator(0.f, 0.f, 90.f),
+		FVector::ZeroVector,
+		FVector::OneVector);
+	CB_FaintStateMtx =  MeshAdjMtx.Inverse() * FaintStateMtx * MeshAdjMtx;
 }

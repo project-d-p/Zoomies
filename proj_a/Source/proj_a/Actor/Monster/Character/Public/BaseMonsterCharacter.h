@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "PathManager.h"
 #include "BaseMonsterCharacter.generated.h"
 
 UENUM()
@@ -9,6 +10,12 @@ enum class EMonsterState : uint8
 {
 	Idle UMETA(DisplayName = "Idle"),
 	Faint UMETA(DisplayName = "Faint"),
+};
+
+struct FCapsuleProperties
+{
+	float Radius = 150.f;
+	float HalfHeight = 100.f;
 };
 
 UCLASS()
@@ -22,10 +29,11 @@ public:
 	
 	void TakeMonsterDamage(float Dmg);
 	UFUNCTION()
-	void OnRep_FaintCharacterMotion() const;
+	void OnRep_FaintCharacterMotion();
 	void ScaleCapsuleSize(float ScaleFactor);
-	EMonsterState GetState() const { return CurrentState; } 
-	
+	EMonsterState GetState() const { return CurrentState; }
+	void SetCatchable(bool bCond);
+
 	UPROPERTY(Replicated)
 	int32 MonsterId;
 
@@ -35,6 +43,9 @@ public:
 	class UNiagaraSystem* sparkleEffect;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UWidgetComponent* widgetComponent;
+	
+	FCapsuleProperties DefaultCP;
+	FCapsuleProperties FaintCP;
 private:
 	const float MaxHp = 100.f;
 	float CurrentHp = 100.f;
@@ -52,4 +63,8 @@ protected:
 
 	void SyncPosition();
 	bool bCaught = false;
+
+	FTransform MeshAdjMtx;
+	FTransform FaintStateMtx;
+	FTransform CB_FaintStateMtx;
 };

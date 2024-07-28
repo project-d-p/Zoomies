@@ -11,11 +11,21 @@
 #include "SocketManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "FNetLogger.h"
+#include "ELevelComponentType.h"
 #include <exception>
+
+#include "MainLevelComponent.h"
 #include "MessageMaker.h"
+#include "NetworkMessage.h"
+#include "OnlineSubsystem.h"
+#include "proj_a/GameInstance/GI_Zoomies.h"
 
 ADPGameModeBase::ADPGameModeBase()
 {
+	bUseSeamlessTravel = true;
+	bReplicates = true;
+	PrimaryActorTick.bCanEverTick = true;
+	
 	DefaultPawnClass = ADPCharacter::StaticClass();
 	PlayerControllerClass = ADPPlayerController::StaticClass();
 	PlayerStateClass = ADPPlayerState::StaticClass();
@@ -26,8 +36,6 @@ ADPGameModeBase::ADPGameModeBase()
 	ScoreManager = CreateDefaultSubobject<UScoreManagerComp>(TEXT("ScoreManager"));
 	MonsterFactory = CreateDefaultSubobject<UMonsterFactory>(TEXT("MonsterFactory"));
 
-	PrimaryActorTick.bCanEverTick = true;
-	// PrimaryActorTick.TickGroup = TG_PostPhysics;
 	monster_controllers_.resize(NUM_OF_MAX_MONSTERS, nullptr);
 	empty_monster_slots_.reserve(NUM_OF_MAX_MONSTERS);
 
@@ -35,7 +43,26 @@ ADPGameModeBase::ADPGameModeBase()
 	{
 		empty_monster_slots_.push_back(i);
 	}
-	bReplicates = true;
+}
+
+// Only Called in Server : PlayerController && PlayerState Automatically Travel
+void ADPGameModeBase::GetSeamlessTravelActorList(bool bToTransition, TArray<AActor*>& ActorList)
+{
+	Super::GetSeamlessTravelActorList(bToTransition, ActorList);
+
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (!GameInstance)
+		return ;
+	
+	for (FConstPlayerControllerIterator IT = GetWorld()->GetPlayerControllerIterator(); IT; ++IT)
+	{
+		ADPPlayerController* PlayerController = Cast<ADPPlayerController>(*IT);
+		if (PlayerController)
+		{
+			PlayerController->SwitchLevelComponent(ELevelComponentType::NONE);
+			GameInstance->PlayerCharacters.Add(PlayerController, PlayerController->GetPrivateScoreManagerComponent()->GetPrivatePlayerScore());
+		}
+	}
 }
 
 void ADPGameModeBase::SendChatToAllClients(const FString& SenderName, const FString& Message)
@@ -46,6 +73,7 @@ void ADPGameModeBase::SendChatToAllClients(const FString& SenderName, const FStr
 void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 {
 	Super::PostLogin(newPlayer);
+#if UE_BUILD_DEBUG == 0
 	if (steam_listen_socket_ == nullptr)
 	{
 		steam_listen_socket_ = new SteamNetworkingSocket();
@@ -53,6 +81,7 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 		if (game_state_ != nullptr)
 			game_state_->bServerTraveled = true;
 	}
+#endif
 	if (!newPlayer)
 	{
 		return ;
@@ -65,15 +94,15 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 		return;
 	}
 	FString name = player_state->GetPlayerName();
-	FNetLogger::EditerLog(FColor::Blue, TEXT("Player name: %s"), *name);
 	std::string key(TCHAR_TO_UTF8(*name));
+	
 	if (player_controllers_.find(key) != player_controllers_.end())
 	{
 		player_state->SetPlayerName(name + "1");
-		FNetLogger::EditerLog(FColor::Red, TEXT("Player name: %s"), *player_state->GetPlayerName());
 		key = std::string(TCHAR_TO_UTF8(*player_state->GetPlayerName()));
 	}
 	player_controllers_[key] = Cast<ADPPlayerController>(newPlayer);
+	player_controllers_[key]->SwitchLevelComponent(ELevelComponentType::MAIN);
 }
 
 void ADPGameModeBase::Logout(AController* Exiting)
@@ -109,12 +138,13 @@ void ADPGameModeBase::StartPlay()
 	UE_LOG(LogTemp, Log, TEXT("Number of ADPCharacters in the world: %d"), NumberOfCharacters);
 	UE_LOG(LogTemp, Log, TEXT("Number of Players in this Session: %d"), GetNumPlayers());
 
-	TimerManager->StartTimer(60.0f);
+	TimerManager->StartTimer(30.0f);
 }
 
 void ADPGameModeBase::Tick(float delta_time)
 {
 	Super::Tick(delta_time);
+
 	if (steam_listen_socket_ == nullptr)
 	{
 		return;
@@ -122,6 +152,17 @@ void ADPGameModeBase::Tick(float delta_time)
 	if (steam_listen_socket_->IsGameStarted())
 	{
 		this->ProcessData(delta_time);
+	}
+	if (TimerManager->IsTimeOver())
+	{
+		if (steam_listen_socket_)
+		{
+			steam_listen_socket_->DestoryInstance();
+			delete steam_listen_socket_;
+			steam_listen_socket_ = nullptr;
+		}
+
+		GetWorld()->ServerTravel(TEXT("calculateLevel?listen"), true);
 	}
 	else
 	{
@@ -137,6 +178,7 @@ void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	UE_LOG(LogTemp, Warning, TEXT("Call end play."));
 	if (steam_listen_socket_)
 	{
+		steam_listen_socket_->DestoryInstance();
 		delete steam_listen_socket_;
 		steam_listen_socket_ = nullptr;
 	}
@@ -154,7 +196,7 @@ void ADPGameModeBase::ProcessData(float delta_time)
 		ADPPlayerController* controller = this->player_controllers_[message.player_id()];
 		message_handler_.HandleMessage(message)->ExecuteIfBound(controller, message, delta_time);
 	}
-	this->SyncHostAiming();
+	this->SimulateAiming();
 	this->SimulateGunFire();
 	this->SimulateCatch();
 	this->SyncMovement();
@@ -191,6 +233,12 @@ void ADPGameModeBase::SpawnMonsters(float delta_time)
 
 ADPGameModeBase::~ADPGameModeBase()
 {
+	if (steam_listen_socket_)
+	{
+		steam_listen_socket_->DestoryInstance();
+		delete steam_listen_socket_;
+		steam_listen_socket_ = nullptr;
+	}
 }
 
 void ADPGameModeBase::SyncMovement()
@@ -206,8 +254,13 @@ void ADPGameModeBase::SimulateGunFire()
 {
 	for (auto& pair: player_controllers_)
 	{
-		ADPPlayerController* controller = pair.second;
-		controller->SimulateGunFire(steam_listen_socket_);
+		ADPPlayerController* Controller = pair.second;
+		UMainLevelComponent* MainLevelComponent = Cast<UMainLevelComponent>(Controller->GetLevelComponent());
+		if (MainLevelComponent == nullptr)
+		{
+			continue;
+		}
+		MainLevelComponent->SimulateGunFire(steam_listen_socket_);
 	}
 }
 
@@ -215,24 +268,27 @@ void ADPGameModeBase::SimulateCatch()
 {
 	for (auto& pair: player_controllers_)
 	{
-		ADPPlayerController* controller = pair.second;
-		controller->SimulateCatch(steam_listen_socket_);
+		ADPPlayerController* Controller = pair.second;
+		UMainLevelComponent* MainLevelComponent = Cast<UMainLevelComponent>(Controller->GetLevelComponent());
+		if (MainLevelComponent == nullptr)
+		{
+			continue;
+		}
+		MainLevelComponent->SimulateCatch(steam_listen_socket_);
 	}
 }
 
-void ADPGameModeBase::SyncHostAiming()
+void ADPGameModeBase::SimulateAiming()
 {
-	ADPPlayerController* host_controller = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
-	if (!host_controller)
+	for (auto& pair: player_controllers_)
 	{
-		return ;
-	}
-	while (!host_controller->aim_queue_.empty())
-	{
-		bool aim_state = host_controller->aim_queue_.front();
-		host_controller->aim_queue_.pop();
-		Message msg = MessageMaker::MakeAimMessage(host_controller, aim_state);
-		steam_listen_socket_->PushUdpFlushMessage(msg);
+		ADPPlayerController* Controller = pair.second;
+		UMainLevelComponent* MainLevelComponent = Cast<UMainLevelComponent>(Controller->GetLevelComponent());
+		if (MainLevelComponent == nullptr)
+		{
+			continue;
+		}
+		MainLevelComponent->SimulateAim(steam_listen_socket_);
 	}
 }
 

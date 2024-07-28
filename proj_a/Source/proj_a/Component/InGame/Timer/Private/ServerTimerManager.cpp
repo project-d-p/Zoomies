@@ -17,6 +17,7 @@ void UServerTimerManager::BeginPlay()
 
 void UServerTimerManager::StartTimer(float Duration)
 {
+	bIsTimeOver = false;
 	TimerDuration = Duration;
 	TimeRemaining = TimerDuration;
 	SetTimeRemaining();
@@ -26,6 +27,11 @@ void UServerTimerManager::StartTimer(float Duration)
 		&UServerTimerManager::TimerFunction,
 		INTERVAL,
 		true);
+}
+
+bool UServerTimerManager::IsTimeOver() const
+{
+	return bIsTimeOver;
 }
 
 void UServerTimerManager::TimerFunction()
@@ -40,6 +46,7 @@ void UServerTimerManager::TimerFunction()
 	{
 		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 		UE_LOG(LogTemp, Warning, TEXT("Timer ended"));
+		bIsTimeOver = true;
 	}
 }
 

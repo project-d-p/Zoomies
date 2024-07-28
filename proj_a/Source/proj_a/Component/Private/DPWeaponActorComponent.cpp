@@ -21,6 +21,15 @@ UDPWeaponActorComponent::UDPWeaponActorComponent()
 
 }
 
+UDPWeaponActorComponent::~UDPWeaponActorComponent()
+{
+	// if (weapons.Num() > 0) {
+	// 	for (ADPWeapon* weapon : weapons) {
+	// 		weapon->Destroy();
+	// 	}
+	// }
+}
+
 
 // Called when the game starts
 void UDPWeaponActorComponent::BeginPlay()
@@ -53,6 +62,12 @@ FVector UDPWeaponActorComponent::GetFireLocation()
 	if (currentWeapon)
 		return currentWeapon->GetFireLocation();
 	return FVector();
+}
+
+void UDPWeaponActorComponent::SpawnEffects(const FHitResult& HitResult, const FRotator& Rotator)
+{
+	if (currentWeapon)
+		currentWeapon->SpawnEffects(HitResult, Rotator);
 }
 
 void UDPWeaponActorComponent::AddWeapons(TSubclassOf<ADPWeapon> weaponClass)
