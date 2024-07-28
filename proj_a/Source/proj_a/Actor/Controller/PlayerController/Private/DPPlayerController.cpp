@@ -11,7 +11,6 @@
 #include "JudgeLevelComponent.h"
 #include "MainLevelComponent.h"
 #include "ResultLevelComponent.h"
-#include "GameFramework/GameMode.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 DEFINE_LOG_CATEGORY(LogNetwork);
@@ -143,7 +142,7 @@ void ADPPlayerController::ClientDestroySession_Implementation()
 
 void ADPPlayerController::ConnectToServer_Implementation()
 {
-	NetworkManager->Initialize(ZOOMIES::ESocketType::SOCKET_STEAM_LAN);
+	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
 }
 
 void ADPPlayerController::BeginPlay()

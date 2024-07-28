@@ -10,7 +10,7 @@ class UClientNetworkManager : public UANetworkManager
 {
 	GENERATED_BODY()
 public:
-	virtual void Initialize(ZOOMIES::ESocketType SocketType) override;
+	virtual void Initialize(ENetworkTypeZoomies SocketType) override;
 	virtual void OnDataReceived(const Message& Data) override;
 	virtual void SendData(const Message& Data) override;
 	virtual void Shutdown() override;

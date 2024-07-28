@@ -4,7 +4,7 @@
 #include "ISocketInterface.h"
 #include "NetworkWorker.h"
 
-void UServerNetworkManager::Initialize(ZOOMIES::ESocketType SocketType)
+void UServerNetworkManager::Initialize(ENetworkTypeZoomies SocketType)
 {
 	ISocketInterface* SocketInterface = ISocketFactory::CreateSocketInterface(SocketType);
 	check(SocketInterface);

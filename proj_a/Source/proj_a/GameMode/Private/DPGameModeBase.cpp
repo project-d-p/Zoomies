@@ -9,6 +9,7 @@
 #include "DPPlayerState.h"
 #include "FNetLogger.h"
 #include "ELevelComponentType.h"
+#include "ENetworkTypeZoomies.h"
 #include "MainLevelComponent.h"
 #include "MessageMaker.h"
 #include "ServerNetworkManager.h"
@@ -32,7 +33,7 @@ ADPGameModeBase::ADPGameModeBase()
 
 	//// TEST
 	NetworkManager = CreateDefaultSubobject<UServerNetworkManager>(TEXT("NetworkManager"));
-	NetworkManager->Initialize(ZOOMIES::ESocketType::SOCKET_STEAM_LAN);
+	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
 	NetworkManager->SetGameStartCallback(NUM_OF_MAX_CLIENTS, [this]()
 	{
 		this->OnGameStart();

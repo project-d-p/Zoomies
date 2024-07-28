@@ -1,8 +1,10 @@
 #include "ANetworkManager.h"
+
+#include "ENetworkTypeZoomies.h"
 #include "ISocketFactory.h"
 #include "ISocketInterface.h"
 
-void UANetworkManager::Initialize(ZOOMIES::ESocketType SocketType)
+void UANetworkManager::Initialize(ENetworkTypeZoomies SocketType)
 {
 }
 

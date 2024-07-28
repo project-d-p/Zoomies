@@ -4,7 +4,7 @@
 #include "ISocketFactory.h"
 #include "MessageHandler.h"
 
-void UClientNetworkManager::Initialize(ZOOMIES::ESocketType SocketType)
+void UClientNetworkManager::Initialize(ENetworkTypeZoomies SocketType)
 {
 	ISocketInterface* SocketInterface = ISocketFactory::CreateSocketInterface(SocketType);
 	check(SocketInterface);

@@ -1,15 +1,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ESocketType.h"
+#include "ENetworkTypeZoomies.h"
 
 class ISocketInterface;
 
 class ISocketFactory
 {
 public:
-	static ISocketInterface* CreateSocketInterface(ZOOMIES::ESocketType socketType);
+	static ISocketInterface* CreateSocketInterface(ENetworkTypeZoomies socketType);
 	~ISocketFactory();
 private:
-	static TMap<ZOOMIES::ESocketType, ISocketInterface*> SocketTypeToSocketInterfaceMap;
+	static TMap<ENetworkTypeZoomies, ISocketInterface*> SocketTypeToSocketInterfaceMap;
 };

@@ -2,11 +2,11 @@
 #include "ISocketInterface.h"
 #include "SteamSocketIP.h"
 
-TMap<ZOOMIES::ESocketType, ISocketInterface*> ISocketFactory::SocketTypeToSocketInterfaceMap = {
-	{ZOOMIES::ESocketType::SOCKET_STEAM_LAN, new SteamSocketIP()},
+TMap<ENetworkTypeZoomies, ISocketInterface*> ISocketFactory::SocketTypeToSocketInterfaceMap = {
+	{ENetworkTypeZoomies::SOCKET_STEAM_LAN, new SteamSocketIP()},
 };
 
-ISocketInterface* ISocketFactory::CreateSocketInterface(ZOOMIES::ESocketType socketType)
+ISocketInterface* ISocketFactory::CreateSocketInterface(ENetworkTypeZoomies socketType)
 {
 	ISocketInterface* SocketInterface = SocketTypeToSocketInterfaceMap[socketType]->Clone();
 	return SocketInterface;
