@@ -21,7 +21,7 @@ public:
 	void Stop();
 	void DestoryInstance();
 
-	STEAM_CALLBACK(UClientSocket, OnSteamNetConnectionStatusChanged, SteamNetConnectionStatusChangedCallback_t);
+	// STEAM_CALLBACK(UClientSocket, OnSteamNetConnectionStatusChanged, SteamNetConnectionStatusChangedCallback_t);
 private:
 	void HandleRecieveMessages();
 	void HandleSendMessages();

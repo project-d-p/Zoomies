@@ -9,8 +9,6 @@
 #include "DPPlayerState.h"
 #include "FNetLogger.h"
 #include "ELevelComponentType.h"
-#include <exception>
-
 #include "MainLevelComponent.h"
 #include "MessageMaker.h"
 #include "ServerNetworkManager.h"

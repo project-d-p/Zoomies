@@ -81,7 +81,6 @@ public class proj_a : ModuleRules
 			"proj_a/Network/NetLogger/Public",
 			"proj_a/Network/NetworkManager/Public",
 			"proj_a/Network/NetworkWorker/Public",
-			"proj_a/Network/SocketHandler/Public",
 			"proj_a/Network/SocketFactory/Public",
 			"proj_a/Network/SocketInterface/Public",
 			"proj_a/GameInstance/Public",

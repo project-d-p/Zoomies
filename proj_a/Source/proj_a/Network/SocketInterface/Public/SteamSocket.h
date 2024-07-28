@@ -1,6 +1,5 @@
 #pragma once
 
-#include "DoubleBuffer.h"
 #include "ISocketInterface.h"
 #include "message.pb.h"
 #include "isteamnetworkingsockets.h"

@@ -119,45 +119,45 @@ std::queue<Message> SteamNetworkingSocket::GetReadBuffer()
 	return recieve_buffer_.GetReadBuffer();
 }
 
-void SteamNetworkingSocket::OnSteamNetConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t* info)
-{
-	switch (info->m_info.m_eState)
-	{
-	case k_ESteamNetworkingConnectionState_Connecting:
-		if (SteamNetworkingSockets()->AcceptConnection(info->m_hConn) == k_EResultOK)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Client Connecting"));
-		}
-		else
-		{
-			SteamNetworkingSockets()->CloseConnection(info->m_hConn, 0, "Failed to accept connection", true);
-			UE_LOG(LogTemp, Error, TEXT("Failed to accept connection."));
-		}
-		break ;
-	case k_ESteamNetworkingConnectionState_Connected:
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("Client Connected"));
-		UE_LOG(LogTemp, Warning, TEXT("Client Connected"));
-		steam_connections_.push_back(info->m_hConn);
-		num_clients_ += 1;
-		SteamNetworkingSockets()->SetConnectionPollGroup(info->m_hConn, this->poll_group_);
-		if (num_clients_ == MAX_CLIENTS)
-		{
-			FNetLogger::EditerLog(FColor::Cyan, TEXT("Game Started"));
-			UE_LOG(LogTemp, Warning, TEXT("Game Started"));
-			b_is_game_stated = true;
-		}
-		break ;
-	case k_ESteamNetworkingConnectionState_ClosedByPeer:
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("Closed By Peer: %s"), UTF8_TO_TCHAR(info->m_info.m_szEndDebug));
-		UE_LOG(LogTemp, Error, TEXT("Connection closed by peer. Reason: %d, Info: %hs"), info->m_info.m_eEndReason, UTF8_TO_TCHAR(info->m_info.m_szEndDebug));
-	case k_ESteamNetworkingConnectionState_ProblemDetectedLocally:
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("Client Disconnected"));
-		SteamNetworkingSockets()->CloseConnection(info->m_hConn, 0, nullptr, false);
-		break ;
-	default:
-		break;
-	}
-}
+// void SteamNetworkingSocket::OnSteamNetConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t* info)
+// {
+// 	switch (info->m_info.m_eState)
+// 	{
+// 	case k_ESteamNetworkingConnectionState_Connecting:
+// 		if (SteamNetworkingSockets()->AcceptConnection(info->m_hConn) == k_EResultOK)
+// 		{
+// 			UE_LOG(LogTemp, Warning, TEXT("Client Connecting"));
+// 		}
+// 		else
+// 		{
+// 			SteamNetworkingSockets()->CloseConnection(info->m_hConn, 0, "Failed to accept connection", true);
+// 			UE_LOG(LogTemp, Error, TEXT("Failed to accept connection."));
+// 		}
+// 		break ;
+// 	case k_ESteamNetworkingConnectionState_Connected:
+// 		FNetLogger::EditerLog(FColor::Cyan, TEXT("Client Connected"));
+// 		UE_LOG(LogTemp, Warning, TEXT("Client Connected"));
+// 		steam_connections_.push_back(info->m_hConn);
+// 		num_clients_ += 1;
+// 		SteamNetworkingSockets()->SetConnectionPollGroup(info->m_hConn, this->poll_group_);
+// 		if (num_clients_ == MAX_CLIENTS)
+// 		{
+// 			FNetLogger::EditerLog(FColor::Cyan, TEXT("Game Started"));
+// 			UE_LOG(LogTemp, Warning, TEXT("Game Started"));
+// 			b_is_game_stated = true;
+// 		}
+// 		break ;
+// 	case k_ESteamNetworkingConnectionState_ClosedByPeer:
+// 		FNetLogger::EditerLog(FColor::Cyan, TEXT("Closed By Peer: %s"), UTF8_TO_TCHAR(info->m_info.m_szEndDebug));
+// 		UE_LOG(LogTemp, Error, TEXT("Connection closed by peer. Reason: %d, Info: %hs"), info->m_info.m_eEndReason, UTF8_TO_TCHAR(info->m_info.m_szEndDebug));
+// 	case k_ESteamNetworkingConnectionState_ProblemDetectedLocally:
+// 		FNetLogger::EditerLog(FColor::Cyan, TEXT("Client Disconnected"));
+// 		SteamNetworkingSockets()->CloseConnection(info->m_hConn, 0, nullptr, false);
+// 		break ;
+// 	default:
+// 		break;
+// 	}
+// }
 
 bool SteamNetworkingSocket::IsGameStarted() const
 {

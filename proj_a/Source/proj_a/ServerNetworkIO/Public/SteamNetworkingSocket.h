@@ -25,7 +25,7 @@ public:
 	void DestoryInstance();
 	// void OnSteamNetConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t* info);
 	
-	STEAM_CALLBACK(SteamNetworkingSocket, OnSteamNetConnectionStatusChanged, SteamNetConnectionStatusChangedCallback_t);
+	// STEAM_CALLBACK(SteamNetworkingSocket, OnSteamNetConnectionStatusChanged, SteamNetConnectionStatusChangedCallback_t);
 protected:
 	virtual uint32 Run() override;
 

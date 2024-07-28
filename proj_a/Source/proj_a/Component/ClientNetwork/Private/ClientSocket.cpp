@@ -150,23 +150,23 @@ void UClientSocket::HandleSendMessages()
 	}
 }
 
-void UClientSocket::OnSteamNetConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t* info)
-{
-	switch (info->m_info.m_eState)
-	{
-	case k_ESteamNetworkingConnectionState_Connecting:
-		FNetLogger::LogInfo(TEXT("-=Connection Connecting=-"));
-		break ;
-	case k_ESteamNetworkingConnectionState_Connected:
-		FNetLogger::LogInfo(TEXT("-=Connection Connected=-"));
-		break ;
-	case k_ESteamNetworkingConnectionState_ClosedByPeer:
-	case k_ESteamNetworkingConnectionState_ProblemDetectedLocally:
-		FNetLogger::LogInfo(TEXT("-=Connection Closed=-"));
-		SteamNetworkingSockets()->CloseConnection(connection_, 0, nullptr, false);
-		this->Stop();
-		break ;
-	default:
-		break;
-	}
-}
+// void UClientSocket::OnSteamNetConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t* info)
+// {
+// 	switch (info->m_info.m_eState)
+// 	{
+// 	case k_ESteamNetworkingConnectionState_Connecting:
+// 		FNetLogger::LogInfo(TEXT("-=Connection Connecting=-"));
+// 		break ;
+// 	case k_ESteamNetworkingConnectionState_Connected:
+// 		FNetLogger::LogInfo(TEXT("-=Connection Connected=-"));
+// 		break ;
+// 	case k_ESteamNetworkingConnectionState_ClosedByPeer:
+// 	case k_ESteamNetworkingConnectionState_ProblemDetectedLocally:
+// 		FNetLogger::LogInfo(TEXT("-=Connection Closed=-"));
+// 		SteamNetworkingSockets()->CloseConnection(connection_, 0, nullptr, false);
+// 		this->Stop();
+// 		break ;
+// 	default:
+// 		break;
+// 	}
+// }
