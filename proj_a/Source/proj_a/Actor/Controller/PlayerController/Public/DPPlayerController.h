@@ -40,13 +40,26 @@ public:
 
 	UPlayerScoreComp* GetScoreManagerComponent() const;
 	UPrivateScoreManager* GetPrivateScoreManagerComponent() const;
+
+	/*
+	 * TEST: COMMENT
 	UClientSocket* GetClientSocket() const;
+	 */
+
+	/// TEST
+	UANetworkManager* GetNetworkManager() const;
+	///
 
 	void ReleaseMemory();
 
 	UFUNCTION(Client, Reliable)
 	void ClientDestroySession();
 
+	/// TEST
+	UFUNCTION(Client, Reliable)
+	void ConnectToServer();
+	///
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -60,8 +73,17 @@ private:
 	// Move To PlayerState
 	UPROPERTY(VisibleAnywhere)
 	UPrivateScoreManager* PrivateScoreManager;
+
+	/*
+	 * TEST: COMMENT
 	UPROPERTY()
 	UClientSocket* Socket = nullptr;
+	 */
+
+	/// TEST
+	UPROPERTY()
+	UANetworkManager* NetworkManager = nullptr;
+	///
 
 	UPROPERTY()
 	TMap<uint32, UBaseLevelComponent*> LevelComponents;

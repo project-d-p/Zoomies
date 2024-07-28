@@ -115,8 +115,16 @@ void UMainLevelComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	}
 	
 	Message msg = MessageMaker::MakePositionMessage(PlayerController);
+
+	/*
+	 * TEST : COMMENT
 	UClientSocket* Socket = PlayerController->GetClientSocket();
 	Socket->AsyncSendPacket(msg);
+	*/
+	/// TEST
+	UANetworkManager* NetworkManager = PlayerController->GetNetworkManager();
+	NetworkManager->SendData(msg);
+	///
 }
 
 bool UMainLevelComponent::IsCatchable(FHitResult& HitResult)

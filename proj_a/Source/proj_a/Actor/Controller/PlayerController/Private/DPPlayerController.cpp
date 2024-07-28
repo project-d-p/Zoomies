@@ -6,6 +6,7 @@
 #include "DPPlayerState.h"
 #include "FNetLogger.h"
 #include "BaseInputComponent.h"
+#include "ClientNetworkManager.h"
 #include "JudgeGameMode.h"
 #include "JudgeLevelComponent.h"
 #include "MainLevelComponent.h"
@@ -16,7 +17,15 @@ DEFINE_LOG_CATEGORY(LogNetwork);
 
 ADPPlayerController::ADPPlayerController()
 {
+	/*
+	 * TEST: COMMENT
 	Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
+	*/
+	
+	/// TEST
+	NetworkManager = CreateDefaultSubobject<UClientNetworkManager>(TEXT("NetworkManager"));
+	///
+
 	PrivateScoreManager = CreateDefaultSubobject<UPrivateScoreManager>(TEXT("PrivateScoreManager"));
 	
 	UBaseLevelComponent* MainLevelComponet = CreateDefaultSubobject<UMainLevelComponent>(TEXT("MainLevelComponent"));
@@ -50,10 +59,20 @@ UPrivateScoreManager* ADPPlayerController::GetPrivateScoreManagerComponent() con
 	return PrivateScoreManager;
 }
 
+/// TEST
+UANetworkManager* ADPPlayerController::GetNetworkManager() const
+{
+	return NetworkManager;
+}
+///
+
+/*
+ * TEST: COMMENT
 UClientSocket* ADPPlayerController::GetClientSocket() const
 {
 	return Socket;
 }
+*/
 
 void ADPPlayerController::AcknowledgePossession(APawn* P)
 {
@@ -90,12 +109,19 @@ void ADPPlayerController::ServerSendChatMessage_Implementation(const FString& Se
 
 void ADPPlayerController::ReleaseMemory()
 {
+	/*
+	 * TEST: COMMENT
 	if (Socket)
 	{
 		Socket->DestoryInstance();
 		Socket->DestroyComponent();
 		Socket = nullptr;
 	}
+	*/
+
+	/// TEST
+	NetworkManager->Shutdown();
+	///
 }
 
 void ADPPlayerController::ClientDestroySession_Implementation()
@@ -114,6 +140,11 @@ void ADPPlayerController::ClientDestroySession_Implementation()
 	}
 }
 
+void ADPPlayerController::ConnectToServer_Implementation()
+{
+	NetworkManager->Initialize(ZOOMIES::ESocketType::SOCKET_STEAM_LAN);
+}
+
 void ADPPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -130,12 +161,19 @@ void ADPPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
+	/*
+	 * TEST: COMMENT
 	if (Socket)
 	{
 		Socket->DestoryInstance();
 		Socket->DestroyComponent();
 		Socket = nullptr;
 	}
+	 */
+
+	/// TEST
+	NetworkManager->Shutdown();
+	/// TEST
 }
 
 void ADPPlayerController::OnPossess(APawn* InPawn)

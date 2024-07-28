@@ -24,9 +24,14 @@ void ADPInGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	DOREPLIFETIME(ADPInGameState, TimerManager);
 	DOREPLIFETIME(ADPInGameState, ScoreManager);
+	/*
+	 * TEST: COMMENT
 	DOREPLIFETIME(ADPInGameState, bServerTraveled);
+	 */
 }
 
+/*
+ * TEST: COMMENT
 void ADPInGameState::OnRep_ServerTraveled() const
 {
 	UE_LOG(LogTemp, Log, TEXT("Server traveled[CLIENT]"));
@@ -38,3 +43,4 @@ void ADPInGameState::OnRep_ServerTraveled() const
 	my_socket->Connect("127.0.0.1", 4242);
 	my_socket->RunTask();
 }
+*/

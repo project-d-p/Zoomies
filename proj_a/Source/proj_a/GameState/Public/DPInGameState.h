@@ -19,15 +19,21 @@ public:
 
 	virtual UChatManager* GetChatManager() const override { return ChatManager; }
 	UClientTimerManager* GetTimerManager() const { return TimerManager; }
-	
+
+	/*
+	 * TEST: COMMENT
 	UPROPERTY(ReplicatedUsing=OnRep_ServerTraveled)
 	bool bServerTraveled;
+	*/
 protected:
 	virtual void AddPlayerState(APlayerState* PlayerState) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	/*
+	 * TEST: COMMENT
 	UFUNCTION()
 	void OnRep_ServerTraveled() const;
+	 */
 
 	UPROPERTY(Replicated)
 	UClientTimerManager* TimerManager;

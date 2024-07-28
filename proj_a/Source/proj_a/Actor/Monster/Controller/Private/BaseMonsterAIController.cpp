@@ -1,6 +1,7 @@
 #include "BaseMonsterAIController.h"
 
 #include "DPGameModeBase.h"
+#include "FNetLogger.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Navigation/PathFollowingComponent.h"

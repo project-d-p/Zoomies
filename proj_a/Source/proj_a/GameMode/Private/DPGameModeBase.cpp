@@ -93,17 +93,11 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 	}
 #endif
 	*/
-	if (!newPlayer)
-	{
-		return ;
-	}
-	
+	check(newPlayer);
 	// Player state
 	ADPPlayerState* player_state = Cast<ADPPlayerState>(newPlayer->PlayerState);
-	if (!player_state)
-	{
-		return;
-	}
+	check(player_state);
+	
 	FString name = player_state->GetPlayerName();
 	std::string key(TCHAR_TO_UTF8(*name));
 	
@@ -114,6 +108,11 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 	}
 	player_controllers_[key] = Cast<ADPPlayerController>(newPlayer);
 	player_controllers_[key]->SwitchLevelComponent(ELevelComponentType::MAIN);
+
+	if (!newPlayer->IsLocalController())
+	{
+		player_controllers_[key]->ConnectToServer();
+	}
 }
 
 void ADPGameModeBase::Logout(AController* Exiting)
