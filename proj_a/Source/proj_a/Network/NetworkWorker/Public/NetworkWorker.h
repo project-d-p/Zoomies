@@ -16,7 +16,7 @@ class UNetworkWorker : public UObject, public FRunnable
 	GENERATED_BODY()
 public:
 	UNetworkWorker();
-	void Initialize(ISocketInterface* SocketInterface);
+	void Initialize(UISocketInterface* SocketInterface);
 	void SetMessageReceivedCallback(TFunction<void(const Message&)> Callback);
 	void SetGameStartCallback(int NumOfPlayers, const TFunction<void()>& Function);
 	
@@ -29,7 +29,8 @@ private:
 	void FlushSendMessages();
 
 	bool bIsRunning = true;
-	ISocketInterface* SocketInterface = nullptr;
+	UPROPERTY()
+	UISocketInterface* SocketInterface = nullptr;
 	DoubleBuffer SendBuffer;
 	TFunction<void(const Message&)> DataRecieveCallback;
 };

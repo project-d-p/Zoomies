@@ -6,7 +6,7 @@
 
 void UServerNetworkManager::Initialize(ENetworkTypeZoomies SocketType)
 {
-	ISocketInterface* SocketInterface = ISocketFactory::CreateSocketInterface(SocketType);
+	UISocketInterface* SocketInterface = SocketFactory->CreateSocketInterface(SocketType);
 	check(SocketInterface);
 	SocketInterface->SetAsServer();
 	SocketInterface->ActivateServer();
@@ -26,17 +26,20 @@ void UServerNetworkManager::OnDataReceived(const Message& Data)
 
 void UServerNetworkManager::SendData(const Message& Data)
 {
-	Worker->SendData(Data);
+	if (Worker)
+		Worker->SendData(Data);
 }
 
 void UServerNetworkManager::Shutdown()
 {
-	Worker->Stop();
+	if (Worker)
+		Worker->Stop();
 }
 
 void UServerNetworkManager::SetGameStartCallback(int NumOfPlayers, const TFunction<void()>& Callback)
 {
-	Worker->SetGameStartCallback(NumOfPlayers, Callback);
+	if (Worker)	
+		Worker->SetGameStartCallback(NumOfPlayers, Callback);
 }
 
 UServerNetworkManager::~UServerNetworkManager()

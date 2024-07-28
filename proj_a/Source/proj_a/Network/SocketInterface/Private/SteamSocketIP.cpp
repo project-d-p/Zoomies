@@ -2,12 +2,12 @@
 
 #include "FNetLogger.h"
 
-ISocketInterface* SteamSocketIP::Clone() const
+UISocketInterface* USteamSocketIP::Clone() const
 {
-	return new SteamSocketIP();
+	return NewObject<USteamSocketIP>();
 }
 
-void SteamSocketIP::ActivateServer()
+void USteamSocketIP::ActivateServer()
 {
 	m_LocalAddr.Clear();
 	m_LocalAddr.m_port = SERVER_PORT;
@@ -24,7 +24,7 @@ void SteamSocketIP::ActivateServer()
 	}
 }
 
-void SteamSocketIP::ActivateClient()
+void USteamSocketIP::ActivateClient()
 {
 	m_LocalAddr.Clear();
 
@@ -47,7 +47,7 @@ void SteamSocketIP::ActivateClient()
 	}
 }
 
-SteamSocketIP::~SteamSocketIP()
+USteamSocketIP::~USteamSocketIP()
 {
 	if (m_ListenSocket != k_HSteamListenSocket_Invalid)
 	{

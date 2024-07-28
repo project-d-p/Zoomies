@@ -1,20 +1,27 @@
 #pragma once
 
+#include "CoreMinimal.h"
 #include "message.pb.h"
+#include "ISocketInterface.generated.h"
 
 /*
  * TODO: Add Children for SteamSockets and WinSockets etc.
  */
 
-class ISocketInterface {
+UCLASS()
+class UISocketInterface : public UObject {
+	GENERATED_BODY()
 public:
-	virtual ~ISocketInterface() = default;
-	virtual ISocketInterface* Clone() const = 0;
-	virtual void ActivateServer() = 0;
-	virtual void ActivateClient() = 0;
-	virtual void RecieveData(const TFunction<void(const Message&)>& Callback) = 0;
-	virtual void SendData(const Message& Msg) = 0;
-	virtual void SetAsServer() = 0;
-	virtual void SetAsClient() = 0;
-	virtual void SetGameStartCallback(int NumOfPlayers, const TFunction<void()>& Function) = 0;
+	UISocketInterface();
+	virtual ~UISocketInterface();
+	virtual UISocketInterface* Clone() const;
+
+	virtual void ActivateServer();
+	virtual void ActivateClient();
+	
+	virtual void RecieveData(const TFunction<void(const Message&)>& Callback);
+	virtual void SendData(const Message& Msg);
+	virtual void SetAsServer();
+	virtual void SetAsClient();
+	virtual void SetGameStartCallback(int NumOfPlayers, const TFunction<void()>& Function);
 };

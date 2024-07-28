@@ -33,11 +33,6 @@ ADPGameModeBase::ADPGameModeBase()
 
 	//// TEST
 	NetworkManager = CreateDefaultSubobject<UServerNetworkManager>(TEXT("NetworkManager"));
-	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
-	NetworkManager->SetGameStartCallback(NUM_OF_MAX_CLIENTS, [this]()
-	{
-		this->OnGameStart();
-	});
 	//// TEST
 
 	monster_controllers_.resize(NUM_OF_MAX_MONSTERS, nullptr);
@@ -157,6 +152,12 @@ void ADPGameModeBase::EndGame()
 void ADPGameModeBase::StartPlay()
 {
 	Super::StartPlay();
+
+	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
+	NetworkManager->SetGameStartCallback(NUM_OF_MAX_CLIENTS, [this]()
+	{
+		this->OnGameStart();
+	});
 }
 
 void ADPGameModeBase::Tick(float delta_time)

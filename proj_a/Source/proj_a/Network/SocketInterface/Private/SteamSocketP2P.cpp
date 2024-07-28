@@ -1,20 +1,22 @@
 #include "SteamSocketP2P.h"
 
-ISocketInterface* SteamSocketP2P::Clone() const
+#include "SteamSocketIP.h"
+
+UISocketInterface* USteamSocketP2P::Clone() const
 {
-	return new SteamSocketP2P();
+	return NewObject<USteamSocketIP>();
 }
 
-void SteamSocketP2P::ActivateServer()
+void USteamSocketP2P::ActivateServer()
 {
 	
 }
 
-void SteamSocketP2P::ActivateClient()
+void USteamSocketP2P::ActivateClient()
 {
 }
 
-SteamSocketP2P::~SteamSocketP2P()
+USteamSocketP2P::~USteamSocketP2P()
 {
 	
 }

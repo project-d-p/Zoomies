@@ -10,7 +10,7 @@ UNetworkWorker::UNetworkWorker()
 {
 }
 
-void UNetworkWorker::Initialize(ISocketInterface* socketInterface)
+void UNetworkWorker::Initialize(UISocketInterface* socketInterface)
 {
 	this->SocketInterface = socketInterface;
 }
@@ -52,7 +52,7 @@ UNetworkWorker::~UNetworkWorker()
 {
 	if (SocketInterface)
 	{
-		delete SocketInterface;
+		SocketInterface->ConditionalBeginDestroy();
 		SocketInterface = nullptr;
 	}
 }

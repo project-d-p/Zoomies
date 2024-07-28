@@ -6,7 +6,7 @@
 
 void UClientNetworkManager::Initialize(ENetworkTypeZoomies SocketType)
 {
-	ISocketInterface* SocketInterface = ISocketFactory::CreateSocketInterface(SocketType);
+	UISocketInterface* SocketInterface = SocketFactory->CreateSocketInterface(SocketType);
 	check(SocketInterface);
 	SocketInterface->SetAsClient();
 	SocketInterface->ActivateClient();

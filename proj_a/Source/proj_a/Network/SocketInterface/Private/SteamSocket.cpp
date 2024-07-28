@@ -2,20 +2,14 @@
 
 #include "FNetLogger.h"
 #include "Marshaller.h"
-#include "SteamNetworkingSocket.h"
+#include "isteamnetworkingsockets.h"
+#include "isteamnetworkingutils.h"
 
-SteamSocket::SteamSocket()
-	: OnSteamNetConnectionStatusChanged(this, &SteamSocket::OnClientCallBack)
+USteamSocket::USteamSocket(): MaxClients(0), bIsServer(false)
 {
-	PollGroup = SteamNetworkingSockets()->CreatePollGroup();
-	if (PollGroup == k_HSteamNetPollGroup_Invalid)
-	{
-		UE_LOG(LogTemp, Error, TEXT("Failed to create poll group"));
-		check(false)
-	}
 }
 
-void SteamSocket::RecieveData(const TFunction<void(const Message&)>& Callback)
+void USteamSocket::RecieveData(const TFunction<void(const Message&)>& Callback)
 {
 	const int n_max_message = 10;
 	SteamNetworkingMessage_t* pp_message[n_max_message];
@@ -51,7 +45,7 @@ void SteamSocket::RecieveData(const TFunction<void(const Message&)>& Callback)
 	}
 }
 
-void SteamSocket::SendData(const Message& Msg)
+void USteamSocket::SendData(const Message& Msg)
 {
 	if (Connections.Num() == 0)
 	{
@@ -83,23 +77,25 @@ void SteamSocket::SendData(const Message& Msg)
 	}
 }
 
-void SteamSocket::SetGameStartCallback(int NumOfPlayers, const TFunction<void()>& Function)
+void USteamSocket::SetGameStartCallback(int NumOfPlayers, const TFunction<void()>& Function)
 {
 	MaxClients = NumOfPlayers;
 	GameStartCallback = Function;
 }
 
-void SteamSocket::SetAsServer()
+void USteamSocket::SetAsServer()
 {
-	OnSteamNetConnectionStatusChanged.Register(this, &SteamSocket::OnServerCallBack);
+	bIsServer = true;
+	// OnSteamNetConnectionStatusChanged.Register(this, &USteamSocket::OnServerCallBack);
 }
 
-void SteamSocket::SetAsClient()
+void USteamSocket::SetAsClient()
 {
-	OnSteamNetConnectionStatusChanged.Register(this, &SteamSocket::OnClientCallBack);
+	bIsServer = false;
+	// OnSteamNetConnectionStatusChanged.Register(this, &USteamSocket::OnClientCallBack);
 }
 
-SteamSocket::~SteamSocket()
+USteamSocket::~USteamSocket()
 {
 	for (auto& conn : Connections)
 	{
@@ -111,20 +107,43 @@ SteamSocket::~SteamSocket()
 	}
 }
 
-void SteamSocket::AddConnection(HSteamNetConnection Connection)
+void USteamSocket::AddConnection(HSteamNetConnection Connection)
 {
 	Connections.Add(Connection);
 	SteamNetworkingSockets()->SetConnectionPollGroup(Connection, PollGroup);
 }
 
-void SteamSocket::CloseConnection(HSteamNetConnection Connection)
+void USteamSocket::CloseConnection(HSteamNetConnection Connection)
 {
 	Connections.Remove(Connection);
 	SteamNetworkingSockets()->CloseConnection(Connection, 0, nullptr, false);
 }
 
+void USteamSocket::OnSteamNetConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t* pParam)
+{
+	if (bIsServer)
+	{
+		OnServerCallBack(pParam);
+	}
+	else
+	{
+		OnClientCallBack(pParam);
+	}
+}
 
-void SteamSocket::OnServerCallBack(SteamNetConnectionStatusChangedCallback_t* pParam)
+// void USteamSocket::OnNetConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t* pParam)
+// {
+// 	if (bIsServer)
+// 	{
+// 		OnServerCallBack(pParam);
+// 	}
+// 	else
+// 	{
+// 		OnClientCallBack(pParam);
+// 	}
+// }
+
+void USteamSocket::OnServerCallBack(SteamNetConnectionStatusChangedCallback_t* pParam)
 {
 	switch (pParam->m_info.m_eState)
 	{
@@ -154,7 +173,7 @@ void SteamSocket::OnServerCallBack(SteamNetConnectionStatusChangedCallback_t* pP
 	}
 }
 
-void SteamSocket::OnClientCallBack(SteamNetConnectionStatusChangedCallback_t* pParam)
+void USteamSocket::OnClientCallBack(SteamNetConnectionStatusChangedCallback_t* pParam)
 {
 	switch (pParam->m_info.m_eState)
 	{
@@ -170,5 +189,34 @@ void SteamSocket::OnClientCallBack(SteamNetConnectionStatusChangedCallback_t* pP
 		break ;
 	default:
 		break;
+	}
+}
+
+UISocketInterface* USteamSocket::Clone() const
+{
+	return nullptr;
+}
+
+void USteamSocket::ActivateServer()
+{
+	Super::ActivateServer();
+
+	PollGroup = SteamNetworkingSockets()->CreatePollGroup();
+	if (PollGroup == k_HSteamNetPollGroup_Invalid)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to create poll group"));
+		check(false)
+	}
+}
+
+void USteamSocket::ActivateClient()
+{
+	Super::ActivateClient();
+
+	PollGroup = SteamNetworkingSockets()->CreatePollGroup();
+	if (PollGroup == k_HSteamNetPollGroup_Invalid)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to create poll group"));
+		check(false)
 	}
 }

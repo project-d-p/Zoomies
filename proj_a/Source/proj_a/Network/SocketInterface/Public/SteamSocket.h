@@ -1,19 +1,23 @@
 #pragma once
 
+#include "CoreMinimal.h"
 #include "ISocketInterface.h"
 #include "message.pb.h"
 #include "isteamnetworkingsockets.h"
 #include "steamnetworkingtypes.h"
 #include "steam_api_common.h"
+#include "SteamSocket.generated.h"
 
-class SteamSocket :	public ISocketInterface		
+UCLASS()
+class USteamSocket : public UISocketInterface		
 {
+	GENERATED_BODY()
 public:
-	SteamSocket();
-	virtual ISocketInterface* Clone() const = 0;
+	USteamSocket();
+	virtual UISocketInterface* Clone() const override;
 	
-	virtual void ActivateServer() = 0;
-	virtual void ActivateClient() = 0;
+	virtual void ActivateServer();
+	virtual void ActivateClient();
 	
 	virtual void SetGameStartCallback(int NumOfPlayers, const TFunction<void()>& Function);
 	virtual void SetAsServer() override;
@@ -22,11 +26,13 @@ public:
 	virtual void RecieveData(const TFunction<void(const Message&)>& Callback) override;
 	virtual void SendData(const Message& Msg) override;
 	
-	virtual ~SteamSocket() override;
+	virtual ~USteamSocket() override;
 
+	STEAM_CALLBACK(USteamSocket, OnSteamNetConnectionStatusChanged, SteamNetConnectionStatusChangedCallback_t);
 protected:
 	/* CallBack on Network Event */
-	CCallback<SteamSocket, SteamNetConnectionStatusChangedCallback_t> OnSteamNetConnectionStatusChanged;
+	// CCallback<USteamSocket, SteamNetConnectionStatusChangedCallback_t> OnSteamNetConnectionStatusChanged;
+	// void OnNetConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t* pParam);
 	void OnServerCallBack(SteamNetConnectionStatusChangedCallback_t* pParam);
 	void OnClientCallBack(SteamNetConnectionStatusChangedCallback_t* pParam);
 	
@@ -37,6 +43,7 @@ protected:
 	TArray<HSteamNetConnection> Connections;
 	TFunction<void()> GameStartCallback;
 	int MaxClients;
+	bool bIsServer;
 };
 
 // 어떻게 하면 CALLBACK에서 클라이언트와 서버의 구현을 다르게 할 수 있을까?

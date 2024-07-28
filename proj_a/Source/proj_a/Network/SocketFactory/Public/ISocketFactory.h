@@ -2,14 +2,17 @@
 
 #include "CoreMinimal.h"
 #include "ENetworkTypeZoomies.h"
+#include "ISocketInterface.h"
+#include "ISocketFactory.generated.h"
 
-class ISocketInterface;
-
-class ISocketFactory
+UCLASS()
+class UISocketFactory : public UObject
 {
+	GENERATED_BODY()
 public:
-	static ISocketInterface* CreateSocketInterface(ENetworkTypeZoomies socketType);
-	~ISocketFactory();
+	UISocketFactory();
+	UISocketInterface* CreateSocketInterface(ENetworkTypeZoomies socketType);
+	~UISocketFactory();
 private:
-	static TMap<ENetworkTypeZoomies, ISocketInterface*> SocketTypeToSocketInterfaceMap;
+	TMap<ENetworkTypeZoomies, TFunction<UISocketInterface*(void)>> SocketTypeToSocketInterfaceMap;
 };

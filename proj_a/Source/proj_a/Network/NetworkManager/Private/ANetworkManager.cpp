@@ -4,6 +4,11 @@
 #include "ISocketFactory.h"
 #include "ISocketInterface.h"
 
+UANetworkManager::UANetworkManager()
+{
+	SocketFactory = NewObject<UISocketFactory>();
+}
+
 void UANetworkManager::Initialize(ENetworkTypeZoomies SocketType)
 {
 }

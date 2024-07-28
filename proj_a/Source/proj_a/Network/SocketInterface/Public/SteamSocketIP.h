@@ -1,13 +1,18 @@
 #pragma once
-#include "SteamSocket.h"
 
-class SteamSocketIP : public SteamSocket
+#include "CoreMinimal.h"
+#include "SteamSocket.h"
+#include "SteamSocketIP.generated.h"
+
+UCLASS()
+class USteamSocketIP : public USteamSocket
 {
+	GENERATED_BODY()
 public:
-	virtual ISocketInterface* Clone() const;
+	virtual UISocketInterface* Clone() const;
 	virtual void ActivateServer() override;
 	virtual void ActivateClient() override;
-	virtual ~SteamSocketIP();
+	virtual ~USteamSocketIP();
 private:
 	enum
 	{

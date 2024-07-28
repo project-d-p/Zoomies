@@ -1,14 +1,18 @@
 #pragma once
 
+#include "CoreMinimal.h"
 #include "SteamSocket.h"
+#include "SteamSocketP2P.generated.h"
 
-class SteamSocketP2P : public SteamSocket
+UCLASS()
+class USteamSocketP2P : public USteamSocket
 {
+	GENERATED_BODY()
 public:
-	virtual ISocketInterface* Clone() const;
+	virtual UISocketInterface* Clone() const;
 	virtual void ActivateServer() override;
 	virtual void ActivateClient() override;
-	virtual ~SteamSocketP2P();
+	virtual ~USteamSocketP2P();
 
 private:
 	

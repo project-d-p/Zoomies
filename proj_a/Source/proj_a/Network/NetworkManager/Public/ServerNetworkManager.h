@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "ANetworkManager.h"
+#include "ISocketFactory.h"
 #include "NetworkWorker.h"
 #include "ServerNetworkManager.generated.h"
 
