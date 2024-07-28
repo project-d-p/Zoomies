@@ -18,6 +18,10 @@ void UANetworkManager::Shutdown()
 {
 }
 
+void UANetworkManager::SetGameStartCallback(int NumOfPlayers, const TFunction<void()>& Callback)
+{
+}
+
 UANetworkManager::~UANetworkManager()
 {
 }

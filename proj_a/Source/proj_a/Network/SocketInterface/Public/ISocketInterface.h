@@ -6,6 +6,7 @@
 /*
  * TODO: Add Children for SteamSockets and WinSockets etc.
  */
+
 class ISocketInterface {
 public:
 	virtual ~ISocketInterface() = default;
@@ -16,4 +17,5 @@ public:
 	virtual void SendData(const Message& Msg) = 0;
 	virtual void SetAsServer() = 0;
 	virtual void SetAsClient() = 0;
+	virtual void SetGameStartCallback(int NumOfPlayers, const TFunction<void()>& Function) = 0;
 };

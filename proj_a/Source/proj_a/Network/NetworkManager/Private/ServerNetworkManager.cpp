@@ -34,6 +34,11 @@ void UServerNetworkManager::Shutdown()
 	Worker->Stop();
 }
 
+void UServerNetworkManager::SetGameStartCallback(int NumOfPlayers, const TFunction<void()>& Callback)
+{
+	Worker->SetGameStartCallback(NumOfPlayers, Callback);
+}
+
 UServerNetworkManager::~UServerNetworkManager()
 {
 	if (WorkerThread)

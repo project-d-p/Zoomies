@@ -18,10 +18,13 @@ public:
 	UNetworkWorker();
 	void Initialize(ISocketInterface* SocketInterface);
 	void SetMessageReceivedCallback(TFunction<void(const Message&)> Callback);
+	void SetGameStartCallback(int NumOfPlayers, const TFunction<void()>& Function);
+	
 	void SendData(const Message& Data);
 
 	virtual uint32 Run() override;
 	virtual void Stop() override;
+	virtual ~UNetworkWorker() override;
 private:
 	void FlushSendMessages();
 

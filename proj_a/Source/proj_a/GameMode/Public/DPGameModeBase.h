@@ -7,6 +7,8 @@
 #include "ServerChatManager.h"
 #include "GameFramework/GameModeBase.h"
 #include <queue>
+
+#include "ANetworkManager.h"
 #include "message.pb.h"
 #include "ServerMessageHandler.h"
 #include "DPPlayerController.h"
@@ -28,6 +30,7 @@ public:
 	typedef std::queue<Message> FMessageQueue_T;
 	// Sets default values for this character's properties
 	ADPGameModeBase();
+	void OnGameStart();
 
 	virtual void GetSeamlessTravelActorList(bool bToTransition, TArray<AActor*>& ActorList) override;
 
@@ -48,7 +51,7 @@ public:
 	UPROPERTY()
 	UScoreManagerComp* ScoreManager;
 	FTimerHandle TimerHandle_SpawnAI;
-	
+
 	// Called when the game starts or when spawned
 	virtual void PostLogin(APlayerController* newPlayer) override;
 	virtual void Logout(AController* Exiting) override;
@@ -77,10 +80,11 @@ private:
 
 	// Member variables
 	enum { NUM_OF_MAX_CLIENTS = 2 };
-	// FListenSocketRunnable* listen_socket_ = nullptr;
 
-	SteamNetworkingSocket* steam_listen_socket_ = nullptr;
-	// HSteamListenSocket steam_listen_socket_;
+	// SteamNetworkingSocket* steam_listen_socket_ = nullptr;
+	UPROPERTY()
+	UANetworkManager* NetworkManager = nullptr;
+	
 	
 	float time_accumulator_ = 0.0f;
 	int gun_fire_ = 0;
@@ -95,4 +99,5 @@ private:
 	UServerChatManager* ChatManager;
 	UPROPERTY()
 	UMonsterFactory* MonsterFactory;
+	bool bStart = false;
 };

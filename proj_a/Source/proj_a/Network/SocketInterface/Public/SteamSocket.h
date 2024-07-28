@@ -12,12 +12,17 @@ class SteamSocket :	public ISocketInterface
 public:
 	SteamSocket();
 	virtual ISocketInterface* Clone() const = 0;
+	
 	virtual void ActivateServer() = 0;
 	virtual void ActivateClient() = 0;
-	virtual void RecieveData(const TFunction<void(const Message&)>& Callback) override;
-	virtual void SendData(const Message& Msg) override;
+	
+	virtual void SetGameStartCallback(int NumOfPlayers, const TFunction<void()>& Function);
 	virtual void SetAsServer() override;
 	virtual void SetAsClient() override;
+	
+	virtual void RecieveData(const TFunction<void(const Message&)>& Callback) override;
+	virtual void SendData(const Message& Msg) override;
+	
 	virtual ~SteamSocket() override;
 
 protected:
@@ -31,6 +36,8 @@ protected:
 	
 	HSteamNetPollGroup PollGroup;
 	TArray<HSteamNetConnection> Connections;
+	TFunction<void()> GameStartCallback;
+	int MaxClients;
 };
 
 // 어떻게 하면 CALLBACK에서 클라이언트와 서버의 구현을 다르게 할 수 있을까?

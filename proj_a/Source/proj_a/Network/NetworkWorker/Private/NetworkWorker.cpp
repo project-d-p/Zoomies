@@ -25,6 +25,11 @@ void UNetworkWorker::SendData(const Message& Data)
 	SendBuffer.Push(Data);
 }
 
+void UNetworkWorker::SetGameStartCallback(int NumOfPlayers, const TFunction<void()>& Function)
+{
+	SocketInterface->SetGameStartCallback(NumOfPlayers, Function);
+}
+
 uint32 UNetworkWorker::Run()
 {
 	while (this->bIsRunning)
@@ -41,6 +46,15 @@ void UNetworkWorker::Stop()
 	FRunnable::Stop();
 
 	this->bIsRunning = false;
+}
+
+UNetworkWorker::~UNetworkWorker()
+{
+	if (SocketInterface)
+	{
+		delete SocketInterface;
+		SocketInterface = nullptr;
+	}
 }
 
 void UNetworkWorker::FlushSendMessages()

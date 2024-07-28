@@ -83,6 +83,12 @@ void SteamSocket::SendData(const Message& Msg)
 	}
 }
 
+void SteamSocket::SetGameStartCallback(int NumOfPlayers, const TFunction<void()>& Function)
+{
+	MaxClients = NumOfPlayers;
+	GameStartCallback = Function;
+}
+
 void SteamSocket::SetAsServer()
 {
 	OnSteamNetConnectionStatusChanged.Register(this, &SteamSocket::OnServerCallBack);
@@ -134,6 +140,8 @@ void SteamSocket::OnServerCallBack(SteamNetConnectionStatusChangedCallback_t* pP
 		break;
 	case k_ESteamNetworkingConnectionState_Connected:
 		this->AddConnection(pParam->m_hConn);
+		if (Connections.Num() == MaxClients - 1)
+			this->GameStartCallback();
 		break ;
 	case k_ESteamNetworkingConnectionState_ClosedByPeer:
 		FNetLogger::LogError(TEXT("Connection Closed By Peer:  %d, pParam: %hs"), pParam->m_info.m_eEndReason, UTF8_TO_TCHAR(pParam->m_info.m_szEndDebug));

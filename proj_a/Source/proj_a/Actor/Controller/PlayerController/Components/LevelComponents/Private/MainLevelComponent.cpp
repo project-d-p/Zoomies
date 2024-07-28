@@ -7,6 +7,7 @@
 #include "DPGameModeBase.h"
 #include "DPInGameState.h"
 #include "DPWeaponActorComponent.h"
+#include "FNetLogger.h"
 #include "HitScan.h"
 #include "MainInputComponent.h"
 #include "MessageMaker.h"
@@ -268,6 +269,8 @@ void UMainLevelComponent::SetState(const ActorPosition& ActorPosition)
 	}
 }
 
+/*
+ * TEST : COMMENT
 void UMainLevelComponent::SimulateGunFire(SteamNetworkingSocket* SteamSocket)
 {
 	ADPPlayerController* PlayerController = GetPlayerController();
@@ -303,7 +306,48 @@ void UMainLevelComponent::SimulateGunFire(SteamNetworkingSocket* SteamSocket)
 		SteamSocket->PushUdpFlushMessage(fire);
 	}
 }
+*/
 
+/// TEST
+void UMainLevelComponent::SimulateGunFire(UANetworkManager* NetworkManager)
+{
+	ADPPlayerController* PlayerController = GetPlayerController();
+	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
+	if (!Character) return;
+	
+	while (!GunQueue.empty())
+	{
+		Message fire = GunQueue.front();
+		GunQueue.pop();
+		FHitResult hit_result;
+		Character->PlayFireAnimation();
+		if (Character->weaponComponent->SimulateAttack(Character, hit_result, fire.gunfire()))
+		{
+			ABaseMonsterCharacter* MC = Cast<ABaseMonsterCharacter>(hit_result.GetActor());
+			if (MC)
+			{
+				ABaseMonsterAIController* MAC = Cast<ABaseMonsterAIController>(MC->GetOwner());
+				if (MAC)
+				{
+					// MAC->RemovePawnAndController();
+					MAC->TakeMonsterDamage(100);
+				}
+			}
+			// Logic for Hit Success && Damage && Score
+			// Add Particle Effect
+			if (!PlayerController->IsLocalController())
+			{
+				FRotator final_direction = FRotator(fire.gunfire().direction().x(), fire.gunfire().direction().y(), fire.gunfire().direction().z());
+				Character->weaponComponent->SpawnEffects(hit_result, final_direction);
+			}
+		}
+		NetworkManager->SendData(fire);
+	}
+}
+///
+
+/*
+ * TEST : COMMENT
 void UMainLevelComponent::SimulateCatch(SteamNetworkingSocket* SteamSocket)
 {
 	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
@@ -348,7 +392,57 @@ void UMainLevelComponent::SimulateCatch(SteamNetworkingSocket* SteamSocket)
 		SteamSocket->PushUdpFlushMessage(catch_);
 	}
 }
+*/
 
+/// TEST
+void UMainLevelComponent::SimulateCatch(UANetworkManager* NetworkManager)
+{
+	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
+	if (!Character) return;
+	
+	while (!CatchQueue.empty())
+	{
+		Message catch_ = CatchQueue.front();
+		CatchQueue.pop();
+		::Catch catch_message = catch_.catch_();
+		FVector start = FVector(catch_message.position().x(), catch_message.position().y(), catch_message.position().z());
+		FRotator direction = FRotator(catch_message.rotation().x(), catch_message.rotation().y(), catch_message.rotation().z());
+		
+		FHitResult hit_result;
+		if (!CatchRay->HitDetect(Character, start, direction, 300.0f, hit_result))
+		{
+			continue;
+		}
+		ABaseMonsterCharacter* MC = Cast<ABaseMonsterCharacter>(hit_result.GetActor());
+		if (!MC)
+		{
+			continue;
+		}
+		if (MC->GetState() != EMonsterState::Faint)
+		{
+			continue;
+		}
+		UClass* class_type = hit_result.GetActor()->GetClass();
+		FString monster_type = class_type->GetName();
+		if (!Character->CatchMonster(monster_type))
+		{
+			continue ;
+		}
+		this->CurrentTarget = nullptr;
+		ABaseMonsterAIController* MAC = Cast<ABaseMonsterAIController>(MC->GetOwner());
+		check(MAC)
+		MAC->RemovePawnAndController();
+		::Catch reply;
+		reply.set_target(TCHAR_TO_UTF8(*monster_type));
+		*catch_.mutable_catch_() = reply;
+		FString TestString = UTF8_TO_TCHAR(reply.target().c_str());
+		NetworkManager->SendData(catch_);
+	}
+}
+///
+
+/*
+ * TEST : COMMENT
 void UMainLevelComponent::SimulateAim(SteamNetworkingSocket* SteamSocket)
 {
 	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
@@ -367,5 +461,28 @@ void UMainLevelComponent::SimulateAim(SteamNetworkingSocket* SteamSocket)
 			Character->StopAimAnimation();
 		}
 		SteamSocket->PushUdpFlushMessage(aimState);
+	}
+}
+*/
+
+/// TEST
+void UMainLevelComponent::SimulateAim(UANetworkManager* NetworkManager)
+{
+	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
+	if (!Character) return;
+
+	while (!AimQueue.empty())
+	{
+		Message aimState = AimQueue.front();
+		AimQueue.pop();
+		if (aimState.aim_state().aim_state() == AimState::AIM_STATE_ACTIVE)
+		{
+			Character->PlayAimAnimation();
+		}
+		else
+		{
+			Character->StopAimAnimation();
+		}
+		NetworkManager->SendData(aimState);
 	}
 }

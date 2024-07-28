@@ -17,6 +17,9 @@ public:
 	virtual void SendData(const Message& Data);
 	virtual void Shutdown();
 
+	// Set the callback for when the game starts
+	virtual void SetGameStartCallback(int NumOfPlayers, const TFunction<void()>& Callback);
+
 	virtual ~UANetworkManager() override;
 
 	std::queue<Message> GetRecievedMessages();	
