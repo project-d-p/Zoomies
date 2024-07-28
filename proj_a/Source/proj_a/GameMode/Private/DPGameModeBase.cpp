@@ -3,12 +3,10 @@
 #include "DPGameModeBase.h"
 
 #include "BaseMonsterAIController.h"
-#include "CrabCharacter.h"
 #include "DPCharacter.h"
 #include "DPInGameState.h"
 #include "DPPlayerController.h"
 #include "DPPlayerState.h"
-#include "SocketManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "FNetLogger.h"
 #include "ELevelComponentType.h"
@@ -16,8 +14,6 @@
 
 #include "MainLevelComponent.h"
 #include "MessageMaker.h"
-#include "NetworkMessage.h"
-#include "OnlineSubsystem.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 ADPGameModeBase::ADPGameModeBase()
@@ -148,7 +144,7 @@ void ADPGameModeBase::StartPlay()
 	UE_LOG(LogTemp, Log, TEXT("Number of ADPCharacters in the world: %d"), NumberOfCharacters);
 	UE_LOG(LogTemp, Log, TEXT("Number of Players in this Session: %d"), GetNumPlayers());
 
-	TimerManager->StartTimer<ADPInGameState>(5.0f, &ADPGameModeBase::EndGame, this);
+	TimerManager->StartTimer<ADPInGameState>(30.0f, &ADPGameModeBase::EndGame, this);
 }
 
 void ADPGameModeBase::Tick(float delta_time)

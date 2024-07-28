@@ -1,12 +1,14 @@
 #pragma once
 
-#include "CoreMinimal.h"
-#include "ESocketType.generated.h"
+namespace ZOOMIES
+{
 
 UENUM()
-enum ESocketType
+enum class ESocketType : uint8
 {
 	SOCKET_NONE,
 	SOCKET_STEAM_LAN,
 	SOCKET_STEAM_P2P,
 };
+
+}
