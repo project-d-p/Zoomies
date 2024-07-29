@@ -15,5 +15,8 @@ public:
 	virtual ~USteamSocketP2P();
 
 private:
+	CSteamID GetHostSteamID();
 	
+	HSteamListenSocket m_ListenSocket;
+	HSteamNetConnection m_Connection;
 };

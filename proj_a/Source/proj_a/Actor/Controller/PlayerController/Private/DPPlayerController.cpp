@@ -108,7 +108,11 @@ void ADPPlayerController::ClientDestroySession_Implementation()
 
 void ADPPlayerController::ConnectToServer_Implementation(ELevelComponentType Type)
 {
+	/*
+	 * TEST: Comment
 	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
+	*/
+	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
 	SwitchLevelComponent(Type);
 }
 
