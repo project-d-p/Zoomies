@@ -77,7 +77,7 @@ public:
 		case EAnimal::ANIMAL_FOX: return TEXT("/Game/animation/animals/foxAnimation.foxAnimation_C");
 		case EAnimal::ANIMAL_GIRAFFE: return TEXT("/Game/animation/animals/giraffeAnimation.giraffeAnimation_C");
 		case EAnimal::ANIMAL_LION: return TEXT("/Game/animation/animals/lionAnimation.lionAnimation_C");
-		case EAnimal::ANIMAL_LOBSTER: return TEXT("/Game/animation/animals/lobsterAnimation.lobsterAnimation_C");
+		case EAnimal::ANIMAL_LOBSTER: return TEXT("/Game/animation/animals/lobstarAnimation.lobstarAnimation_C");
 		case EAnimal::ANIMAL_MAMMOTH: return TEXT("/Game/animation/animals/mammothAnimation.mammothAnimation_C");
 		case EAnimal::ANIMAL_OCTOPUS: return TEXT("/Game/animation/animals/octopusAnimation.octopusAnimation_C");
 		case EAnimal::ANIMAL_PENGUIN: return TEXT("/Game/animation/animals/penguinAnimation.penguinAnimation_C");
@@ -90,7 +90,7 @@ public:
 		case EAnimal::ANIMAL_STINGRAY: return TEXT("/Game/animation/animals/stingRayAnimation.stingRayAnimation_C");
 		case EAnimal::ANIMAL_WHALE: return TEXT("/Game/animation/animals/whaleAnimation.whaleAnimation_C");
 		case EAnimal::ANIMAL_HORSE: return TEXT("/Game/animation/animals/horseAnimation.horseAnimation_C");
-		case EAnimal::ANIMAL_CHAMELEON: return TEXT("/Game/animation/animals/chameleonAnimation.chameleonAnimation_C");
+		case EAnimal::ANIMAL_CHAMELEON: return TEXT("/Game/animation/animals/chamalionAnimation.chamalionAnimation_C");
 		default:
 			checkf(false, TEXT("Invalid monster type: %d"), static_cast<int>(MType)) return nullptr;;
 		}
