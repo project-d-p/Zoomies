@@ -83,130 +83,45 @@ void AReturnTriggerVolume::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent
 
 void AReturnTriggerVolume::InitializeMonsterMeshes()
 {
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CRAB
-	(PathManager::GetMonsterPath(EMonster::CRAB));
-	if (SK_CRAB.Succeeded()) {
-		monsterMeshMap[EAnimal::ANIMAL_CRAB] = SK_CRAB.Object;
-	}
+	struct FAnimalInfo
+	{
+		EAnimal AnimalType;
+		FString PathSuffix;
+	};
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_DOLPHIN
-	(PathManager::GetMonsterPath(EMonster::DOLPHIN));
-	if (SK_DOLPHIN.Succeeded()) {
-		monsterMeshMap[EAnimal::ANIMAL_DOLPHIN] = SK_DOLPHIN.Object;
-	}
+	TArray<FAnimalInfo> AnimalInfos = {
+		{EAnimal::ANIMAL_CRAB, "CRAB"},
+		{EAnimal::ANIMAL_DOLPHIN, "DOLPHIN"},
+		{EAnimal::ANIMAL_EEL, "EEL"},
+		{EAnimal::ANIMAL_ELEPHANT, "ELEPHANT"},
+		{EAnimal::ANIMAL_FOX, "FOX"},
+		{EAnimal::ANIMAL_GIRAFFE, "GIRAFFE"},
+		{EAnimal::ANIMAL_LION, "LION"},
+		{EAnimal::ANIMAL_LOBSTER, "LOBSTER"},
+		{EAnimal::ANIMAL_MAMMOTH, "MAMMOTH"},
+		{EAnimal::ANIMAL_OCTOPUS, "OCTOPUS"},
+		{EAnimal::ANIMAL_PENGUIN, "PENGUIN"},
+		{EAnimal::ANIMAL_SABER_TOOTH_TIGER, "SABER_TOOTH_TIGER"},
+		{EAnimal::ANIMAL_SEAL, "SEAL"},
+		{EAnimal::ANIMAL_SKUNK, "SKUNK"},
+		{EAnimal::ANIMAL_SLOTH, "SLOTH"},
+		{EAnimal::ANIMAL_SQUID, "SQUID"},
+		{EAnimal::ANIMAL_STAR_FISH, "STAR_FISH"},
+		{EAnimal::ANIMAL_STINGRAY, "STINGRAY"},
+		{EAnimal::ANIMAL_WHALE, "WHALE"},
+		{EAnimal::ANIMAL_CHAMELEON, "CHAMELEON"},
+		{EAnimal::ANIMAL_HORSE, "HORSE"}
+	};
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_EEL
-	(PathManager::GetMonsterPath(EMonster::EEL));
-	if (SK_EEL.Succeeded()) {
-		monsterMeshMap[EAnimal::ANIMAL_EEL] = SK_EEL.Object;
-	}
-	
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_ELEPHANT
-    (PathManager::GetMonsterPath(EMonster::ELEPHANT));
-    if (SK_ELEPHANT.Succeeded()) {
-    	monsterMeshMap[EAnimal::ANIMAL_ELEPHANT] = SK_ELEPHANT.Object;
-    }
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_FOX
-	(PathManager::GetMonsterPath(EMonster::FOX));
-	if (SK_FOX.Succeeded()) {
-		monsterMeshMap[EAnimal::ANIMAL_FOX] = SK_FOX.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_GIRAFFE
-	(PathManager::GetMonsterPath(EMonster::GIRAFFE));
-	if (SK_GIRAFFE.Succeeded()) {
-		monsterMeshMap[EAnimal::ANIMAL_GIRAFFE] = SK_GIRAFFE.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_LION
-	(PathManager::GetMonsterPath(EMonster::LION));
-	if (SK_LION.Succeeded()) {
-		monsterMeshMap[EAnimal::ANIMAL_LION] = SK_LION.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_LOBSTER
-	(PathManager::GetMonsterPath(EMonster::LOBSTER));
-	if (SK_LOBSTER.Succeeded()) {
-		monsterMeshMap[EAnimal::ANIMAL_LOBSTER] = SK_LOBSTER.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH
-	(PathManager::GetMonsterPath(EMonster::MAMMOTH));
-	if (SK_MAMMOTH.Succeeded()) {
-		monsterMeshMap[EAnimal::ANIMAL_MAMMOTH] = SK_MAMMOTH.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_OCTOPUS
-	(PathManager::GetMonsterPath(EMonster::OCTOPUS));
-	if (SK_OCTOPUS.Succeeded()) {
-		monsterMeshMap[EAnimal::ANIMAL_OCTOPUS] = SK_OCTOPUS.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_PENGUIN
-	(PathManager::GetMonsterPath(EMonster::PENGUIN));
-	if (SK_PENGUIN.Succeeded()) {
-		monsterMeshMap[EAnimal::ANIMAL_PENGUIN] = SK_PENGUIN.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_RABBIT
-	(PathManager::GetMonsterPath(EMonster::RABBIT));
-	if (SK_RABBIT.Succeeded()) {
-		monsterMeshMap[EAnimal::ANIMAL_RABBIT] = SK_RABBIT.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SABERTOOTHTIGER
-	(PathManager::GetMonsterPath(EMonster::SABER_TOOTH_TIGER));
-	if (SK_SABERTOOTHTIGER.Succeeded()) {
-		monsterMeshMap[EAnimal::ANIMAL_SABER_TOOTH_TIGER] = SK_SABERTOOTHTIGER.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SEAL
-	(PathManager::GetMonsterPath(EMonster::SEAL));
-	if (SK_SEAL.Succeeded()) {
-		monsterMeshMap[EAnimal::ANIMAL_SEAL] = SK_SEAL.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SHEPHERD
-	(PathManager::GetMonsterPath(EMonster::SHEPHERD));
-	if (SK_SHEPHERD.Succeeded()) {
-		monsterMeshMap[EAnimal::ANIMAL_SHEPHERD] = SK_SHEPHERD.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SKUNK
-	(PathManager::GetMonsterPath(EMonster::SKUNK));
-	if (SK_SKUNK.Succeeded()) {
-		monsterMeshMap[EAnimal::ANIMAL_SKUNK] = SK_SKUNK.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SLOTH
-	(PathManager::GetMonsterPath(EMonster::SLOTH));
-	if (SK_SLOTH.Succeeded()) {
-		monsterMeshMap[EAnimal::ANIMAL_SLOTH] = SK_SLOTH.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SQUID
-	(PathManager::GetMonsterPath(EMonster::SQUID));
-	if (SK_SQUID.Succeeded()) {
-		monsterMeshMap[EAnimal::ANIMAL_SQUID] = SK_SQUID.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_STARFISH
-	(PathManager::GetMonsterPath(EMonster::STAR_FISH));
-	if (SK_STARFISH.Succeeded()) {
-		monsterMeshMap[EAnimal::ANIMAL_STAR_FISH] = SK_STARFISH.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_STINGRAY
-	(PathManager::GetMonsterPath(EMonster::STINGRAY));
-	if (SK_STINGRAY.Succeeded()) {
-		monsterMeshMap[EAnimal::ANIMAL_STINGRAY] = SK_STINGRAY.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_WHALE
-	(PathManager::GetMonsterPath(EMonster::WHALE));
-	if (SK_WHALE.Succeeded()) {
-		monsterMeshMap[EAnimal::ANIMAL_WHALE] = SK_WHALE.Object;
+	for (const auto& AnimalInfo : AnimalInfos)
+	{
+		static ConstructorHelpers::FObjectFinder<USkeletalMesh> SkeletalMeshFinder
+		(PathManager::GetMonsterPath(AnimalInfo.AnimalType));
+        
+		if (SkeletalMeshFinder.Succeeded())
+		{
+			monsterMeshMap[AnimalInfo.AnimalType] = SkeletalMeshFinder.Object;
+		}
 	}
 }
 

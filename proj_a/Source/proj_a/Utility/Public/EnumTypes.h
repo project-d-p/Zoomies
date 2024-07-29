@@ -1,34 +1,6 @@
 ﻿#pragma once
 
 UENUM()
-enum class EMonster : uint8
-{
-	CRAB,
-	LOBSTER,
-	MAMMOTH,
-	OCTOPUS,
-	STAR_FISH,
-	SLOTH,
-	FOX,
-	GIRAFFE,
-	LION,
-	RABBIT,
-	ELEPHANT,
-	SABER_TOOTH_TIGER,
-	SHEPHERD,
-	SKUNK,
-	SQUID,
-	DOLPHIN,
-	EEL,
-	PENGUIN,
-	SEAL,
-	WHALE,
-	STINGRAY,
-	HORSE,
-	CHAMALEON,
-};
-
-UENUM()
 enum class EWidget : uint8
 {
 	JUDGE_LEVEL,
@@ -36,15 +8,3 @@ enum class EWidget : uint8
 	CALCULATE_WIDGET,
 	BOARD_ACTOR,
 };
-
-// UENUM()
-// enum class EOccupation : uint8
-// {
-// 	ARCHAEOLOGIST,
-// 	POACHER,
-// 	ENVIRONMENTALIST,
-// 	RINGMASTER,
-// 	TERRORIST,
-// 	CHECK,
-// 	CROSS,
-// };

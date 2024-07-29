@@ -7,7 +7,7 @@ AWhaleCharacter::AWhaleCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_WHALE
-	(PathManager::GetMonsterPath(EMonster::WHALE));
+	(PathManager::GetMonsterPath(EAnimal::ANIMAL_WHALE));
 	if (SK_WHALE.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_WHALE.Object);
 	}
@@ -15,7 +15,7 @@ AWhaleCharacter::AWhaleCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER(
-		TEXT("/Game/animation/animals/whaleAnimation.whaleAnimation_C"));
+		PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_WHALE));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}

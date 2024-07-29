@@ -1,12 +1,12 @@
-﻿#include "ChamalionCharacter.h"
+﻿#include "ChamelionCharacter.h"
 
 #include "Components/CapsuleComponent.h"
 
-AChamalionCharacter::AChamalionCharacter()
+AChamelionCharacter::AChamelionCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK
-	(PathManager::GetMonsterPath(EMonster::CHAMALEON));
+	(PathManager::GetMonsterPath(EAnimal::ANIMAL_CHAMELEON));
 	if (SK.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK.Object);
 	}
@@ -14,7 +14,7 @@ AChamalionCharacter::AChamalionCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(TEXT("/Game/animation/animals/chamalionAnimation.chamalionAnimation_C"));
+	(PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_CHAMELEON));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}

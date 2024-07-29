@@ -7,7 +7,7 @@ AElephantCharacter::AElephantCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_ELEPHANT
-	(PathManager::GetMonsterPath(EMonster::ELEPHANT));
+	(PathManager::GetMonsterPath(EAnimal::ANIMAL_ELEPHANT));
 	if (SK_ELEPHANT.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_ELEPHANT.Object);
 	}
@@ -15,7 +15,7 @@ AElephantCharacter::AElephantCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER(
-		TEXT("/Game/animation/animals/elephantAnimation.elephantAnimation_C"));
+		PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_ELEPHANT));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}

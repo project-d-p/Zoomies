@@ -48,10 +48,10 @@ enum class EAnimal : uint8
 	ANIMAL_FOX UMETA(DisplayName = "Fox"),
 	ANIMAL_GIRAFFE UMETA(DisplayName = "Giraffe"),
 	ANIMAL_LION UMETA(DisplayName = "Lion"),
-	ANIMAL_RABBIT UMETA(DisplayName = "Rabbit"),
+	// ANIMAL_RABBIT UMETA(DisplayName = "Rabbit"),
 	ANIMAL_ELEPHANT UMETA(DisplayName = "Elephant"),
 	ANIMAL_SABER_TOOTH_TIGER UMETA(DisplayName = "SaberToothTiger"),
-	ANIMAL_SHEPHERD UMETA(DisplayName = "Shepherd"),
+	// ANIMAL_SHEPHERD UMETA(DisplayName = "Shepherd"),
 	ANIMAL_SKUNK UMETA(DisplayName = "Skunk"),
 	ANIMAL_SQUID UMETA(DisplayName = "Squid"),
 	ANIMAL_DOLPHIN UMETA(DisplayName = "Dolphin"),
@@ -60,6 +60,8 @@ enum class EAnimal : uint8
 	ANIMAL_SEAL UMETA(DisplayName = "Seal"),
 	ANIMAL_WHALE UMETA(DisplayName = "Whale"),
 	ANIMAL_STINGRAY UMETA(DisplayName = "Stingray"),
+	ANIMAL_HORSE UMETA(DisplayName = "Horse"),
+	ANIMAL_CHAMELEON UMETA(DisplayName = "Chameleon"),
 };
 
 USTRUCT(BlueprintType)
