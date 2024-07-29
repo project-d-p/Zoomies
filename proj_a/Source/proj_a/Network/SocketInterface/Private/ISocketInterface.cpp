@@ -25,7 +25,7 @@ void UISocketInterface::RecieveData(const TFunction<void(const Message&)>& Callb
 {
 }
 
-void UISocketInterface::SendData(const Message& Msg)
+void UISocketInterface::SendData(Message& Msg)
 {
 }
 

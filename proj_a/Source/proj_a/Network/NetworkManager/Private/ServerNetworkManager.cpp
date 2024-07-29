@@ -12,11 +12,13 @@ void UServerNetworkManager::Initialize(ENetworkTypeZoomies SocketType)
 	SocketInterface->ActivateServer();
 
 	Worker = NewObject<UNetworkWorker>();
+	check(Worker);
 	Worker->Initialize(SocketInterface);
 	Worker->SetMessageReceivedCallback([this](const Message& Data)
 	{
 		this->OnDataReceived(Data);		
 	});
+	WorkerThread = FRunnableThread::Create(Worker, TEXT("NetworkWorker"));
 }
 
 void UServerNetworkManager::OnDataReceived(const Message& Data)
@@ -44,6 +46,7 @@ void UServerNetworkManager::SetGameStartCallback(int NumOfPlayers, const TFuncti
 
 UServerNetworkManager::~UServerNetworkManager()
 {
+	// Worker->Stop();
 	if (WorkerThread)
 	{
 		WorkerThread->Kill();
@@ -51,9 +54,9 @@ UServerNetworkManager::~UServerNetworkManager()
 		delete WorkerThread;
 		WorkerThread = nullptr;
 	}
-	if (Worker)
-	{
-		Worker->ConditionalBeginDestroy();
-		Worker = nullptr;
-	}
+	// if (Worker)
+	// {
+	// 	Worker->ConditionalBeginDestroy();
+	// 	Worker = nullptr;
+	// }
 }

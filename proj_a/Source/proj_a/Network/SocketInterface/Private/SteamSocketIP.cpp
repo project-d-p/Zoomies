@@ -9,6 +9,8 @@ UISocketInterface* USteamSocketIP::Clone() const
 
 void USteamSocketIP::ActivateServer()
 {
+	Super::ActivateServer();
+	
 	m_LocalAddr.Clear();
 	m_LocalAddr.m_port = SERVER_PORT;
 	
@@ -26,6 +28,8 @@ void USteamSocketIP::ActivateServer()
 
 void USteamSocketIP::ActivateClient()
 {
+	Super::ActivateClient();
+	
 	m_LocalAddr.Clear();
 
 	m_LocalAddr.SetIPv4(SERVER_IPV4_LOCAL, SERVER_PORT);

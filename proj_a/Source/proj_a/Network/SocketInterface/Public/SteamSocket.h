@@ -24,7 +24,7 @@ public:
 	virtual void SetAsClient() override;
 	
 	virtual void RecieveData(const TFunction<void(const Message&)>& Callback) override;
-	virtual void SendData(const Message& Msg) override;
+	virtual void SendData(Message& Msg) override;
 	
 	virtual ~USteamSocket() override;
 

@@ -144,6 +144,8 @@ void ADPGameModeBase::EndGame()
 	}
 	*/
 
+	bStart = false;
+
 	/// TEST
 	NetworkManager->Shutdown();
 	///
@@ -201,7 +203,7 @@ void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	*/
 
 	/// TEST
-	NetworkManager->Shutdown();
+	// NetworkManager->Shutdown();
 	///
 }
 
@@ -216,8 +218,8 @@ void ADPGameModeBase::ProcessData(float delta_time)
 	message_queue_ = NetworkManager->GetRecievedMessages();
 	///
 
-	this->SpawnMonsters(delta_time);
-	this->MonsterMoveSimulate(delta_time);
+	// this->SpawnMonsters(delta_time);
+	// this->MonsterMoveSimulate(delta_time);
 	while (!this->message_queue_.empty())
 	{
 		Message message = this->message_queue_.front();
@@ -272,7 +274,7 @@ ADPGameModeBase::~ADPGameModeBase()
 	}
 	 */
 	/// TEST
-	NetworkManager->Shutdown();
+	// NetworkManager->Shutdown();
 	///
 }
 

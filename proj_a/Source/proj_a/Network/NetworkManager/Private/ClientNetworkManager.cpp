@@ -13,11 +13,13 @@ void UClientNetworkManager::Initialize(ENetworkTypeZoomies SocketType)
 	SocketInterface->ActivateClient();
 
 	Worker = NewObject<UNetworkWorker>();
+	check(Worker);
 	Worker->Initialize(SocketInterface);
 	Worker->SetMessageReceivedCallback([this](const Message& Data)
 	{
 		this->OnDataReceived(Data);
 	});
+	WorkerThread = FRunnableThread::Create(Worker, TEXT("NetworkWorker"));
 }
 
 void UClientNetworkManager::OnDataReceived(const Message& Data)
@@ -42,6 +44,7 @@ void UClientNetworkManager::Shutdown()
 
 UClientNetworkManager::~UClientNetworkManager()
 {
+	// Worker->Stop();
 	if (WorkerThread)
 	{
 		WorkerThread->Kill();
@@ -49,10 +52,10 @@ UClientNetworkManager::~UClientNetworkManager()
 		delete WorkerThread;
 		WorkerThread = nullptr;
 	}
-	if (Worker)
-	{
-		Worker->ConditionalBeginDestroy();
-		Worker = nullptr;
-	}
+	// if (Worker)
+	// {
+	// 	Worker->ConditionalBeginDestroy();
+	// 	Worker = nullptr;
+	// }
 }
 

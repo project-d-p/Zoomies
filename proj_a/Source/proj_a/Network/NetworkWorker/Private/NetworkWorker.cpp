@@ -13,6 +13,8 @@ UNetworkWorker::UNetworkWorker()
 void UNetworkWorker::Initialize(UISocketInterface* socketInterface)
 {
 	this->SocketInterface = socketInterface;
+
+	FNetLogger::LogError(TEXT("NetWorker Initialized"));
 }
 
 void UNetworkWorker::SetMessageReceivedCallback(TFunction<void(const Message&)> Callback)
@@ -37,6 +39,7 @@ uint32 UNetworkWorker::Run()
 		SteamAPI_RunCallbacks();
 		SocketInterface->RecieveData(DataRecieveCallback);
 		this->FlushSendMessages();
+		FPlatformProcess::Sleep(0.01);
 	}
 	return 0;
 }
@@ -64,7 +67,7 @@ void UNetworkWorker::FlushSendMessages()
 
 	while (!send_buffer.empty())
 	{
-		const Message& msg = send_buffer.front();
+		Message& msg = send_buffer.front();
 		SocketInterface->SendData(msg);
 		send_buffer.pop();
 	}
