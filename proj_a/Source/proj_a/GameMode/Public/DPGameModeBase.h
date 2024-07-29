@@ -100,4 +100,5 @@ private:
 	UPROPERTY()
 	UMonsterFactory* MonsterFactory;
 	bool bStart = false;
+	bool bTimeSet = false;
 };

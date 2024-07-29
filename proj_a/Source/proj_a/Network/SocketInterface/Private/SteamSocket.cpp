@@ -11,6 +11,7 @@ USteamSocket::USteamSocket(): MaxClients(0), bIsServer(false)
 
 void USteamSocket::RecieveData(const TFunction<void(const Message&)>& Callback)
 {
+	FNetLogger::LogError(TEXT("Recieve Data In Steam Socket1"));
 	const int n_max_message = 10;
 	SteamNetworkingMessage_t* pp_message[n_max_message];
 	int n_messages = SteamNetworkingSockets()->ReceiveMessagesOnPollGroup(PollGroup, pp_message, n_max_message);
@@ -21,6 +22,7 @@ void USteamSocket::RecieveData(const TFunction<void(const Message&)>& Callback)
 
 	TArray<uint8> data;
 	data.SetNum(1512);
+	FNetLogger::LogError(TEXT("Recieve Data In Steam Socket2"));
 	
 	for (int i = 0; i < n_messages; ++i)
 	{
@@ -41,12 +43,14 @@ void USteamSocket::RecieveData(const TFunction<void(const Message&)>& Callback)
 		
 		Message ret_msg = Marshaller::DeserializeMessage(data);
 		pp_message[i]->Release();
+		FNetLogger::LogError(TEXT("Recieve Data In Steam Socket3"));
 		Callback(ret_msg);
 	}
 }
 
 void USteamSocket::SendData(const Message& Msg)
 {
+	FNetLogger::LogError(TEXT("Send Data In Steam Socket1"));
 	if (Connections.Num() == 0)
 	{
 		return ;
@@ -57,8 +61,10 @@ void USteamSocket::SendData(const Message& Msg)
 	std::vector<SteamNetworkingMessage_t*> messages;
 	messages.reserve(Connections.Num());
 	
+	FNetLogger::LogError(TEXT("Send Data In Steam Socket2"));
 	for (auto& conn : Connections)
 	{
+		FNetLogger::LogError(TEXT("Send Data In Steam Socket3"));
 		SteamNetworkingMessage_t* pMsg = SteamNetworkingUtils()->AllocateMessage(data.Num());
 		if (pMsg)
 		{
@@ -72,6 +78,7 @@ void USteamSocket::SendData(const Message& Msg)
 
 	if (!messages.empty())
 	{
+		FNetLogger::LogError(TEXT("Send Data In Steam Socket4"));
 		SteamNetworkingSockets()->SendMessages(messages.size(), messages.data(), nullptr);
 		messages.clear();
 	}
@@ -85,12 +92,14 @@ void USteamSocket::SetGameStartCallback(int NumOfPlayers, const TFunction<void()
 
 void USteamSocket::SetAsServer()
 {
+	FNetLogger::LogError(TEXT("Set As Server"));
 	bIsServer = true;
 	// OnSteamNetConnectionStatusChanged.Register(this, &USteamSocket::OnServerCallBack);
 }
 
 void USteamSocket::SetAsClient()
 {
+	FNetLogger::LogError(TEXT("Set As Client"));
 	bIsServer = false;
 	// OnSteamNetConnectionStatusChanged.Register(this, &USteamSocket::OnClientCallBack);
 }

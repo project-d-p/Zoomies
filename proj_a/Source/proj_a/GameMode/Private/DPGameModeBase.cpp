@@ -47,8 +47,9 @@ ADPGameModeBase::ADPGameModeBase()
 void ADPGameModeBase::OnGameStart()
 {
 	this->bStart = true;
-	
-	TimerManager->StartTimer<ADPInGameState>(30.0f, &ADPGameModeBase::EndGame, this);
+
+	// ERROR: Slate can only be accessed from the GameThread or the SlateLoadingThread!!
+	// TimerManager->StartTimer<ADPInGameState>(30.0f, &ADPGameModeBase::EndGame, this);
 }
 
 // Only Called in Server : PlayerController && PlayerState Automatically Travel
@@ -105,7 +106,8 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 
 	if (!newPlayer->IsLocalController())
 	{
-		player_controllers_[key]->ConnectToServer();
+		FNetLogger::LogError(TEXT("This is not local controller."));
+		player_controllers_[key]->ConnectToServer(ELevelComponentType::MAIN);
 	}
 }
 
@@ -174,6 +176,12 @@ void ADPGameModeBase::Tick(float delta_time)
 	*/
 	if (bStart)
 	{
+		if (bTimeSet == false)
+		{
+			bTimeSet = true;
+			TimerManager->StartTimer<ADPInGameState>(30.0f, &ADPGameModeBase::EndGame, this);
+		}
+
 		this->ProcessData(delta_time);
 	}
 }

@@ -140,9 +140,11 @@ void ADPPlayerController::ClientDestroySession_Implementation()
 	}
 }
 
-void ADPPlayerController::ConnectToServer_Implementation()
+void ADPPlayerController::ConnectToServer_Implementation(ELevelComponentType Type)
 {
+	FNetLogger::LogError(TEXT("Am I Here?"));
 	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
+	SwitchLevelComponent(Type);
 }
 
 void ADPPlayerController::BeginPlay()

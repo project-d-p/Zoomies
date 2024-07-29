@@ -1,6 +1,7 @@
 #include "ClientNetworkManager.h"
 
 #include "FDataHub.h"
+#include "FNetLogger.h"
 #include "ISocketFactory.h"
 #include "MessageHandler.h"
 
@@ -28,12 +29,15 @@ void UClientNetworkManager::OnDataReceived(const Message& Data)
 
 void UClientNetworkManager::SendData(const Message& Data)
 {
-	Worker->SendData(Data);
+	FNetLogger::LogError(TEXT("SENDING DATA"));
+	if (Worker)
+		Worker->SendData(Data);
 }
 
 void UClientNetworkManager::Shutdown()
 {
-	Worker->Stop();
+	if (Worker)
+		Worker->Stop();
 }
 
 UClientNetworkManager::~UClientNetworkManager()

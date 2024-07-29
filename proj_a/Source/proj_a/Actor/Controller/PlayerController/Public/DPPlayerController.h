@@ -57,7 +57,7 @@ public:
 
 	/// TEST
 	UFUNCTION(Client, Reliable)
-	void ConnectToServer();
+	void ConnectToServer(ELevelComponentType Type);
 	///
 	
 protected:
