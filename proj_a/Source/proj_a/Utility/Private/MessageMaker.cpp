@@ -53,7 +53,7 @@ Message MessageMaker::MakePositionMessage(const ADPPlayerController* Controller)
 	}
 	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetPlayerName()));
 	ActorPosition actor_position;
-	if (Controller->GetPawn() == nullptr)
+	if (Controller->GetPawn() == nullptr || IsValid(Controller->GetPawn()))
 	{
 		return msg;
 	}
