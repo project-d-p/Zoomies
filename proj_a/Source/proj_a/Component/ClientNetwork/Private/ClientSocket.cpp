@@ -20,7 +20,7 @@ void UClientSocket::Connect(const char* /*ip*/, uint16 port)
 	server_address_.Clear();
 	// local address
 
-	server_address_.SetIPv4(/*0x7f000001*/ 0x0A13E17C, port);
+	server_address_.SetIPv4(0x7f000001 /*0x0A13E17C*/, port);
 
 	opt_.m_eValue = k_ESteamNetworkingConfig_IP_AllowWithoutAuth;
 	opt_.m_eDataType = k_ESteamNetworkingConfig_Int32;
