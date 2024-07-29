@@ -15,7 +15,8 @@ void AJudgeGameState::NotifyTimerEnd_Implementation()
 {
 	FNetLogger::EditerLog(FColor::Green, TEXT("NotifyTimerEnd"));
 	AJudgePlayerController* PC = Cast<AJudgePlayerController>(GetWorld()->GetFirstPlayerController());
-	check(PC && PC->GetJudgeLevelUI())
+	if (!PC || !PC->GetJudgeLevelUI())
+		return;
 	FNetLogger::EditerLog(FColor::Green, TEXT("JudgeLevelUI: %d"), PC->GetJudgeLevelUI()->GetVote());
 	PC->ReturnVote(PC->GetJudgeLevelUI()->GetVote());
 }

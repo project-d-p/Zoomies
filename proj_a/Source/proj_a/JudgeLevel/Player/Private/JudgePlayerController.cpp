@@ -39,6 +39,7 @@ void AJudgePlayerController::InitConstUI()
 
 void AJudgePlayerController::SetOccupationeName_Implementation(int index, const FString& Name)
 {
+	// XXX: 만약 로드가 느린 사람이 있다면 해당 코드에서 문제가 된다.
 	check(JudgeLevelUI)
 	JudgeLevelUI->SetBlockContent(ETextBlockType::Occupation, index, Name);
 }

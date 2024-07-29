@@ -50,7 +50,7 @@ private:
     void EndTimer();
 
     int CurrentPlayerIndex = 0;
-    const float WAIT_TIME = 10.f;
+    const float WAIT_TIME = 30.f;
     TArray<EPlayerJob> PlayerVotes;
     
 protected:
