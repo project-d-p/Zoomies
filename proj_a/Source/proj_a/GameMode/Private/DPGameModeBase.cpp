@@ -30,10 +30,7 @@ ADPGameModeBase::ADPGameModeBase()
 	ChatManager = CreateDefaultSubobject<UServerChatManager>(TEXT("ChatManager"));
 	ScoreManager = CreateDefaultSubobject<UScoreManagerComp>(TEXT("ScoreManager"));
 	MonsterFactory = CreateDefaultSubobject<UMonsterFactory>(TEXT("MonsterFactory"));
-
-	//// TEST
 	NetworkManager = CreateDefaultSubobject<UServerNetworkManager>(TEXT("NetworkManager"));
-	//// TEST
 
 	monster_controllers_.resize(NUM_OF_MAX_MONSTERS, nullptr);
 	empty_monster_slots_.reserve(NUM_OF_MAX_MONSTERS);
@@ -47,9 +44,6 @@ ADPGameModeBase::ADPGameModeBase()
 void ADPGameModeBase::OnGameStart()
 {
 	this->bStart = true;
-
-	// ERROR: Slate can only be accessed from the GameThread or the SlateLoadingThread!!
-	// TimerManager->StartTimer<ADPInGameState>(30.0f, &ADPGameModeBase::EndGame, this);
 }
 
 // Only Called in Server : PlayerController && PlayerState Automatically Travel
@@ -76,20 +70,8 @@ void ADPGameModeBase::GetSeamlessTravelActorList(bool bToTransition, TArray<AAct
 void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 {
 	Super::PostLogin(newPlayer);
-	/*
-	 * TEST : COMMENTS
-#if UE_BUILD_DEBUG == 0
-	if (steam_listen_socket_ == nullptr)
-	{
-		steam_listen_socket_ = new SteamNetworkingSocket();
-		ADPInGameState* game_state_ = Cast<ADPInGameState>(GameState);
-		if (game_state_ != nullptr)
-			game_state_->bServerTraveled = true;
-	}
-#endif
-	*/
 	check(newPlayer);
-	// Player state
+
 	ADPPlayerState* player_state = Cast<ADPPlayerState>(newPlayer->PlayerState);
 	check(player_state);
 	
@@ -106,7 +88,6 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 
 	if (!newPlayer->IsLocalController())
 	{
-		FNetLogger::LogError(TEXT("This is not local controller."));
 		player_controllers_[key]->ConnectToServer(ELevelComponentType::MAIN);
 	}
 }
@@ -132,24 +113,8 @@ void ADPGameModeBase::Logout(AController* Exiting)
 
 void ADPGameModeBase::EndGame()
 {
-	FNetLogger::EditerLog(FColor::Green, TEXT("Game Ended."));
-
-	/*
-	 * TEST : COMMENTS 
-	if (steam_listen_socket_)
-	{
-		steam_listen_socket_->DestoryInstance();
-		delete steam_listen_socket_;
-		steam_listen_socket_ = nullptr;
-	}
-	*/
-
 	bStart = false;
-
-	/// TEST
 	NetworkManager->Shutdown();
-	///
-	
 	GetWorld()->ServerTravel("judgeLevel?listen");
 }
 
@@ -167,15 +132,6 @@ void ADPGameModeBase::StartPlay()
 void ADPGameModeBase::Tick(float delta_time)
 {
 	Super::Tick(delta_time);
-
-	/*
-	 * TEST : COMMENTS
-	if (steam_listen_socket_ == nullptr)
-	{
-		return;
-	} 
-	if (steam_listen_socket_->IsGameStarted())
-	*/
 	if (bStart)
 	{
 		if (bTimeSet == false)
@@ -192,34 +148,16 @@ void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 	UE_LOG(LogTemp, Warning, TEXT("Call end play."));
-	/*
-	 * TEST : COMMENTS
-	if (steam_listen_socket_)
-	{
-		steam_listen_socket_->DestoryInstance();
-		delete steam_listen_socket_;
-		steam_listen_socket_ = nullptr;
-	}
-	*/
 
-	/// TEST
 	NetworkManager->Shutdown();
-	///
 }
 
 void ADPGameModeBase::ProcessData(float delta_time)
 {
-	/*
-	 * TEST : COMMENTS
-	message_queue_ = steam_listen_socket_->GetReadBuffer();
-	 */
-
-	/// TEST
 	message_queue_ = NetworkManager->GetRecievedMessages();
-	///
 
-	// this->SpawnMonsters(delta_time);
-	// this->MonsterMoveSimulate(delta_time);
+	this->SpawnMonsters(delta_time);
+	this->MonsterMoveSimulate(delta_time);
 	while (!this->message_queue_.empty())
 	{
 		Message message = this->message_queue_.front();
@@ -264,18 +202,6 @@ void ADPGameModeBase::SpawnMonsters(float delta_time)
 
 ADPGameModeBase::~ADPGameModeBase()
 {
-	/*
-	 * TEST : COMMENTS
-	if (steam_listen_socket_)
-	{
-		steam_listen_socket_->DestoryInstance();
-		delete steam_listen_socket_;
-		steam_listen_socket_ = nullptr;
-	}
-	 */
-	/// TEST
-	// NetworkManager->Shutdown();
-	///
 }
 
 void ADPGameModeBase::SyncMovement()
@@ -283,14 +209,7 @@ void ADPGameModeBase::SyncMovement()
 	for (auto& pair: player_controllers_)
 	{
 		Message msg = MessageMaker::MakePositionMessage(pair.second);
-		/* 
-		 * TEST : COMMENTS
-		steam_listen_socket_->PushUdpFlushMessage(msg);
-		 */
-
-		/// TEST
 		NetworkManager->SendData(msg);
-		///
 	}
 }
 
@@ -304,13 +223,7 @@ void ADPGameModeBase::SimulateGunFire()
 		{
 			continue;
 		}
-		/*
-		 * TEST : COMMENTS
-		MainLevelComponent->SimulateGunFire(steam_listen_socket_);
-		*/
-		/// TEST
 		MainLevelComponent->SimulateGunFire(NetworkManager);
-		///
 	}
 }
 
@@ -324,13 +237,7 @@ void ADPGameModeBase::SimulateCatch()
 		{
 			continue;
 		}
-		/*
-		 * TEST : COMMENTS
-		MainLevelComponent->SimulateCatch(steam_listen_socket_);
-		*/
-		/// TEST
 		MainLevelComponent->SimulateCatch(NetworkManager);
-		///
 	}
 }
 
@@ -344,13 +251,7 @@ void ADPGameModeBase::SimulateAiming()
 		{
 			continue;
 		}
-		/*
-		 * TEST : COMMENTS
-		MainLevelComponent->SimulateAim(steam_listen_socket_);
-		*/
-		/// TEST
 		MainLevelComponent->SimulateAim(NetworkManager);
-		///
 	}
 }
 
@@ -386,13 +287,6 @@ void ADPGameModeBase::SyncMonsterMovement()
 	{
 		Message message;
 		*message.mutable_monster_position() = msg;
-		/*
-		 * TEST : COMMENTS
-		steam_listen_socket_->PushUdpFlushMessage(message);
-		 */
-
-		/// TEST
 		NetworkManager->SendData(message);
-		///
 	}
 }

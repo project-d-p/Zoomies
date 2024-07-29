@@ -17,15 +17,7 @@ DEFINE_LOG_CATEGORY(LogNetwork);
 
 ADPPlayerController::ADPPlayerController()
 {
-	/*
-	 * TEST: COMMENT
-	Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
-	*/
-	
-	/// TEST
 	NetworkManager = CreateDefaultSubobject<UClientNetworkManager>(TEXT("NetworkManager"));
-	///
-
 	PrivateScoreManager = CreateDefaultSubobject<UPrivateScoreManager>(TEXT("PrivateScoreManager"));
 	
 	UBaseLevelComponent* MainLevelComponet = CreateDefaultSubobject<UMainLevelComponent>(TEXT("MainLevelComponent"));
@@ -41,8 +33,6 @@ ADPPlayerController::ADPPlayerController()
 
 ADPPlayerController::~ADPPlayerController()
 {
-	FNetLogger::EditerLog(FColor::Red, TEXT("ADPPlayerController::~ADPPlayerController"));
-	FNetLogger::LogError(TEXT("PlayerController ID[~Destructor]: %d"), this->GetUniqueID());
 }
 
 UPlayerScoreComp* ADPPlayerController::GetScoreManagerComponent() const
@@ -59,20 +49,10 @@ UPrivateScoreManager* ADPPlayerController::GetPrivateScoreManagerComponent() con
 	return PrivateScoreManager;
 }
 
-/// TEST
 UANetworkManager* ADPPlayerController::GetNetworkManager() const
 {
 	return NetworkManager;
 }
-///
-
-/*
- * TEST: COMMENT
-UClientSocket* ADPPlayerController::GetClientSocket() const
-{
-	return Socket;
-}
-*/
 
 void ADPPlayerController::AcknowledgePossession(APawn* P)
 {
@@ -109,32 +89,18 @@ void ADPPlayerController::ServerSendChatMessage_Implementation(const FString& Se
 
 void ADPPlayerController::ReleaseMemory()
 {
-	/*
-	 * TEST: COMMENT
-	if (Socket)
-	{
-		Socket->DestoryInstance();
-		Socket->DestroyComponent();
-		Socket = nullptr;
-	}
-	*/
-
-	/// TEST
 	NetworkManager->Shutdown();
-	///
 }
 
 void ADPPlayerController::ClientDestroySession_Implementation()
 {
 	// 게임 인스턴스를 통해 세션 제거
-	FNetLogger::LogError(TEXT("ClientDestroySession_Implementation Before"));
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
 	if (GameInstance)
 	{
 		IOnlineSessionPtr SessionInt = GameInstance->GetOnlineSessionInterface();
 		if (SessionInt.IsValid())
 		{
-			FNetLogger::LogError(TEXT("ClientDestroySession_Implementation After"));
 			SessionInt->DestroySession(NAME_GameSession);
 		}
 	}
@@ -142,7 +108,6 @@ void ADPPlayerController::ClientDestroySession_Implementation()
 
 void ADPPlayerController::ConnectToServer_Implementation(ELevelComponentType Type)
 {
-	FNetLogger::LogError(TEXT("Am I Here?"));
 	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
 	SwitchLevelComponent(Type);
 }
@@ -163,19 +128,7 @@ void ADPPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	/*
-	 * TEST: COMMENT
-	if (Socket)
-	{
-		Socket->DestoryInstance();
-		Socket->DestroyComponent();
-		Socket = nullptr;
-	}
-	 */
-
-	/// TEST
 	NetworkManager->Shutdown();
-	/// TEST
 }
 
 void ADPPlayerController::OnPossess(APawn* InPawn)

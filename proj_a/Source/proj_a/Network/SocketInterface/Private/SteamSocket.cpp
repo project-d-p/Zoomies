@@ -100,13 +100,11 @@ void USteamSocket::SetGameStartCallback(int NumOfPlayers, const TFunction<void()
 
 void USteamSocket::SetAsServer()
 {
-	FNetLogger::LogError(TEXT("Set As Server"));
 	bIsServer = true;
 }
 
 void USteamSocket::SetAsClient()
 {
-	FNetLogger::LogError(TEXT("Set As Client"));
 	bIsServer = false;
 }
 
@@ -126,8 +124,6 @@ void USteamSocket::AddConnection(HSteamNetConnection Connection)
 {
 	Connections.Add(Connection);
 	SteamNetworkingSockets()->SetConnectionPollGroup(Connection, PollGroup);
-
-	FNetLogger::LogError(TEXT("Connection Added: %d"), Connections.Num());
 }
 
 void USteamSocket::CloseConnection(HSteamNetConnection Connection)

@@ -105,7 +105,6 @@ void AResultLevelGameMode::CheckPlayersAllTraveled()
 	AResultLevelGameState* GS = Cast<AResultLevelGameState>(GetWorld()->GetGameState());
 	check(GS)
 
-	FNetLogger::LogError(TEXT("CurrentPlayerCount : %d, GI->player_count : %d"), CurrentPlayerCount, GI->player_count);
 	if (CurrentPlayerCount == GI->player_count)
 	{
 		FTimerHandle StartTimerHandle;

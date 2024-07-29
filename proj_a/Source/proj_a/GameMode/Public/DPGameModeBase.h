@@ -15,7 +15,6 @@
 #include "IChatGameMode.h"
 #include "ServerTimerManager.h"
 #include "MonsterFactory.h"
-#include "SteamNetworkingSocket.h"
 #include "DPGameModeBase.generated.h"
 
 /**

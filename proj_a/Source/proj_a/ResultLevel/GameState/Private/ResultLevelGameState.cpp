@@ -56,7 +56,6 @@ void AResultLevelGameState::NotifyPlayersAllTraveled_Implementation()
 	{
 		Character->SetReplicatingMovement(true);
 	}
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("NotifyPlayersAllTraveled"));
 }
 
 void AResultLevelGameState::AddPlayerState(APlayerState* PlayerState)
@@ -96,8 +95,6 @@ void AResultLevelGameState::SetMyRank()
 		PlayerScores[i].Rank = rank;
 	}
 
-	FNetLogger::LogError(TEXT("Number of PlayerControllers[server] : %d"), GetWorld()->GetNumPlayerControllers());
-	
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
 		ADPPlayerController* PlayerController = Cast<ADPPlayerController>(*Iterator);
@@ -129,8 +126,6 @@ void AResultLevelGameState::SetPlayerScores()
 {
 	FPlayerScore PlayerScore;
 
-	FNetLogger::LogInfo(TEXT("SetPlayerScores"));
-	FNetLogger::LogError(TEXT("Number of PlayerControllers[server] : %d"), GetWorld()->GetNumPlayerControllers());
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
 		ADPPlayerController* PlayerController = Cast<ADPPlayerController>(*Iterator);

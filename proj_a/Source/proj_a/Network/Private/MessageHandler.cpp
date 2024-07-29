@@ -8,7 +8,6 @@ FMessageHandler::FMessageHandler()
 	// Movement 메시지 처리 함수 등록
 	MessageHandlers.Add(Message::kMovement, FMessageDelegate::CreateLambda([](const Message& Msg)
 	{
-		// FNetLogger::GetInstance().LogInfo(TEXT("Movement message received: %s", *FString(Msg.DebugString().c_str())));
 		FDataHub::PushEchoDA(Msg);
 	}));
 

@@ -33,19 +33,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	// Locally Controlled
-	virtual bool IsLocallyControlled() const override;
-
 	UFUNCTION(Client, Reliable)
 	void ClientNotifyAnimalReturn(const FString& player_name);
 
-	/*
-	 * Move To Server Logic
-	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
-			   FVector NormalImpulse, const FHitResult& Hit);
-	*/
-	
 	TArray<EAnimal> ReturnMonsters();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "References")

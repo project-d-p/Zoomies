@@ -226,15 +226,8 @@ void UMainInputComponent::Active(const FInputActionValue& value)
 		Message msg = MessageMaker::MakeFireMessage(PlayerController, position, final_direction);
 		if (!PlayerController->HasAuthority())
 		{
-			/*
-			 * TEST: COMMENT
-			UClientSocket* Socket = PlayerController->GetClientSocket();
-			Socket->AsyncSendPacket(msg);
-			*/
-			/// TEST
 			UANetworkManager* NetworkManager = PlayerController->GetNetworkManager();
 			NetworkManager->SendData(msg);
-			///
 		}
 		else
 		{
@@ -309,16 +302,8 @@ void UMainInputComponent::Aim(const FInputActionValue& value)
 			Message msg = MessageMaker::MakeAimMessage(PlayerController, !Character->isAim);
 			if (!PlayerController->HasAuthority())
 			{
-				/*
-				 * TEST: COMMENT
-				UClientSocket* Socket = PlayerController->GetClientSocket();
-				Socket->AsyncSendPacket(msg);
-				*/
-				
-				/// TEST
 				UANetworkManager* NetworkManager = PlayerController->GetNetworkManager();
 				NetworkManager->SendData(msg);
-				///
 			}
 			else
 			{
@@ -356,15 +341,8 @@ void UMainInputComponent::AimReleased(const FInputActionValue& value)
 		Message msg = MessageMaker::MakeAimMessage(PlayerController, !Character->isAim);
 		if (!PlayerController->HasAuthority())
 		{
-			/*
-			 * TEST: COMMENT
-			UClientSocket* Socket = PlayerController->GetClientSocket();
-			Socket->AsyncSendPacket(msg);
-			*/
-			/// TEST
 			UANetworkManager* NetworkManager = PlayerController->GetNetworkManager();
 			NetworkManager->SendData(msg);
-			///
 		}
 		else
 		{
@@ -408,16 +386,8 @@ void UMainInputComponent::CatchAnimals(const FInputActionValue& value)
 	}
 	else
 	{
-		/*
-		 * TEST: COMMENT
-		UClientSocket* Socket = PlayerController->GetClientSocket();
-		Socket->AsyncSendPacket(msg);
-		 */
-
-		/// TEST
 		UANetworkManager* NetworkManager = PlayerController->GetNetworkManager();
 		NetworkManager->SendData(msg);
-		///
 	}
 }
 
@@ -441,7 +411,6 @@ void UMainInputComponent::ReturningAnimals(const FInputActionValue& value)
 		PlayerController->GetPrivateScoreManagerComponent()->IncreasePrivatePlayerScore(PlayerState->GetPlayerJob(), animals);
 		uint32 score = PlayerController->GetPrivateScoreManagerComponent()->GetPrivatePlayerScore();
 		FString playerName = PlayerState->GetPlayerName();
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Score[%s] : %d"), *playerName, score);
 	}
 	if (PlayerController->HasAuthority())
 	{

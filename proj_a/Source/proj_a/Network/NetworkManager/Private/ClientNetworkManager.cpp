@@ -31,7 +31,6 @@ void UClientNetworkManager::OnDataReceived(const Message& Data)
 
 void UClientNetworkManager::SendData(const Message& Data)
 {
-	FNetLogger::LogError(TEXT("SENDING DATA"));
 	if (Worker)
 		Worker->SendData(Data);
 }

@@ -4,7 +4,6 @@
 #include "ANetworkManager.h"
 #include "BaseLevelComponent.h"
 #include "message.pb.h"
-#include "SteamNetworkingSocket.h"
 #include "MainLevelComponent.generated.h"
 
 class UPrivateScoreManager;

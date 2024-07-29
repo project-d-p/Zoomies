@@ -2,9 +2,7 @@
 
 #include "FNetLogger.h"
 #include "ISocketInterface.h"
-#include "Marshaller.h"
 #include "message.pb.h"
-#include "SteamNetworkingSocket.h"
 
 UNetworkWorker::UNetworkWorker()
 {
@@ -13,8 +11,6 @@ UNetworkWorker::UNetworkWorker()
 void UNetworkWorker::Initialize(UISocketInterface* socketInterface)
 {
 	this->SocketInterface = socketInterface;
-
-	FNetLogger::LogError(TEXT("NetWorker Initialized"));
 }
 
 void UNetworkWorker::SetMessageReceivedCallback(TFunction<void(const Message&)> Callback)
