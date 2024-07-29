@@ -148,7 +148,7 @@ void ADPGameModeBase::StartPlay()
 	UE_LOG(LogTemp, Log, TEXT("Number of ADPCharacters in the world: %d"), NumberOfCharacters);
 	UE_LOG(LogTemp, Log, TEXT("Number of Players in this Session: %d"), GetNumPlayers());
 
-	TimerManager->StartTimer<ADPInGameState>(5.0f, &ADPGameModeBase::EndGame, this);
+	TimerManager->StartTimer<ADPInGameState>(35.0f, &ADPGameModeBase::EndGame, this);
 }
 
 void ADPGameModeBase::Tick(float delta_time)
