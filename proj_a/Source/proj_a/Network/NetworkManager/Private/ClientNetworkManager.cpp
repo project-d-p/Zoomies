@@ -44,7 +44,7 @@ void UClientNetworkManager::Shutdown()
 
 UClientNetworkManager::~UClientNetworkManager()
 {
-	// Worker->Stop();
+	UClientNetworkManager::Shutdown();
 	if (WorkerThread)
 	{
 		WorkerThread->Kill();
@@ -52,10 +52,5 @@ UClientNetworkManager::~UClientNetworkManager()
 		delete WorkerThread;
 		WorkerThread = nullptr;
 	}
-	// if (Worker)
-	// {
-	// 	Worker->ConditionalBeginDestroy();
-	// 	Worker = nullptr;
-	// }
 }
 

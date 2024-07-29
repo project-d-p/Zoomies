@@ -203,7 +203,7 @@ void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	*/
 
 	/// TEST
-	// NetworkManager->Shutdown();
+	NetworkManager->Shutdown();
 	///
 }
 

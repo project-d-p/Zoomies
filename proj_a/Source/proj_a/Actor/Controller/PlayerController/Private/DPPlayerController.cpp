@@ -267,6 +267,7 @@ void ADPPlayerController::GetSeamlessTravelActorList(bool bToTransitionMap, TArr
 		{
 			return ;
 		}
+		NetworkManager->Shutdown();
 	}
 	this->SwitchLevelComponent(ELevelComponentType::NONE);
 }

@@ -46,7 +46,7 @@ void UServerNetworkManager::SetGameStartCallback(int NumOfPlayers, const TFuncti
 
 UServerNetworkManager::~UServerNetworkManager()
 {
-	// Worker->Stop();
+	UServerNetworkManager::Shutdown();
 	if (WorkerThread)
 	{
 		WorkerThread->Kill();
@@ -54,9 +54,4 @@ UServerNetworkManager::~UServerNetworkManager()
 		delete WorkerThread;
 		WorkerThread = nullptr;
 	}
-	// if (Worker)
-	// {
-	// 	Worker->ConditionalBeginDestroy();
-	// 	Worker = nullptr;
-	// }
 }
