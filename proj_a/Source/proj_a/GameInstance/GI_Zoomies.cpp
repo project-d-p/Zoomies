@@ -157,36 +157,40 @@ void UGI_Zoomies::OnSessionFailure()
 	UWorld* World = GetWorld();
 	if (World)
 	{
-		// 현재 OnlineSubsystem을 가져옵니다.
-		IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
-		if (OnlineSubsystem)
+		if (World->GetNetMode() == NM_ListenServer)
 		{
-			IOnlineSessionPtr Sessions = OnlineSubsystem->GetSessionInterface();
-			if (Sessions.IsValid())
+			IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
+			if (OnlineSubsystem)
 			{
-				// 세션 종료
-				FNamedOnlineSession* Session = Sessions->GetNamedSession(NAME_GameSession);
-				if (Session)
+				IOnlineSessionPtr Sessions = OnlineSubsystem->GetSessionInterface();
+				if (Sessions.IsValid())
 				{
-					Sessions->EndSession(NAME_GameSession);
+					FNamedOnlineSession* Session = Sessions->GetNamedSession(NAME_GameSession);
+					if (Session)
+					{
+						Sessions->EndSession(NAME_GameSession);
+					}
 				}
 			}
-		}
-
-		for (FConstPlayerControllerIterator It = World->GetPlayerControllerIterator(); It; ++It)
-		{
-			APlayerController* PlayerController = It->Get();
-			if (PlayerController)
+			for (FConstPlayerControllerIterator It = World->GetPlayerControllerIterator(); It; ++It)
 			{
-				PlayerController->ClientTravel(TEXT("lobbyLevel?closed"), ETravelType::TRAVEL_Absolute);
+				APlayerController* PlayerController = It->Get();
+				if (PlayerController)
+				{
+					PlayerController->ClientTravel(TEXT("lobbyLevel?closed"), ETravelType::TRAVEL_Absolute);
+				}
 			}
-		}
-        
-		// 서버에서 레벨 이동
-		if (World->GetNetMode() == NM_DedicatedServer || World->GetNetMode() == NM_ListenServer)
-		{
 			World->ServerTravel(TEXT("lobbyLevel?closed"), true);
 			session_interface_->DestroySession(NAME_GameSession);
+		}
+		else
+		{
+			APlayerController* CurrentPlayerController = GetWorld()->GetFirstPlayerController();
+			if (CurrentPlayerController)
+			{
+				CurrentPlayerController->ClientTravel(TEXT("lobbyLevel?closed"), ETravelType::TRAVEL_Absolute);
+				session_interface_->DestroySession(NAME_GameSession);
+			}
 		}
 	}
 }
@@ -287,7 +291,7 @@ void UGI_Zoomies::InitOnlineSubsystemSteam()
 {
 	if (!is_online_session_steam_init)
 	{
-		online_subsystem_ = IOnlineSubsystem::Get();
+		online_subsystem_ = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
 		if (online_subsystem_)
 		{
 			session_interface_ = online_subsystem_->GetSessionInterface();
