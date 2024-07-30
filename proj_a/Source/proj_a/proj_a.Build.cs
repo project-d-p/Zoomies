@@ -150,7 +150,8 @@ public class proj_a : ModuleRules
 			AddAllLibrariesFromPath(Path.Combine(protobufPath, "lib"));
 			RuntimeDependencies.Add("$(ProjectDir)/Binaries/Win64/libprotobuf.dll", Path.Combine(protobufPath, "bin", "libprotobuf.dll"));
 			RuntimeDependencies.Add("$(ProjectDir)/Binaries/Win64/libprotobuf-lite.dll", Path.Combine(protobufPath, "bin", "libprotobuf-lite.dll"));
-		}		else
+		}
+		else
 		{
 			throw new Exception("No Protobuf Error" + thirdPartyDir + ".");
 		}
