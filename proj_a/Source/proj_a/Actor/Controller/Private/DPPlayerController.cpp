@@ -193,7 +193,6 @@ void ADPPlayerController::BeginPlay()
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
 		GetLocalPlayer()))
 	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("Add Mapping Context [Begin Play]"));
 		SubSystem->AddMappingContext(defaultContext, 0);
 	}
 	
@@ -289,7 +288,6 @@ void ADPPlayerController::OnPossess(APawn* InPawn)
 	
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("Add Mapping Context [On Possess]"));
 		SubSystem->AddMappingContext(defaultContext, 0);
 	}
 }
