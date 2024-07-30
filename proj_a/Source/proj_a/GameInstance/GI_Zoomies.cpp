@@ -2,9 +2,7 @@
 
 #include "CreateSessionCallbackProxy.h"
 #include "DPPlayerController.h"
-#include "FindSessionsCallbackProxy.h"
 #include "FNetLogger.h"
-#include "LocalizationDescriptor.h"
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
 #include "steam_api.h"
