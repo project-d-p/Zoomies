@@ -6,6 +6,7 @@
 #include "Engine/StaticMeshActor.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
+#include "proj_a/MatchingLobby/CHAR_MatchingLobby/CHAR_MatchingLobby.h"
 #include "UObject/ConstructorHelpers.h"
 
 ALobbyPlatform::ALobbyPlatform()
@@ -15,7 +16,7 @@ ALobbyPlatform::ALobbyPlatform()
 	CylinderComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CylinderComponent"));
 	CylinderComponent->SetupAttachment(RootComponent);
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(TEXT("'/Game/StarterContent/Shapes/Shape_Cylinder.Shape_Cylinder'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(TEXT("'/Game/etc/Lobby/Shape_Cylinder.Shape_Cylinder'"));
 	if (MeshAsset.Succeeded())
 	{
 		CylinderComponent->SetStaticMesh(MeshAsset.Object);
@@ -41,11 +42,11 @@ void ALobbyPlatform::SpawnCharacter(APlayerController* PlayerController)
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	CurrentCharacter = GetWorld()->SpawnActor<ADPCharacter>(
-		ADPCharacter::StaticClass(),
-		ArrowComponent->GetComponentTransform(),
-		SpawnParams);
-}
+	CurrentCharacter = GetWorld()->SpawnActor<ACHAR_MatchingLobby>(
+		ACHAR_MatchingLobby::StaticClass(),
+ 		ArrowComponent->GetComponentTransform(),
+ 		SpawnParams);
+ }
 
 void ALobbyPlatform::Clear_Platform()
 {
@@ -53,6 +54,18 @@ void ALobbyPlatform::Clear_Platform()
 
 	if (CurrentCharacter && CurrentCharacter->IsValidLowLevel())
 	{
+		TArray<AActor*> AttachedActors;
+		CurrentCharacter->GetAttachedActors(AttachedActors);
+
+		for (AActor* Actor : AttachedActors)
+		{
+			if (Actor)
+			{
+				Actor->Destroy();
+			}
+		}
+
+		// CurrentCharacter ÆÄ±«
 		CurrentCharacter->Destroy();
 		CurrentCharacter = nullptr;
 	}
