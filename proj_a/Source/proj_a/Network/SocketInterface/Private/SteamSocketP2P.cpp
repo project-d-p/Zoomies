@@ -1,6 +1,7 @@
 #include "SteamSocketP2P.h"
 
 #include "FNetLogger.h"
+#include "isteamnetworkingutils.h"
 #include "OnlineSessionSettings.h"
 #include "SteamSocketIP.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
@@ -34,6 +35,8 @@ void USteamSocketP2P::ActivateClient()
 
 	SteamNetworkingIdentity identityRemote;
 	identityRemote.SetSteamID(this->GetHostSteamID());
+
+	this->CheckRelayNetworkStatus();
 
 	int nRemoteVirtualPort = 0; // 상대방의 가상 포트 번호와 일치해야 함
 	m_Connection = SteamNetworkingSockets()->ConnectP2P(identityRemote, nRemoteVirtualPort, 0, nullptr);
@@ -79,4 +82,27 @@ CSteamID USteamSocketP2P::GetHostSteamID()
 	CSteamID hostSteamID = CSteamID(HostSteamID64);
 
 	return hostSteamID;
+}
+
+void USteamSocketP2P::CheckRelayNetworkStatus()
+{
+	while (true)
+	{
+		SteamRelayNetworkStatus_t status;
+		ESteamNetworkingAvailability availability = SteamNetworkingUtils()->GetRelayNetworkStatus(&status);
+
+		if (availability == k_ESteamNetworkingAvailability_Current || availability == k_ESteamNetworkingAvailability_Unknown)
+		{
+			FNetLogger::LogError(TEXT("SDR is now available"));
+			break ;
+		}
+		else if (availability == k_ESteamNetworkingAvailability_Attempting)
+		{
+			FNetLogger::LogError(TEXT("SDR is attempting to be available"));
+		}
+		else
+		{
+			FNetLogger::LogError(TEXT("SDR is not available"));
+		}
+	}
 }

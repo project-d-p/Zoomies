@@ -16,6 +16,7 @@ public:
 
 private:
 	CSteamID GetHostSteamID();
+	void CheckRelayNetworkStatus();
 	
 	HSteamListenSocket m_ListenSocket;
 	HSteamNetConnection m_Connection;
