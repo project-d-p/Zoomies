@@ -60,8 +60,8 @@ void UGI_Zoomies::FindSession_t()
 	session_search_->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
     
 	// Add these lines to set more search criteria
-	session_search_->QuerySettings.Set(SETTING_GAMEMODE, FString("MyGameMode"), EOnlineComparisonOp::Equals);
-	session_search_->QuerySettings.Set(SETTING_MATCHING_HOPPER, FString("MyHopper"), EOnlineComparisonOp::Equals);
+	// session_search_->QuerySettings.Set(SETTING_GAMEMODE, FString("MyGameMode"), EOnlineComparisonOp::Equals);
+	// session_search_->QuerySettings.Set(SETTING_MATCHING_HOPPER, FString("MyHopper"), EOnlineComparisonOp::Equals);
     
 	dh_on_find_complete = session_interface_->AddOnFindSessionsCompleteDelegate_Handle(
 		FOnFindSessionsCompleteDelegate::CreateUObject(this, &UGI_Zoomies::OnFindComplete));
