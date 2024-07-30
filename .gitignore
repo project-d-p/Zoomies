@@ -55,6 +55,7 @@ Binaries/*
 Plugins/*/Binaries/*
 proj_a/Binaries/*
 proj_a/Plugins/*/Binaries/*
+proj_a/Plugins/AdvancedSessions/
 
 
 proj_a/Package/*

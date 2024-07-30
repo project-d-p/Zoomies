@@ -1,5 +1,8 @@
 #include "GI_Zoomies.h"
+
+#include "CreateSessionCallbackProxy.h"
 #include "DPPlayerController.h"
+#include "FindSessionsCallbackProxy.h"
 #include "FNetLogger.h"
 #include "LocalizationDescriptor.h"
 #include "OnlineSessionSettings.h"
@@ -54,15 +57,11 @@ IOnlineSessionPtr UGI_Zoomies::GetOnlineSessionInterface() const
 void UGI_Zoomies::FindSession_t()
 {
 	session_search_ = MakeShareable(new FOnlineSessionSearch());
-	session_search_->bIsLanQuery = false;
-	// session_search_->bIsLanQuery = true; // for LAN testing
+	// session_search_->bIsLanQuery = false;
+	session_search_->bIsLanQuery = true; // for LAN testing
 	session_search_->MaxSearchResults = 20;
 	session_search_->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
-    
-	// Add these lines to set more search criteria
-	// session_search_->QuerySettings.Set(SETTING_GAMEMODE, FString("MyGameMode"), EOnlineComparisonOp::Equals);
-	// session_search_->QuerySettings.Set(SETTING_MATCHING_HOPPER, FString("MyHopper"), EOnlineComparisonOp::Equals);
-    
+
 	dh_on_find_complete = session_interface_->AddOnFindSessionsCompleteDelegate_Handle(
 		FOnFindSessionsCompleteDelegate::CreateUObject(this, &UGI_Zoomies::OnFindComplete));
 
@@ -99,21 +98,18 @@ void UGI_Zoomies::CreateSession_t()
 {
 	FNetLogger::LogError(TEXT("CreateSession_t"));
 	session_settings_ = MakeShareable(new FOnlineSessionSettings());
-	session_settings_->bIsLANMatch = false;
-	// session_settings_->bIsLANMatch = true; // for LAN testing
+	// session_settings_->bIsLANMatch = false;
+	session_settings_->bIsLANMatch = true; // for LAN testing
 	session_settings_->NumPublicConnections = 4;
 	session_settings_->bShouldAdvertise = true;
 	session_settings_->bAllowJoinInProgress = true;
 	session_settings_->bUsesPresence = true;
     
-	// Use a custom session name instead of NAME_GameSession
-	// FName MySessionName = FName("MyCustomSessionName");
-    
 	dh_on_create_complete = session_interface_->AddOnCreateSessionCompleteDelegate_Handle(
 		FOnCreateSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onCreateComplete));
     
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
-	session_interface_->CreateSession(*local_player->GetPreferredUniqueNetId(), /*MySessionName*/ NAME_GameSession, *session_settings_);
+	session_interface_->CreateSession(*local_player->GetPreferredUniqueNetId(), NAME_GameSession, *session_settings_);
 }
 
 void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
@@ -138,50 +134,11 @@ void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
 
 void UGI_Zoomies::JoinSession_t(const FOnlineSessionSearchResult& search_result)
 {
-	// // register join complete delegate
-	// dh_on_join_complete = session_interface_->AddOnJoinSessionCompleteDelegate_Handle(
-	// 	FOnJoinSessionCompleteDelegate::CreateUObject(
-	// 		this,
-	// 		&UGI_Zoomies::onJoinComplete
-	// 		));
-	//
-	// // join session
-	// const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
-	// session_interface_->JoinSession(
-	// 	*local_player->GetPreferredUniqueNetId(),
-	// 	NAME_GameSession,
-	// 	search_result);
-	// Add this check before joining
-
-	/* --------------------------- */
-	
-	// FString game_mode;
-	// if (search_result.Session.SessionSettings.Get(SETTING_GAMEMODE, game_mode))
-	// {
-	// 	if (game_mode.Equals("MyGameMode"))
-	// 	{
-	// 		UE_LOG(LogTemp, Warning, TEXT("Joining compatible session"));
-	// 	}
-	// 	else
-	// 	{
-	// 		UE_LOG(LogTemp, Warning, TEXT("Attempted to join incompatible session"));
-	// 		check(false)
-	// 	}
-	// }
-	// else
-	// {
-	// 	UE_LOG(LogTemp, Warning, TEXT("Attempted to join incompatible session"));
-	// 	check(false)
-	// }
-
-	// Use a custom session name instead of NAME_GameSession
-    FName MySessionName = FName("MyCustomSessionName");
-
 	dh_on_join_complete = session_interface_->AddOnJoinSessionCompleteDelegate_Handle(
 		FOnJoinSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onJoinComplete));
     
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
-	session_interface_->JoinSession(*local_player->GetPreferredUniqueNetId(), /*MySessionName*/ NAME_GameSession, search_result);
+	session_interface_->JoinSession(*local_player->GetPreferredUniqueNetId(), NAME_GameSession, search_result);
 }
 
 void UGI_Zoomies::onJoinComplete(FName session_name, EOnJoinSessionCompleteResult::Type result)

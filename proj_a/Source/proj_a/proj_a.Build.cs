@@ -9,6 +9,7 @@ public class proj_a : ModuleRules
 {
 	public proj_a(ReadOnlyTargetRules Target) : base(Target)
 	{
+		// PrivateDependencyModuleNames.AddRange(new string[] { "AdvancedSessions" });
 		string projectDir = Path.Combine(ModuleDirectory, "../../");
 		string thirdPartyDir = Path.Combine(projectDir, "ThirdParty");
 			
@@ -109,7 +110,9 @@ public class proj_a : ModuleRules
 			"AIModule",
 			"NavigationSystem",
 			"Niagara",
-            "GameplayCameras"
+            "GameplayCameras",
+            "AdvancedSessions",
+            "AdvancedSteamSessions"
         });
 
 		string SteamSDKPath = Path.Combine(ModuleDirectory, "Steam");
