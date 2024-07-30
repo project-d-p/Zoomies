@@ -14,6 +14,7 @@ UISocketInterface* USteamSocketP2P::Clone() const
 void USteamSocketP2P::ActivateServer()
 {
 	Super::ActivateServer();
+	this->CheckRelayNetworkStatus();
 
 	int nLocalVirtualPort = 0;
 	m_ListenSocket = SteamNetworkingSockets()->CreateListenSocketP2P(nLocalVirtualPort, 0, nullptr);
@@ -32,11 +33,11 @@ void USteamSocketP2P::ActivateServer()
 void USteamSocketP2P::ActivateClient()
 {
 	Super::ActivateClient();
+	this->CheckRelayNetworkStatus();
 
 	SteamNetworkingIdentity identityRemote;
 	identityRemote.SetSteamID(this->GetHostSteamID());
 
-	this->CheckRelayNetworkStatus();
 
 	int nRemoteVirtualPort = 0; // 상대방의 가상 포트 번호와 일치해야 함
 	m_Connection = SteamNetworkingSockets()->ConnectP2P(identityRemote, nRemoteVirtualPort, 0, nullptr);
