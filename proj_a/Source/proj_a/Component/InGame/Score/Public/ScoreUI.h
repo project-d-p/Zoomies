@@ -1,7 +1,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "DPPlayerState.h"
 #include "Components/WidgetComponent.h"
 #include "ScoreUI.generated.h"
 

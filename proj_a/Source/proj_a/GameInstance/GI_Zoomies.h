@@ -1,9 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DPCharacter.h"
 #include "Engine/GameInstance.h"
 #include "OnlineSubsystem.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include "ScoreTypes.h"
 #include "GI_Zoomies.generated.h"
 
 UCLASS()
@@ -18,10 +20,14 @@ public:
 	// Matching starting function
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void StartMatchMaking();
+	IOnlineSessionPtr GetOnlineSessionInterface() const;
+
+	/* Number of players before Seamless Travel */
 	bool ResetSession();
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void OnSessionFailure();
 
+	int player_count = 0;
 private:
 	// Online subsystem & session interface pointers
 	IOnlineSubsystem* online_subsystem_;

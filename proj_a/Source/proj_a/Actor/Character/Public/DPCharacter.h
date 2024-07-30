@@ -19,24 +19,27 @@ class PROJ_A_API ADPCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ADPCharacter();
+	virtual ~ADPCharacter() override;
 	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	// Locally Controlled
-	virtual bool IsLocallyControlled() const override;
-	TArray<EAnimal> ReturnMonsters();
-
 	UFUNCTION(Client, Reliable)
 	void ClientNotifyAnimalReturn(const FString& player_name);
+
+	TArray<EAnimal> ReturnMonsters();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "References")
+	class AReturnTriggerVolume* ReturnTriggerVolume; 
 
 public:	// component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -56,6 +59,25 @@ public:	// component
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
 	UMaterialInstanceDynamic* dynamicMaterialInstance;
 
+	// stun effect
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "effects")
+	class UNiagaraSystem* StunEffect;
+	UPROPERTY(VisibleAnywhere)
+	class UArrowComponent* StunArrow;
+	UPROPERTY(VisibleAnywhere)
+	class UNiagaraComponent* StunEffectComponent;
+
+	UPROPERTY(ReplicatedUsing=OnRep_SyncStunned)
+	bool bIsStunned;
+
+	UFUNCTION()
+	void OnRep_SyncStunned();
+
+	void SetStunned(bool bCond);
+	bool IsStunned() const;
+	void ApplyStunEffect();
+	void RemoveStunEffect();
+
 	void PlayAimAnimation();
 	void StopAimAnimation();
 	void PlayFireAnimation();
@@ -66,13 +88,19 @@ public:	// component
 
 	bool CatchMonster(const FString& monster_type);
 
+	
 	void SetAtReturnPlace(bool isReturnPlace);
 	bool IsAtReturnPlace() const;
 
+	void RemoveSpringArm();
+	
 protected:
 	void ClientNotifyAnimalReturn_Implementation(const FString& player_name);
 	
 private:
+	void CheckCollisionWithMonster();
+	void OnServerHit(const FHitResult& HitResult);
+
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* springArm;
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -86,8 +114,11 @@ private:
 	UPROPERTY()
 	UCharacterPositionSync* syncer = nullptr;
 
-	FTimerHandle SynchronizeHandle;
 	TSubclassOf<UCameraShakeBase> cameraShake;
+
+	// Collision with monster
+	FTimerHandle timerCollisionHandle;
+	
 public:
 	FVector currentVelocity{ 0.f, 0.f, 0.f };
 	UPROPERTY(BlueprintReadWrite)

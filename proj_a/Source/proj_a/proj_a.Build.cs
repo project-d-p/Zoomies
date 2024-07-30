@@ -9,6 +9,7 @@ public class proj_a : ModuleRules
 {
 	public proj_a(ReadOnlyTargetRules Target) : base(Target)
 	{
+		// PrivateDependencyModuleNames.AddRange(new string[] { "AdvancedSessions" });
 		string projectDir = Path.Combine(ModuleDirectory, "../../");
 		string thirdPartyDir = Path.Combine(projectDir, "ThirdParty");
 			
@@ -18,6 +19,15 @@ public class proj_a : ModuleRules
 		}
 		
 		SetProtobuf(thirdPartyDir);
+		
+		if (Target.Configuration == UnrealTargetConfiguration.DebugGame)
+		{
+			PublicDefinitions.Add("UE_BUILD_DEBUG=1");
+		}
+		else
+		{
+			PublicDefinitions.Add("UE_BUILD_DEVELOPMENT=1");
+		}
 		
 		// XXX: 배포시에 컴파일 코드 삭제(혹은 주석 처리)
 		string protocPath = "";
@@ -32,14 +42,19 @@ public class proj_a : ModuleRules
 		string protoFilesPath = Path.Combine(ModuleDirectory, "Protobuf", "Proto_file");
 		string generatedProtoFilesPath = Path.Combine(ModuleDirectory, "Protobuf", "Pb_File");
 		
-		System.Console.WriteLine("Compiling .proto files...");
+		Console.WriteLine("Compiling .proto files...");
 		CompileProtoFiles(protocPath, protoFilesPath, generatedProtoFilesPath);
 		// XXX: 배포시에 컴파일 코드 삭제(혹은 주석 처리)
 		
 		PublicIncludePaths.AddRange(new string[] {
+			"proj_a/JudgeLevel/GameCore/Public",
+			"proj_a/JudgeLevel/Player/Public",
+			"proj_a/JudgeLevel/UI/Public",
 			"proj_a/GameMode/Public",
 			"proj_a/GameState/Public",
-			"proj_a/Actor/Controller/Public",
+			"proj_a/Actor/Controller/PlayerController/Public",
+			"proj_a/Actor/Controller/PlayerController/Components/InputComponents/Public",
+			"proj_a/Actor/Controller/PlayerController/Components/LevelComponents/Public",
 			"proj_a/Actor/Character/Public",
 			"proj_a/Actor/Character/CharacterPositionSync/Public",
 			"proj_a/Actor/Character/PlayerState/Public",
@@ -55,18 +70,20 @@ public class proj_a : ModuleRules
 			"proj_a/Component/InGame/HitDetection/Public",
 			"proj_a/Component/InGame/Timer/Public",
 			"proj_a/Component/InGame/ReturnPlace/Public",
-			"proj_a/Component/ClientNetwork/Public",
+			"proj_a/Component/InGame/Score/Types",
+			"proj_a/Component/Audio/Public",
+			"proj_a/ResultLevel/GameMode/Public",
+			"proj_a/ResultLevel/GameState/Public",
             "proj_a/Widget/Public",
             "proj_a/Widget/InGame/Public",
             "proj_a/DataHub/Public",
 			"proj_a/Network/Public",
 			"proj_a/Network/NetLogger/Public",
-			"proj_a/Network/ReceiveTask/Public",
-			"proj_a/Network/SendTask/Public",
-			"proj_a/GameInstance/Public",
+			"proj_a/Network/NetworkManager/Public",
+			"proj_a/Network/NetworkWorker/Public",
+			"proj_a/Network/SocketFactory/Public",
+			"proj_a/Network/SocketInterface/Public",
 			"proj_a/SteamGameManager/Public",
-			"proj_a/ServerNetworkIO/Public",
-			"proj_a/ServerMessageHandler/Public",
 			"proj_a/Lobby/Public",
 			"proj_a/Core/Public",
 			"proj_a/Utility/Public",
@@ -92,7 +109,9 @@ public class proj_a : ModuleRules
 			"AIModule",
 			"NavigationSystem",
 			"Niagara",
-            "GameplayCameras"
+            "GameplayCameras",
+            "AdvancedSessions",
+            "AdvancedSteamSessions"
         });
 		PrivateDependencyModuleNames.AddRange(new string[] { "CinematicCamera" });
 

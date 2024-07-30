@@ -7,7 +7,7 @@ ASealCharacter::ASealCharacter()
 	/** Loading models */
 	
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SEAL
-	(TEXT("/Game/model/animals/seal/seal1.seal1"));
+	(PathManager::GetMonsterPath(EMonster::SEAL));
 	if (SK_SEAL.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_SEAL.Object);
 	}
@@ -21,11 +21,27 @@ ASealCharacter::ASealCharacter()
 	}
 
 	/** Set the Capsule size */
-	GetCapsuleComponent()->SetCapsuleRadius(90.f);
-	GetCapsuleComponent()->SetCapsuleHalfHeight(90.f);
+	DefaultCP.Radius = 90.f;
+	DefaultCP.HalfHeight = 90.f;
+	GetCapsuleComponent()->SetCapsuleRadius(DefaultCP.Radius);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(DefaultCP.HalfHeight);
+
+	FaintCP.Radius = 90.f;
+	FaintCP.HalfHeight = 90.f;
 	
 	/** Set the model size and adjust position */
-	GetMesh()->SetRelativeScale3D(FVector(1.f, 1.f, 1.f));
-	GetMesh()->SetRelativeLocationAndRotation(
-		FVector(0.f, 0.f, -87.f), FRotator(0.f, 90.f, 0.f));
+	FVector Scale(FVector::OneVector);
+	FVector Location(0.f, 0.f, 40.f);
+	FRotator Rotation(0.f, 0.f, 0.f);
+	FTransform Transform(Rotation, Location, Scale);
+		
+	MeshAdjMtx = Transform;
+	GetMesh()->SetRelativeTransform(MeshAdjMtx);
+	
+	/** Set the faint state matrix */
+	FaintStateMtx = FTransform(
+		FRotator(0.f, 0.f, 90.f),
+		FVector(0.f, 30.f, -40.f),
+		FVector::OneVector);
+	CB_FaintStateMtx =  MeshAdjMtx.Inverse() * FaintStateMtx * MeshAdjMtx;
 }

@@ -9,6 +9,7 @@
 #include "Components/WidgetComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
+#include "proj_a.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -22,24 +23,23 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
 	
 	GetMesh()->SetCollisionProfileName(UCollisionProfile::BlockAllDynamic_ProfileName);
 	GetMesh()->SetupAttachment(RootComponent);
-	GetMesh()->SetGenerateOverlapEvents(true);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	GetMesh()->SetCollisionResponseToAllChannels(ECR_Block);
 	
     GetCharacterMovement()->bOrientRotationToMovement = true;
     bUseControllerRotationYaw = false;
 	
-	arrowSparkle = CreateDefaultSubobject<UArrowComponent>(TEXT("arrowComponent"));
-	arrowSparkle->SetupAttachment(GetMesh());
-	arrowSparkle->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
-	arrowSparkle->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
-	arrowSparkle->SetRelativeScale3D(FVector(2.f, 2.f, 2.f));
+	// arrowSparkle = CreateDefaultSubobject<UArrowComponent>(TEXT("arrowComponent"));
+	// arrowSparkle->SetupAttachment(GetMesh());
+	// arrowSparkle->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
+	// arrowSparkle->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+	// arrowSparkle->SetRelativeScale3D(FVector(2.f, 2.f, 2.f));
 
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> SPARKLE
-	(TEXT("/Game/effect/ns_sparkle.ns_sparkle"));
-	if (SPARKLE.Succeeded()) {
-		sparkleEffect = SPARKLE.Object;
-	}
+	// static ConstructorHelpers::FObjectFinder<UNiagaraSystem> SPARKLE
+	// (TEXT("/Game/effect/ns_sparkle.ns_sparkle"));
+	// if (SPARKLE.Succeeded()) {
+	// 	sparkleEffect = SPARKLE.Object;
+	// }
 
 	GetMesh()->SetRenderCustomDepth(true);
 	GetMesh()->CustomDepthStencilValue = 2;
@@ -72,9 +72,10 @@ void ABaseMonsterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UNiagaraComponent* sparkle = nullptr;
 	// special animals
 	if (sparkleEffect && arrowSparkle) {
-		UNiagaraFunctionLibrary::SpawnSystemAttached(
+		sparkle = UNiagaraFunctionLibrary::SpawnSystemAttached(
 			sparkleEffect,
 			arrowSparkle,
 			NAME_None,
@@ -85,20 +86,23 @@ void ABaseMonsterCharacter::BeginPlay()
 		);
 	}
 
+	if (sparkle)
+		sparkle->SetVectorParameter(FName("particleBoxSize"),GetMesh()->GetRelativeScale3D() * 100.f);
+	
 	if (widgetComponent)
 		widgetComponent->SetVisibility(false);
+
+	GetCapsuleComponent()->SetCollisionObjectType(ECC_MonsterChannel);
 }
 
 void ABaseMonsterCharacter::SyncPosition()
 {
 	int32 id = MonsterId;
 	FString MonsterID = FString::FromInt(id);
-	FNetLogger::LogInfo(TEXT("SyncPosition: %s"), *MonsterID);
 	
 	MonsterPosition* MonsterData = FDataHub::monsterData.Find(MonsterID);
 	if (!MonsterData)
 	{
-		FNetLogger::LogInfo(TEXT("Monster data does not contain: %s"), *MonsterID);
 		return ;
 	}
 	
@@ -125,6 +129,22 @@ void ABaseMonsterCharacter::ScaleCapsuleSize(float ScaleFactor)
 	{
 		FVector Scalar = FVector(ScaleFactor, ScaleFactor, ScaleFactor);
 		LCC->SetRelativeScale3D(Scalar);
+	}
+}
+
+void ABaseMonsterCharacter::SetCatchable(bool bCond)
+{
+	if (bCond)
+	{
+		GetMesh()->CustomDepthStencilValue = 3;
+		GetMesh()->MarkRenderStateDirty();	// render 상태 갱신
+		widgetComponent->SetVisibility(bCond);
+	}
+	else
+	{
+		GetMesh()->CustomDepthStencilValue = 2;
+		GetMesh()->MarkRenderStateDirty();
+		widgetComponent->SetVisibility(bCond);
 	}
 }
 
@@ -158,18 +178,15 @@ void ABaseMonsterCharacter::TakeMonsterDamage(float Dmg)
 	{
 		CurrentHp = 0;
 		CurrentState = EMonsterState::Faint;
-		ABaseMonsterAIController *BMC = Cast<ABaseMonsterAIController>(GetOwner());
-		check(BMC)
-		BMC->StopMovement();
 		OnRep_FaintCharacterMotion();
 	}
 }
 
-void ABaseMonsterCharacter::OnRep_FaintCharacterMotion() const
+void ABaseMonsterCharacter::OnRep_FaintCharacterMotion()
 {
-	FRotator NewRotation = FRotator(0.0f, 0.0f, 90.0f);
-	GetCapsuleComponent()->SetRelativeRotation(NewRotation);
-	GetMesh()->SetRelativeRotation(NewRotation);
+	GetCapsuleComponent()->SetCapsuleRadius(FaintCP.Radius);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(FaintCP.HalfHeight);
+	GetMesh()->SetRelativeTransform(CB_FaintStateMtx);
 }
 
 ABaseMonsterCharacter::~ABaseMonsterCharacter()

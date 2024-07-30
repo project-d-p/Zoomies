@@ -12,36 +12,38 @@ void UGI_Zoomies::Init()
 	CheckSteamInit();
 }
 
+// matching session Functions
 void UGI_Zoomies::StartMatchMaking()
 {
 	FindSession();
 }
 
+IOnlineSessionPtr UGI_Zoomies::GetOnlineSessionInterface() const
+{
+	return session_interface_;
+}
+
 void UGI_Zoomies::FindSession()
 {
-	//Find Session by these settings
+	// session search settings	
 	session_search_ = MakeShareable(new FOnlineSessionSearch());
-	session_search_->bIsLanQuery = true;
+	// session_search_->bIsLanQuery = false;
+	session_search_->bIsLanQuery = true; // for LAN testing
 	session_search_->MaxSearchResults = 20;
 	session_search_->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 
-	//add delegate to handle the result of found sessions
 	dh_on_find_complete = session_interface_->AddOnFindSessionsCompleteDelegate_Handle(
-		FOnFindSessionsCompleteDelegate::CreateUObject(
-			this,
-			&UGI_Zoomies::OnFindComplete
-			));
+		FOnFindSessionsCompleteDelegate::CreateUObject(this, &UGI_Zoomies::OnFindComplete));
 
-	// start finding sessions
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
-	session_interface_->FindSessions(
-		*local_player->GetPreferredUniqueNetId(),
-		session_search_.ToSharedRef());
+	session_interface_->FindSessions(*local_player->GetPreferredUniqueNetId(), session_search_.ToSharedRef());
+	FNetLogger::LogError(TEXT("FindSession_t"));
 }
 
 void UGI_Zoomies::OnFindComplete(bool bWasSuccessful)
 {
-	//unregister the delegate
+	FNetLogger::LogError(TEXT("OnFindComplete"));
+	// unregister the delegate
 	session_interface_->ClearOnFindSessionsCompleteDelegate_Handle(
 		dh_on_find_complete
 		);
@@ -52,19 +54,22 @@ void UGI_Zoomies::OnFindComplete(bool bWasSuccessful)
 		if (session_search_->SearchResults.Num() > 0)
 		{	
 			JoinSessionBySearchResult(session_search_->SearchResults[0]);
+			FNetLogger::LogError(TEXT("FindSession_t[Join]"));
 		}
 		else
 		{
 			CreateSession();
+			FNetLogger::LogError(TEXT("FindSession_t[Create]"));
 		}
 	}
 }
 
 void UGI_Zoomies::CreateSession()
 {
-	//settings for create session
+	FNetLogger::LogError(TEXT("CreateSession_t"));
 	session_settings_ = MakeShareable(new FOnlineSessionSettings());
-	session_settings_->bIsLANMatch = true;
+	// session_settings_->bIsLANMatch = false;
+	session_settings_->bIsLANMatch = true; // for LAN testing
 	session_settings_->NumPublicConnections = 4;
 	session_settings_->bShouldAdvertise = true;
 	session_settings_->bAllowJoinInProgress = true;
@@ -76,17 +81,10 @@ void UGI_Zoomies::CreateSession()
 		FString("matchLobby"),
 		EOnlineDataAdvertisementType::ViaOnlineService);
 	dh_on_create_complete = session_interface_->AddOnCreateSessionCompleteDelegate_Handle(
-		FOnCreateSessionCompleteDelegate::CreateUObject(
-			this,
-			&UGI_Zoomies::onCreateComplete
-			));
-	
-	// create session
+		FOnCreateSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onCreateComplete));
+    
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
-	session_interface_->CreateSession(
-		*local_player->GetPreferredUniqueNetId(),
-		NAME_GameSession,
-		*session_settings_);
+	session_interface_->CreateSession(*local_player->GetPreferredUniqueNetId(), NAME_GameSession, *session_settings_);
 }
 
 void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
@@ -99,7 +97,8 @@ void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
 	// if the session was created successfully, travel to the lobby level
 	if (bWasSuccessful)
 	{
-		// travel to lobby level by a session host
+		// travel to lobby level
+		FNetLogger::LogError(TEXT("onCreateComplete"));
 		GetWorld()->ServerTravel(TEXT("matchLobby?listen"), true);
 	}
 	else
@@ -110,19 +109,11 @@ void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
 
 void UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& search_result)
 {
-	// register join complete delegate
 	dh_on_join_complete = session_interface_->AddOnJoinSessionCompleteDelegate_Handle(
-		FOnJoinSessionCompleteDelegate::CreateUObject(
-			this,
-			&UGI_Zoomies::onJoinComplete
-			));
-	
-	// join session
+		FOnJoinSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onJoinComplete));
+    
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
-	session_interface_->JoinSession(
-		*local_player->GetPreferredUniqueNetId(),
-		NAME_GameSession,
-		search_result);
+	session_interface_->JoinSession(*local_player->GetPreferredUniqueNetId(), NAME_GameSession, search_result);
 }
 
 void UGI_Zoomies::onJoinComplete(FName session_name, EOnJoinSessionCompleteResult::Type result)
@@ -260,8 +251,8 @@ void UGI_Zoomies::InitSteamAPI()
 		if (steam_id.IsValid() && !steam_username.IsEmpty())
 		{
 			UE_LOG(LogTemp, Log, TEXT("SteamAPI INIT SUCCESS || ID: %llu, Username: %s"), steam_id.ConvertToUint64(), *steam_username);
+			SteamNetworkingUtils()->InitRelayNetworkAccess();
 		}
-		// SteamNetworkingUtils()->InitRelayNetworkAccess();
 	}
 	
 	if (!is_steamAPI_init)

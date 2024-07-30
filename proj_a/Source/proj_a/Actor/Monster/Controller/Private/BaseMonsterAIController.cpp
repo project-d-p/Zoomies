@@ -1,8 +1,10 @@
 #include "BaseMonsterAIController.h"
 
 #include "DPGameModeBase.h"
+#include "FNetLogger.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Navigation/PathFollowingComponent.h"
 
 ABaseMonsterAIController::ABaseMonsterAIController()
 {
@@ -46,6 +48,12 @@ bool ABaseMonsterAIController::GetMovementAllowed()
 	ABaseMonsterCharacter* CC = Cast<ABaseMonsterCharacter>(GetCharacter());
 	check(CC);
 	if (CC->GetState() == EMonsterState::Faint)
+	{
+		FPathFollowingResultFlags::Type AbortFlags = FPathFollowingResultFlags::UserAbort;
+		FAIRequestID RequestID = GetCurrentMoveRequestID();
+		EPathFollowingVelocityMode VelocityMode = EPathFollowingVelocityMode::Keep;
+		GetPathFollowingComponent()->AbortMove(*this, AbortFlags, RequestID, VelocityMode);
 		return false;
+	}
 	return true;
 }

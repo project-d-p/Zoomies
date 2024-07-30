@@ -10,10 +10,7 @@ class PROJ_A_API UChatManager : public UActorComponent
 {
 	GENERATED_BODY()
 public:
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerSendChatMessage(const FString& SenderName, const FString& Message);
-	
-	UFUNCTION(Client, Reliable)
+	UFUNCTION(NetMulticast, Reliable)
 	void ClientReceiveChatMessage(const FString& SenderName, const FString& Message);
 
 	UFUNCTION()

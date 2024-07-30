@@ -7,7 +7,7 @@ AOctopusCharacter::AOctopusCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_OCTOPUS
-	(TEXT("/Game/model/animals/octopus/Octopus1.Octopus1"));
+	(PathManager::GetMonsterPath(EMonster::OCTOPUS));
 	if (SK_OCTOPUS.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_OCTOPUS.Object);
 	}
@@ -21,11 +21,26 @@ AOctopusCharacter::AOctopusCharacter()
 	}
 
 	/** Set the Capsule size */
-	GetCapsuleComponent()->SetCapsuleRadius(110.f);
-	GetCapsuleComponent()->SetCapsuleHalfHeight(60.f);
+	DefaultCP.Radius = 100.f;
+	DefaultCP.HalfHeight = 42.f;
+	GetCapsuleComponent()->SetCapsuleRadius(DefaultCP.Radius);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(DefaultCP.HalfHeight);
+
+	FaintCP.Radius = 35.f;
+	FaintCP.HalfHeight = 35.f;
 	
 	/** Set the model size and adjust position */
-	GetMesh()->SetRelativeScale3D(FVector(2.f, 2.f, 2.f));
-	GetMesh()->SetRelativeLocationAndRotation(
-		FVector(30.f, 0.f, -42.f), FRotator(0.f, 0.f, 0.f));
+	FVector Location(0.f, 0.f, 40.f);
+	FRotator Rotation(0.f, 0.f, 0.f);
+	FTransform Transform(Rotation, Location);
+		
+	MeshAdjMtx = Transform;
+	GetMesh()->SetRelativeTransform(MeshAdjMtx);
+
+	/** Set the faint state matrix */
+	FaintStateMtx = FTransform(
+		FRotator(0.f, 0.f, 90.f),
+		FVector::ZeroVector,
+		FVector::OneVector);
+	CB_FaintStateMtx =  MeshAdjMtx.Inverse() * FaintStateMtx * MeshAdjMtx;
 }

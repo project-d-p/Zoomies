@@ -3,6 +3,27 @@
 #include "CoreMinimal.h"
 #include "ScoreTypes.generated.h"
 
+struct FFinalScoreData
+{
+	TArray<TArray<EAnimal>> CapturedAnimals;
+	TArray<FScoreData> ScoreDatas;
+	bool bIsDetected = false;
+	FFinalScoreData& operator=(const FFinalScoreData& InFinalScoreData)
+	{
+		if (this != &InFinalScoreData)
+		{
+			CapturedAnimals.Empty();
+			for (const auto& AnimalArray : InFinalScoreData.CapturedAnimals)
+				CapturedAnimals.Add(AnimalArray);
+			ScoreDatas.Empty();
+			for (const auto& ScoreData : InFinalScoreData.ScoreDatas)
+				ScoreDatas.Add(ScoreData);
+			bIsDetected = InFinalScoreData.bIsDetected;
+		}
+		return *this;
+	}
+};
+
 UENUM(BlueprintType)
 enum class EPlayerJob : uint8
 {
@@ -11,6 +32,8 @@ enum class EPlayerJob : uint8
 	JOB_RINGMASTER UMETA(DisplayName = "Ringmaster"),
 	JOB_TERRORIST UMETA(DisplayName = "Terrorist"),
 	JOB_ENVIRONMENTALIST UMETA(DisplayName = "Environmentalist"),
+	JOB_CHECK UMETA(DisplayName = "Check"),
+	JOB_CROSS UMETA(DisplayName = "Cross"),
 };
 
 UENUM(BlueprintType)
@@ -52,4 +75,5 @@ struct FScoreData
 
 	UPROPERTY(BlueprintReadWrite, Category = "Score")
 	float mulMulScore = 1;
+
 };

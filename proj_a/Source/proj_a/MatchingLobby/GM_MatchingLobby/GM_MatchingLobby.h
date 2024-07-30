@@ -29,6 +29,7 @@ public:
 	FTimerHandle UnusedHandle;
 
 private:
+	void SetPlayerIdMap() const;
 	void StartGame_t() const;
 	FString InviteURL;
 protected:
