@@ -122,8 +122,8 @@ void ADPGameModeBase::StartPlay()
 {
 	Super::StartPlay();
 
-	// NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
-	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
+	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
+	// NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
 	NetworkManager->SetGameStartCallback(NUM_OF_MAX_CLIENTS, [this]()
 	{
 		this->OnGameStart();
