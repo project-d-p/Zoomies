@@ -94,6 +94,7 @@ public class proj_a : ModuleRules
 			"Niagara",
             "GameplayCameras"
         });
+		PrivateDependencyModuleNames.AddRange(new string[] { "CinematicCamera" });
 
 		string SteamSDKPath = Path.Combine(ModuleDirectory, "Steam");
 		if (Directory.Exists(SteamSDKPath))
@@ -147,6 +148,8 @@ public class proj_a : ModuleRules
 		{
 			PublicIncludePaths.Add(Path.Combine(protobufPath, "include"));
 			AddAllLibrariesFromPath(Path.Combine(protobufPath, "lib"));
+			RuntimeDependencies.Add("$(ProjectDir)/Binaries/Win64/libprotobuf.dll", Path.Combine(protobufPath, "bin", "libprotobuf.dll"));
+			RuntimeDependencies.Add("$(ProjectDir)/Binaries/Win64/libprotobuf-lite.dll", Path.Combine(protobufPath, "bin", "libprotobuf-lite.dll"));
 		}
 		else
 		{

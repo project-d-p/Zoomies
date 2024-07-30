@@ -9,6 +9,8 @@
 #include "FNetLogger.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "proj_a/MatchingLobby/CHAR_MatchingLobby/CHAR_MatchingLobby.h"
 //#include "DPWeapon.h"
 
 class ADPWeaponGun;
@@ -28,7 +30,19 @@ void UDPWeaponActorComponent::BeginPlay()
 	Super::BeginPlay();
 
 	TSubclassOf<ADPWeapon> gunClass = ADPWeaponGun::StaticClass();
-	this->AddWeapons(gunClass);
+	if (UWorld* World = GetWorld())
+	{
+		FString CurrentLevelName = UGameplayStatics::GetCurrentLevelName(World);
+		
+		if (CurrentLevelName == "matchLobby")
+		{
+			this->AddWeapons_MatchLobby(gunClass);
+		}
+		else
+		{
+			this->AddWeapons(gunClass);
+		}
+	}
 	this->Equip(gunClass);
 }
 
@@ -58,6 +72,21 @@ FVector UDPWeaponActorComponent::GetFireLocation()
 void UDPWeaponActorComponent::AddWeapons(TSubclassOf<ADPWeapon> weaponClass)
 {
 	ADPCharacter* playerCharacter = Cast<ADPCharacter>(GetOwner());
+	if (weaponClass) {
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = Cast<AActor>(playerCharacter);
+		ADPWeapon* newWeapon = GetWorld()->SpawnActor<ADPWeaponGun>(ADPWeaponGun::StaticClass(), spawnParams);
+		if (newWeapon)
+		{
+			weapons.Add(newWeapon); UE_LOG(LogTemp, Warning, TEXT("add weapon : %s"), *newWeapon->GetName());
+			newWeapon->AttachToComponent(playerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("gunSocket"));
+		}
+	}
+}
+
+void UDPWeaponActorComponent::AddWeapons_MatchLobby(TSubclassOf<ADPWeapon> weaponClass)
+{
+	ACHAR_MatchingLobby* playerCharacter = Cast<ACHAR_MatchingLobby>(GetOwner());
 	if (weaponClass) {
 		FActorSpawnParameters spawnParams;
 		spawnParams.Owner = Cast<AActor>(playerCharacter);

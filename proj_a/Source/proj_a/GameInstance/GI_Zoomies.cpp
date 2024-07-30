@@ -6,50 +6,26 @@
 #include "Kismet/GameplayStatics.h"
 #include "Online/OnlineSessionNames.h"
 
-void UGI_Zoomies::OnHostDisconnected()
-{
-	if (ADPPlayerController* PC = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController()))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Destroying PlayerController"));
-		PC->ReleaseMemory();
-		PC->Destroy();
-	}
-	UGameplayStatics::OpenLevel(GetWorld(), FName("lobbyLevel?closed"));
-}
-
-void UGI_Zoomies::HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type Arg,
-                                       const FString& String)
-{
-	if (Arg == ENetworkFailure::ConnectionLost || Arg == ENetworkFailure::ConnectionTimeout)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Network failure In HandleNetworkFailure: %s"), *String);
-		OnHostDisconnected();
-	}
-}
-
 void UGI_Zoomies::Init()
 {
 	Super::Init();
 	CheckSteamInit();
 }
 
-// matching session Functions
 void UGI_Zoomies::StartMatchMaking()
 {
-	FindSession_t();
+	FindSession();
 }
 
-void UGI_Zoomies::FindSession_t()
+void UGI_Zoomies::FindSession()
 {
-	// session search settings	
+	//Find Session by these settings
 	session_search_ = MakeShareable(new FOnlineSessionSearch());
 	session_search_->bIsLanQuery = true;
-		// online testing
-		// session_search_->bIsLanQuery = false;
 	session_search_->MaxSearchResults = 20;
 	session_search_->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
-	
-	// register find complete delegate
+
+	//add delegate to handle the result of found sessions
 	dh_on_find_complete = session_interface_->AddOnFindSessionsCompleteDelegate_Handle(
 		FOnFindSessionsCompleteDelegate::CreateUObject(
 			this,
@@ -65,38 +41,36 @@ void UGI_Zoomies::FindSession_t()
 
 void UGI_Zoomies::OnFindComplete(bool bWasSuccessful)
 {
-	// unregister the delegate
+	//unregister the delegate
 	session_interface_->ClearOnFindSessionsCompleteDelegate_Handle(
 		dh_on_find_complete
 		);
-	
-	// if we found a session, join it
+
+	//if we found right session, initiate join
 	if (bWasSuccessful && session_search_.IsValid())
 	{
 		if (session_search_->SearchResults.Num() > 0)
 		{	
-			JoinSession_t(session_search_->SearchResults[0]);
+			JoinSessionBySearchResult(session_search_->SearchResults[0]);
 		}
 		else
 		{
-			CreateSession_t();
+			CreateSession();
 		}
 	}
 }
 
-void UGI_Zoomies::CreateSession_t()
+void UGI_Zoomies::CreateSession()
 {
-	// session settings
+	//settings for create session
 	session_settings_ = MakeShareable(new FOnlineSessionSettings());
 	session_settings_->bIsLANMatch = true;
-		// online testing
-		// session_search_->bIsLANMatch = false;
 	session_settings_->NumPublicConnections = 4;
 	session_settings_->bShouldAdvertise = true;
 	session_settings_->bAllowJoinInProgress = true;
 	session_settings_->bUsesPresence = true;
 	
-	// register create complete delegate
+	// add delegate to handle the result of created session
 	session_settings_->Set(
 		SETTING_MAPNAME,
 		FString("matchLobby"),
@@ -125,7 +99,7 @@ void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
 	// if the session was created successfully, travel to the lobby level
 	if (bWasSuccessful)
 	{
-		// travel to lobby level
+		// travel to lobby level by a session host
 		GetWorld()->ServerTravel(TEXT("matchLobby?listen"), true);
 	}
 	else
@@ -134,7 +108,7 @@ void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
 	}
 }
 
-void UGI_Zoomies::JoinSession_t(const FOnlineSessionSearchResult& search_result)
+void UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& search_result)
 {
 	// register join complete delegate
 	dh_on_join_complete = session_interface_->AddOnJoinSessionCompleteDelegate_Handle(
@@ -166,19 +140,7 @@ void UGI_Zoomies::onJoinComplete(FName session_name, EOnJoinSessionCompleteResul
 		if (session_interface_->GetResolvedConnectString(session_name, travel_url))
 		{
 			UWorld* world = GetWorld();
-			if (world && world->GetMapName().Contains(travel_url))
-			{
-				//logging
-				if (GEngine)
-				{
-					GEngine->AddOnScreenDebugMessage(
-						-1,
-						30.f,
-						FColor::Cyan,
-						FString::Printf(TEXT("join complete & already in target map")));
-				}
-			}
-			else
+			if (world && !(world->GetMapName().Contains(travel_url)))
 			{
 				player_controller->ClientTravel(travel_url, ETravelType::TRAVEL_Absolute);
 			}
@@ -190,14 +152,80 @@ void UGI_Zoomies::onJoinComplete(FName session_name, EOnJoinSessionCompleteResul
 	}
 }
 
-void UGI_Zoomies::onDestroySessionComplete(FName session_name, bool bWasSuccessful)
+void UGI_Zoomies::OnSessionFailure()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Session %s was destroyed. Success: %s"), *session_name.ToString(), bWasSuccessful ? TEXT("true") : TEXT("false"))
-	
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		if (World->GetNetMode() == NM_ListenServer)
+		{
+			IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
+			if (OnlineSubsystem)
+			{
+				IOnlineSessionPtr Sessions = OnlineSubsystem->GetSessionInterface();
+				if (Sessions.IsValid())
+				{
+					FNamedOnlineSession* Session = Sessions->GetNamedSession(NAME_GameSession);
+					if (Session)
+					{
+						Sessions->EndSession(NAME_GameSession);
+					}
+				}
+			}
+			for (FConstPlayerControllerIterator It = World->GetPlayerControllerIterator(); It; ++It)
+			{
+				APlayerController* PlayerController = It->Get();
+				if (PlayerController)
+				{
+					PlayerController->ClientTravel(TEXT("lobbyLevel?closed"), ETravelType::TRAVEL_Absolute);
+				}
+			}
+			World->ServerTravel(TEXT("lobbyLevel?closed"), true);
+			session_interface_->DestroySession(NAME_GameSession);
+		}
+		else
+		{
+			APlayerController* CurrentPlayerController = GetWorld()->GetFirstPlayerController();
+			if (CurrentPlayerController)
+			{
+				CurrentPlayerController->ClientTravel(TEXT("lobbyLevel?closed"), ETravelType::TRAVEL_Absolute);
+				session_interface_->DestroySession(NAME_GameSession);
+			}
+		}
+	}
+}
+
+void UGI_Zoomies::OnDestroyComplete(FName session_name, bool bWasSuccessful)
+{
+	session_interface_->ClearOnDestroySessionCompleteDelegate_Handle(dh_on_destroy_complete);
+
 	if (bWasSuccessful)
 	{
-		OnHostDisconnected();
+		UE_LOG(LogTemp, Log, TEXT("Session destroyed successfully"));
 	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to destroy session"));
+	}
+}
+
+bool UGI_Zoomies::ResetSession()
+{
+	if (session_interface_.IsValid())
+	{
+		if (session_interface_->GetNamedSession(NAME_GameSession) != nullptr)
+		{
+			// Register OnDestroySessionComplete delegate
+			dh_on_destroy_complete = session_interface_->AddOnDestroySessionCompleteDelegate_Handle(
+				FOnDestroySessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::OnDestroyComplete)
+			);
+			// Destroy the current session
+			session_interface_->DestroySession(NAME_GameSession);
+			return true;
+		}
+	}
+	UE_LOG(LogTemp, Log, TEXT("no existing session to reset"));
+	return false;
 }
 
 void UGI_Zoomies::CheckSteamInit()
