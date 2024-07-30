@@ -42,6 +42,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void AddWeapons(TSubclassOf<ADPWeapon> weaponClass);
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void AddWeapons_MatchLobby(TSubclassOf<ADPWeapon> weaponClass);
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void Equip(TSubclassOf<ADPWeapon> weaponClass);
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	bool Attack(ADPPlayerController* controller, FHitResult& result, FRotator& info);
