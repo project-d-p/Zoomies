@@ -1,5 +1,6 @@
 #include "GI_Zoomies.h"
 #include "DPPlayerController.h"
+#include "FNetLogger.h"
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
 #include "steam_api.h"
@@ -25,19 +26,38 @@ IOnlineSessionPtr UGI_Zoomies::GetOnlineSessionInterface() const
 
 void UGI_Zoomies::FindSession()
 {
-	// session search settings	
+	FNetLogger::LogError(TEXT("FindSession_t"));
+    
+	// Session search settings 
 	session_search_ = MakeShareable(new FOnlineSessionSearch());
-	// session_search_->bIsLanQuery = false;
-	session_search_->bIsLanQuery = true; // for LAN testing
+    
+	// Align with CreateSession settings
+	bool bIsOnline = true;  // Set true for online mode, false for LAN mode
+	session_search_->bIsLanQuery = !bIsOnline;
+    
 	session_search_->MaxSearchResults = 20;
-	session_search_->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
+    
+	// Set query settings based on the online/LAN mode
+	if (bIsOnline)
+	{
+		session_search_->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
+        
+		// If using lobbies (as set in CreateSession)
+		session_search_->QuerySettings.Set(SEARCH_LOBBIES, true, EOnlineComparisonOp::Equals);
+	}
+	else
+	{
+		// For LAN, we don't need to set SEARCH_PRESENCE or SEARCH_LOBBIES
+		session_search_->QuerySettings.Set(SETTING_MAPNAME, FString("matchLobby"), EOnlineComparisonOp::Equals);
+	}
 
+	// Add delegate
 	dh_on_find_complete = session_interface_->AddOnFindSessionsCompleteDelegate_Handle(
-		FOnFindSessionsCompleteDelegate::CreateUObject(this, &UGI_Zoomies::OnFindComplete));
+	   FOnFindSessionsCompleteDelegate::CreateUObject(this, &UGI_Zoomies::OnFindComplete));
 
+	// Find sessions
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
 	session_interface_->FindSessions(*local_player->GetPreferredUniqueNetId(), session_search_.ToSharedRef());
-	FNetLogger::LogError(TEXT("FindSession_t"));
 }
 
 void UGI_Zoomies::OnFindComplete(bool bWasSuccessful)
@@ -68,21 +88,34 @@ void UGI_Zoomies::CreateSession()
 {
 	FNetLogger::LogError(TEXT("CreateSession_t"));
 	session_settings_ = MakeShareable(new FOnlineSessionSettings());
-	// session_settings_->bIsLANMatch = false;
-	session_settings_->bIsLANMatch = true; // for LAN testing
+    
+	// Online or LAN setting
+	bool bIsOnline = true;  // Set true for online mode, false for LAN mode
+	session_settings_->bIsLANMatch = !bIsOnline;
+    
 	session_settings_->NumPublicConnections = 4;
 	session_settings_->bShouldAdvertise = true;
 	session_settings_->bAllowJoinInProgress = true;
-	session_settings_->bUsesPresence = true;
-	
-	// add delegate to handle the result of created session
-	session_settings_->Set(
-		SETTING_MAPNAME,
-		FString("matchLobby"),
-		EOnlineDataAdvertisementType::ViaOnlineService);
-	dh_on_create_complete = session_interface_->AddOnCreateSessionCompleteDelegate_Handle(
-		FOnCreateSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onCreateComplete));
+
+	// Presence and lobby settings
+	session_settings_->bUsesPresence = bIsOnline;
+	session_settings_->bUseLobbiesIfAvailable = bIsOnline;
     
+	// Steam-related settings (for dedicated server)
+	// if (bIsOnline && !session_settings_->bUsesPresence)
+	// {
+	// 	session_settings_->Set(STEAMPRODUCTNAME, FString("YourAppID"), EOnlineDataAdvertisementType::ViaOnlineService);
+	// 	session_settings_->Set(STEAMGAMEDIR, FString("YourGameDir"), EOnlineDataAdvertisementType::ViaOnlineService);
+	// 	session_settings_->Set(STEAMGAMEDESC, FString("Your Game Description"), EOnlineDataAdvertisementType::ViaOnlineService);
+	// }
+
+	session_settings_->Set(SETTING_MAPNAME, FString("matchLobby"), EOnlineDataAdvertisementType::ViaOnlineService);
+    
+	// Add delegate
+	dh_on_create_complete = session_interface_->AddOnCreateSessionCompleteDelegate_Handle(
+	   FOnCreateSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onCreateComplete));
+    
+	// Create session
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
 	session_interface_->CreateSession(*local_player->GetPreferredUniqueNetId(), NAME_GameSession, *session_settings_);
 }
