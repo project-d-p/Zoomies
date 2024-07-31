@@ -83,7 +83,6 @@ public class proj_a : ModuleRules
 			"proj_a/Network/NetworkWorker/Public",
 			"proj_a/Network/SocketFactory/Public",
 			"proj_a/Network/SocketInterface/Public",
-			"proj_a/GameInstance/Public",
 			"proj_a/SteamGameManager/Public",
 			"proj_a/Lobby/Public",
 			"proj_a/Core/Public",
