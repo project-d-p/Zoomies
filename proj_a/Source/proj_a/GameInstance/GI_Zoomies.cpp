@@ -44,6 +44,7 @@ void UGI_Zoomies::FindSession()
         
 		// If using lobbies (as set in CreateSession)
 		session_search_->QuerySettings.Set(SEARCH_LOBBIES, true, EOnlineComparisonOp::Equals);
+		session_search_->QuerySettings.Set(SETTING_MAPNAME, FString("matchLobby"), EOnlineComparisonOp::Equals);
 	}
 	else
 	{
