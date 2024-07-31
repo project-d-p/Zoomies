@@ -44,7 +44,7 @@ void UGI_Zoomies::FindSession()
 		session_search_->QuerySettings.Set(SETTING_MAPNAME, FString("matchLobby"), EOnlineComparisonOp::Equals);
         
 		// If using lobbies (as set in CreateSession)
-		// session_search_->QuerySettings.Set(SEARCH_LOBBIES, true, EOnlineComparisonOp::Equals);
+		session_search_->QuerySettings.Set(SEARCH_LOBBIES, true, EOnlineComparisonOp::Equals);
 	}
 	else
 	{
@@ -92,7 +92,7 @@ void UGI_Zoomies::CreateSession()
 	session_settings_ = MakeShareable(new FOnlineSessionSettings());
     
 	// Online or LAN setting
-	bool bIsOnline = false;  // Set true for online mode, false for LAN mode
+	bool bIsOnline = true;  // Set true for online mode, false for LAN mode
 	session_settings_->bIsLANMatch = !bIsOnline;
     
 	session_settings_->NumPublicConnections = 4;
@@ -101,7 +101,7 @@ void UGI_Zoomies::CreateSession()
 
 	// Presence and lobby settings
 	session_settings_->bUsesPresence = true;
-	// session_settings_->bUseLobbiesIfAvailable = bIsOnline;
+	session_settings_->bUseLobbiesIfAvailable = bIsOnline;
     
 	// Steam-related settings (for dedicated server)
 	// if (bIsOnline && !session_settings_->bUsesPresence)
@@ -134,6 +134,7 @@ void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
 	{
 		// travel to lobby level
 		FNetLogger::LogError(TEXT("onCreateComplete"));
+
 		GetWorld()->ServerTravel(TEXT("matchLobby?listen"), true);
 	}
 	else
