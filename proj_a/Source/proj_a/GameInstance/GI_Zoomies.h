@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -18,7 +16,6 @@ public:
 	void OnHostDisconnected();
 	void HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type Arg, const FString& String);
 	virtual void Init() override;
-	virtual void ReturnToMainMenu() override;
 
 	// Matching starting function
 	UFUNCTION(BlueprintCallable, Category = "Network")
@@ -26,8 +23,11 @@ public:
 	IOnlineSessionPtr GetOnlineSessionInterface() const;
 
 	/* Number of players before Seamless Travel */
-	int player_count = 0;
+	bool ResetSession();
+	UFUNCTION(BlueprintCallable, Category = "Network")
+	void OnSessionFailure();
 
+	int player_count = 0;
 private:
 	// Online subsystem & session interface pointers
 	IOnlineSubsystem* online_subsystem_;
@@ -38,28 +38,29 @@ private:
 	TSharedPtr<FOnlineSessionSettings> session_settings_;
 	
 	// Matchmaking functions & callbacks & handlers
-	void FindSession_t();
+	void FindSession();
 	void OnFindComplete(bool bWasSuccessful);
 	FDelegateHandle dh_on_find_complete;
-	void JoinSession_t(const FOnlineSessionSearchResult& search_result);
+	void JoinSessionBySearchResult(const FOnlineSessionSearchResult& search_result);
 	void onJoinComplete(FName session_name, EOnJoinSessionCompleteResult::Type result);
 	FDelegateHandle dh_on_join_complete;
-	void CreateSession_t();
+	void CreateSession();
 	void onCreateComplete(FName session_name, bool bWasSuccessful);
 	FDelegateHandle dh_on_create_complete;
 	FOnCreateSessionComplete on_create_complete_event;
-	void onDestroySessionComplete(FName session_name, bool bWasSuccessful);
+	
+	void OnDestroyComplete(FName session_name, bool bWasSuccessful);
 	FDelegateHandle dh_on_destroy_complete;
+
 
 	int count = 0;
 	int max_count = 5;
 	bool is_steamAPI_init = false;
-	bool is_online_session_steam_init =false;
+	bool is_online_session_steam_init=false;
 
 	
 	FTimerHandle UnusedHandle;
 	void CheckSteamInit();
 	void InitSteamAPI();
 	void InitOnlineSubsystemSteam();
-
 };

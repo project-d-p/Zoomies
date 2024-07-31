@@ -6,18 +6,18 @@
 #include "DPPlayerState.h"
 #include "FNetLogger.h"
 #include "BaseInputComponent.h"
+#include "ClientNetworkManager.h"
 #include "JudgeGameMode.h"
 #include "JudgeLevelComponent.h"
 #include "MainLevelComponent.h"
 #include "ResultLevelComponent.h"
-#include "GameFramework/GameMode.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 DEFINE_LOG_CATEGORY(LogNetwork);
 
 ADPPlayerController::ADPPlayerController()
 {
-	Socket = CreateDefaultSubobject<UClientSocket>(TEXT("MySocket"));
+	NetworkManager = CreateDefaultSubobject<UClientNetworkManager>(TEXT("NetworkManager"));
 	PrivateScoreManager = CreateDefaultSubobject<UPrivateScoreManager>(TEXT("PrivateScoreManager"));
 	
 	UBaseLevelComponent* MainLevelComponet = CreateDefaultSubobject<UMainLevelComponent>(TEXT("MainLevelComponent"));
@@ -33,8 +33,6 @@ ADPPlayerController::ADPPlayerController()
 
 ADPPlayerController::~ADPPlayerController()
 {
-	FNetLogger::EditerLog(FColor::Red, TEXT("ADPPlayerController::~ADPPlayerController"));
-	FNetLogger::LogError(TEXT("PlayerController ID[~Destructor]: %d"), this->GetUniqueID());
 }
 
 UPlayerScoreComp* ADPPlayerController::GetScoreManagerComponent() const
@@ -51,9 +49,9 @@ UPrivateScoreManager* ADPPlayerController::GetPrivateScoreManagerComponent() con
 	return PrivateScoreManager;
 }
 
-UClientSocket* ADPPlayerController::GetClientSocket() const
+UANetworkManager* ADPPlayerController::GetNetworkManager() const
 {
-	return Socket;
+	return NetworkManager;
 }
 
 void ADPPlayerController::AcknowledgePossession(APawn* P)
@@ -91,28 +89,28 @@ void ADPPlayerController::ServerSendChatMessage_Implementation(const FString& Se
 
 void ADPPlayerController::ReleaseMemory()
 {
-	if (Socket)
-	{
-		Socket->DestoryInstance();
-		Socket->DestroyComponent();
-		Socket = nullptr;
-	}
+	NetworkManager->Shutdown();
 }
 
 void ADPPlayerController::ClientDestroySession_Implementation()
 {
 	// 게임 인스턴스를 통해 세션 제거
-	FNetLogger::LogError(TEXT("ClientDestroySession_Implementation Before"));
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
 	if (GameInstance)
 	{
 		IOnlineSessionPtr SessionInt = GameInstance->GetOnlineSessionInterface();
 		if (SessionInt.IsValid())
 		{
-			FNetLogger::LogError(TEXT("ClientDestroySession_Implementation After"));
 			SessionInt->DestroySession(NAME_GameSession);
 		}
 	}
+}
+
+void ADPPlayerController::ConnectToServer_Implementation(ELevelComponentType Type)
+{
+	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
+	// NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
+	SwitchLevelComponent(Type);
 }
 
 void ADPPlayerController::BeginPlay()
@@ -131,12 +129,7 @@ void ADPPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	if (Socket)
-	{
-		Socket->DestoryInstance();
-		Socket->DestroyComponent();
-		Socket = nullptr;
-	}
+	NetworkManager->Shutdown();
 }
 
 void ADPPlayerController::OnPossess(APawn* InPawn)
@@ -228,6 +221,7 @@ void ADPPlayerController::GetSeamlessTravelActorList(bool bToTransitionMap, TArr
 		{
 			return ;
 		}
+		NetworkManager->Shutdown();
 	}
 	this->SwitchLevelComponent(ELevelComponentType::NONE);
 }

@@ -28,7 +28,6 @@ void AJudgePlayerController::InitConstUI()
 	checkf(GM, TEXT("Failed to get JudgeGameState"))
 	TArray<TObjectPtr<APlayerState>> PA = GM->PlayerArray;
 	checkf(PA.Num() <= 4, TEXT("The number of players is more than 4"))
-	FNetLogger::LogInfo(TEXT("PA.Num(): %d"), PA.Num());
 	for (int i = 0; i < PA.Num(); i++)
 	{
 		JudgeLevelUI->SetBlockContent(ETextBlockType::Id, i, PA[i]->GetPlayerName());

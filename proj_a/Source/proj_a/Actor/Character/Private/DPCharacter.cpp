@@ -69,8 +69,6 @@ ADPCharacter::ADPCharacter()
 	GetMesh()->SetRelativeScale3D(FVector(0.35f, 0.35f, 0.35f));
 
 	springArm->TargetArmLength = 400.0f;
-	//springArm->SetRelativeLocation(FVector(0.f, 50.f, 150.f));
-	//springArm->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
 	springArm->bUsePawnControlRotation = true;
 	camera->SetRelativeLocation(FVector(0.f, 50.f, 150.f));
 
@@ -130,10 +128,6 @@ ADPCharacter::ADPCharacter()
 
 	// Enable hit events
 	GetCapsuleComponent()->SetNotifyRigidBodyCollision(true);
-    
-	// Bind the hit event
-	// Change To Server Logic
-	// GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ADPCharacter::OnHit);
 
 	GetMesh()->SetRenderCustomDepth(true);
 	GetMesh()->CustomDepthStencilValue = 2;
@@ -247,20 +241,11 @@ void ADPCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-bool ADPCharacter::IsLocallyControlled() const
-{
-	// Super::IsLocallyControlled();
-	// if (HasAuthority())
-	// 	return true;
-	return Super::IsLocallyControlled();
-}
-
-
 void ADPCharacter::PlayAimAnimation()
 {
 	if (characterMontage && !isAim ) {
 		isAim = true;
-		PlayAnimMontage(characterMontage, 1.f, "aim");	UE_LOG(LogTemp, Warning, TEXT("PlayAimAnimation"));
+		PlayAnimMontage(characterMontage, 1.f, "aim");
 
 		springArm->TargetArmLength = 270.0f;
 	}
@@ -270,7 +255,7 @@ void ADPCharacter::StopAimAnimation()
 {
 	if (characterMontage) {
 		isAim = false;
-		StopAnimMontage(characterMontage); UE_LOG(LogTemp, Warning, TEXT("StopAimAnimation"));
+		StopAnimMontage(characterMontage);
 
 		springArm->TargetArmLength = 400.0f;
 	}
@@ -279,7 +264,7 @@ void ADPCharacter::StopAimAnimation()
 void ADPCharacter::PlayFireAnimation()
 {
 	if (characterMontage) {
-		PlayAnimMontage(characterMontage, 1.f, "fire");	UE_LOG(LogTemp, Warning, TEXT("PlayFireAnimation"));
+		PlayAnimMontage(characterMontage, 1.f, "fire");
 	}
 
 	if (camera && cameraShake) {
@@ -291,7 +276,7 @@ void ADPCharacter::PlayFireAnimation()
 void ADPCharacter::ChangeAnimation()
 {
 	if (characterMontage) {
-		PlayAnimMontage(characterMontage, 1.f, "changeWeapon");	UE_LOG(LogTemp, Warning, TEXT("ChangeAnimation"));
+		PlayAnimMontage(characterMontage, 1.f, "changeWeapon");
 	}
 }
 
@@ -377,38 +362,6 @@ TArray<EAnimal> ADPCharacter::ReturnMonsters()
 {
 	return monsterSlotComponent->RemoveMonstersFromSlot();
 }
-
-/*
- * Move To Server Logic
-void ADPCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	FVector NormalImpulse, const FHitResult& Hit)
-{
-	if (this->IsStunned())
-	{
-		return ;
-	}
-	
-	ABaseMonsterCharacter* monster = Cast<ABaseMonsterCharacter>(OtherActor);
-	if (!monster)
-	{
-		return ;
-	}
-	
-	if (monster->GetState() == EMonsterState::Faint)
-	{
-		return ;
-	}
-	this->ApplyStunEffect();
-	
-	FTimerDelegate timerCollisionDelegate;
-	timerCollisionDelegate.BindLambda([this]()
-	{
-		this->RemoveStunEffect();
-	});
-	float stunTime = 1.0f;
-	GetWorld()->GetTimerManager().SetTimer(timerCollisionHandle, timerCollisionDelegate, stunTime, false);
-}
-*/
 
 void ADPCharacter::ApplyStunEffect()
 {

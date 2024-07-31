@@ -24,7 +24,6 @@ EPlayerJob AJudgeGameMode::CollateVotingResults()
 {
     TMap<EPlayerJob, int32> VoteCounts;
 
-    FNetLogger::EditerLog(FColor::Emerald, TEXT("PlayerVotes.Num(): %d"), PlayerVotes.Num());
     for (const EPlayerJob& Vote : PlayerVotes)
     {
         VoteCounts.FindOrAdd(Vote)++;

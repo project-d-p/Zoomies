@@ -1,9 +1,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ANetworkManager.h"
 #include "BaseLevelComponent.h"
 #include "message.pb.h"
-#include "SteamNetworkingSocket.h"
 #include "MainLevelComponent.generated.h"
 
 class UPrivateScoreManager;
@@ -42,12 +42,18 @@ public:
 	/* Handle Message From Client Only Execute in Server */
 	void HandlePosition(const ActorPosition& ActorPosition);
 
+	/*
+	 * TEST : COMMENT
+	 */
 	/* Simulate Gun Fire */
-	void SimulateGunFire(SteamNetworkingSocket* SteamSocket);
+	// void SimulateGunFire(SteamNetworkingSocket* SteamSocket);
+	void SimulateGunFire(UANetworkManager* NetworkManager); // TEST
 	/* Simulate Catch */
-	void SimulateCatch(SteamNetworkingSocket* SteamSocket);
+	// void SimulateCatch(SteamNetworkingSocket* SteamSocket);
+	void SimulateCatch(UANetworkManager* NetworkManager); // TEST
 	/* Simulate Aim */
-	void SimulateAim(SteamNetworkingSocket* SteamSocket);
+	// void SimulateAim(SteamNetworkingSocket* SteamSocket);
+	void SimulateAim(UANetworkManager* NetworkManager); // TEST
 	
 protected:
 	virtual void BeginPlay() override;

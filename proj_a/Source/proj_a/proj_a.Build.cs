@@ -9,6 +9,7 @@ public class proj_a : ModuleRules
 {
 	public proj_a(ReadOnlyTargetRules Target) : base(Target)
 	{
+		// PrivateDependencyModuleNames.AddRange(new string[] { "AdvancedSessions" });
 		string projectDir = Path.Combine(ModuleDirectory, "../../");
 		string thirdPartyDir = Path.Combine(projectDir, "ThirdParty");
 			
@@ -71,7 +72,6 @@ public class proj_a : ModuleRules
 			"proj_a/Component/InGame/ReturnPlace/Public",
 			"proj_a/Component/InGame/Score/Types",
 			"proj_a/Component/Audio/Public",
-			"proj_a/Component/ClientNetwork/Public",
 			"proj_a/ResultLevel/GameMode/Public",
 			"proj_a/ResultLevel/GameState/Public",
             "proj_a/Widget/Public",
@@ -79,12 +79,11 @@ public class proj_a : ModuleRules
             "proj_a/DataHub/Public",
 			"proj_a/Network/Public",
 			"proj_a/Network/NetLogger/Public",
-			"proj_a/Network/ReceiveTask/Public",
-			"proj_a/Network/SendTask/Public",
-			"proj_a/GameInstance/Public",
+			"proj_a/Network/NetworkManager/Public",
+			"proj_a/Network/NetworkWorker/Public",
+			"proj_a/Network/SocketFactory/Public",
+			"proj_a/Network/SocketInterface/Public",
 			"proj_a/SteamGameManager/Public",
-			"proj_a/ServerNetworkIO/Public",
-			"proj_a/ServerMessageHandler/Public",
 			"proj_a/Lobby/Public",
 			"proj_a/Core/Public",
 			"proj_a/Utility/Public",
@@ -110,8 +109,11 @@ public class proj_a : ModuleRules
 			"AIModule",
 			"NavigationSystem",
 			"Niagara",
-            "GameplayCameras"
+            "GameplayCameras",
+            "AdvancedSessions",
+            "AdvancedSteamSessions"
         });
+		PrivateDependencyModuleNames.AddRange(new string[] { "CinematicCamera" });
 
 		string SteamSDKPath = Path.Combine(ModuleDirectory, "Steam");
 		if (Directory.Exists(SteamSDKPath))
@@ -165,6 +167,8 @@ public class proj_a : ModuleRules
 		{
 			PublicIncludePaths.Add(Path.Combine(protobufPath, "include"));
 			AddAllLibrariesFromPath(Path.Combine(protobufPath, "lib"));
+			RuntimeDependencies.Add("$(ProjectDir)/Binaries/Win64/libprotobuf.dll", Path.Combine(protobufPath, "bin", "libprotobuf.dll"));
+			RuntimeDependencies.Add("$(ProjectDir)/Binaries/Win64/libprotobuf-lite.dll", Path.Combine(protobufPath, "bin", "libprotobuf-lite.dll"));
 		}
 		else
 		{

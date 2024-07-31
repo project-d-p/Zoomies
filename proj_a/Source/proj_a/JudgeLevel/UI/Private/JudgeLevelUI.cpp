@@ -28,7 +28,6 @@ void UJudgeLevelUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("JudgeLevelUI Constructed"));
 	
 	TimerUI = NewObject<UTimerUI>(Time_Text);
 	if (TimerUI)

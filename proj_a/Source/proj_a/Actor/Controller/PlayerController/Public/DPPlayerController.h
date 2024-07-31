@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "ChatManager.h"
-#include "ClientSocket.h"
 #include "proj_a/Component/InGame/Score/PrivateScoreManager.h"
 #include "BaseLevelComponent.h"
 #include "ELevelComponentType.h"
@@ -31,7 +30,6 @@ public:
 	void ServerSendChatMessage(const FString& SenderName, const FString& Message);
 
 	/* Switch level component Called By GameMode & GameState */
-	// UFUNCTION(Client, Reliable)
 	void SwitchLevelComponent(ELevelComponentType Type);
 
 	/* Get Level Component */
@@ -40,13 +38,19 @@ public:
 
 	UPlayerScoreComp* GetScoreManagerComponent() const;
 	UPrivateScoreManager* GetPrivateScoreManagerComponent() const;
-	UClientSocket* GetClientSocket() const;
+
+	UANetworkManager* GetNetworkManager() const;
 
 	void ReleaseMemory();
 
 	UFUNCTION(Client, Reliable)
 	void ClientDestroySession();
 
+	/// TEST
+	UFUNCTION(Client, Reliable)
+	void ConnectToServer(ELevelComponentType Type);
+	///
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -60,8 +64,9 @@ private:
 	// Move To PlayerState
 	UPROPERTY(VisibleAnywhere)
 	UPrivateScoreManager* PrivateScoreManager;
+
 	UPROPERTY()
-	UClientSocket* Socket = nullptr;
+	UANetworkManager* NetworkManager = nullptr;
 
 	UPROPERTY()
 	TMap<uint32, UBaseLevelComponent*> LevelComponents;
