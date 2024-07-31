@@ -41,14 +41,15 @@ void UGI_Zoomies::FindSession()
 	if (bIsOnline)
 	{
 		session_search_->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
+		session_search_->QuerySettings.Set(SETTING_MAPNAME, FString("matchLobby"), EOnlineComparisonOp::Equals);
         
 		// If using lobbies (as set in CreateSession)
-		session_search_->QuerySettings.Set(SEARCH_LOBBIES, true, EOnlineComparisonOp::Equals);
-		session_search_->QuerySettings.Set(SETTING_MAPNAME, FString("matchLobby"), EOnlineComparisonOp::Equals);
+		// session_search_->QuerySettings.Set(SEARCH_LOBBIES, true, EOnlineComparisonOp::Equals);
 	}
 	else
 	{
-		// For LAN, we don't need to set SEARCH_PRESENCE or SEARCH_LOBBIES
+		// For LAN, we don't need to set SEARCH_LOBBIES
+		session_search_->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 		session_search_->QuerySettings.Set(SETTING_MAPNAME, FString("matchLobby"), EOnlineComparisonOp::Equals);
 	}
 
@@ -91,7 +92,7 @@ void UGI_Zoomies::CreateSession()
 	session_settings_ = MakeShareable(new FOnlineSessionSettings());
     
 	// Online or LAN setting
-	bool bIsOnline = true;  // Set true for online mode, false for LAN mode
+	bool bIsOnline = false;  // Set true for online mode, false for LAN mode
 	session_settings_->bIsLANMatch = !bIsOnline;
     
 	session_settings_->NumPublicConnections = 4;
@@ -99,8 +100,8 @@ void UGI_Zoomies::CreateSession()
 	session_settings_->bAllowJoinInProgress = true;
 
 	// Presence and lobby settings
-	session_settings_->bUsesPresence = bIsOnline;
-	session_settings_->bUseLobbiesIfAvailable = bIsOnline;
+	session_settings_->bUsesPresence = true;
+	// session_settings_->bUseLobbiesIfAvailable = bIsOnline;
     
 	// Steam-related settings (for dedicated server)
 	// if (bIsOnline && !session_settings_->bUsesPresence)
