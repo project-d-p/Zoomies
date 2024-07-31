@@ -90,7 +90,17 @@ void UGI_Zoomies::CreateSession()
 {
 	FNetLogger::LogError(TEXT("CreateSession_t"));
 	session_settings_ = MakeShareable(new FOnlineSessionSettings());
-    
+
+	
+	// 이미 세션이 존재한다면 기존 세션을 삭제한다
+	auto ExistingSession = session_interface_->GetNamedSession(NAME_GameSession);
+	if (ExistingSession != nullptr)
+	{
+		session_interface_->DestroySession(NAME_GameSession);
+
+		FNetLogger::LogError(TEXT("Destroy existing session: %s"), NAME_GameSession);
+	}
+	
 	// Online or LAN setting
 	bool bIsOnline = true;  // Set true for online mode, false for LAN mode
 	session_settings_->bIsLANMatch = !bIsOnline;
