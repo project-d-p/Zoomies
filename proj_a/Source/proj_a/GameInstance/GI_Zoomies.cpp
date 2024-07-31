@@ -136,11 +136,6 @@ void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
 		FNetLogger::LogError(TEXT("onCreateComplete"));
 
 		GetWorld()->ServerTravel(TEXT("matchLobby?listen"), true);
-
-		FString NewMapName = TEXT("matchLobby");
-		FOnlineSessionSettings* SessionSettings = session_interface_->GetSessionSettings(NAME_GameSession);
-		SessionSettings->Set(SETTING_MAPNAME, NewMapName, EOnlineDataAdvertisementType::ViaOnlineService);
-		session_interface_->UpdateSession(NAME_GameSession, *SessionSettings);
 	}
 	else
 	{
@@ -159,29 +154,47 @@ void UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& se
 
 void UGI_Zoomies::onJoinComplete(FName session_name, EOnJoinSessionCompleteResult::Type result)
 {
-	// unregister the delegate
-	session_interface_->ClearOnJoinSessionCompleteDelegate_Handle(
-		dh_on_join_complete
-		);
-	
-	// if the join was successful, travel to the target map
 	if (result == EOnJoinSessionCompleteResult::Success)
 	{
 		APlayerController* player_controller = GetWorld()->GetFirstPlayerController();
-		FString travel_url;
-		if (session_interface_->GetResolvedConnectString(session_name, travel_url))
+		if (player_controller)
 		{
-			UWorld* world = GetWorld();
-			if (world && !(world->GetMapName().Contains(travel_url)))
+			FString connect_string;
+			if (session_interface_->GetResolvedConnectString(session_name, connect_string))
 			{
-				player_controller->ClientTravel(travel_url, ETravelType::TRAVEL_Absolute);
+				// Get map name from session settings
+				FString map_name;
+				FOnlineSessionSettings* session_settings = session_interface_->GetSessionSettings(session_name);
+				if (session_settings && session_settings->Get(SETTING_MAPNAME, map_name))
+				{
+					// URL: "IP:Port/MapName"
+					FString travel_url = FString::Printf(TEXT("%s/%s"), *connect_string, *map_name);
+					FNetLogger::LogError(TEXT("Joining address: %s"), *travel_url);
+                    
+					// ClientTravel to the map
+					player_controller->ClientTravel(travel_url, ETravelType::TRAVEL_Absolute);
+				}
+				else
+				{
+					FNetLogger::LogError(TEXT("Failed to get map name from session settings"));
+				}
+			}
+			else
+			{
+				FNetLogger::LogError(TEXT("Failed to get resolved connect string"));
 			}
 		}
 		else
 		{
-			UE_LOG(LogTemp, Error, TEXT("Failed to get travel URL"));
+			FNetLogger::LogError(TEXT("PlayerController is null"));
 		}
 	}
+	else
+	{
+		FNetLogger::LogError(TEXT("Join session failed with result: %d"), static_cast<int32>(result));
+	}
+
+	session_interface_->ClearOnJoinSessionCompleteDelegate_Handle(dh_on_join_complete);
 }
 
 void UGI_Zoomies::OnSessionFailure()
