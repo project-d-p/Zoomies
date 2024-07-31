@@ -136,6 +136,11 @@ void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
 		FNetLogger::LogError(TEXT("onCreateComplete"));
 
 		GetWorld()->ServerTravel(TEXT("matchLobby?listen"), true);
+
+		FString NewMapName = TEXT("matchLobby");
+		FOnlineSessionSettings* SessionSettings = session_interface_->GetSessionSettings(NAME_GameSession);
+		SessionSettings->Set(SETTING_MAPNAME, NewMapName, EOnlineDataAdvertisementType::ViaOnlineService);
+		session_interface_->UpdateSession(NAME_GameSession, *SessionSettings);
 	}
 	else
 	{
