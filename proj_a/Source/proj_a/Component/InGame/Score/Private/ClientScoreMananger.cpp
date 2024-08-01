@@ -35,7 +35,15 @@ void UClientScoreMananger::InitScoreUi()
 
 void UClientScoreMananger::SetScoreUI(UScoreUI* InScoreUI)
 {
-	ScoreUI = InScoreUI;
+	if (ScoreUI != nullptr)
+	{
+		ScoreUI->DestroyComponent();
+		ScoreUI = InScoreUI;
+	}
+	else
+	{
+		ScoreUI = InScoreUI;
+	}
 }
 
 void UClientScoreMananger::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

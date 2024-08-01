@@ -78,7 +78,7 @@ private:
 	void SpawnMonsters(float delta_time);
 
 	// Member variables
-	enum { NUM_OF_MAX_CLIENTS = 2 };
+	enum { NUM_OF_MAX_CLIENTS = 4 };
 
 	// SteamNetworkingSocket* steam_listen_socket_ = nullptr;
 	UPROPERTY()
