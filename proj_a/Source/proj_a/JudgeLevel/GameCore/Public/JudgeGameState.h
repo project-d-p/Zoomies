@@ -18,6 +18,9 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void NotifyTimerEnd();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void SetVoterName(const FString& Name);
 	
 protected:
 	virtual void BeginPlay() override;

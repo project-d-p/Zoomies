@@ -1,6 +1,7 @@
 ﻿#include "JudgeGameState.h"
 
 #include "DPPlayerController.h"
+#include "FNetLogger.h"
 #include "JudgePlayerController.h"
 #include "Net/UnrealNetwork.h"
 
@@ -16,8 +17,17 @@ void AJudgeGameState::NotifyTimerEnd_Implementation()
 	AJudgePlayerController* PC = Cast<AJudgePlayerController>(GetWorld()->GetFirstPlayerController());
 	if (!PC || !PC->GetJudgeLevelUI())
 		return;
-	FNetLogger::EditerLog(FColor::Green, TEXT("JudgeLevelUI: %d"), PC->GetJudgeLevelUI()->GetVote());
 	PC->ReturnVote(PC->GetJudgeLevelUI()->GetVote());
+}
+
+void AJudgeGameState::SetVoterName_Implementation(const FString& Name)
+{
+	AJudgePlayerController* PC = Cast<AJudgePlayerController>(GetWorld()->GetFirstPlayerController());
+	// XXX: This code may fail if the client's loading is slow.
+	// In such cases, the voter name might not be set properly.
+	// TODO: Address this after alpha testing.
+	check(PC && PC->GetJudgeLevelUI())
+	PC->GetJudgeLevelUI()->SetVoterName(Name);
 }
 
 void AJudgeGameState::BeginPlay()

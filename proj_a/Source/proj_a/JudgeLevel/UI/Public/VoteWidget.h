@@ -35,6 +35,8 @@ class PROJ_A_API UVoteWidget : public UUserWidget
 
 public:
     EPlayerJob GetVote() const { return CurrentVoterOcc; }
+    void SetVoterName(const FString& Name) { VoterName->SetText(FText::FromString(Name)); }
+    
 protected:
     UPROPERTY(meta = (BindWidget))
     UButton* OpenVoteListButton;

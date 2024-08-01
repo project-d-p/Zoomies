@@ -8,30 +8,34 @@
 #include "GameFramework/GameModeBase.h"
 #include "JudgeGameMode.generated.h"
 
-
-// 추후 변경
-inline FString OccupationToString(EPlayerJob Occupation)
+USTRUCT()
+struct FPlayerInitData
 {
-    switch(Occupation)
-    {
-    case EPlayerJob::JOB_ARCHAEOLOGIST:
-        return FString("ARCHAEOLOGIST");
-    case EPlayerJob::JOB_POACHER:
-        return FString("POACHER");
-    case EPlayerJob::JOB_ENVIRONMENTALIST:
-        return FString("ENVIRONMENTALIST");
-    case EPlayerJob::JOB_RINGMASTER:
-        return FString("RINGMASTER");
-    case EPlayerJob::JOB_TERRORIST:
-        return FString("TERRORIST");
-    case EPlayerJob::JOB_CHECK:
-        return FString("CHECK");
-    case EPlayerJob::JOB_CROSS:
-        return FString("CROSS");
-    default:
-        return FString("UNKNOWN");
-    }
-}
+    GENERATED_BODY()
+
+    UPROPERTY()
+    FString PlayerName;
+    UPROPERTY()
+    int32 Score;
+    UPROPERTY()
+    FString Occupation;
+
+    FPlayerInitData() : Score(0), Occupation(TEXT("None")) {}
+
+    FPlayerInitData(const FString& InName, int32 InScore, const FString& InOccupation = TEXT("None"))
+        : PlayerName(InName), Score(InScore), Occupation(InOccupation) {}
+};
+
+USTRUCT()
+struct FUIInitData
+{
+    GENERATED_BODY()
+
+    UPROPERTY()
+    TArray<FPlayerInitData> PlayerData;
+    UPROPERTY()
+    FString VoterName;
+};
 
 UCLASS()
 class PROJ_A_API AJudgeGameMode : public AGameModeBase, public IChatGameMode
@@ -43,6 +47,7 @@ public:
 
     void AddVote(EPlayerJob Occupation) { PlayerVotes.Add(Occupation); }
     virtual UServerChatManager* GetChatManager() const override { return ChatManager; }
+    FUIInitData GetUiData();
 
 private:
     EPlayerJob CollateVotingResults();
