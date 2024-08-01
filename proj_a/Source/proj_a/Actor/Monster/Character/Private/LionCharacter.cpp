@@ -7,7 +7,7 @@ ALionCharacter::ALionCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_LION
-	(PathManager::GetMonsterPath(EMonster::LION));
+	(PathManager::GetMonsterPath(EAnimal::ANIMAL_LION));
 	if (SK_LION.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_LION.Object);
 	}
@@ -15,7 +15,7 @@ ALionCharacter::ALionCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(TEXT("/Game/animation/animals/lionAnimation.lionAnimation_C"));
+	(PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_LION));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}

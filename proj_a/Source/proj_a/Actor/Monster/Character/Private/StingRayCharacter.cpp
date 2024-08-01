@@ -7,7 +7,7 @@ AStingRayCharacter::AStingRayCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_STINGRAY
-	(PathManager::GetMonsterPath(EMonster::STINGRAY));
+	(PathManager::GetMonsterPath(EAnimal::ANIMAL_STINGRAY));
 	if (SK_STINGRAY.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_STINGRAY.Object);
 	}
@@ -15,7 +15,7 @@ AStingRayCharacter::AStingRayCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER(
-		TEXT("/Game/animation/animals/stingRayAnimation.stingRayAnimation_C"));
+		PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_STINGRAY));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}

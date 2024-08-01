@@ -20,6 +20,25 @@ AJudgeGameMode::AJudgeGameMode()
     bUseSeamlessTravel = true;
 }
 
+FUIInitData AJudgeGameMode::GetUiData()
+{
+    FUIInitData UIData;
+    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+    {
+        AJudgePlayerController* PC = Cast<AJudgePlayerController>(*It);
+        check(PC)
+        AJudgePlayerState* PS = Cast<AJudgePlayerState>(PC->PlayerState);
+        check(PS)
+        FPlayerInitData PlayerData;
+        PlayerData.PlayerName = PS->GetPlayerName();
+        PlayerData.Score = PS->GetScore();
+        UIData.PlayerData.Add(PlayerData);
+    }
+    // for now, following code is temporary. (Current player index)
+    UIData.VoterName = Cast<AJudgePlayerState>(GetWorld()->GetGameState<AJudgeGameState>()->PlayerArray[CurrentPlayerIndex])->GetPlayerName();
+    return UIData;
+}
+
 EPlayerJob AJudgeGameMode::CollateVotingResults()
 {
     TMap<EPlayerJob, int32> VoteCounts;
@@ -45,7 +64,20 @@ void AJudgeGameMode::ProcessVotingResults()
     {
         PS->SetIsDetected(true);
     }
+
+    constexpr int TOTAL_PLAYER = 2;
+    if (CurrentPlayerIndex == TOTAL_PLAYER)
+    {
+        EndTimer();
+        return;
+    }
     
+    PS = Cast<AJudgePlayerState>(GetWorld()->GetGameState<AJudgeGameState>()->PlayerArray[CurrentPlayerIndex]);
+    FString PName = PS->GetPlayerName();
+    AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
+    check(GS)
+    GS->SetVoterName(PName);
+
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         AJudgePlayerController* PC = Cast<AJudgePlayerController>(*It);
@@ -58,7 +90,7 @@ void AJudgeGameMode::ProcessVotingResults()
 void AJudgeGameMode::EndTimer()
 {
     constexpr int TOTAL_PLAYER = 2;
-    if (++CurrentPlayerIndex < TOTAL_PLAYER)
+    if (CurrentPlayerIndex++ < TOTAL_PLAYER)
     {
         AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
         check(GS)

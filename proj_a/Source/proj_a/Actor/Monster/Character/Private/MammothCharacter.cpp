@@ -7,7 +7,7 @@ AMammothCharacter::AMammothCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MAMMOTH
-	(PathManager::GetMonsterPath(EMonster::MAMMOTH));
+	(PathManager::GetMonsterPath(EAnimal::ANIMAL_MAMMOTH));
 	if (SK_MAMMOTH.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_MAMMOTH.Object);
 	}
@@ -15,7 +15,7 @@ AMammothCharacter::AMammothCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(TEXT("/Game/animation/animals/mammothAnimation.mammothAnimation_C"));
+	(PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_MAMMOTH));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}

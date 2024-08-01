@@ -7,7 +7,7 @@ ASlothCharacter::ASlothCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SLOTH
-	(PathManager::GetMonsterPath(EMonster::SLOTH));
+	(PathManager::GetMonsterPath(EAnimal::ANIMAL_SLOTH));
 	if (SK_SLOTH.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_SLOTH.Object);
 	}
@@ -15,7 +15,7 @@ ASlothCharacter::ASlothCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(TEXT("/Game/animation/animals/slothAnimation.slothAnimation_C"));
+	(PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_SLOTH));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}

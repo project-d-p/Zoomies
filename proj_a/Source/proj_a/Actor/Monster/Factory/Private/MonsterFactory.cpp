@@ -3,7 +3,7 @@
 #include "AvoidPlayerMonsterAIController.h"
 #include "BaseMonsterAIController.h"
 #include "BaseMonsterCharacter.h"
-#include "ChamalionCharacter.h"
+#include "ChamelionCharacter.h"
 #include "ChasePlayerMonsterAIController.h"
 #include "CrabCharacter.h"
 #include "DolphinCharacter.h"
@@ -57,7 +57,7 @@ ABaseMonsterAIController* UMonsterFactory::RandomMonsterSpawn(int32 idx)
 		ALionCharacter::StaticClass(),
 		APenguinCharacter::StaticClass(),
 		AHorseCharacter::StaticClass(),
-		AChamalionCharacter::StaticClass(),
+		AChamelionCharacter::StaticClass(),
 		ASaberToothTigerCharacter::StaticClass(),
 		ASealCharacter::StaticClass(),
 		ASkunkCharacter::StaticClass(),
