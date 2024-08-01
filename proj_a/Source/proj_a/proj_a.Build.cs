@@ -110,8 +110,6 @@ public class proj_a : ModuleRules
 			"NavigationSystem",
 			"Niagara",
             "GameplayCameras",
-            "AdvancedSessions",
-            "AdvancedSteamSessions"
         });
 		PrivateDependencyModuleNames.AddRange(new string[] { "CinematicCamera" });
 
@@ -169,6 +167,8 @@ public class proj_a : ModuleRules
 			AddAllLibrariesFromPath(Path.Combine(protobufPath, "lib"));
 			RuntimeDependencies.Add("$(ProjectDir)/Binaries/Win64/libprotobuf.dll", Path.Combine(protobufPath, "bin", "libprotobuf.dll"));
 			RuntimeDependencies.Add("$(ProjectDir)/Binaries/Win64/libprotobuf-lite.dll", Path.Combine(protobufPath, "bin", "libprotobuf-lite.dll"));
+			RuntimeDependencies.Add("$(ProjectDir)/Binaries/Win64/libprotoc.dll", Path.Combine(protobufPath, "bin", "libprotoc.dll"));
+			RuntimeDependencies.Add("$(ProjectDir)/Binaries/Win64/zlib1.dll", Path.Combine(protobufPath, "tools", "protobuf", "zlib1.dll"));
 		}
 		else
 		{
