@@ -7,7 +7,7 @@ ADolphinCharacter::ADolphinCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_DOLPHIN
-	(PathManager::GetMonsterPath(EMonster::DOLPHIN));
+	(PathManager::GetMonsterPath(EAnimal::ANIMAL_DOLPHIN));
 	if (SK_DOLPHIN.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_DOLPHIN.Object);
 	}
@@ -15,7 +15,7 @@ ADolphinCharacter::ADolphinCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER(
-		TEXT("/Game/animation/animals/dolphinAnimation.dolphinAnimation_C"));
+		PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_DOLPHIN));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}

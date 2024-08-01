@@ -31,8 +31,9 @@ FScoreData UCalculateScoreByJobs::CalculateScoreByJobs(EPlayerJob Job, const TAr
 					EAnimal::ANIMAL_GIRAFFE,
 					{TArray<EAnimal>{
 						EAnimal::ANIMAL_GIRAFFE,
-						EAnimal::ANIMAL_RABBIT,
-						EAnimal::ANIMAL_SHEPHERD}},
+						// EAnimal::ANIMAL_RABBIT,
+						// EAnimal::ANIMAL_SHEPHERD
+						}},
 					{TArray<EAnimal>{
 						EAnimal::ANIMAL_SABER_TOOTH_TIGER,
 						EAnimal::ANIMAL_LION,
@@ -52,7 +53,7 @@ FScoreData UCalculateScoreByJobs::CalculateScoreByJobs(EPlayerJob Job, const TAr
 					EAnimal::ANIMAL_LION,
 					EAnimal::ANIMAL_SABER_TOOTH_TIGER,
 					EAnimal::ANIMAL_SEAL,
-					EAnimal::ANIMAL_RABBIT,
+					// EAnimal::ANIMAL_RABBIT,
 					EAnimal::ANIMAL_FOX}});
 			break;
 		case EPlayerJob::JOB_TERRORIST:

@@ -1,6 +1,7 @@
 ﻿#include "JudgePlayerController.h"
 
 #include "DPPlayerController.h"
+#include "FNetLogger.h"
 #include "IChatGameMode.h"
 #include "JudgeGameMode.h"
 #include "JudgeGameState.h"
@@ -22,24 +23,32 @@ AJudgePlayerController::AJudgePlayerController()
 	}
 }
 
-void AJudgePlayerController::InitConstUI()
-{
-	AJudgeGameState* GM = Cast<AJudgeGameState>(GetWorld()->GetGameState());
-	checkf(GM, TEXT("Failed to get JudgeGameState"))
-	TArray<TObjectPtr<APlayerState>> PA = GM->PlayerArray;
-	checkf(PA.Num() <= 4, TEXT("The number of players is more than 4"))
-	for (int i = 0; i < PA.Num(); i++)
-	{
-		JudgeLevelUI->SetBlockContent(ETextBlockType::Id, i, PA[i]->GetPlayerName());
-		JudgeLevelUI->SetBlockContent(ETextBlockType::Score, i, FString::FromInt(PA[i]->GetScore()));
-		SetOccupationeName_Implementation(i, TEXT("None"));
-	}
-}
-
 void AJudgePlayerController::SetOccupationeName_Implementation(int index, const FString& Name)
 {
+	// XXX: If the client experiences slow loading times, issues may arise with the code below.
+	// TODO: Address this after alpha testing.
 	check(JudgeLevelUI)
 	JudgeLevelUI->SetBlockContent(ETextBlockType::Occupation, index, Name);
+}
+
+void AJudgePlayerController::InitializeUI_Implementation(const FUIInitData UIData)
+{
+	check(JudgeLevelUI)
+	for (int32 i = 0; i < UIData.PlayerData.Num(); i++)
+	{
+		const FPlayerInitData& PlayerData = UIData.PlayerData[i];
+    
+		JudgeLevelUI->SetBlockContent(ETextBlockType::Id, i, PlayerData.PlayerName);
+		JudgeLevelUI->SetBlockContent(ETextBlockType::Score, i, FString::FromInt(PlayerData.Score));
+		JudgeLevelUI->SetBlockContent(ETextBlockType::Occupation, i, PlayerData.Occupation);
+	}
+	JudgeLevelUI->SetVoterName(UIData.VoterName);
+}
+
+void AJudgePlayerController::SetVoterName_Implementation(const FString& Name)
+{
+	check(JudgeLevelUI)
+	JudgeLevelUI->SetVoterName(Name);
 }
 
 void AJudgePlayerController::ServerSendChatMessage_Implementation(const FString& SenderName, const FString& Message)
@@ -52,7 +61,20 @@ void AJudgePlayerController::ServerSendChatMessage_Implementation(const FString&
 void AJudgePlayerController::ReturnVote_Implementation(EPlayerJob Type)
 {
 	AJudgeGameMode* GM = Cast<AJudgeGameMode>(GetWorld()->GetAuthGameMode());
+	check(GM)
 	GM->AddVote(Type);
+}
+
+void AJudgePlayerController::RequestUIData_Implementation()
+{
+	AJudgeGameMode* GM = Cast<AJudgeGameMode>(GetWorld()->GetAuthGameMode());
+	check(GM)
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		AJudgePlayerController* JPS = Cast<AJudgePlayerController>(*It);
+		check(JPS)
+		JPS->InitializeUI(GM->GetUiData());
+	}
 }
 
 void AJudgePlayerController::BeginPlay()
@@ -66,10 +88,10 @@ void AJudgePlayerController::BeginPlay()
 		checkf(JudgeLevelUI, TEXT("Failed to create JudgeLevelUI"));
 		JudgeLevelUI->AddToViewport();
 		IsBeginPlay = true;
-
-		FTimerHandle UIUpdateTimerHandle;
-		GetWorldTimerManager().SetTimer(UIUpdateTimerHandle, this, &AJudgePlayerController::InitConstUI, 1.0f, false);
 		bShowMouseCursor = true;
+
+		FTimerHandle TH;
+		GetWorldTimerManager().SetTimer(TH, this, &AJudgePlayerController::RequestUIData, 1.f, false);
 	}
 }
 

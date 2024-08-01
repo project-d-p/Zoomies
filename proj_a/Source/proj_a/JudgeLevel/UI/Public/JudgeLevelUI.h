@@ -23,6 +23,7 @@ class PROJ_A_API UJudgeLevelUI : public UUserWidget
 public:
 	void SetBlockContent(ETextBlockType BlockType, int32 Index, const FString& Content);
 	EPlayerJob GetVote() const { return widget_vote->GetVote(); }
+	void SetVoterName(const FString& Name) { widget_vote->SetVoterName(Name); }
 
 protected:
 	void InitTextBlocksFromContainer(UPanelWidget* Container, TArray<UTextBlock*>& OutTextBlocks);

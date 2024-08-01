@@ -3,6 +3,7 @@
 #include "IChatGameMode.h"
 #include "IChatGameState.h"
 #include "JudgePlayerController.h"
+#include "Fonts/FontTypes.h"
 #include "ServerChatManager.h"
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/GameModeBase.h"
@@ -99,7 +100,15 @@ void UChatUI::AddChatMessage(const FString& SenderName, const FString& Message)
 	ChatMessage->SetText(FText::FromString(FullMessage));
 	UVerticalBoxSlot* NewSlot = ChatLogBox->AddChildToVerticalBox(ChatMessage);
 	NewSlot->SetPadding(FMargin(5.0f, 5.0f));
-
+	
+	FSlateFontInfo FontInfo;
+	FontInfo.Size = 28.0f;
+	UObject* FontObj = LoadObject<UObject>(this, TEXT("/Script/Engine.Font'/Game/font/HakgyoansimKkokkomaR_Font.HakgyoansimKkokkomaR_Font'"), NULL, LOAD_None, NULL);
+	check(FontObj)
+	FontInfo.FontObject = FontObj;
+	FontInfo.TypefaceFontName = "SemiBold";
+	ChatMessage->SetFont(FontInfo);
+	
 	check(ChatScrollBox)
 	ChatScrollBox->ScrollToEnd();
 }

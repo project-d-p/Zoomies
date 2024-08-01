@@ -7,7 +7,7 @@ AGiraffeCharacter::AGiraffeCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_GIRAFFE
-	(PathManager::GetMonsterPath(EMonster::GIRAFFE));
+	(PathManager::GetMonsterPath(EAnimal::ANIMAL_GIRAFFE));
 	if (SK_GIRAFFE.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_GIRAFFE.Object);
 	}
@@ -15,7 +15,7 @@ AGiraffeCharacter::AGiraffeCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(TEXT("/Game/animation/animals/giraffeAnimation.giraffeAnimation_C"));
+	(PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_GIRAFFE));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}
