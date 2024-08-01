@@ -89,7 +89,7 @@ void AJudgeGameMode::ProcessVotingResults()
 
 void AJudgeGameMode::EndTimer()
 {
-    constexpr int TOTAL_PLAYER = 2;
+    constexpr int TOTAL_PLAYER = 4;
     if (CurrentPlayerIndex++ < TOTAL_PLAYER)
     {
         AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
