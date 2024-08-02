@@ -1,13 +1,15 @@
 #include "DPPlayerState.h"
 
+#include "DPInGameState.h"
 #include "FNetLogger.h"
+#include "JudgePlayerState.h"
 #include "PlayerName.h"
 #include "PlayerScoreComp.h"
 #include "Net/UnrealNetwork.h"
 
 ADPPlayerState::ADPPlayerState()
 {
-	// bReplicates = true;
+	bReplicates = true;
 	
 	PlayerScoreComp = CreateDefaultSubobject<UPlayerScoreComp>(TEXT("PlayerScore"));
 	FString PlayerName = FGuid::NewGuid().ToString();
@@ -24,6 +26,28 @@ EPlayerJob ADPPlayerState::GetPlayerJob() const
 	return PlayerJob;
 }
 
+void ADPPlayerState::OnRep_Rank()
+{
+}
+
+void ADPPlayerState::CopyProperties(APlayerState* PlayerState)
+{
+	Super::CopyProperties(PlayerState);
+	
+	AJudgePlayerState* JPS = Cast<AJudgePlayerState>(PlayerState);
+	if (JPS)
+	{
+		JPS->SetPlayerJob(PlayerJob);
+	}
+}
+
+void ADPPlayerState::ServerSetRank_Implementation(int InRank)
+{
+	Rank = InRank;
+
+	OnRep_Rank();
+}
+
 void ADPPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
@@ -33,7 +57,6 @@ void ADPPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	// DOREPLIFETIME(ADPPlayerState, PlayerScoreComp);
-	// DOREPLIFETIME(ADPPlayerState, APlayerState::PlayerName);
 	DOREPLIFETIME(ADPPlayerState, PlayerJob);
+	DOREPLIFETIME(ADPPlayerState, Rank);
 }

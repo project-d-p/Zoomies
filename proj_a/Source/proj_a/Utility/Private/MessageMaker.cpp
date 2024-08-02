@@ -43,7 +43,7 @@ Message MessageMaker::MakeMovementMessage(const ADPPlayerController* Controller,
 Message MessageMaker::MakePositionMessage(const ADPPlayerController* Controller)
 {
 	Message msg;
-	if (Controller == nullptr)
+	if (Controller == nullptr || !IsValid(Controller))
 	{
 		return msg;
 	}
@@ -53,6 +53,10 @@ Message MessageMaker::MakePositionMessage(const ADPPlayerController* Controller)
 	}
 	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetPlayerName()));
 	ActorPosition actor_position;
+	if (Controller->GetPawn() == nullptr || !IsValid(Controller->GetPawn()))
+	{
+		return msg;
+	}
 	Vec3 position;
 	position.set_x(Controller->GetPawn()->GetActorLocation().X);
 	position.set_y(Controller->GetPawn()->GetActorLocation().Y);

@@ -3,6 +3,7 @@
 
 #include "DPIngameWidget.h"
 
+#include "DPInGameState.h"
 #include "DPPlayerState.h"
 #include "FNetLogger.h"
 #include "PlayerScoreComp.h"
@@ -20,7 +21,7 @@ void UDPIngameWidget::NativeConstruct()
 		FTimerUiInitializer TimerUiInitializer;
 		TimerUiInitializer.Time_Text = Time_Text;
 		TimerUiInitializer.InWorld = GetWorld();
-		TimerUI->initTimerUI(TimerUiInitializer);
+		TimerUI->initTimerUI<ADPInGameState>(TimerUiInitializer);
 	}
 	
 	ScoreUI = NewObject<UScoreUI>(this);

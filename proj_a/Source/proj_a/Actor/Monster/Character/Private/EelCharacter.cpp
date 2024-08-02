@@ -7,7 +7,7 @@ AEelCharacter::AEelCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_EEL
-	(TEXT("/Game/model/animals/eel/eel.eel"));
+	(PathManager::GetMonsterPath(EAnimal::ANIMAL_EEL));
 	if (SK_EEL.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_EEL.Object);
 	}
@@ -15,17 +15,33 @@ AEelCharacter::AEelCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER(
-		TEXT("/Game/animation/animals/eelAnimation.eelAnimation_C"));
+		PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_EEL));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}
 
 	/** Set the Capsule size */
-	GetCapsuleComponent()->SetCapsuleRadius(65.f);
-	GetCapsuleComponent()->SetCapsuleHalfHeight(65.f);
+	DefaultCP.Radius = 34.f;
+	DefaultCP.HalfHeight = 88.f;
+	GetCapsuleComponent()->SetCapsuleRadius(DefaultCP.Radius);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(DefaultCP.HalfHeight);
+
+	FaintCP.Radius = 34.f;
+	FaintCP.HalfHeight = 34.f;
 	
-	/** Set the model size */
-	GetMesh()->SetRelativeScale3D(FVector(1.00f, 1.00f, 1.00f));
-	GetMesh()->SetRelativeLocationAndRotation(
-		FVector(0.f, 0.f, -20.f), FRotator(0.f, -90.f, 0.f));
+	/** Set the model size and adjust position */
+	FVector Scale(FVector::OneVector);
+	FVector Location(0.f, 0.f, 10.f);
+	FRotator Rotation(0.f, 0.f, 0.f);
+	FTransform Transform(Rotation, Location, Scale);
+		
+	MeshAdjMtx = Transform;
+	GetMesh()->SetRelativeTransform(MeshAdjMtx);
+
+	/** Set the faint state matrix */
+	FaintStateMtx = FTransform(
+		FRotator(0.f, 0.f, 90.f),
+		FVector::ZeroVector,
+		FVector::OneVector);
+	CB_FaintStateMtx =  MeshAdjMtx.Inverse() * FaintStateMtx * MeshAdjMtx;
 }

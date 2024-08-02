@@ -21,7 +21,7 @@ public:
 	UFUNCTION()
 	void OnRep_TimeRemaining();
 	
-	UFUNCTION()
+	UFUNCTION() 
 	void SetTimerUI(UTimerUI* inTime_Text);
 protected:
 	virtual void BeginPlay() override;

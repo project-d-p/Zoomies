@@ -6,6 +6,7 @@
 #include "DPCharacter.h"
 #include "DPWeaponActorComponent.h"
 #include "FNetLogger.h"
+#include "ReturnTriggerVolume.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -92,6 +93,9 @@ void UCharacterPositionSync::SyncGunFire(ADPCharacter* character)
 	if (character->weaponComponent->SimulateAttack(character, hit_result, gunfire_))
 	{
 	}
+
+	FRotator direction = FRotator(gunfire_.direction().x(), gunfire_.direction().y(), gunfire_.direction().z());
+	character->weaponComponent->SpawnEffects(hit_result, direction);
 }
 
 void UCharacterPositionSync::SyncCatch(ADPCharacter* character)
@@ -110,7 +114,6 @@ void UCharacterPositionSync::SyncCatch(ADPCharacter* character)
 	Catch catch_data = *catch_;
 	FDataHub::catchData.Remove(PlayerId);
 	FString monster_id = UTF8_TO_TCHAR(catch_data.target().c_str());
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Catch monster_id: %s"), *monster_id);
 	character->CatchMonster(monster_id);
 }
 
@@ -129,7 +132,11 @@ void UCharacterPositionSync::SyncReturnAnimal(ADPCharacter* character)
 	}
 	if (*isReturn)
 	{
-		character->ReturnMonsters();
+		TArray<EAnimal> animals = character->ReturnMonsters();
+		if (character->ReturnTriggerVolume)
+		{
+			character->ReturnTriggerVolume->SpawnReturnEffect(animals);
+		}
 	}
 	FDataHub::returnAnimalData.Remove(PlayerId);
 }

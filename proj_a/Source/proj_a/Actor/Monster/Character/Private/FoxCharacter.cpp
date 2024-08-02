@@ -7,7 +7,7 @@ AFoxCharacter::AFoxCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_FOX
-	(TEXT("/Game/model/animals/fox_1/fennec_fox.fennec_fox"));
+	(PathManager::GetMonsterPath(EAnimal::ANIMAL_FOX));
     if (SK_FOX.Succeeded()) {
     	GetMesh()->SetSkeletalMesh(SK_FOX.Object);
     }
@@ -15,17 +15,31 @@ AFoxCharacter::AFoxCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(TEXT("/Game/animation/animals/fennecFoxAnimation.fennecFoxAnimation_C"));
+	(PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_FOX));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}
 
 	/** Set the Capsule size */
-	GetCapsuleComponent()->SetCapsuleRadius(65.f);
-	GetCapsuleComponent()->SetCapsuleHalfHeight(65.f);
+	DefaultCP.Radius = 72.f;
+	DefaultCP.HalfHeight = 150.f;
+	GetCapsuleComponent()->SetCapsuleRadius(DefaultCP.Radius);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(DefaultCP.HalfHeight);
+
+	FaintCP.Radius = 52.f;
+	FaintCP.HalfHeight = 52.f;
 	
-    /** Set the model size */
-    GetMesh()->SetRelativeScale3D(FVector(1.00f, 1.00f, 1.00f));
-	GetMesh()->SetRelativeLocationAndRotation(
-		FVector(0.f, 0.f, -20.f), FRotator(0.f, -90.f, 0.f));
+	/** Set the model size and adjust position */
+	FVector Location(0.f, 0.f, 10.f);
+	FRotator Rotation(0.f, 0.f, 0.f);
+	FTransform Transform(Rotation, Location);
+		
+	MeshAdjMtx = Transform;
+	GetMesh()->SetRelativeTransform(MeshAdjMtx);
+
+	/** Set the faint state matrix */
+	FaintStateMtx = FTransform(
+		FRotator(0.f, 0.f, 90.f),
+		FVector::ZeroVector);
+	CB_FaintStateMtx =  MeshAdjMtx.Inverse() * FaintStateMtx * MeshAdjMtx;
 }

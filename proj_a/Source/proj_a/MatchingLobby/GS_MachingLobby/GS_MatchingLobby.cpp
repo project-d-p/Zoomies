@@ -1,37 +1,57 @@
 #include "GS_MatchingLobby.h"
+
+#include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerState.h"
+#include "Kismet/GameplayStatics.h"
+#include "proj_a/MatchingLobby/CHAR_MatchingLobby/CHAR_MatchingLobby.h"
 #include "proj_a/MatchingLobby/GM_MatchingLobby/GM_MatchingLobby.h"
 
 AGS_MatchingLobby::AGS_MatchingLobby() {
 	// Set Players Num. need to be Set
-	ReadyPlayers.SetNum(2, false);
+	ReadyPlayers.SetNum(MAX_USERS, false);
+	LobbyInfos.SetNum(MAX_USERS, false);
 	BestHostPlayer = nullptr;
 	LowestAveragePing = 202406071806.0f;
 	HostPlayerIndex = -1;
 }
 
-void AGS_MatchingLobby::OnRep_ReadyPlayers()
+void AGS_MatchingLobby::OnRep_LobbyInfo()
 {
-	//ReadypPlayers array has been replicated
+	UpdateLobbyInfo();
+}
+
+void AGS_MatchingLobby::UpdateLobbyInfo() const
+{
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACHAR_MatchingLobby::StaticClass(), FoundActors);
+	for (int32 j = 0; j < FoundActors.Num(); j++)
+	{
+		ACHAR_MatchingLobby* Character = Cast<ACHAR_MatchingLobby>(FoundActors[j]);
+		if (Character && Character->LobbyInfoWidgetComponent)
+		{
+			UUserWidget* Widget = Character->LobbyInfoWidgetComponent->GetUserWidgetObject();
+			if (Widget)
+			{
+				FString Command = FString::Printf(TEXT("Update %d"), j);
+				Widget->CallFunctionByNameWithArguments(*Command, *GLog, nullptr, true);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("&*Widget is null for Character at index %d"), j);
+			}
+		}
+	}
 }
 
 void AGS_MatchingLobby::SetPlayerReady(int32 PlayerIndex, bool bIsReady)
 {
-	int32 PlayerOrder = PlayerIndex - HostPlayerIndex;
-	if (PlayerOrder >= 0 && PlayerOrder < ReadyPlayers.Num())
+	if (PlayerIndex >= 0 && PlayerIndex < ReadyPlayers.Num())
 	{
-		ReadyPlayers[PlayerOrder] = bIsReady;
-	}
-	// logging
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			30.f,
-			FColor::Green,
-			FString::Printf(TEXT("Player %d is %s"), PlayerIndex, bIsReady ? TEXT("Ready") : TEXT("Not Ready")));
+		ReadyPlayers[PlayerIndex] = bIsReady;
+		LobbyInfos[PlayerIndex].bIsReady = bIsReady;
+		UpdateLobbyInfo();
 	}
 	if (HasAuthority())
 	{
@@ -48,6 +68,7 @@ void AGS_MatchingLobby::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AGS_MatchingLobby, ReadyPlayers);
+	DOREPLIFETIME(AGS_MatchingLobby, LobbyInfos);
 	DOREPLIFETIME(AGS_MatchingLobby, LowestAveragePing);
 	DOREPLIFETIME(AGS_MatchingLobby, BestHostPlayer);
 }
@@ -102,4 +123,35 @@ void AGS_MatchingLobby::ReportPing_Implementation(APlayerState* ReportingPlayer,
 		BestHostPlayer = ReportingPlayer;
 	}
 }
+
+void AGS_MatchingLobby::MulticastShowLoadingWidget_Implementation()
+{
+	UClass* WidgetClass = nullptr;
+	FString WidgetPath = TEXT("/Game/widget/widget_loading.widget_loading_C");
+
+	WidgetClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *WidgetPath));
+
+	if (WidgetClass != nullptr)
+	{
+		UUserWidget* LoadingWidget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), WidgetClass);
+
+		if (LoadingWidget != nullptr)
+		{
+			LoadingWidget->AddToViewport();
+		}
+		else
+		{
+			//logging on screen about failed to create widget
+			if (GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(
+					-1,
+					30.f,
+					FColor::Red,
+					FString::Printf(TEXT("Failed to create widget")));
+			}
+		}
+	}
+}
+
 

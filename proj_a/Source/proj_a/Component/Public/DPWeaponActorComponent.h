@@ -19,6 +19,7 @@ class PROJ_A_API UDPWeaponActorComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UDPWeaponActorComponent();
+	virtual ~UDPWeaponActorComponent() override;
 
 protected:
 	// Called when the game starts
@@ -30,6 +31,7 @@ public:
 
 	bool SimulateAttack(ADPCharacter* character, FHitResult& result, const Gunfire& gunfire);
 	FVector GetFireLocation();
+	void SpawnEffects(const FHitResult& HitResult, const FRotator& Rotator);
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Weapon")
@@ -39,6 +41,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void AddWeapons(TSubclassOf<ADPWeapon> weaponClass);
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void AddWeapons_MatchLobby(TSubclassOf<ADPWeapon> weaponClass);
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void Equip(TSubclassOf<ADPWeapon> weaponClass);
 	UFUNCTION(BlueprintCallable, Category = "Weapon")

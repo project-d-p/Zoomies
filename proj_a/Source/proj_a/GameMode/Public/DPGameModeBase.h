@@ -7,20 +7,21 @@
 #include "ServerChatManager.h"
 #include "GameFramework/GameModeBase.h"
 #include <queue>
+
+#include "ANetworkManager.h"
 #include "message.pb.h"
 #include "ServerMessageHandler.h"
 #include "DPPlayerController.h"
+#include "IChatGameMode.h"
 #include "ServerTimerManager.h"
 #include "MonsterFactory.h"
-#include "SteamNetworkingSocket.h"
-#include <thread>
 #include "DPGameModeBase.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJ_A_API ADPGameModeBase : public AGameModeBase
+class PROJ_A_API ADPGameModeBase : public AGameModeBase, public IChatGameMode
 {
 	GENERATED_BODY()
 public:
@@ -28,14 +29,14 @@ public:
 	typedef std::queue<Message> FMessageQueue_T;
 	// Sets default values for this character's properties
 	ADPGameModeBase();
+	void OnGameStart();
 
-	// for test
-	void SpawnAndPossessAI();
+	virtual void GetSeamlessTravelActorList(bool bToTransition, TArray<AActor*>& ActorList) override;
 
-	void SendChatToAllClients(const FString& SenderName, const FString& Message);
-
+	virtual UServerChatManager* GetChatManager() const override { return ChatManager; }
+	
 	// monster
-	enum { NUM_OF_MAX_MONSTERS = 10 };
+	enum { NUM_OF_MAX_MONSTERS = 20 };
 	std::vector<ABaseMonsterAIController*> monster_controllers_;
 	std::vector<int32> empty_monster_slots_;
 
@@ -54,32 +55,35 @@ public:
 	virtual void PostLogin(APlayerController* newPlayer) override;
 	virtual void Logout(AController* Exiting) override;
 	virtual void StartPlay() override;
+	void EndGame();
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
+	
 	// Called every frame
 	virtual void Tick(float delta_time) override;
 
 	// Destructor
 	virtual ~ADPGameModeBase() override;
 
+	UServerTimerManager* GetTimerManager() const { return TimerManager; }
+
 private:
 	// Implementations
 	void SyncMovement();
 	void SimulateGunFire();
 	void SimulateCatch();
-	void SyncHostAiming();
+	void SimulateAiming();
 	void SyncMonsterMovement();
 	void ProcessData(float delta_time);
 	void MonsterMoveSimulate(float delta_time);
 	void SpawnMonsters(float delta_time);
-	
-private:
+
 	// Member variables
 	enum { NUM_OF_MAX_CLIENTS = 2 };
-	// FListenSocketRunnable* listen_socket_ = nullptr;
 
-	SteamNetworkingSocket* steam_listen_socket_ = nullptr;
-	// HSteamListenSocket steam_listen_socket_;
+	// SteamNetworkingSocket* steam_listen_socket_ = nullptr;
+	UPROPERTY()
+	UANetworkManager* NetworkManager = nullptr;
+	
 	
 	float time_accumulator_ = 0.0f;
 	int gun_fire_ = 0;
@@ -94,4 +98,6 @@ private:
 	UServerChatManager* ChatManager;
 	UPROPERTY()
 	UMonsterFactory* MonsterFactory;
+	bool bStart = false;
+	bool bTimeSet = false;
 };

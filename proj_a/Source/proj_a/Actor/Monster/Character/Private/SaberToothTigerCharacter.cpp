@@ -7,7 +7,7 @@ ASaberToothTigerCharacter::ASaberToothTigerCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SABERTOOTHTIGER
-	(TEXT("/Game/model/animals/sabertoothTiger/sm_sabertoothTiger.sm_sabertoothTiger"));
+	(PathManager::GetMonsterPath(EAnimal::ANIMAL_SABER_TOOTH_TIGER));
 	if (SK_SABERTOOTHTIGER.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_SABERTOOTHTIGER.Object);
 	}
@@ -15,17 +15,33 @@ ASaberToothTigerCharacter::ASaberToothTigerCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER(
-		TEXT("/Game/animation/animals/sabertoothTigerAnimation.sabertoothTigerAnimation_C"));
+		PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_SABER_TOOTH_TIGER));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}
 
 	/** Set the Capsule size */
-	GetCapsuleComponent()->SetCapsuleRadius(90.f);
-	GetCapsuleComponent()->SetCapsuleHalfHeight(90.f);
+	DefaultCP.Radius = 70.f;
+	DefaultCP.HalfHeight = 150.f;
+	GetCapsuleComponent()->SetCapsuleRadius(DefaultCP.Radius);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(DefaultCP.HalfHeight);
+
+	FaintCP.Radius = 70.f;
+	FaintCP.HalfHeight = 70.f;
 	
 	/** Set the model size and adjust position */
-	GetMesh()->SetRelativeScale3D(FVector(1.f, 1.f, 1.f));
-	GetMesh()->SetRelativeLocationAndRotation(
-		FVector(0.f, 0.f, -87.f), FRotator(0.f, 90.f, 0.f));
+	FVector Scale(FVector::OneVector);
+	FVector Location(0.f, 0.f, 0.f);
+	FRotator Rotation(0.f, 0.f, 0.f);
+	FTransform Transform(Rotation, Location, Scale);
+		
+	MeshAdjMtx = Transform;
+	GetMesh()->SetRelativeTransform(MeshAdjMtx);
+
+	/** Set the faint state matrix */
+	FaintStateMtx = FTransform(
+		FRotator(0.f, 0.f, 90.f),
+		FVector::ZeroVector,
+		FVector::OneVector);
+	CB_FaintStateMtx =  MeshAdjMtx.Inverse() * FaintStateMtx * MeshAdjMtx;
 }

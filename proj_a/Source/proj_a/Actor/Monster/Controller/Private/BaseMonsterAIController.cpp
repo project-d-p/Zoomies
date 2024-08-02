@@ -1,8 +1,10 @@
 #include "BaseMonsterAIController.h"
 
 #include "DPGameModeBase.h"
+#include "FNetLogger.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Navigation/PathFollowingComponent.h"
 
 ABaseMonsterAIController::ABaseMonsterAIController()
 {
@@ -26,11 +28,9 @@ void ABaseMonsterAIController::RemovePawnAndController()
 	}
 
 	ADPGameModeBase* GM = GetWorld()->GetAuthGameMode<ADPGameModeBase>();
-	if (GM)
-	{
-		GM->empty_monster_slots_.push_back(index);
-		GM->monster_controllers_[index] = nullptr;
-	}
+	check(GM)
+	GM->empty_monster_slots_.push_back(index);
+	GM->monster_controllers_[index] = nullptr;
 	Destroy();
 }
 
@@ -39,6 +39,10 @@ void ABaseMonsterAIController::TakeMonsterDamage(float dmg)
 	ABaseMonsterCharacter* CC = Cast<ABaseMonsterCharacter>(GetCharacter());
 	check(CC);
 	CC->TakeMonsterDamage(dmg);
+	// if (CC->GetCurrentHealth() <= 0)
+	constexpr float TIME_TO_REMOVE = 7.f;
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABaseMonsterAIController::RemovePawnAndController, TIME_TO_REMOVE, false);
 }
 
 bool ABaseMonsterAIController::GetMovementAllowed()
@@ -46,6 +50,12 @@ bool ABaseMonsterAIController::GetMovementAllowed()
 	ABaseMonsterCharacter* CC = Cast<ABaseMonsterCharacter>(GetCharacter());
 	check(CC);
 	if (CC->GetState() == EMonsterState::Faint)
+	{
+		FPathFollowingResultFlags::Type AbortFlags = FPathFollowingResultFlags::UserAbort;
+		FAIRequestID RequestID = GetCurrentMoveRequestID();
+		EPathFollowingVelocityMode VelocityMode = EPathFollowingVelocityMode::Keep;
+		GetPathFollowingComponent()->AbortMove(*this, AbortFlags, RequestID, VelocityMode);
 		return false;
+	}
 	return true;
 }

@@ -7,7 +7,7 @@ ASlothCharacter::ASlothCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SLOTH
-	(TEXT("/Game/model/animals/sloth/sm_sloth.sm_sloth"));
+	(PathManager::GetMonsterPath(EAnimal::ANIMAL_SLOTH));
 	if (SK_SLOTH.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_SLOTH.Object);
 	}
@@ -15,17 +15,31 @@ ASlothCharacter::ASlothCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(TEXT("/Game/animation/animals/slothAnimation.slothAnimation_C"));
+	(PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_SLOTH));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}
-
+	
 	/** Set the Capsule size */
-	GetCapsuleComponent()->SetCapsuleRadius(90.f);
-	GetCapsuleComponent()->SetCapsuleHalfHeight(90.f);
+	DefaultCP.Radius = 120.f;
+	DefaultCP.HalfHeight = 78.f;
+	GetCapsuleComponent()->SetCapsuleRadius(DefaultCP.Radius);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(DefaultCP.HalfHeight);
+
+	FaintCP.Radius = 75.f;
+	FaintCP.HalfHeight = 75.f;
 	
 	/** Set the model size and adjust position */
-	GetMesh()->SetRelativeScale3D(FVector(1.f, 1.f, 1.f));
-	GetMesh()->SetRelativeLocationAndRotation(
-		FVector(0.f, 0.f, -87.f), FRotator(0.f, 90.f, 0.f));
+	FVector Location(0.f, 0.f, 10.f);
+	FRotator Rotation(0.f, 0.f, 0.f);
+	FTransform Transform(Rotation, Location);
+		
+	MeshAdjMtx = Transform;
+	GetMesh()->SetRelativeTransform(MeshAdjMtx);
+
+	/** Set the faint state matrix */
+	FaintStateMtx = FTransform(
+		FRotator(0.f, 0.f, 90.f),
+		FVector::ZeroVector);
+	CB_FaintStateMtx =  MeshAdjMtx.Inverse() * FaintStateMtx * MeshAdjMtx;
 }
