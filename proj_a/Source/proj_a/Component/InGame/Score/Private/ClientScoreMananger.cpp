@@ -2,14 +2,8 @@
 
 #include "DPInGameState.h"
 #include "DPPlayerState.h"
-#include "FNetLogger.h"
 #include "PlayerScoreComp.h"
 #include "Net/UnrealNetwork.h"
-
-UClientScoreMananger::UClientScoreMananger()
-{
-	SetIsReplicatedByDefault(true);
-}
 
 void UClientScoreMananger::InitScoreUi()
 {
@@ -44,11 +38,4 @@ void UClientScoreMananger::SetScoreUI(UScoreUI* InScoreUI)
 	{
 		ScoreUI = InScoreUI;
 	}
-}
-
-void UClientScoreMananger::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(UClientScoreMananger, ScoreUI);
 }
