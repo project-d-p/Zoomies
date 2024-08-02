@@ -5,12 +5,21 @@
 #include "OnlineSubsystem.h"
 #include "steam_api.h"
 #include "Kismet/GameplayStatics.h"
+#include "CompileMode.h"
 #include "Online/OnlineSessionNames.h"
 
 void UGI_Zoomies::Init()
 {
 	Super::Init();
 	CheckSteamInit();
+
+#if EDITOR_MODE
+	bIsOnline = false;
+#elif LAN_MODE
+	bIsOnline = false;
+#else
+	bIsOnline = true;
+#endif
 }
 
 // matching session Functions
@@ -32,25 +41,17 @@ void UGI_Zoomies::FindSession()
 	session_search_ = MakeShareable(new FOnlineSessionSearch());
     
 	// Align with CreateSession settings
-	bool bIsOnline = true;  // Set true for online mode, false for LAN mode
 	session_search_->bIsLanQuery = !bIsOnline;
     
 	session_search_->MaxSearchResults = 20;
     
 	// Set query settings based on the online/LAN mode
+	session_search_->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
+	session_search_->QuerySettings.Set(SETTING_MAPNAME, FString("matchLobby"), EOnlineComparisonOp::Equals);
 	if (bIsOnline)
 	{
-		session_search_->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
-		session_search_->QuerySettings.Set(SETTING_MAPNAME, FString("matchLobby"), EOnlineComparisonOp::Equals);
-        
 		// If using lobbies (as set in CreateSession)
 		session_search_->QuerySettings.Set(SEARCH_LOBBIES, true, EOnlineComparisonOp::Equals);
-	}
-	else
-	{
-		// For LAN, we don't need to set SEARCH_LOBBIES
-		session_search_->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
-		session_search_->QuerySettings.Set(SETTING_MAPNAME, FString("matchLobby"), EOnlineComparisonOp::Equals);
 	}
 
 	// Add delegate
@@ -102,17 +103,17 @@ void UGI_Zoomies::CreateSession()
 	}
 	
 	// Online or LAN setting
-	bool bIsOnline = true;  // Set true for online mode, false for LAN mode
 	session_settings_->bIsLANMatch = !bIsOnline;
     
 	session_settings_->NumPublicConnections = 4; // Number of players
 	session_settings_->bShouldAdvertise = true; // Advertise the session to others
 	session_settings_->bAllowJoinInProgress = true; // Allow joining in progress
 	session_settings_->bAllowJoinViaPresence = true; // Allow joining via presence (show sessions to players in current regions)
-
-	// Presence and lobby settings
 	session_settings_->bUsesPresence = true; // Use presence for the session
-	session_settings_->bUseLobbiesIfAvailable = true; // Use lobbies if available
+	if (bIsOnline)
+	{
+		session_settings_->bUseLobbiesIfAvailable = true; // Use lobbies if available
+	}
     
 	// Steam-related settings (for dedicated server)
 	// if (bIsOnline && !session_settings_->bUsesPresence)

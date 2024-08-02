@@ -57,6 +57,7 @@ private:
 	int max_count = 5;
 	bool is_steamAPI_init = false;
 	bool is_online_session_steam_init=false;
+	bool bIsOnline = false;
 
 	
 	FTimerHandle UnusedHandle;

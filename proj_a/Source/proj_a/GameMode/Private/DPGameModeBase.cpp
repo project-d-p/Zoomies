@@ -13,6 +13,7 @@
 #include "MainLevelComponent.h"
 #include "MessageMaker.h"
 #include "ServerNetworkManager.h"
+#include "CompileMode.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 ADPGameModeBase::ADPGameModeBase()
@@ -30,7 +31,14 @@ ADPGameModeBase::ADPGameModeBase()
 	ChatManager = CreateDefaultSubobject<UServerChatManager>(TEXT("ChatManager"));
 	ScoreManager = CreateDefaultSubobject<UScoreManagerComp>(TEXT("ScoreManager"));
 	MonsterFactory = CreateDefaultSubobject<UMonsterFactory>(TEXT("MonsterFactory"));
+
+#if EDITOR_MODE
+	NetworkManager = CreateDefaultSubobject<UANetworkManager>(TEXT("NetworkManager"));
+#elif LAN_MODE
 	NetworkManager = CreateDefaultSubobject<UServerNetworkManager>(TEXT("NetworkManager"));
+#else
+	NetworkManager = CreateDefaultSubobject<UServerNetworkManager>(TEXT("NetworkManager"));
+#endif	
 
 	monster_controllers_.resize(NUM_OF_MAX_MONSTERS, nullptr);
 	empty_monster_slots_.reserve(NUM_OF_MAX_MONSTERS);
@@ -122,8 +130,14 @@ void ADPGameModeBase::StartPlay()
 {
 	Super::StartPlay();
 
-	// NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
+#if EDITOR_MODE
+	NetworkManager->Initialize(ENetworkTypeZoomies::NONE);
+#elif LAN_MODE
+	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
+#else
 	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
+#endif
+	
 	NetworkManager->SetGameStartCallback(NUM_OF_MAX_CLIENTS, [this]()
 	{
 		this->OnGameStart();
