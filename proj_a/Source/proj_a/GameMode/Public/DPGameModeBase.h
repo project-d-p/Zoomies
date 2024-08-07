@@ -51,6 +51,8 @@ public:
 	UScoreManagerComp* ScoreManager;
 	FTimerHandle TimerHandle_SpawnAI;
 
+	void SpawnNewCharacter(APlayerController* NewPlayer);
+	
 	// Called when the game starts or when spawned
 	virtual void PostLogin(APlayerController* newPlayer) override;
 	virtual void Logout(AController* Exiting) override;

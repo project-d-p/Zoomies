@@ -75,6 +75,22 @@ void ADPGameModeBase::GetSeamlessTravelActorList(bool bToTransition, TArray<AAct
 	GameInstance->player_count = GetWorld()->GetNumControllers();
 }
 
+void ADPGameModeBase::SpawnNewCharacter(APlayerController* NewPlayer)
+{
+	FVector Location[4] = {
+		FVector(-230.000000,230.000000,10.000000),
+		FVector(-230.000000,-250.000000,10.000000),
+		FVector(270.000000,-250.000000,10.000000),
+		FVector(270.000000,230.000000,10.000000),
+	};
+	static int idx = 0;
+	if (idx >= 4)
+		idx = 0;
+	FVector SpawnLocation = Location[idx++];
+	// ADPCharacter* NewCharacter = GetWorld()->SpawnActor<ADPCharacter>(DefaultPawnClass, SpawnLocation, FRotator::ZeroRotator);
+	NewPlayer->GetCharacter()->SetActorLocation(SpawnLocation);
+}
+
 void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 {
 	Super::PostLogin(newPlayer);
@@ -94,6 +110,7 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 	player_controllers_[key] = Cast<ADPPlayerController>(newPlayer);
 	player_controllers_[key]->SwitchLevelComponent(ELevelComponentType::MAIN);
 
+	SpawnNewCharacter(newPlayer); 
 	if (!newPlayer->IsLocalController())
 	{
 		player_controllers_[key]->ConnectToServer(ELevelComponentType::MAIN);

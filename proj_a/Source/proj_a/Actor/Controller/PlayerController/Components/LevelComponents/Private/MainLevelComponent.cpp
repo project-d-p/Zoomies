@@ -134,7 +134,7 @@ bool UMainLevelComponent::IsCatchable(FHitResult& HitResult)
 
 	FVector Direction = (ImpactPoint - Character->GetActorLocation()).GetSafeNormal();
 	
-	if (CatchRay->HitDetect(Character, Character->GetActorLocation(), Direction.Rotation(), 300.0f, HitResult, true))
+	if (CatchRay->HitDetect(Character, Character->GetActorLocation(), Direction.Rotation(), 300.0f, HitResult, false))
 	{
 		CurrentTarget.Location = Character->GetActorLocation();
 		CurrentTarget.Rotation = Direction.Rotation();
