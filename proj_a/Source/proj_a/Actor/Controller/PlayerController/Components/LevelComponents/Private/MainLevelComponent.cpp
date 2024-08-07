@@ -124,10 +124,12 @@ bool UMainLevelComponent::IsCatchable(FHitResult& HitResult)
 {
 	ADPPlayerController* PlayerController = GetPlayerController();
 	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
+
 	if (CatchRay->HitDetect(Character, Character->GetActorLocation(), PlayerController->GetControlRotation(), 300.0f, HitResult, false))
 	{
-		return true;
+		
 	}
+	
 	return false;
 }
 

@@ -62,7 +62,6 @@ void UDPWeaponActorComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	}
 }
 
-
 // Called every frame
 void UDPWeaponActorComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
