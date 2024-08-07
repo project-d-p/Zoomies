@@ -51,6 +51,10 @@ ADPGameModeBase::ADPGameModeBase()
 
 void ADPGameModeBase::OnGameStart()
 {
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	check(GameInstance);
+
+	GameInstance->ChangeJoinInProgress(false);
 	this->bStart = true;
 }
 
@@ -98,7 +102,7 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 
 	ADPPlayerState* player_state = Cast<ADPPlayerState>(newPlayer->PlayerState);
 	check(player_state);
-	
+
 	FString name = player_state->GetPlayerName();
 	std::string key(TCHAR_TO_UTF8(*name));
 	
@@ -133,6 +137,11 @@ void ADPGameModeBase::Logout(AController* Exiting)
 	if (player_controllers_.find(key) != player_controllers_.end())
 	{
 		player_controllers_.erase(key);
+	}
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (GameInstance)
+	{
+		GameInstance->AddBanPlayer(controller->PlayerState->GetUniqueId()->ToString());
 	}
 }
 
@@ -171,7 +180,7 @@ void ADPGameModeBase::Tick(float delta_time)
 		if (bTimeSet == false)
 		{
 			bTimeSet = true;
-			TimerManager->StartTimer<ADPInGameState>(300.f, &ADPGameModeBase::EndGame, this);
+			TimerManager->StartTimer<ADPInGameState>(30.f, &ADPGameModeBase::EndGame, this);
 		}
 
 		this->ProcessData(delta_time);

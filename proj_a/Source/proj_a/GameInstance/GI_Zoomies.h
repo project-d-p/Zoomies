@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "DPCharacter.h"
+#include "DPPlayerController.h"
 #include "Engine/GameInstance.h"
 #include "OnlineSubsystem.h"
 #include "Interfaces/OnlineSessionInterface.h"
@@ -26,6 +27,8 @@ public:
 	bool ResetSession();
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void OnSessionFailure();
+	void ChangeJoinInProgress(bool bCond);
+	void AddBanPlayer(const FString& String);
 
 	int player_count = 0;
 private:
@@ -41,7 +44,7 @@ private:
 	void FindSession();
 	void OnFindComplete(bool bWasSuccessful);
 	FDelegateHandle dh_on_find_complete;
-	void JoinSessionBySearchResult(const FOnlineSessionSearchResult& search_result);
+	bool JoinSessionBySearchResult(const FOnlineSessionSearchResult& search_result);
 	void onJoinComplete(FName session_name, EOnJoinSessionCompleteResult::Type result);
 	FDelegateHandle dh_on_join_complete;
 	void CreateSession();
