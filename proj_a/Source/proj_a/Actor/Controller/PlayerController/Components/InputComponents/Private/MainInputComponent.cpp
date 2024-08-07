@@ -406,6 +406,10 @@ void UMainInputComponent::ReturningAnimals(const FInputActionValue& value)
 		return ;
 	}
 	TArray<EAnimal> animals = Character->ReturnMonsters();
+	if (animals.Num() == 0)
+	{
+		return ;
+	}
 	// ���� ���� ����
 	ADPPlayerState* PlayerState = Cast<ADPPlayerState>(PlayerController->PlayerState);
 	if (PlayerState)
