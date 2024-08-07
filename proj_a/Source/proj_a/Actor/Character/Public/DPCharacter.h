@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "CharacterPositionSync.h"
+#include "NameTag.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "proj_a/Component/InGame/Score/Types/ScoreTypes.h"
 #include "DPCharacter.generated.h"
@@ -20,7 +22,8 @@ public:
 	// Sets default values for this character's properties
 	ADPCharacter();
 	virtual ~ADPCharacter() override;
-	
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -59,6 +62,13 @@ public:	// component
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
 	UMaterialInstanceDynamic* dynamicMaterialInstance;
 
+	UPROPERTY()
+	TSubclassOf<UNameTag> NameTag_BP;
+	UPROPERTY()
+	UNameTag* NameTag_Instance;
+	UPROPERTY()
+	UWidgetComponent* NameTag_WidgetComponent;
+	
 	// stun effect
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "effects")
 	class UNiagaraSystem* StunEffect;
@@ -100,6 +110,8 @@ protected:
 	void ClientNotifyAnimalReturn_Implementation(const FString& player_name);
 	
 private:
+	void SetNameTag();
+	void UpdateNameTagRotation();
 	void CheckCollisionWithMonster();
 	void OnServerHit(const FHitResult& HitResult);
 

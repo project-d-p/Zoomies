@@ -153,11 +153,57 @@ ADPCharacter::ADPCharacter()
 		StunEffect = STUN.Object;
 		StunEffectComponent->SetAsset(StunEffect);
 	}
+
+	static ConstructorHelpers::FClassFinder<UNameTag> NAME_TAG
+	(TEXT("/Game/widget/widget_NameTag.widget_NameTag_C"));
+	if (NAME_TAG.Succeeded())
+	{
+		NameTag_BP = NAME_TAG.Class;
+	}
+
+	NameTag_WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("NameTag_WidgetComponent"));
+	NameTag_WidgetComponent->SetupAttachment(RootComponent);
+	// NameTag_WidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+	NameTag_WidgetComponent->SetDrawAtDesiredSize(true);
+	NameTag_WidgetComponent->SetRelativeLocation(FVector(0, 0, 100));
+	NameTag_WidgetComponent->SetWorldScale3D(FVector(0.6f, 0.6f, 0.6f));
+	
+	NameTag_Instance = CreateWidget<UNameTag>(GetWorld(), NameTag_BP);
+	if (NameTag_Instance)
+	{
+		NameTag_WidgetComponent->SetWidget(NameTag_Instance);
+		NameTag_WidgetComponent->SetVisibility(false);
+	}
 }
 
 ADPCharacter::~ADPCharacter()
 {
 }
+
+void ADPCharacter::SetNameTag()
+{
+	APlayerState* PS = GetPlayerState();
+	if (!PS)
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this, String]()
+		{
+			SetNameTag();
+		}), 0.1f, false);
+		return ;
+	}
+
+	FString Name = PS->GetPlayerName();
+	if (NameTag_Instance)
+	{
+		NameTag_Instance->SetName(Name);
+	}
+	if (NameTag_WidgetComponent && !IsLocallyControlled())
+	{
+		NameTag_WidgetComponent->SetVisibility(true);
+	}
+}
+
 
 // Called when the game starts or when spawned
 void ADPCharacter::BeginPlay()
@@ -187,6 +233,7 @@ void ADPCharacter::BeginPlay()
 	constructionComponent->placeWall = false;
 	constructionComponent->placeturret = false;
 	bUseControllerRotationYaw = false;
+	SetNameTag();
 }
 
 // Called every frame
@@ -200,6 +247,11 @@ void ADPCharacter::Tick(float DeltaTime)
 	}
 	else
 		UE_LOG(LogTemp, Warning, TEXT("null GetCharacterMovement"));
+	
+	if (!IsLocallyControlled())
+	{
+		UpdateNameTagRotation();
+	}
 
 	if (UWorld* World = GetWorld())
 	{
@@ -233,6 +285,7 @@ void ADPCharacter::Tick(float DeltaTime)
 	{
 		CheckCollisionWithMonster();
 	}
+
 }
 
 // Called to bind functionality to input
@@ -325,6 +378,25 @@ bool ADPCharacter::IsStunned() const
 void ADPCharacter::ClientNotifyAnimalReturn_Implementation(const FString& player_name)
 {
 	FDataHub::PushReturnAnimalDA(player_name, true);
+}
+
+void ADPCharacter::UpdateNameTagRotation()
+{
+	if (NameTag_WidgetComponent)
+	{
+		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+		if (PlayerController)
+		{
+			FVector CameraLocation = PlayerController->PlayerCameraManager->GetCameraLocation();
+			FRotator NewRotation = (CameraLocation - NameTag_WidgetComponent->GetComponentLocation()).Rotation();
+            
+			// 오직 Yaw 회전만 적용
+			NewRotation.Pitch = 0.0f;
+			NewRotation.Roll = 0.0f;
+            
+			NameTag_WidgetComponent->SetWorldRotation(NewRotation);
+		}
+	}
 }
 
 void ADPCharacter::CheckCollisionWithMonster()
