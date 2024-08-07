@@ -63,7 +63,7 @@ void ADPWeaponGun::BeginPlay()
 
 bool ADPWeaponGun::Attack(ADPPlayerController* controller, FHitResult& result, FRotator& info)
 {
-	const FVector start_aim_pos = controller->GetCharacter()->FindComponentByClass<UCameraComponent>()->GetComponentLocation();
+	const FVector start_aim_pos = Cast<ADPCharacter>(controller->GetCharacter())->GetCameraLocation();
 	const FRotator aim_direction = controller->GetControlRotation();
 
 	FVector impact_point;

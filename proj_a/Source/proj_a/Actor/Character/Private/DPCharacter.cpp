@@ -431,6 +431,12 @@ void ADPCharacter::OnRep_SyncStunned()
 	}
 }
 
+FVector ADPCharacter::GetCameraLocation() const
+{
+	FVector cameraLocation = camera->GetComponentLocation();
+	return cameraLocation;
+}
+
 void ADPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

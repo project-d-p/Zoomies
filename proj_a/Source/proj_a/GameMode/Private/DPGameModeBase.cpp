@@ -147,16 +147,20 @@ void ADPGameModeBase::StartPlay()
 void ADPGameModeBase::Tick(float delta_time)
 {
 	Super::Tick(delta_time);
+#if EDITOR_MODE != 1
 	if (bStart)
 	{
+#endif
 		if (bTimeSet == false)
 		{
 			bTimeSet = true;
-			TimerManager->StartTimer<ADPInGameState>(30.f, &ADPGameModeBase::EndGame, this);
+			TimerManager->StartTimer<ADPInGameState>(300.f, &ADPGameModeBase::EndGame, this);
 		}
 
 		this->ProcessData(delta_time);
+#if EDITOR_MODE != 1
 	}
+#endif
 }
 
 void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)

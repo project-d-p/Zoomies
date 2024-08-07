@@ -73,6 +73,8 @@ public:	// component
 	UFUNCTION()
 	void OnRep_SyncStunned();
 
+	FVector GetCameraLocation() const;
+
 	void SetStunned(bool bCond);
 	bool IsStunned() const;
 	void ApplyStunEffect();

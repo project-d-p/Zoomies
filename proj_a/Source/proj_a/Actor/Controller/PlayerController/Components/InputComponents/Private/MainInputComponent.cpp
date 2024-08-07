@@ -10,6 +10,7 @@
 #include "MessageMaker.h"
 #include "DPStateActorComponent.h"
 #include "FNetLogger.h"
+#include "NetworkMessage.h"
 #include "ReturnTriggerVolume.h"
 
 UMainInputComponent::UMainInputComponent()
@@ -375,11 +376,12 @@ void UMainInputComponent::CatchAnimals(const FInputActionValue& value)
 	{
 		return ;
 	}
-	if (!MainLevelComponent->GetCurrentTarget())
+	const TargetInfo target = MainLevelComponent->GetCurrentTarget();
+	if (!target.CurrentTarget)
 	{
 		return ;
 	}
-	Message msg = MessageMaker::MakeCatchMessage(PlayerController);
+	Message msg = MessageMaker::MakeCatchMessage(PlayerController, target.Location, target.Rotation);
 	if (PlayerController->HasAuthority())
 	{
 		MainLevelComponent->AddCatchMessage(msg);
