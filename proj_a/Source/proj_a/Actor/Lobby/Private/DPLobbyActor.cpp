@@ -39,21 +39,20 @@ ADPLobbyActor::ADPLobbyActor()
     arrowComponent->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
     arrowComponent->SetRelativeScale3D(FVector(2.5f, 2.5f, 2.5f));
 
-    //foxAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("audioComponent"));
-    //foxAudioComponent->SetupAttachment(foxComponent);
+    foxAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("audioComponent"));
+    foxAudioComponent->SetupAttachment(foxComponent);
 
-    //static ConstructorHelpers::FObjectFinder<USoundCue> SoundCue
-    //(TEXT("/Game/sounds/background/background_ingame_Cue.background_ingame_Cue"));
-    //if (SoundCue.Succeeded()) {
-    //    foxAudioComponent->SetSound(SoundCue.Object);
-    //    foxAudioComponent->Play();
-    //}
-
-    //static ConstructorHelpers::FObjectFinder<USoundAttenuation> AttenuationSettings
-    //(TEXT("/Game/sounds/dp_animalSoundAttenuation.dp_animalSoundAttenuation"));
-    //if (AttenuationSettings.Succeeded()) {
-    //    foxAudioComponent->AttenuationSettings = AttenuationSettings.Object;
-    //}
+    foxAudioComponent->bAutoActivate = false;
+    static ConstructorHelpers::FObjectFinder<USoundCue> SoundCue
+    (TEXT("/Game/sounds/background/background_ingame_Cue.background_ingame_Cue"));
+    if (SoundCue.Succeeded()) {
+        foxAudioComponent->SetSound(SoundCue.Object);
+    }
+    static ConstructorHelpers::FObjectFinder<USoundAttenuation> AttenuationSettings
+    (TEXT("/Game/sounds/dp_animalSoundAttenuation.dp_animalSoundAttenuation"));
+    if (AttenuationSettings.Succeeded()) {
+        foxAudioComponent->AttenuationSettings = AttenuationSettings.Object;
+    }
 
     FAnimalData foxData;
     foxData.meshComponent = foxComponent;
@@ -222,6 +221,7 @@ void ADPLobbyActor::BeginPlay()
 	Super::BeginPlay();
 
     initialLocation = GetActorLocation();
+    foxAudioComponent->Play();
 }
 
 // Called every frame
