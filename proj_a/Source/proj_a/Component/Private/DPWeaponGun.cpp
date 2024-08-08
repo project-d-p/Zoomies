@@ -9,9 +9,8 @@
 #include "HitScan.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
-#include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
-#include "EntitySystem/MovieSceneEntitySystemTypes.h"
+#include "BaseMonsterCharacter.h"
+#include "Engine/StaticMeshActor.h"
 #include "GameFramework/Character.h"
 
 ADPWeaponGun::ADPWeaponGun()
@@ -47,10 +46,22 @@ ADPWeaponGun::ADPWeaponGun()
 		smokeEffect = SMOKE.Object;
 	}
 	
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> PARTICLE
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> PARTICLE_ANIMAL
 	(TEXT("/Game/effect/ns_animalHitScrew.ns_animalHitScrew"));
-	if (PARTICLE.Succeeded()) {
-		particleEffect = PARTICLE.Object;
+	if (PARTICLE_ANIMAL.Succeeded()) {
+		particleEffectAnim = PARTICLE_ANIMAL.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> PARTICLE_PLANT
+	(TEXT("/Game/effect/ns_animalHitPlant.ns_animalHitPlant"));
+	if (PARTICLE_PLANT.Succeeded()) {
+		particleEffectPlant = PARTICLE_PLANT.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> PARTICLE_CHAR
+	(TEXT("/Game/effect/ns_animalHit.ns_animalHit"));
+	if (PARTICLE_CHAR.Succeeded()) {
+		particleEffectChar = PARTICLE_CHAR.Object;
 	}
 }
 
@@ -158,17 +169,36 @@ void ADPWeaponGun::SpawnEffects(const FHitResult& HitResult, const FRotator& rot
 
 void ADPWeaponGun::SpawnHitEffect(const FHitResult& HitResult)
 {
+	if (HitResult.GetActor() == nullptr)
+	{
+		return;
+	}
 	FVector ImpactPoint = HitResult.ImpactPoint;
 	FVector ImpactNormal = HitResult.ImpactNormal;
 
 	FRotator ParticleRotation = ImpactNormal.Rotation();
-	if (particleEffect)
+
+	UNiagaraSystem* particleEffect = nullptr;
+
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("%s"), *HitResult.GetActor()->GetName());
+	FNetLogger::LogError(TEXT("%s"), *HitResult.GetActor()->GetName());
+	if (HitResult.GetActor()->IsA<ADPCharacter>() || HitResult.GetActor()->GetName().Contains("21"))
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-			GetWorld(),
-			particleEffect,
-			ImpactPoint,
-			ParticleRotation
-		);
+		particleEffect = particleEffectChar;
 	}
+	else if (HitResult.GetActor()->IsA<ABaseMonsterCharacter>())
+	{
+		particleEffect = particleEffectAnim;
+	}
+	else if (HitResult.GetActor()->IsA<AStaticMeshActor>())
+	{
+		particleEffect = particleEffectPlant;
+	}
+
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		GetWorld(),
+		particleEffect,
+		ImpactPoint,
+		ParticleRotation
+	);
 }

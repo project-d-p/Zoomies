@@ -477,6 +477,7 @@ void ADPCharacter::ApplyKockback_Implementation(const FHitResult& HitResult)
 
 	// 충돌 지점에서 캐릭터 위치로의 방향을 계산
 	FVector KnockbackDirection = GetActorLocation() - HitResult.ImpactPoint;
+	// FVector KnockbackDirection = -HitResult.ImpactNormal;
 	KnockbackDirection.Z = 20.0f;
     
 	if (!KnockbackDirection.IsNearlyZero())
@@ -513,7 +514,6 @@ void ADPCharacter::ApplyKockback_Implementation(const FHitResult& HitResult)
 			{
 				// Reset Movement Mode
 				MovementComponent->SetMovementMode(PreviousMovementMode);
-				
 			}
 		}, 0.5f, false);
 	}
