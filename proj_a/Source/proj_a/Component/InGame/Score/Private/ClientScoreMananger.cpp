@@ -3,7 +3,6 @@
 #include "DPInGameState.h"
 #include "DPPlayerState.h"
 #include "PlayerScoreComp.h"
-#include "Net/UnrealNetwork.h"
 
 void UClientScoreMananger::InitScoreUi()
 {

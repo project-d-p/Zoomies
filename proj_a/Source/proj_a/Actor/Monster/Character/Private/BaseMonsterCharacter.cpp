@@ -93,6 +93,7 @@ void ABaseMonsterCharacter::BeginPlay()
 		widgetComponent->SetVisibility(false);
 
 	GetCapsuleComponent()->SetCollisionObjectType(ECC_MonsterChannel);
+	GetMesh()->SetCollisionObjectType(ECC_MonsterChannel);
 }
 
 void ABaseMonsterCharacter::SyncPosition()
@@ -186,6 +187,8 @@ void ABaseMonsterCharacter::OnRep_FaintCharacterMotion()
 {
 	GetCapsuleComponent()->SetCapsuleRadius(FaintCP.Radius);
 	GetCapsuleComponent()->SetCapsuleHalfHeight(FaintCP.HalfHeight);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_MonsterChannel, ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_MonsterChannel, ECR_Ignore);
 	GetMesh()->SetRelativeTransform(CB_FaintStateMtx);
 }
 

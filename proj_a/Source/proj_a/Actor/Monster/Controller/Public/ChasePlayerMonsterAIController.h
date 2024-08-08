@@ -9,8 +9,12 @@ class PROJ_A_API AChasePlayerMonsterAIController : public ABaseMonsterAIControll
 {
 	GENERATED_BODY()
 
+public:
+	void SetRandomPlayerIndex();
+	int32 GetPlayerIndex() const { return PlayerIndex; }
+	
 private:
-	int32 PlayerIndex = 0;
+	int32 PlayerIndex = -1;
 	void MoveToPlayer();
 
 protected:

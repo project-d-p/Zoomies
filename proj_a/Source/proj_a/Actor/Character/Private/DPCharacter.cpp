@@ -3,6 +3,7 @@
 #include "DPCharacter.h"
 
 #include "BaseMonsterCharacter.h"
+#include "ChasePlayerMonsterAIController.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "DPHpActorComponent.h"
@@ -352,6 +353,17 @@ void ADPCharacter::CheckCollisionWithMonster()
 		{
 			if (ABaseMonsterCharacter* MC = Cast<ABaseMonsterCharacter>(HitResult.GetActor()))
 			{
+				/* Only ChasePlayerMonsterAIController can hit the player */
+				AChasePlayerMonsterAIController* HC = Cast<AChasePlayerMonsterAIController>(MC->GetController());
+				if (!HC)
+					continue;
+				
+				ACharacter* TargetPlayer = UGameplayStatics::GetPlayerCharacter(GetWorld(), HC->GetPlayerIndex());
+				if (TargetPlayer && TargetPlayer == this)
+				{
+					/* Monster collided with its current target player; initiate search for a new player target */
+					HC->SetRandomPlayerIndex();
+				}
 				OnServerHit(HitResult);
 			}
 		}

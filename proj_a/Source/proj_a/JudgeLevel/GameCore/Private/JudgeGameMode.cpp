@@ -58,6 +58,13 @@ void AJudgeGameMode::ProcessVotingResults()
 {
     EPlayerJob MostVotedOccupation = CollateVotingResults();
 
+    AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
+    check(GS)
+    if (!GS->PlayerArray.IsValidIndex(CurrentPlayerIndex - 1))
+    {
+        FNetLogger::LogError(TEXT("Failed to get %d player state."), CurrentPlayerIndex - 1);
+        return ;
+    }
     AJudgePlayerState* PS = Cast<AJudgePlayerState>(GetWorld()->GetGameState<AJudgeGameState>()->PlayerArray[CurrentPlayerIndex - 1]);
     check(PS)
     if (PS->GetPlayerJob() == MostVotedOccupation)
@@ -65,17 +72,20 @@ void AJudgeGameMode::ProcessVotingResults()
         PS->SetIsDetected(true);
     }
 
-    constexpr int TOTAL_PLAYER = 4;
+    constexpr int TOTAL_PLAYER = 2;
     if (CurrentPlayerIndex == TOTAL_PLAYER)
     {
         EndTimer();
         return;
     }
-    
+
+    if (!GS->PlayerArray.IsValidIndex(CurrentPlayerIndex))
+    {
+        FNetLogger::LogError(TEXT("Failed to get %d player state."), CurrentPlayerIndex);
+        return ;
+    }
     PS = Cast<AJudgePlayerState>(GetWorld()->GetGameState<AJudgeGameState>()->PlayerArray[CurrentPlayerIndex]);
     FString PName = PS->GetPlayerName();
-    AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
-    check(GS)
     GS->SetVoterName(PName);
 
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
@@ -89,7 +99,7 @@ void AJudgeGameMode::ProcessVotingResults()
 
 void AJudgeGameMode::EndTimer()
 {
-    constexpr int TOTAL_PLAYER = 4;
+    constexpr int TOTAL_PLAYER = 2;
     if (CurrentPlayerIndex++ < TOTAL_PLAYER)
     {
         AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
