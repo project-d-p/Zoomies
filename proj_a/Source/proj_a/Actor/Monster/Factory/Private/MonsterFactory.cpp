@@ -67,7 +67,6 @@ ABaseMonsterAIController* UMonsterFactory::RandomMonsterSpawn(int32 idx)
 		AWhaleCharacter::StaticClass()
 	}; 
 	UClass* SelectedMonsterClass = MonsterClasses[FMath::RandRange(0, MonsterClasses.size() - 1)];
-	
 	return SpawnMonster(SelectedMonsterClass, Location, idx);
 }
 

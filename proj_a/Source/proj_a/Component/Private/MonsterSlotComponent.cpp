@@ -49,7 +49,7 @@ UMonsterSlotComponent::UMonsterSlotComponent()
 	for (const auto& AnimalInfo : AnimalInfos)
 	{
 		ConstructorHelpers::FObjectFinder<USkeletalMesh> SkeletalMeshFinder
-		(PathManager::GetMonsterPath(AnimalInfo.AnimalType));
+		(PathManager::GetMonsterTransparencyMeshPath(AnimalInfo.AnimalType));
         
 		if (SkeletalMeshFinder.Succeeded())
 		{

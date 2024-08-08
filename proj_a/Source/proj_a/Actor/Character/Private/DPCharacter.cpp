@@ -186,7 +186,7 @@ void ADPCharacter::SetNameTag()
 	if (!PS)
 	{
 		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this, String]()
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
 		{
 			SetNameTag();
 		}), 0.1f, false);
