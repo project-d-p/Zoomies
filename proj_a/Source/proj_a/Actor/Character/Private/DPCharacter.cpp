@@ -454,13 +454,88 @@ void ADPCharacter::RemoveStunEffect()
 	if (HasAuthority())
 	{
 		bIsStunned = false;
+		bIsInvincible = true;
+		FTimerHandle TimerInvincibleHandle;
+		FTimerDelegate TimerInvincibleDelegate;
+		TWeakObjectPtr<ADPCharacter> WeakThis(this);
+		TimerInvincibleDelegate.BindLambda([WeakThis, this]()
+		{
+			if (WeakThis.IsValid())
+			{
+				bIsInvincible = false;
+			}
+		});
+		GetWorld()->GetTimerManager().SetTimer(TimerInvincibleHandle, TimerInvincibleDelegate, 2.0f, false);
 	}
 	StunEffectComponent->Deactivate();
+	// TODO: Invincible Effect
+}
+
+void ADPCharacter::ApplyKockback_Implementation(const FHitResult& HitResult)
+{
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("ApplyKnockback_Implementation"));
+
+	// 충돌 지점에서 캐릭터 위치로의 방향을 계산
+	FVector KnockbackDirection = GetActorLocation() - HitResult.ImpactPoint;
+	KnockbackDirection.Z = 20.0f;
+    
+	if (!KnockbackDirection.IsNearlyZero())
+	{
+		KnockbackDirection.Normalize();
+	}
+	else
+	{
+		KnockbackDirection = GetActorForwardVector() * -1;
+	}
+
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("KnockbackDirection: %s"), *KnockbackDirection.ToString());
+    
+	// 넉백 속도 설정
+	float KnockbackSpeed = 2000.0f;
+
+	// Character Movement Component 가져오기
+	UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
+	if (MovementComponent)
+	{
+		// Save previous movement mode
+		EMovementMode PreviousMovementMode = MovementComponent->MovementMode;
+
+		// Set Falling Movement Mode
+		MovementComponent->SetMovementMode(MOVE_Falling);
+
+		// Set Knockback Velocity
+		MovementComponent->Velocity = KnockbackDirection * KnockbackSpeed;
+
+		FTimerHandle ResetTimerHandle;
+		TWeakObjectPtr<ADPCharacter> WeakThis(this);
+		GetWorldTimerManager().SetTimer(ResetTimerHandle, [WeakThis, this, MovementComponent, PreviousMovementMode]() {
+			if (WeakThis.IsValid())
+			{
+				// Reset Movement Mode
+				MovementComponent->SetMovementMode(PreviousMovementMode);
+				
+			}
+		}, 0.5f, false);
+	}
+}
+
+void ADPCharacter::OnRep_SyncInvincible()
+{
+}
+
+bool ADPCharacter::IsInvincible()
+{
+	return bIsInvincible;
 }
 
 void ADPCharacter::OnServerHit(const FHitResult& HitResult)
 {
 	if (this->IsStunned())
+	{
+		return ;
+	}
+
+	if (this->IsInvincible())
 	{
 		return ;
 	}
@@ -475,6 +550,7 @@ void ADPCharacter::OnServerHit(const FHitResult& HitResult)
 	{
 		return ;
 	}
+	this->ApplyKockback(HitResult);
 	this->ApplyStunEffect();
 	
 	FTimerDelegate timerCollisionDelegate;

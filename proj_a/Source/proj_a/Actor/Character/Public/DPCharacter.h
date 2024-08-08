@@ -79,16 +79,23 @@ public:	// component
 
 	UPROPERTY(ReplicatedUsing=OnRep_SyncStunned)
 	bool bIsStunned;
-
 	UFUNCTION()
 	void OnRep_SyncStunned();
-
-	FVector GetCameraLocation() const;
-
 	void SetStunned(bool bCond);
 	bool IsStunned() const;
 	void ApplyStunEffect();
 	void RemoveStunEffect();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void ApplyKockback(const FHitResult& HitResult);
+
+	UPROPERTY(ReplicatedUsing=OnRep_SyncInvincible)
+	bool bIsInvincible = false;
+	UFUNCTION()
+	void OnRep_SyncInvincible();
+	bool IsInvincible();
+
+	FVector GetCameraLocation() const;
 
 	void PlayAimAnimation();
 	void StopAimAnimation();
