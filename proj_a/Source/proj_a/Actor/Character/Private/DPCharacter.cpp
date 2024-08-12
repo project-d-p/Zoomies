@@ -163,7 +163,6 @@ ADPCharacter::ADPCharacter()
 
 	NameTag_WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("NameTag_WidgetComponent"));
 	NameTag_WidgetComponent->SetupAttachment(RootComponent);
-	// NameTag_WidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
 	NameTag_WidgetComponent->SetDrawAtDesiredSize(true);
 	NameTag_WidgetComponent->SetRelativeLocation(FVector(0, 0, 100));
 	NameTag_WidgetComponent->SetWorldScale3D(FVector(0.6f, 0.6f, 0.6f));
