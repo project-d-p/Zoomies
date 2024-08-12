@@ -13,6 +13,7 @@
 #include "MainLevelComponent.h"
 #include "MessageMaker.h"
 #include "ServerNetworkManager.h"
+#include "CompileMode.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 ADPGameModeBase::ADPGameModeBase()
@@ -30,7 +31,14 @@ ADPGameModeBase::ADPGameModeBase()
 	ChatManager = CreateDefaultSubobject<UServerChatManager>(TEXT("ChatManager"));
 	ScoreManager = CreateDefaultSubobject<UScoreManagerComp>(TEXT("ScoreManager"));
 	MonsterFactory = CreateDefaultSubobject<UMonsterFactory>(TEXT("MonsterFactory"));
+
+#if EDITOR_MODE
+	NetworkManager = CreateDefaultSubobject<UANetworkManager>(TEXT("NetworkManager"));
+#elif LAN_MODE
 	NetworkManager = CreateDefaultSubobject<UServerNetworkManager>(TEXT("NetworkManager"));
+#else
+	NetworkManager = CreateDefaultSubobject<UServerNetworkManager>(TEXT("NetworkManager"));
+#endif	
 
 	monster_controllers_.resize(NUM_OF_MAX_MONSTERS, nullptr);
 	empty_monster_slots_.reserve(NUM_OF_MAX_MONSTERS);
@@ -43,6 +51,10 @@ ADPGameModeBase::ADPGameModeBase()
 
 void ADPGameModeBase::OnGameStart()
 {
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	check(GameInstance);
+
+	GameInstance->ChangeJoinInProgress(false);
 	this->bStart = true;
 }
 
@@ -67,6 +79,25 @@ void ADPGameModeBase::GetSeamlessTravelActorList(bool bToTransition, TArray<AAct
 	GameInstance->player_count = GetWorld()->GetNumControllers();
 }
 
+void ADPGameModeBase::SpawnNewCharacter(APlayerController* NewPlayer)
+{
+	FVector Location[4] = {
+		FVector(-230.000000,230.000000,10.000000),
+		FVector(-230.000000,-250.000000,10.000000),
+		FVector(270.000000,-250.000000,10.000000),
+		FVector(270.000000,230.000000,10.000000),
+	};
+	static int idx = 0;
+	if (idx >= 4)
+		idx = 0;
+	FVector SpawnLocation = Location[idx++];
+
+	// ADPCharacter* NewCharacter = GetWorld()->SpawnActor<ADPCharacter>(DefaultPawnClass, SpawnLocation, FRotator::ZeroRotator);
+	
+	// As we set the default pawn class to ADPCharacter, we can use the following code to relocate an existing character.
+	NewPlayer->GetCharacter()->SetActorLocation(SpawnLocation);
+}
+
 void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 {
 	Super::PostLogin(newPlayer);
@@ -74,7 +105,7 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 
 	ADPPlayerState* player_state = Cast<ADPPlayerState>(newPlayer->PlayerState);
 	check(player_state);
-	
+
 	FString name = player_state->GetPlayerName();
 	std::string key(TCHAR_TO_UTF8(*name));
 	
@@ -86,6 +117,7 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 	player_controllers_[key] = Cast<ADPPlayerController>(newPlayer);
 	player_controllers_[key]->SwitchLevelComponent(ELevelComponentType::MAIN);
 
+	SpawnNewCharacter(newPlayer); 
 	if (!newPlayer->IsLocalController())
 	{
 		player_controllers_[key]->ConnectToServer(ELevelComponentType::MAIN);
@@ -109,6 +141,11 @@ void ADPGameModeBase::Logout(AController* Exiting)
 	{
 		player_controllers_.erase(key);
 	}
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (GameInstance)
+	{
+		GameInstance->AddBanPlayer(controller->PlayerState->GetUniqueId()->ToString());
+	}
 }
 
 void ADPGameModeBase::EndGame()
@@ -122,8 +159,14 @@ void ADPGameModeBase::StartPlay()
 {
 	Super::StartPlay();
 
+#if EDITOR_MODE
+	NetworkManager->Initialize(ENetworkTypeZoomies::NONE);
+#elif LAN_MODE
 	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
-	// NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
+#else
+	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
+#endif
+	
 	NetworkManager->SetGameStartCallback(NUM_OF_MAX_CLIENTS, [this]()
 	{
 		this->OnGameStart();
@@ -133,8 +176,10 @@ void ADPGameModeBase::StartPlay()
 void ADPGameModeBase::Tick(float delta_time)
 {
 	Super::Tick(delta_time);
+#if EDITOR_MODE != 1
 	if (bStart)
 	{
+#endif
 		if (bTimeSet == false)
 		{
 			bTimeSet = true;
@@ -142,7 +187,9 @@ void ADPGameModeBase::Tick(float delta_time)
 		}
 
 		this->ProcessData(delta_time);
+#if EDITOR_MODE != 1
 	}
+#endif
 }
 
 void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)

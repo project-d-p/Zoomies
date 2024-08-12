@@ -36,7 +36,7 @@ public:
 	virtual UServerChatManager* GetChatManager() const override { return ChatManager; }
 	
 	// monster
-	enum { NUM_OF_MAX_MONSTERS = 20 };
+	enum { NUM_OF_MAX_MONSTERS = 2 };
 	std::vector<ABaseMonsterAIController*> monster_controllers_;
 	std::vector<int32> empty_monster_slots_;
 
@@ -50,6 +50,8 @@ public:
 	UPROPERTY()
 	UScoreManagerComp* ScoreManager;
 	FTimerHandle TimerHandle_SpawnAI;
+
+	void SpawnNewCharacter(APlayerController* NewPlayer);
 
 	// Called when the game starts or when spawned
 	virtual void PostLogin(APlayerController* newPlayer) override;

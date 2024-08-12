@@ -1,15 +1,26 @@
 #include "GI_Zoomies.h"
 #include "DPPlayerController.h"
+#include "FNetLogger.h"
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
 #include "steam_api.h"
 #include "Kismet/GameplayStatics.h"
+#include "CompileMode.h"
+#include "NavigationSystemTypes.h"
 #include "Online/OnlineSessionNames.h"
 
 void UGI_Zoomies::Init()
 {
 	Super::Init();
 	CheckSteamInit();
+
+#if EDITOR_MODE
+	bIsOnline = false;
+#elif LAN_MODE
+	bIsOnline = false;
+#else
+	bIsOnline = true;
+#endif
 }
 
 // matching session Functions
@@ -25,19 +36,32 @@ IOnlineSessionPtr UGI_Zoomies::GetOnlineSessionInterface() const
 
 void UGI_Zoomies::FindSession()
 {
-	// session search settings	
+	FNetLogger::LogError(TEXT("FindSession_t"));
+    
+	// Session search settings 
 	session_search_ = MakeShareable(new FOnlineSessionSearch());
-	// session_search_->bIsLanQuery = false;
-	session_search_->bIsLanQuery = true; // for LAN testing
+    
+	// Align with CreateSession settings
+	session_search_->bIsLanQuery = !bIsOnline;
+    
 	session_search_->MaxSearchResults = 20;
+    
+	// Set query settings based on the online/LAN mode
 	session_search_->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
+	session_search_->QuerySettings.Set(SETTING_MAPNAME, FString("matchLobby"), EOnlineComparisonOp::Equals);
+	if (bIsOnline)
+	{
+		// If using lobbies (as set in CreateSession)
+		session_search_->QuerySettings.Set(SEARCH_LOBBIES, true, EOnlineComparisonOp::Equals);
+	}
 
+	// Add delegate
 	dh_on_find_complete = session_interface_->AddOnFindSessionsCompleteDelegate_Handle(
-		FOnFindSessionsCompleteDelegate::CreateUObject(this, &UGI_Zoomies::OnFindComplete));
+	   FOnFindSessionsCompleteDelegate::CreateUObject(this, &UGI_Zoomies::OnFindComplete));
 
+	// Find sessions
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
 	session_interface_->FindSessions(*local_player->GetPreferredUniqueNetId(), session_search_.ToSharedRef());
-	FNetLogger::LogError(TEXT("FindSession_t"));
 }
 
 void UGI_Zoomies::OnFindComplete(bool bWasSuccessful)
@@ -52,9 +76,15 @@ void UGI_Zoomies::OnFindComplete(bool bWasSuccessful)
 	if (bWasSuccessful && session_search_.IsValid())
 	{
 		if (session_search_->SearchResults.Num() > 0)
-		{	
-			JoinSessionBySearchResult(session_search_->SearchResults[0]);
-			FNetLogger::LogError(TEXT("FindSession_t[Join]"));
+		{
+			for (int32 i = 0; i < session_search_->SearchResults.Num(); i++)
+			{
+				if (JoinSessionBySearchResult(session_search_->SearchResults[i]))
+					return ;
+				FNetLogger::LogError(TEXT("Session[%d]: %s"), i, *session_search_->SearchResults[i].Session.OwningUserName);
+			}
+			CreateSession();
+			FNetLogger::LogError(TEXT("FindSession_t[Create Another Session]"));
 		}
 		else
 		{
@@ -68,21 +98,45 @@ void UGI_Zoomies::CreateSession()
 {
 	FNetLogger::LogError(TEXT("CreateSession_t"));
 	session_settings_ = MakeShareable(new FOnlineSessionSettings());
-	// session_settings_->bIsLANMatch = false;
-	session_settings_->bIsLANMatch = true; // for LAN testing
-	session_settings_->NumPublicConnections = 4;
-	session_settings_->bShouldAdvertise = true;
-	session_settings_->bAllowJoinInProgress = true;
-	session_settings_->bUsesPresence = true;
+
+	// TODO: Should Not Destory Existing Session Because that will cause the server(playing) to be destroyed
+	// If there is an existing session, destroy it
+	// auto ExistingSession = session_interface_->GetNamedSession(NAME_GameSession);
+	// if (ExistingSession != nullptr)
+	// {
+	// 	session_interface_->DestroySession(NAME_GameSession);
+	//
+	// 	FNetLogger::LogError(TEXT("Destroy existing session: %s"), NAME_GameSession);
+	// }
 	
-	// add delegate to handle the result of created session
-	session_settings_->Set(
-		SETTING_MAPNAME,
-		FString("matchLobby"),
-		EOnlineDataAdvertisementType::ViaOnlineService);
-	dh_on_create_complete = session_interface_->AddOnCreateSessionCompleteDelegate_Handle(
-		FOnCreateSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onCreateComplete));
+	// Online or LAN setting
+	session_settings_->bIsLANMatch = !bIsOnline;
     
+	session_settings_->NumPublicConnections = 4; // Number of players
+	session_settings_->bShouldAdvertise = true; // Advertise the session to others
+	session_settings_->bAllowJoinInProgress = true; // Allow joining in progress
+	session_settings_->bAllowJoinViaPresence = true; // Allow joining via presence (show sessions to players in current regions)
+	session_settings_->bUsesPresence = true; // Use presence for the session
+	if (bIsOnline)
+	{
+		session_settings_->bUseLobbiesIfAvailable = true; // Use lobbies if available
+	}
+    
+	// Steam-related settings (for dedicated server)
+	// if (bIsOnline && !session_settings_->bUsesPresence)
+	// {
+	// 	session_settings_->Set(STEAMPRODUCTNAME, FString("YourAppID"), EOnlineDataAdvertisementType::ViaOnlineService);
+	// 	session_settings_->Set(STEAMGAMEDIR, FString("YourGameDir"), EOnlineDataAdvertisementType::ViaOnlineService);
+	// 	session_settings_->Set(STEAMGAMEDESC, FString("Your Game Description"), EOnlineDataAdvertisementType::ViaOnlineService);
+	// }
+
+	session_settings_->Set(SETTING_MAPNAME, FString("matchLobby"), EOnlineDataAdvertisementType::ViaOnlineService);
+    
+	// Add delegate
+	dh_on_create_complete = session_interface_->AddOnCreateSessionCompleteDelegate_Handle(
+	   FOnCreateSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onCreateComplete));
+    
+	// Create session
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
 	session_interface_->CreateSession(*local_player->GetPreferredUniqueNetId(), NAME_GameSession, *session_settings_);
 }
@@ -99,6 +153,7 @@ void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
 	{
 		// travel to lobby level
 		FNetLogger::LogError(TEXT("onCreateComplete"));
+
 		GetWorld()->ServerTravel(TEXT("matchLobby?listen"), true);
 	}
 	else
@@ -107,40 +162,72 @@ void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
 	}
 }
 
-void UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& search_result)
+bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& search_result)
 {
+	FString BanList;
+	if (search_result.Session.SessionSettings.Get(FName("BanList"), BanList))
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("BanList: %s"), *BanList);
+		CSteamID SteamIDRaw = SteamUser()->GetSteamID();
+		FString PlayerID = FString::Printf(TEXT("%llu"), SteamIDRaw.ConvertToUint64());
+		if (BanList.Contains(PlayerID))
+		{
+			FNetLogger::EditerLog(FColor::Red, TEXT("You are banned from this session"));
+			return false;
+		}
+	}
+	
 	dh_on_join_complete = session_interface_->AddOnJoinSessionCompleteDelegate_Handle(
 		FOnJoinSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onJoinComplete));
     
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
 	session_interface_->JoinSession(*local_player->GetPreferredUniqueNetId(), NAME_GameSession, search_result);
+	return true;
 }
 
 void UGI_Zoomies::onJoinComplete(FName session_name, EOnJoinSessionCompleteResult::Type result)
 {
-	// unregister the delegate
-	session_interface_->ClearOnJoinSessionCompleteDelegate_Handle(
-		dh_on_join_complete
-		);
-	
-	// if the join was successful, travel to the target map
 	if (result == EOnJoinSessionCompleteResult::Success)
 	{
 		APlayerController* player_controller = GetWorld()->GetFirstPlayerController();
-		FString travel_url;
-		if (session_interface_->GetResolvedConnectString(session_name, travel_url))
+		if (player_controller)
 		{
-			UWorld* world = GetWorld();
-			if (world && !(world->GetMapName().Contains(travel_url)))
+			FString connect_string;
+			if (session_interface_->GetResolvedConnectString(session_name, connect_string))
 			{
-				player_controller->ClientTravel(travel_url, ETravelType::TRAVEL_Absolute);
+				// Get map name from session settings
+				FString map_name;
+				FOnlineSessionSettings* session_settings = session_interface_->GetSessionSettings(session_name);
+				if (session_settings && session_settings->Get(SETTING_MAPNAME, map_name))
+				{
+					// URL: "IP:Port/MapName"
+					FString travel_url = FString::Printf(TEXT("%s/%s"), *connect_string, *map_name);
+					FNetLogger::LogError(TEXT("Joining address: %s"), *travel_url);
+                    
+					// ClientTravel to the map
+					player_controller->ClientTravel(travel_url, ETravelType::TRAVEL_Absolute);
+				}
+				else
+				{
+					FNetLogger::LogError(TEXT("Failed to get map name from session settings"));
+				}
+			}
+			else
+			{
+				FNetLogger::LogError(TEXT("Failed to get resolved connect string"));
 			}
 		}
 		else
 		{
-			UE_LOG(LogTemp, Error, TEXT("Failed to get travel URL"));
+			FNetLogger::LogError(TEXT("PlayerController is null"));
 		}
 	}
+	else
+	{
+		FNetLogger::LogError(TEXT("Join session failed with result: %d"), static_cast<int32>(result));
+	}
+
+	session_interface_->ClearOnJoinSessionCompleteDelegate_Handle(dh_on_join_complete);
 }
 
 void UGI_Zoomies::OnSessionFailure()
@@ -183,6 +270,53 @@ void UGI_Zoomies::OnSessionFailure()
 				session_interface_->DestroySession(NAME_GameSession);
 			}
 		}
+	}
+}
+
+void UGI_Zoomies::ChangeJoinInProgress(bool bCond)
+{
+	IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
+	IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
+	FNamedOnlineSession* ExistingSession = SessionInterface->GetNamedSession(NAME_GameSession);
+
+	if (ExistingSession != nullptr)
+	{
+		// 세션 설정 업데이트
+		FOnlineSessionSettings UpdatedSessionSettings = ExistingSession->SessionSettings;
+        
+		// 세션을 비공개로 설정
+		UpdatedSessionSettings.bAllowJoinInProgress = false;
+        
+		// 추가적으로 검색 결과에서 숨기기 위해
+		UpdatedSessionSettings.bShouldAdvertise = false;
+
+		// 세션 설정 업데이트
+		SessionInterface->UpdateSession(NAME_GameSession, UpdatedSessionSettings);
+	}
+}
+
+void UGI_Zoomies::AddBanPlayer(const FString& String)
+{
+	IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
+	IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
+	FNamedOnlineSession* ExistingSession = SessionInterface->GetNamedSession(NAME_GameSession);
+
+	if (ExistingSession != nullptr)
+	{
+		FOnlineSessionSettings UpdatedSessionSettings = ExistingSession->SessionSettings;
+
+		///
+		FString MapName;
+		UpdatedSessionSettings.Get(SETTING_MAPNAME, MapName);
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("MapName: %s"), *MapName);
+		///
+		
+		FString BanList;
+		UpdatedSessionSettings.Get(FName("BanList"), BanList);
+		BanList += String + TEXT(",");
+		UpdatedSessionSettings.Set(FName("BanList"), BanList, EOnlineDataAdvertisementType::ViaOnlineService);
+
+		SessionInterface->UpdateSession(NAME_GameSession, UpdatedSessionSettings);
 	}
 }
 

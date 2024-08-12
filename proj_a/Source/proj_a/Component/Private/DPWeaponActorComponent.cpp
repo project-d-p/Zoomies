@@ -25,11 +25,6 @@ UDPWeaponActorComponent::UDPWeaponActorComponent()
 
 UDPWeaponActorComponent::~UDPWeaponActorComponent()
 {
-	// if (weapons.Num() > 0) {
-	// 	for (ADPWeapon* weapon : weapons) {
-	// 		weapon->Destroy();
-	// 	}
-	// }
 }
 
 
@@ -55,6 +50,17 @@ void UDPWeaponActorComponent::BeginPlay()
 	this->Equip(gunClass);
 }
 
+void UDPWeaponActorComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	if (weapons.Num() > 0) {
+		for (ADPWeapon* weapon : weapons) {
+			if (weapon->IsValidLowLevel())
+				weapon->Destroy();
+		}
+	}
+}
 
 // Called every frame
 void UDPWeaponActorComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -95,6 +101,7 @@ void UDPWeaponActorComponent::AddWeapons(TSubclassOf<ADPWeapon> weaponClass)
 		{
 			weapons.Add(newWeapon); UE_LOG(LogTemp, Warning, TEXT("add weapon : %s"), *newWeapon->GetName());
 			newWeapon->AttachToComponent(playerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("gunSocket"));
+			newWeapon->RegisterAllComponents();
 		}
 	}
 }
@@ -110,6 +117,7 @@ void UDPWeaponActorComponent::AddWeapons_MatchLobby(TSubclassOf<ADPWeapon> weapo
 		{
 			weapons.Add(newWeapon); UE_LOG(LogTemp, Warning, TEXT("add weapon : %s"), *newWeapon->GetName());
 			newWeapon->AttachToComponent(playerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("gunSocket"));
+			newWeapon->RegisterAllComponents();
 		}
 	}
 }

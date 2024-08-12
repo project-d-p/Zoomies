@@ -65,6 +65,36 @@ public:
 			checkf(false, TEXT("Invalid monster type: %d"), static_cast<int>(MType)) return nullptr;;
 		}
 	}
+
+	static constexpr const TCHAR* GetMonsterTransparencyMeshPath(EAnimal MType)
+	{
+		switch(MType)
+		{
+		case EAnimal::ANIMAL_CRAB: return TEXT("/Game/model/animals/crab/crab_O.crab_O");
+		case EAnimal::ANIMAL_DOLPHIN: return TEXT("/Game/model/animals/dolphin/Dolphin_O.Dolphin_O");
+		case EAnimal::ANIMAL_EEL: return TEXT("/Game/model/animals/eel/eel_O.eel_O");
+		case EAnimal::ANIMAL_ELEPHANT: return TEXT("/Game/model/animals/elephant/low_poly_elephant_O.low_poly_elephant_O");
+		case EAnimal::ANIMAL_FOX: return TEXT("/Game/model/animals/fox_2/fox_O.fox_O");
+		case EAnimal::ANIMAL_GIRAFFE: return TEXT("/Game/model/animals/giraffe/giraffe-lowpoly_O.giraffe-lowpoly_O");
+		case EAnimal::ANIMAL_LION: return TEXT("/Game/model/animals/lion/low_poly_lion_O.low_poly_lion_O");
+		case EAnimal::ANIMAL_LOBSTER: return TEXT("/Game/model/animals/lobstar/Lobster_O.Lobster_O");
+		case EAnimal::ANIMAL_MAMMOTH: return TEXT("/Game/model/animals/mammoth/low_poly_mammoth_O.low_poly_mammoth_O");
+		case EAnimal::ANIMAL_OCTOPUS: return TEXT("/Game/model/animals/octopus/Octopus_O.Octopus_O");
+		case EAnimal::ANIMAL_PENGUIN: return TEXT("/Game/model/animals/penguin/penguin_swimming_O.penguin_swimming_O");
+		case EAnimal::ANIMAL_SABER_TOOTH_TIGER: return TEXT("/Game/model/animals/sabertoothTiger/low_poly_sabertooth_tiger_O.low_poly_sabertooth_tiger_O");
+		case EAnimal::ANIMAL_SEAL: return TEXT("/Game/model/animals/seal/Seal_O.Seal_O");
+		case EAnimal::ANIMAL_SKUNK: return TEXT("/Game/model/animals/skunk/low_poly_skunk_O.low_poly_skunk_O");
+		case EAnimal::ANIMAL_SLOTH: return TEXT("/Game/model/animals/sloth/low_poly_giant_sloth_O.low_poly_giant_sloth_O");
+		case EAnimal::ANIMAL_SQUID: return TEXT("/Game/model/animals/squid/Squid_O.Squid_O");
+		case EAnimal::ANIMAL_STAR_FISH: return TEXT("/Game/model/animals/starFish/star_fish_O.star_fish_O");
+		case EAnimal::ANIMAL_STINGRAY: return TEXT("/Game/model/animals/stingRay/sting_ray_O.sting_ray_O");
+		case EAnimal::ANIMAL_WHALE: return TEXT("/Game/model/animals/whale/Whale_O.Whale_O");
+		case EAnimal::ANIMAL_HORSE: return TEXT("/Game/model/animals/horse/low_poly_western_horse_O.low_poly_western_horse_O");
+		case EAnimal::ANIMAL_CHAMELEON: return TEXT("/Game/model/animals/chamaleon/lowpoly_animated_chamaleon_game_ready_O.lowpoly_animated_chamaleon_game_ready_O");
+		default:
+			checkf(false, TEXT("Invalid monster type: %d"), static_cast<int>(MType)) return nullptr;;
+		}
+	}
 	
 	static constexpr const TCHAR* GetMonsterAnimationPath(EAnimal MType)
 	{

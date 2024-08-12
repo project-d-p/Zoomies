@@ -190,7 +190,7 @@ MonsterPosition MessageMaker::MakeMonsterPositionMessage(ABaseMonsterAIControlle
 	return msg;
 }
 
-Message MessageMaker::MakeCatchMessage(ADPPlayerController* Controller)
+Message MessageMaker::MakeCatchMessage(ADPPlayerController* Controller, const FVector& Position, const FRotator& Rotation)
 {
 	Message msg;
 	if (Controller == nullptr)
@@ -204,14 +204,14 @@ Message MessageMaker::MakeCatchMessage(ADPPlayerController* Controller)
 	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetPlayerName()));
 	Catch catch_;
 	Vec3 position;
-	position.set_x(Controller->GetPawn()->GetActorLocation().X);
-	position.set_y(Controller->GetPawn()->GetActorLocation().Y);
-	position.set_z(Controller->GetPawn()->GetActorLocation().Z);
+	position.set_x(Position.X);
+	position.set_y(Position.Y);
+	position.set_z(Position.Z);
 	*catch_.mutable_position() = position;
 	Vec3 direction;
-	direction.set_x(Controller->GetControlRotation().Pitch);
-	direction.set_y(Controller->GetControlRotation().Yaw);
-	direction.set_z(Controller->GetControlRotation().Roll);
+	direction.set_x(Rotation.Pitch);
+	direction.set_y(Rotation.Yaw);
+	direction.set_z(Rotation.Roll);
 	*catch_.mutable_rotation() = direction;
 	*msg.mutable_catch_() = catch_;
 	return msg;

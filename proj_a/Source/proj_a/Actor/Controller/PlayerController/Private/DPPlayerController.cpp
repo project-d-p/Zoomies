@@ -11,13 +11,19 @@
 #include "JudgeLevelComponent.h"
 #include "MainLevelComponent.h"
 #include "ResultLevelComponent.h"
+#include "CompileMode.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 DEFINE_LOG_CATEGORY(LogNetwork);
 
 ADPPlayerController::ADPPlayerController()
 {
+#if EDITOR_MODE
+	NetworkManager = CreateDefaultSubobject<UANetworkManager>(TEXT("NetworkManager"));
+#else
 	NetworkManager = CreateDefaultSubobject<UClientNetworkManager>(TEXT("NetworkManager"));
+#endif
+	
 	PrivateScoreManager = CreateDefaultSubobject<UPrivateScoreManager>(TEXT("PrivateScoreManager"));
 	
 	UBaseLevelComponent* MainLevelComponet = CreateDefaultSubobject<UMainLevelComponent>(TEXT("MainLevelComponent"));
@@ -108,8 +114,14 @@ void ADPPlayerController::ClientDestroySession_Implementation()
 
 void ADPPlayerController::ConnectToServer_Implementation(ELevelComponentType Type)
 {
+#if EDITOR_MODE
+	NetworkManager->Initialize(ENetworkTypeZoomies::NONE);
+#elif LAN_MODE
 	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
-	// NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
+#else
+	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
+#endif
+	
 	SwitchLevelComponent(Type);
 }
 

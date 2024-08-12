@@ -49,7 +49,7 @@ void UNetworkWorker::Stop()
 
 UNetworkWorker::~UNetworkWorker()
 {
-	if (SocketInterface)
+	if (SocketInterface->IsValidLowLevel())
 	{
 		SocketInterface->ConditionalBeginDestroy();
 		SocketInterface = nullptr;
