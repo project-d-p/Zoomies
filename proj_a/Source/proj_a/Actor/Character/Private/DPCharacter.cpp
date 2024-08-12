@@ -382,11 +382,21 @@ void ADPCharacter::ClientNotifyAnimalReturn_Implementation(const FString& player
 
 void ADPCharacter::UpdateNameTagRotation()
 {
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return ;
+	}
 	if (NameTag_WidgetComponent)
 	{
-		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+		APlayerController* PlayerController = World->GetFirstPlayerController();
 		if (PlayerController)
 		{
+			// FNetLogger::LogError(TEXT("Here is Wrong! : PlayerController"));
+			if (!PlayerController->PlayerCameraManager)
+			{
+				return ;
+			}
 			FVector CameraLocation = PlayerController->PlayerCameraManager->GetCameraLocation();
 			FRotator NewRotation = (CameraLocation - NameTag_WidgetComponent->GetComponentLocation()).Rotation();
             
