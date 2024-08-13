@@ -23,6 +23,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "DSP/LFO.h"
+#include "Components/PostProcessComponent.h"
+#include "Materials/MaterialInstanceConstant.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerState.h"
@@ -174,6 +176,18 @@ ADPCharacter::ADPCharacter()
 		NameTag_WidgetComponent->SetWidget(NameTag_Instance);
 		NameTag_WidgetComponent->SetVisibility(false);
 	}
+
+	postProcessComponent = CreateDefaultSubobject<UPostProcessComponent>(TEXT("postProcessComponent"));
+	postProcessComponent->SetupAttachment(RootComponent);
+
+	static ConstructorHelpers::FObjectFinder<UMaterialInstanceConstant> PostProcessMaterial
+	(TEXT("MaterialInstanceConstant'/Game/material/postprocess/mpp_dizzle_Inst.mpp_dizzle_Inst'"));
+	if (PostProcessMaterial.Succeeded())
+	{
+		postProcessComponent->AddOrUpdateBlendable(PostProcessMaterial.Object, 1.0f);
+		postProcessComponent->BlendWeight = 0.0f;
+	}
+
 }
 
 ADPCharacter::~ADPCharacter()
@@ -446,6 +460,9 @@ void ADPCharacter::ApplyStunEffect()
 	{
 		StunEffectComponent->Activate(true);
 	}
+	if (IsLocallyControlled()) {
+		postProcessComponent->BlendWeight = 1.f;
+	}
 }
 
 void ADPCharacter::RemoveStunEffect()
@@ -469,6 +486,9 @@ void ADPCharacter::RemoveStunEffect()
 	}
 	StunEffectComponent->Deactivate();
 	// TODO: Invincible Effect
+	if (IsLocallyControlled()) {
+		postProcessComponent->BlendWeight = 0.f;
+	}
 }
 
 void ADPCharacter::ApplyKockback_Implementation(const FHitResult& HitResult)

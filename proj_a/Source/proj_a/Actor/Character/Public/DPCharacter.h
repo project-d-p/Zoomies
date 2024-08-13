@@ -56,6 +56,9 @@ public:	// component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UMonsterSlotComponent* monsterSlotComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PostProcess")
+	class UPostProcessComponent* postProcessComponent;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
 	UAnimMontage* characterMontage;
 
@@ -146,4 +149,5 @@ public:
 	float speed{ 0.f };
 	bool isAim{ false };
 	bool mIsAtReturnPlace{ true };
+	bool isKnockback{ false };
 };
