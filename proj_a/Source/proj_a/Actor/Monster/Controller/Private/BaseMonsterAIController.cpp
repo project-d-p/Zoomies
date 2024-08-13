@@ -48,7 +48,11 @@ void ABaseMonsterAIController::TakeMonsterDamage(float dmg)
 bool ABaseMonsterAIController::GetMovementAllowed()
 {
 	ABaseMonsterCharacter* CC = Cast<ABaseMonsterCharacter>(GetCharacter());
-	check(CC);
+	if (!CC)
+	{
+		FNetLogger::LogError(TEXT("Failed to cast to ABaseMonsterCharacter ID: %d"), GetUniqueID());
+		return false;
+	}
 	if (CC->GetState() == EMonsterState::Faint)
 	{
 		FPathFollowingResultFlags::Type AbortFlags = FPathFollowingResultFlags::UserAbort;
