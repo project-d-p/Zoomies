@@ -183,7 +183,7 @@ void ADPGameModeBase::Tick(float delta_time)
 		if (bTimeSet == false)
 		{
 			bTimeSet = true;
-			TimerManager->StartTimer<ADPInGameState>(30.f, &ADPGameModeBase::EndGame, this);
+			TimerManager->StartTimer<ADPInGameState>(1000.f, &ADPGameModeBase::EndGame, this);
 		}
 
 		this->ProcessData(delta_time);

@@ -1,6 +1,5 @@
 #include "NetworkWorker.h"
 
-#include "FNetLogger.h"
 #include "ISocketInterface.h"
 #include "message.pb.h"
 

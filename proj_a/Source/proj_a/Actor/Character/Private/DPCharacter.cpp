@@ -161,20 +161,12 @@ ADPCharacter::ADPCharacter()
 	if (NAME_TAG.Succeeded())
 	{
 		NameTag_BP = NAME_TAG.Class;
-	}
-
-	NameTag_WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("NameTag_WidgetComponent"));
-	NameTag_WidgetComponent->SetupAttachment(RootComponent);
-	// NameTag_WidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
-	NameTag_WidgetComponent->SetDrawAtDesiredSize(true);
-	NameTag_WidgetComponent->SetRelativeLocation(FVector(0, 0, 100));
-	NameTag_WidgetComponent->SetWorldScale3D(FVector(0.6f, 0.6f, 0.6f));
-	
-	NameTag_Instance = CreateWidget<UNameTag>(GetWorld(), NameTag_BP);
-	if (NameTag_Instance)
-	{
-		NameTag_WidgetComponent->SetWidget(NameTag_Instance);
-		NameTag_WidgetComponent->SetVisibility(false);
+		
+		NameTag_WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("NameTag_WidgetComponent"));
+		NameTag_WidgetComponent->SetupAttachment(RootComponent);
+		NameTag_WidgetComponent->SetDrawAtDesiredSize(true);
+		NameTag_WidgetComponent->SetRelativeLocation(FVector(0, 0, 100));
+		NameTag_WidgetComponent->SetWorldScale3D(FVector(0.6f, 0.6f, 0.6f));
 	}
 
 	postProcessComponent = CreateDefaultSubobject<UPostProcessComponent>(TEXT("postProcessComponent"));
@@ -224,6 +216,17 @@ void ADPCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (!NameTag_BP)
+	{
+		check(false);
+	}
+	NameTag_Instance = CreateWidget<UNameTag>(GetWorld(), NameTag_BP);
+	if (NameTag_Instance)
+	{
+		NameTag_WidgetComponent->SetWidget(NameTag_Instance);
+		NameTag_WidgetComponent->SetVisibility(false);
+	}
+	
 	if (GetMesh()) {
 		UMaterialInterface* Material = GetMesh()->GetMaterial(0);
 		if (Material) {
@@ -396,11 +399,21 @@ void ADPCharacter::ClientNotifyAnimalReturn_Implementation(const FString& player
 
 void ADPCharacter::UpdateNameTagRotation()
 {
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return ;
+	}
 	if (NameTag_WidgetComponent)
 	{
-		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+		APlayerController* PlayerController = World->GetFirstPlayerController();
 		if (PlayerController)
 		{
+			// FNetLogger::LogError(TEXT("Here is Wrong! : PlayerController"));
+			if (!PlayerController->PlayerCameraManager)
+			{
+				return ;
+			}
 			FVector CameraLocation = PlayerController->PlayerCameraManager->GetCameraLocation();
 			FRotator NewRotation = (CameraLocation - NameTag_WidgetComponent->GetComponentLocation()).Rotation();
             
@@ -493,9 +506,6 @@ void ADPCharacter::RemoveStunEffect()
 
 void ADPCharacter::ApplyKockback_Implementation(const FHitResult& HitResult)
 {
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("ApplyKnockback_Implementation"));
-
-	isKnockback = true;
 	// 충돌 지점에서 캐릭터 위치로의 방향을 계산
 	FVector KnockbackDirection = GetActorLocation() - HitResult.ImpactPoint;
 	// FVector KnockbackDirection = -HitResult.ImpactNormal;
@@ -510,8 +520,6 @@ void ADPCharacter::ApplyKockback_Implementation(const FHitResult& HitResult)
 		KnockbackDirection = GetActorForwardVector() * -1;
 	}
 
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("KnockbackDirection: %s"), *KnockbackDirection.ToString());
-    
 	// 넉백 속도 설정
 	float KnockbackSpeed = 2000.0f;
 
