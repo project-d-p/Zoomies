@@ -495,6 +495,7 @@ void ADPCharacter::ApplyKockback_Implementation(const FHitResult& HitResult)
 {
 	FNetLogger::EditerLog(FColor::Cyan, TEXT("ApplyKnockback_Implementation"));
 
+	isKnockback = true;
 	// 충돌 지점에서 캐릭터 위치로의 방향을 계산
 	FVector KnockbackDirection = GetActorLocation() - HitResult.ImpactPoint;
 	// FVector KnockbackDirection = -HitResult.ImpactNormal;
@@ -534,6 +535,7 @@ void ADPCharacter::ApplyKockback_Implementation(const FHitResult& HitResult)
 			{
 				// Reset Movement Mode
 				MovementComponent->SetMovementMode(PreviousMovementMode);
+				isKnockback = false;
 			}
 		}, 0.5f, false);
 	}

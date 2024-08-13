@@ -149,5 +149,6 @@ public:
 	float speed{ 0.f };
 	bool isAim{ false };
 	bool mIsAtReturnPlace{ true };
+	UPROPERTY(BlueprintReadWrite)
 	bool isKnockback{ false };
 };
