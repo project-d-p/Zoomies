@@ -89,13 +89,13 @@ void UMainInputComponent::BindMainLevelActions()
 	if (!PlayerController) return ;
 	if (!PlayerController->IsLocalController()) return ;
 	
-	// Mapping Context �߰�
+	// Mapping Context
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 	{
 		SubSystem->AddMappingContext(MainLevelContext, 0);
 	}
 
-	// Enhanced Input Component �������� �� ���ε�
+	// Enhanced Input Component
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 	{
 		// (w, a, s, d) : Move
@@ -128,13 +128,13 @@ void UMainInputComponent::UnbindMainLevelActions()
 	ADPPlayerController* PlayerController = GetPlayerController();
 	if (!PlayerController) return ;
 
-	// Enhanced Input Component ���ε� ����
+	// Enhanced Input Component
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 	{
 		EnhancedInputComponent->ClearActionBindings();
 	}
 
-	// Mapping Context ����
+	// Mapping Context
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 	{
 		if (MainLevelContext)
@@ -226,7 +226,7 @@ void UMainInputComponent::Active(const FInputActionValue& value)
 		}
 		FHitResult hit_result;
 		Character->PlayFireAnimation();
-		// ���� �߻� ��ġ��, ������ �˾ƾ� ��.
+		
 		FRotator final_direction;
 		if (Character->weaponComponent->Attack(PlayerController, hit_result, final_direction))
 		{
@@ -456,20 +456,16 @@ void UMainInputComponent::ReturningAnimals(const FInputActionValue& value)
 
 void UMainInputComponent::Run(const FInputActionValue& value)
 {
-	FNetLogger::EditerLog(FColor::Green, TEXT("Run"));
 	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
 	if (!Character) return ;
 
-	FNetLogger::EditerLog(FColor::Green, TEXT("Run"));
 	Character->GetCharacterMovement()->MaxWalkSpeed = 1000.0f;
 }
 
 void UMainInputComponent::RunReleased(const FInputActionValue& value)
 {
-	FNetLogger::EditerLog(FColor::Green, TEXT("Run Released"));
 	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
 	if (!Character) return ;
 
-	FNetLogger::EditerLog(FColor::Green, TEXT("Run Released"));
 	Character->GetCharacterMovement()->MaxWalkSpeed = 600.0f;
 }

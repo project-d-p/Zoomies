@@ -9,6 +9,7 @@
 #include <queue>
 
 #include "ANetworkManager.h"
+#include "BlockingSphereVolume.h"
 #include "message.pb.h"
 #include "ServerMessageHandler.h"
 #include "DPPlayerController.h"
@@ -56,9 +57,10 @@ public:
 	// Called when the game starts or when spawned
 	virtual void PostLogin(APlayerController* newPlayer) override;
 	virtual void Logout(AController* Exiting) override;
+	virtual void BeginPlay() override;
 	virtual void StartPlay() override;
-	void EndGame();
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	void EndGame();
 	
 	// Called every frame
 	virtual void Tick(float delta_time) override;
@@ -100,6 +102,8 @@ private:
 	UServerChatManager* ChatManager;
 	UPROPERTY()
 	UMonsterFactory* MonsterFactory;
+	UPROPERTY()
+	ABlockingSphereVolume* BlockingVolume;
 	bool bStart = false;
 	bool bTimeSet = false;
 };

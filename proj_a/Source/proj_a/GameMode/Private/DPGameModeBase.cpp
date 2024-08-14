@@ -148,6 +148,13 @@ void ADPGameModeBase::Logout(AController* Exiting)
 	}
 }
 
+void ADPGameModeBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	BlockingVolume = GetWorld()->SpawnActor<ABlockingSphereVolume>(ABlockingSphereVolume::StaticClass(), FVector(0.0f, 0.0f, 0.0f), FRotator(0.0f, 0.0f, 0.0f));
+}
+
 void ADPGameModeBase::EndGame()
 {
 	bStart = false;
@@ -182,6 +189,7 @@ void ADPGameModeBase::Tick(float delta_time)
 #endif
 		if (bTimeSet == false)
 		{
+			BlockingVolume->DeactiveBlockingVolume();
 			bTimeSet = true;
 			TimerManager->StartTimer<ADPInGameState>(1000.f, &ADPGameModeBase::EndGame, this);
 		}

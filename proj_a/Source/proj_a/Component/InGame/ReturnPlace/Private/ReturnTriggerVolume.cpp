@@ -270,8 +270,12 @@ void AReturnTriggerVolume::AnimateAnimalMesh(USkeletalMeshComponent* Mesh)
     Mesh->SetWorldRotation(NewRotation);
 
     // If the animation is complete, stop it
-    if (Progress >= 1.0f)
+    if (Progress < 1.0f)
     {
-        GetWorld()->GetTimerManager().ClearTimer(AnimData.AnimationTimerHandle);
+    	return ;
+    }
+    if (AnimData.AnimationTimerHandle.IsValid())
+    {
+		GetWorld()->GetTimerManager().ClearTimer(AnimData.AnimationTimerHandle);
     }
 }
