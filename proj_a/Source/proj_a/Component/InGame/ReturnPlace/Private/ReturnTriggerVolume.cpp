@@ -200,14 +200,21 @@ void AReturnTriggerVolume::SpawnSingleMonster(EAnimal Animal, int32 Index)
             AnimData.TotalTime = 0.0f;
             AnimData.Index = Index; // Store the index for use in animation
 
+        	TWeakObjectPtr<AReturnTriggerVolume> WeakThis(this);
             // Start the ascension animation
             FTimerDelegate AnimationTimerDelegate;
-			AnimationTimerDelegate.BindUFunction(this, FName("AnimateAnimalMesh"), Mesh);
+			// AnimationTimerDelegate.BindUFunction(this, FName("AnimateAnimalMesh"), Mesh);
+        	AnimationTimerDelegate.BindLambda([WeakThis, Mesh]()
+        	{
+        		if (WeakThis.IsValid() && IsValid(Mesh))
+        		{
+        			WeakThis->AnimateAnimalMesh(Mesh);
+        		}
+        	});
             GetWorld()->GetTimerManager().SetTimer(AnimData.AnimationTimerHandle, AnimationTimerDelegate, 0.016f, true);
 
         	// Schedule mesh destruction
         	FTimerDelegate DestroyTimerDelegate;
-        	TWeakObjectPtr<AReturnTriggerVolume> WeakThis(this);
         	DestroyTimerDelegate.BindLambda([WeakThis, Mesh]()
 			{
 				if (WeakThis.IsValid() && IsValid(Mesh))

@@ -64,6 +64,11 @@ UMainInputComponent::UMainInputComponent()
 	(TEXT("/Game/input/ia_return.ia_return"));
 	if (IA_RETURN.Succeeded())
 		ReturnAction = IA_RETURN.Object;
+	
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_RUN
+	(TEXT("/Game/input/ia_run.ia_run"));
+	if (IA_RUN.Succeeded())
+		RunAction = IA_RUN.Object;
 }
 
 void UMainInputComponent::Activate(bool bReset)
@@ -93,25 +98,28 @@ void UMainInputComponent::BindMainLevelActions()
 	// Enhanced Input Component �������� �� ���ε�
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 	{
-		// �÷��̾� �̵� ( w, a, d, s )
+		// (w, a, s, d) : Move
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &UMainInputComponent::Move);
-		// �÷��̾� ���� ( space )
+		// (space) : Jump
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &UMainInputComponent::Jump);
-		// ���� ��ȯ ( ���콺 ȸ�� )
+		// (mouse) : Rotate
 		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &UMainInputComponent::Rotate);
-		//	�ൿ, �� �߻�/�� ��ġ/�ͷ� ��ġ ( ���콺 ��Ŭ�� )
+		// (left mouse button) : Active
 		EnhancedInputComponent->BindAction(ActiveAction, ETriggerEvent::Triggered, this, &UMainInputComponent::Active);
-		//	����, ���� ����/�� ȸ�� ( ���콺 ��ũ�� )
+		// scroll up, down : Additional Setting
 		EnhancedInputComponent->BindAction(AdditionalSettingAction, ETriggerEvent::Triggered, this, &UMainInputComponent::AdditionalSetting);
-		//	���� ( ���콺 ��Ŭ�� )
+		// (right mouse button) : Aim
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &UMainInputComponent::Aim);	// 	key down
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &UMainInputComponent::AimReleased);
-		//	���, ä�� ���� ( esc - UE �����Ϳ��� �⺻ ����Ű ���� �ʿ� )
+		// (esc) : Cancel
 		EnhancedInputComponent->BindAction(CancelAction, ETriggerEvent::Triggered, this, &UMainInputComponent::ActionCancel);
-		// ��ȹ (f)
+		// (f) : Catch
 		EnhancedInputComponent->BindAction(CatchAction, ETriggerEvent::Started, this, &UMainInputComponent::CatchAnimals);
-		// ���� ��ȯ (q)
+		// (q) : Return
 		EnhancedInputComponent->BindAction(ReturnAction, ETriggerEvent::Started, this, &UMainInputComponent::ReturningAnimals);
+		// (shift) : Run
+		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Triggered, this, &UMainInputComponent::Run); // key down
+		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &UMainInputComponent::RunReleased); // key up
 	}
 }
 
@@ -444,4 +452,24 @@ void UMainInputComponent::ReturningAnimals(const FInputActionValue& value)
 	{
 		Character->ReturnTriggerVolume->SpawnReturnEffect(animals);
 	}
+}
+
+void UMainInputComponent::Run(const FInputActionValue& value)
+{
+	FNetLogger::EditerLog(FColor::Green, TEXT("Run"));
+	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
+	if (!Character) return ;
+
+	FNetLogger::EditerLog(FColor::Green, TEXT("Run"));
+	Character->GetCharacterMovement()->MaxWalkSpeed = 1000.0f;
+}
+
+void UMainInputComponent::RunReleased(const FInputActionValue& value)
+{
+	FNetLogger::EditerLog(FColor::Green, TEXT("Run Released"));
+	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
+	if (!Character) return ;
+
+	FNetLogger::EditerLog(FColor::Green, TEXT("Run Released"));
+	Character->GetCharacterMovement()->MaxWalkSpeed = 600.0f;
 }
