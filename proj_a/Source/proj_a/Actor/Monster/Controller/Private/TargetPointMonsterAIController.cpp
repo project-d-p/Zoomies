@@ -2,6 +2,7 @@
 
 #include "DPGameModeBase.h"
 #include "GameHelper.h"
+#include "Navigation/CrowdFollowingComponent.h"
 #include "Navigation/PathFollowingComponent.h"
 
 void ATargetPointMonsterAIController::MoveToTargetLocation()
@@ -26,6 +27,7 @@ void ATargetPointMonsterAIController::MoveToTargetLocation()
 
 void ATargetPointMonsterAIController::SimulateMovement(float delta_time)
 {
+	Super::SimulateMovement(delta_time);
 	if (!GetMovementAllowed())
 		return;
 	MoveToTargetLocation();

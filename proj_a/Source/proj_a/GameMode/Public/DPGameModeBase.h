@@ -17,6 +17,26 @@
 #include "MonsterFactory.h"
 #include "DPGameModeBase.generated.h"
 
+USTRUCT()
+struct FMonsterOptimizationData
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	ADPCharacter* ClosestPlayer;
+	UPROPERTY()
+	float Interval;
+	UPROPERTY()
+	float Timer;
+	float Dist = 0.0f;
+
+	FMonsterOptimizationData()
+		: ClosestPlayer(nullptr)
+		, Interval(1.0f)
+		, Timer(0.0f)
+	{}
+};
+
 /**
  * 
  */
@@ -36,7 +56,7 @@ public:
 	virtual UServerChatManager* GetChatManager() const override { return ChatManager; }
 	
 	// monster
-	enum { NUM_OF_MAX_MONSTERS = 20 };
+	enum { NUM_OF_MAX_MONSTERS = 1 };
 	std::vector<ABaseMonsterAIController*> monster_controllers_;
 	std::vector<int32> empty_monster_slots_;
 
@@ -51,8 +71,18 @@ public:
 	UScoreManagerComp* ScoreManager;
 	FTimerHandle TimerHandle_SpawnAI;
 
+	/* For Monster Movement Manage (Interval & Process) */
+	void UpdateMonsterData(ABaseMonsterCharacter* Monster);
+	std::pair<ADPCharacter*, float> FindClosestPlayer(ABaseMonsterCharacter* Monster);
+	float CalculateMoveInterval(float DistanceToPlayer);
+	bool ShouldProcessMonster(ABaseMonsterCharacter* Monster, float& delta_time);
+	void RemoveMonsterData(ABaseMonsterCharacter* Monster);
+	float CalculateTickInterval(ABaseMonsterCharacter* InMonster);
+	
 	// Called when the game starts or when spawned
 	virtual void PostLogin(APlayerController* newPlayer) override;
+	void CheckAllPlayersConnected();
+	void StartGame();
 	virtual void Logout(AController* Exiting) override;
 	virtual void StartPlay() override;
 	void EndGame();
@@ -100,4 +130,10 @@ private:
 	UMonsterFactory* MonsterFactory;
 	bool bStart = false;
 	bool bTimeSet = false;
+	/* Set Play Time */
+	const float PLAY_TIME = 300.f;
+
+	/* For Monster Movement Manage (Interval & Process) */
+	UPROPERTY()
+	TMap<ABaseMonsterCharacter*, FMonsterOptimizationData> MonsterOptimizationData;
 };

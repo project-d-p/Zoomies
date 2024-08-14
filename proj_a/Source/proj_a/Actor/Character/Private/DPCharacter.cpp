@@ -126,6 +126,8 @@ ADPCharacter::ADPCharacter()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionObjectType(ECC_PlayerChannel);
+	GetMesh()->SetCollisionObjectType(ECC_PlayerChannel);
 
 	// Enable hit events
 	GetCapsuleComponent()->SetNotifyRigidBodyCollision(true);

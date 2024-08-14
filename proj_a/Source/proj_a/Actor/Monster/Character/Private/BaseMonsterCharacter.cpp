@@ -1,6 +1,5 @@
 #include "BaseMonsterCharacter.h"
 
-#include "BaseMonsterAIController.h"
 #include "DPCharacter.h"
 #include "FDataHub.h"
 #include "FNetLogger.h"
@@ -9,7 +8,6 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 #include "proj_a.h"
-#include "PathManager.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -27,6 +25,7 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
 	GetMesh()->SetCollisionResponseToAllChannels(ECR_Block);
 	
     GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->bRequestedMoveUseAcceleration = false;
     bUseControllerRotationYaw = false;
 	
 	// arrowSparkle = CreateDefaultSubobject<UArrowComponent>(TEXT("arrowComponent"));
@@ -138,7 +137,7 @@ void ABaseMonsterCharacter::SetCatchable(bool bCond)
 	if (bCond)
 	{
 		GetMesh()->CustomDepthStencilValue = 3;
-		GetMesh()->MarkRenderStateDirty();	// render ���� ����
+		GetMesh()->MarkRenderStateDirty();	// render 
 		widgetComponent->SetVisibility(bCond);
 	}
 	else
@@ -183,13 +182,48 @@ void ABaseMonsterCharacter::TakeMonsterDamage(float Dmg)
 	}
 }
 
+void ABaseMonsterCharacter::SetMeshOpacity(float Opacity)
+{
+	USkeletalMeshComponent* MeshComponent = GetMesh();
+	if (!MeshComponent)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Invalid Mesh Component"));
+		return;
+	}
+
+	int32 MaterialCount = MeshComponent->GetNumMaterials();
+	for (int32 i = 0; i < MaterialCount; ++i)
+	{
+		UMaterialInterface* Material = MeshComponent->GetMaterial(i);
+		if (!Material) continue;
+
+		UMaterialInstanceDynamic* DynamicMaterial = Cast<UMaterialInstanceDynamic>(Material);
+		if (!DynamicMaterial)
+		{
+			DynamicMaterial = UMaterialInstanceDynamic::Create(Material, this);
+			if (!DynamicMaterial)
+			{
+				UE_LOG(LogTemp, Error, TEXT("Failed to create Dynamic Material for index %d"), i);
+				continue;
+			}
+			MeshComponent->SetMaterial(i, DynamicMaterial);
+		}
+		DynamicMaterial->SetScalarParameterValue(FName("Opacity"), Opacity);
+		DynamicMaterial->UpdateCachedData();
+	}
+	MeshComponent->MarkRenderStateDirty();
+}
+
 void ABaseMonsterCharacter::OnRep_FaintCharacterMotion()
 {
 	GetCapsuleComponent()->SetCapsuleRadius(FaintCP.Radius);
 	GetCapsuleComponent()->SetCapsuleHalfHeight(FaintCP.HalfHeight);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_MonsterChannel, ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECC_MonsterChannel, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_PlayerChannel, ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_PlayerChannel, ECR_Ignore);
 	GetMesh()->SetRelativeTransform(CB_FaintStateMtx);
+	SetMeshOpacity(0.5f);
 }
 
 ABaseMonsterCharacter::~ABaseMonsterCharacter()

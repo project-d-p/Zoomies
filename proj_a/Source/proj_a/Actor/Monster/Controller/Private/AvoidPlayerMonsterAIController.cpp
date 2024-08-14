@@ -98,6 +98,7 @@ void AAvoidPlayerMonsterAIController::BeginPlay()
 
 void AAvoidPlayerMonsterAIController::SimulateMovement(float delta_time)
 {
+	Super::SimulateMovement(delta_time);
 	if (!GetMovementAllowed())
 		return;
 	elapsed_DeSpawnTime += delta_time;

@@ -28,6 +28,7 @@ public:
 	virtual ~ABaseMonsterCharacter() override;
 	
 	void TakeMonsterDamage(float Dmg);
+
 	UFUNCTION()
 	void OnRep_FaintCharacterMotion();
 	void ScaleCapsuleSize(float ScaleFactor);
@@ -52,7 +53,9 @@ private:
 
 	UPROPERTY(ReplicatedUsing=OnRep_FaintCharacterMotion)
 	EMonsterState CurrentState = EMonsterState::Idle;
-
+	
+	void SetMeshOpacity(float Opacity);
+	
 	float MoveSpeed;
 	
 protected:

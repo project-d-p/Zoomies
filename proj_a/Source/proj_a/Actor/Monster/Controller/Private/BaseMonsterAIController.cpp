@@ -4,9 +4,13 @@
 #include "FNetLogger.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Navigation/CrowdFollowingComponent.h"
+#include "Navigation/CrowdManager.h"
 #include "Navigation/PathFollowingComponent.h"
 
-ABaseMonsterAIController::ABaseMonsterAIController()
+ABaseMonsterAIController::ABaseMonsterAIController(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent")))
 {
 	BehaviorComp = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("BehaviorComp"));
 	BlackboardComp = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackboardComp"));
@@ -18,17 +22,19 @@ ABaseMonsterAIController::ABaseMonsterAIController()
 void ABaseMonsterAIController::RemovePawnAndController()
 {
 	StopMovement();
+
+	ADPGameModeBase* GM = GetWorld()->GetAuthGameMode<ADPGameModeBase>();
+	check(GM)
 	
 	ABaseMonsterCharacter* ControlledCharacter = Cast<ABaseMonsterCharacter>(GetCharacter());
 	if (ControlledCharacter)
 	{
+		GM->RemoveMonsterData(ControlledCharacter);
 		int32 id = Cast<ABaseMonsterCharacter>(GetCharacter())->MonsterId;
 		FNetLogger::LogInfo(TEXT("Monster destroyed. - Character exsist, in Controller id: %d"), id);
 		ControlledCharacter->Destroy();
 	}
-
-	ADPGameModeBase* GM = GetWorld()->GetAuthGameMode<ADPGameModeBase>();
-	check(GM)
+	
 	GM->empty_monster_slots_.push_back(index);
 	GM->monster_controllers_[index] = nullptr;
 	Destroy();
@@ -37,12 +43,56 @@ void ABaseMonsterAIController::RemovePawnAndController()
 void ABaseMonsterAIController::TakeMonsterDamage(float dmg)
 {
 	ABaseMonsterCharacter* CC = Cast<ABaseMonsterCharacter>(GetCharacter());
-	check(CC);
+	if (!CC)
+	{
+		FNetLogger::LogError(TEXT("Failed to cast to ABaseMonsterCharacter Id %d"), GetUniqueID());
+		return ;
+	}
 	CC->TakeMonsterDamage(dmg);
+	UCrowdFollowingComponent* CrowdFollowingComp = FindComponentByClass<UCrowdFollowingComponent>();
+	if (CrowdFollowingComp)
+	{
+		UCrowdManager* CrowdManager = UCrowdManager::GetCurrent(GetWorld());
+		if (CrowdManager)
+		{
+			CrowdManager->UnregisterAgent(CrowdFollowingComp);
+		}
+		CrowdFollowingComp->Deactivate();
+	}
 	// if (CC->GetCurrentHealth() <= 0)
 	constexpr float TIME_TO_REMOVE = 7.f;
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABaseMonsterAIController::RemovePawnAndController, TIME_TO_REMOVE, false);
+}
+
+void ABaseMonsterAIController::SimulateMovement(float delta_time)
+{
+	UCrowdFollowingComponent* CrowdFollowingComp = FindComponentByClass<UCrowdFollowingComponent>();
+	if (CrowdFollowingComp)
+	{
+		const float SafeDistance = 300.0f;
+		const float CloseDistance = 100.0f;
+
+		TArray<AActor*> NearbyMonsters;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseMonsterCharacter::StaticClass(), NearbyMonsters);
+
+		for (AActor* NearbyMonster : NearbyMonsters)
+		{
+			if (NearbyMonster != GetPawn())
+			{
+				float Distance = FVector::Dist(GetPawn()->GetActorLocation(), NearbyMonster ->GetActorLocation());
+
+				if (Distance < CloseDistance)
+				{
+					CrowdFollowingComp->SetCrowdSeparationWeight(100.0f);
+				}
+				else if (Distance > SafeDistance)
+				{
+					CrowdFollowingComp->SetCrowdSeparationWeight(50.0f);
+				}
+			}
+		}
+	}
 }
 
 bool ABaseMonsterAIController::GetMovementAllowed()
@@ -58,4 +108,18 @@ bool ABaseMonsterAIController::GetMovementAllowed()
 		return false;
 	}
 	return true;
+}
+
+void ABaseMonsterAIController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	UCrowdFollowingComponent* CrowdFollowingComp = FindComponentByClass<UCrowdFollowingComponent>();
+	if (CrowdFollowingComp)
+	{
+		CrowdFollowingComp->SetCrowdSeparation(true);
+		CrowdFollowingComp->SetCrowdSeparationWeight(50.f);
+		CrowdFollowingComp->SetCrowdAvoidanceRangeMultiplier(1.2f);
+		CrowdFollowingComp->SetCrowdObstacleAvoidance(true);
+	}
 }

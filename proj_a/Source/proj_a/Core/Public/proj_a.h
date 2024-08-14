@@ -6,3 +6,4 @@
 #include "CoreMinimal.h"
 
 #define ECC_MonsterChannel ECollisionChannel::ECC_GameTraceChannel1
+#define ECC_PlayerChannel ECollisionChannel::ECC_GameTraceChannel2
