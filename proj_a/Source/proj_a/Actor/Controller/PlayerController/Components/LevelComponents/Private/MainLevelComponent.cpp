@@ -332,7 +332,7 @@ void UMainLevelComponent::SimulateCatch(UANetworkManager* NetworkManager)
 		FRotator direction = FRotator(catch_message.rotation().x(), catch_message.rotation().y(), catch_message.rotation().z());
 		
 		FHitResult hit_result;
-		if (!CatchRay->HitDetect(Character, start, direction, 300.0f, hit_result))
+		if (!CatchRay->HitDetect(Character, start, direction, 300.0f, hit_result, false))
 		{
 			continue;
 		}
