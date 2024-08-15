@@ -126,7 +126,7 @@ void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 		{
 			for (int32 j = 0; j < LobbyPlatforms.Num(); j++)
 			{
-				if (LobbyPlatforms[j]->PC != nullptr)
+				if (LobbyPlatforms[j] && LobbyPlatforms[j]->PC != nullptr)
 				{
 					if (PCs[i] == LobbyPlatforms[j]->PC)
 					{
@@ -143,14 +143,17 @@ void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 			//find the first available platform
 			for (int32 j = 0; j < LobbyPlatforms.Num(); j++)
 			{
-				if (LobbyPlatforms[j]->PC == nullptr)
+				if (LobbyPlatforms[j] && LobbyPlatforms[j]->PC == nullptr)
 				{
 					LobbyPlatforms[j]->SpawnCharacter(PCs[i]);
 					//get GameState and set PlayerController to the Lobby Infos
 					if (AGS_MatchingLobby* GS = GetGameState<AGS_MatchingLobby>())
 					{
-						FString steam_username = UTF8_TO_TCHAR(SteamFriends()->GetPersonaName());
-						GS->LobbyInfos[j].Name = steam_username;
+						if (SteamFriends())
+						{
+							FString steam_username = UTF8_TO_TCHAR(SteamFriends()->GetPersonaName());
+							GS->LobbyInfos[j].Name = steam_username;
+						}
 						GS->LobbyInfos[j].PC = Cast<APC_MatchingLobby>(PCs[i]);
 						GS->LobbyInfos[j].PS = Cast<APS_MatchingLobby>(PCs[i]->PlayerState);
 						GS->UpdateLobbyInfo();
@@ -178,7 +181,6 @@ void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 					}
 					else
 					{
-						//logging on screen about the error
 						if (GEngine)
 						{
 							GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Error: Player not found in ReadyPlayers"));
