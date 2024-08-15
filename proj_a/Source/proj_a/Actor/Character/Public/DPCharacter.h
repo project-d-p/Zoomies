@@ -58,6 +58,12 @@ public:	// component
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
 	UMaterialInstanceDynamic* dynamicMaterialInstance;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MatchLobby", meta = (AllowPrivateAccess = "true"))
+	class UWidgetComponent* userInfoWidget;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MatchLobby")
+	UWidgetComponent* LobbyInfoWidgetComponent = nullptr;
 
 	// stun effect
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "effects")
