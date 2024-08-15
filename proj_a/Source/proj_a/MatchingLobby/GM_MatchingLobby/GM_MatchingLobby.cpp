@@ -149,11 +149,8 @@ void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 					//get GameState and set PlayerController to the Lobby Infos
 					if (AGS_MatchingLobby* GS = GetGameState<AGS_MatchingLobby>())
 					{
-						if (SteamFriends())
-						{
-							FString steam_username = UTF8_TO_TCHAR(SteamFriends()->GetPersonaName());
-							GS->LobbyInfos[j].Name = steam_username;
-						}
+						FString steam_username = PCs[i]->PlayerState->GetPlayerName();
+						GS->LobbyInfos[j].Name = steam_username;
 						GS->LobbyInfos[j].PC = Cast<APC_MatchingLobby>(PCs[i]);
 						GS->LobbyInfos[j].PS = Cast<APS_MatchingLobby>(PCs[i]->PlayerState);
 						GS->UpdateLobbyInfo();
