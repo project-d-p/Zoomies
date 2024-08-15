@@ -6,7 +6,6 @@
 #include "Engine/StaticMeshActor.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
-#include "proj_a/MatchingLobby/CHAR_MatchingLobby/CHAR_MatchingLobby.h"
 #include "UObject/ConstructorHelpers.h"
 
 ALobbyPlatform::ALobbyPlatform()
@@ -42,8 +41,8 @@ void ALobbyPlatform::SpawnCharacter(APlayerController* PlayerController)
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	CurrentCharacter = GetWorld()->SpawnActor<ACHAR_MatchingLobby>(
-		ACHAR_MatchingLobby::StaticClass(),
+	CurrentCharacter = GetWorld()->SpawnActor<ADPCharacter>(
+		ADPCharacter::StaticClass(),
  		ArrowComponent->GetComponentTransform(),
  		SpawnParams);
  }
