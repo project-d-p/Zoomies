@@ -64,8 +64,6 @@ void ALobbyPlatform::Clear_Platform()
 				Actor->Destroy();
 			}
 		}
-
-		// CurrentCharacter ÆÄ±«
 		CurrentCharacter->Destroy();
 		CurrentCharacter = nullptr;
 	}
