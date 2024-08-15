@@ -191,4 +191,3 @@ void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 		}
 	}
 }
-

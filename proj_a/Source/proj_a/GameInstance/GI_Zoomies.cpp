@@ -1,5 +1,6 @@
 #include "GI_Zoomies.h"
 #include "DPPlayerController.h"
+#include "FNetLogger.h"
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
 #include "steam_api.h"
@@ -309,5 +310,39 @@ void UGI_Zoomies::InitOnlineSubsystemSteam()
 				FString::Printf(TEXT("Online Subsystem steam init failed")));
 		}
 		UE_LOG(LogTemp, Log, TEXT("Online Subsystem steam init failed"));
+	}
+}
+
+void UGI_Zoomies::SetupSteamInvite()
+{
+	IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
+	if (Subsystem && Subsystem->GetSubsystemName() == "Steam")
+	{
+		IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
+		if (SessionInterface.IsValid())
+		{
+			FString InviteUrl;
+			if (SessionInterface->GetResolvedConnectString(NAME_GameSession, InviteUrl))
+			{
+				// Steam Rich Presence 설정
+				if (SteamFriends())
+				{
+					SteamFriends()->SetRichPresence("connect", TCHAR_TO_UTF8(*InviteUrl));
+                    
+					// 추가 정보 설정 (선택사항)
+					SteamFriends()->SetRichPresence("status", "In Game");
+					SteamFriends()->SetRichPresence("steam_display", "#StatusInGame");
+				}
+			}
+		}
+	}
+}
+
+void UGI_Zoomies::ShowSteamInviteOverlay()
+{
+	SetupSteamInvite();
+	if (SteamFriends())
+	{
+		SteamFriends()->ActivateGameOverlayInviteDialog(CSteamID(SteamUser()->GetSteamID()));
 	}
 }

@@ -26,6 +26,8 @@ public:
 	bool ResetSession();
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void OnSessionFailure();
+	void SetupSteamInvite();
+	void ShowSteamInviteOverlay();
 
 	int player_count = 0;
 private:
