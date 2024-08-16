@@ -9,7 +9,7 @@
 #include <queue>
 
 #include "ANetworkManager.h"
-#include "BlockingSphereVolume.h"
+#include "BlockingBoxVolume.h"
 #include "message.pb.h"
 #include "ServerMessageHandler.h"
 #include "DPPlayerController.h"
@@ -103,7 +103,7 @@ private:
 	UPROPERTY()
 	UMonsterFactory* MonsterFactory;
 	UPROPERTY()
-	ABlockingSphereVolume* BlockingVolume;
+	ABlockingBoxVolume* BlockingVolume;
 	bool bStart = false;
 	bool bTimeSet = false;
 };
