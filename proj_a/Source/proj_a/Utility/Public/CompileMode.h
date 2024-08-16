@@ -8,7 +8,7 @@
 //     1       |    0     : Editor
 
 #ifndef EDITOR_MODE
-	#define EDITOR_MODE 1
+	#define EDITOR_MODE 0
 #endif
 
 #ifndef LAN_MODE

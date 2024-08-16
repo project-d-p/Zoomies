@@ -203,24 +203,42 @@ ADPCharacter::~ADPCharacter()
 void ADPCharacter::SetNameTag()
 {
 	APlayerState* PS = GetPlayerState();
-	if (!PS)
+	if (IsValid(PS))
 	{
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+		FString Name = PS->GetPlayerName();
+		if (IsValid(NameTag_Instance))
 		{
-			SetNameTag();
-		}), 0.1f, false);
-		return ;
+			NameTag_Instance->SetName(Name);
+		}
+		else
+		{
+			FNetLogger::LogError(TEXT("No NameTag_Instance"));
+		}
+		if (IsValid(NameTag_WidgetComponent) && !IsLocallyControlled())
+		{
+			NameTag_WidgetComponent->SetVisibility(true);
+		}
+		else
+		{
+			FNetLogger::LogError(TEXT("No NameTagWidgetComponent || IsLocallyControlled"));
+		}
 	}
-
-	FString Name = PS->GetPlayerName();
-	if (NameTag_Instance)
+	else
 	{
-		NameTag_Instance->SetName(Name);
-	}
-	if (NameTag_WidgetComponent && !IsLocallyControlled())
-	{
-		NameTag_WidgetComponent->SetVisibility(true);
+		static int32 RetryCount = 0;
+		if (RetryCount < 5) // 최대 5회만 시도
+		{
+			RetryCount++;
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+			{
+				SetNameTag();
+			}), 0.1f, false);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to set NameTag after multiple attempts."));
+		}
 	}
 }
 
