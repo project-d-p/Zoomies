@@ -61,6 +61,12 @@ public:	// component
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
 	UMaterialInstanceDynamic* dynamicMaterialInstance;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MatchLobby", meta = (AllowPrivateAccess = "true"))
+	class UWidgetComponent* userInfoWidget;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MatchLobby")
+	UWidgetComponent* LobbyInfoWidgetComponent = nullptr;
 
 	UPROPERTY()
 	TSubclassOf<UNameTag> NameTag_BP;

@@ -7,6 +7,7 @@
 #include "ServerChatManager.h"
 #include "GameFramework/GameModeBase.h"
 #include <queue>
+#include <thread>
 
 #include "ANetworkManager.h"
 #include "BlockingBoxVolume.h"
