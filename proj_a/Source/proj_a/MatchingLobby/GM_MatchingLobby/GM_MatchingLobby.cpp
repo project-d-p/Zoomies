@@ -10,6 +10,7 @@
 #include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
 #include "proj_a/MatchingLobby/PS_MatchingLobby/PS_MatchingLobby.h"
 #include "Kismet/GameplayStatics.h"
+#include "proj_a/GameInstance/GI_Zoomies.h"
 #include "proj_a/MatchingLobby/SteamInvite/SteamInvite.h"
 
 AGM_MatchingLobby::AGM_MatchingLobby() {
@@ -32,6 +33,11 @@ void AGM_MatchingLobby::PostLogin(APlayerController* NewPlayer) {
 	if (APC_MatchingLobby* PC = Cast<APC_MatchingLobby>(NewPlayer))
 	{
 		PC->SetCineCameraView();
+	}
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (IsValid(GameInstance))
+	{
+		GameInstance->ReadFriendList();
 	}
 	CheckAndUpdateLobbyPlatform();
 }

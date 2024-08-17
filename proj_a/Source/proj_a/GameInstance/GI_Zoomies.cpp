@@ -6,6 +6,7 @@
 #include "steam_api.h"
 #include "Kismet/GameplayStatics.h"
 #include "Online/OnlineSessionNames.h"
+#include "Interfaces/OnlineFriendsInterface.h"
 
 void UGI_Zoomies::Init()
 {
@@ -75,6 +76,8 @@ void UGI_Zoomies::CreateSession()
 	session_settings_->bShouldAdvertise = true;
 	session_settings_->bAllowJoinInProgress = true;
 	session_settings_->bUsesPresence = true;
+	session_settings_->bAllowInvites = true; 
+	session_settings_->bAllowJoinViaPresenceFriendsOnly = false;
 	
 	// add delegate to handle the result of created session
 	session_settings_->Set(
@@ -340,9 +343,109 @@ void UGI_Zoomies::SetupSteamInvite()
 
 void UGI_Zoomies::ShowSteamInviteOverlay()
 {
-	SetupSteamInvite();
-	if (SteamFriends())
+	LogFriendsNicknames();
+}
+
+void UGI_Zoomies::ReadFriendList()
+{
+	IOnlineFriendsPtr Friends = online_subsystem_->GetFriendsInterface();
+	if (Friends.IsValid())
 	{
-		SteamFriends()->ActivateGameOverlayInviteDialog(CSteamID(SteamUser()->GetSteamID()));
+		Friends->ReadFriendsList(0, EFriendsLists::ToString(EFriendsLists::Default),
+			FOnReadFriendsListComplete::CreateUObject(this, &ThisClass::OnFriendsListReadComplete));
+	}
+}
+
+void UGI_Zoomies::OnFriendsListReadComplete(int32 LocalUserNum, bool bWasSuccessful, const FString& ListName, const FString& ErrorStr)
+{
+	if (bWasSuccessful)
+	{
+		UE_LOG(LogTemp, Log, TEXT("success to get friends list"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Fail to get firends List: %s"), *ErrorStr);
+	}
+}
+
+void UGI_Zoomies::LogFriendsNicknames()
+{
+	IOnlineFriendsPtr Friends = online_subsystem_->GetFriendsInterface();
+	if (Friends.IsValid())
+	{
+		TArray<TSharedRef<FOnlineFriend>> FriendsList;
+		FString ListName = TEXT("Default");
+
+		if (Friends->GetFriendsList(0, ListName, FriendsList))
+		{
+			// 친구 리스트 순회
+			for (auto Friend : FriendsList)
+			{
+				// 친구의 닉네임 가져오기
+				FString FriendNickname = Friend->GetDisplayName();
+
+				// 디버그 메시지 출력
+				if (GEngine)
+				{
+					GEngine->AddOnScreenDebugMessage(
+						-1,                                // 메세지 ID, -1로 설정하면 새로운 메시지를 추가
+						5.0f,                              // 메시지가 화면에 표시될 시간 (초)
+						FColor::Green,                     // 메시지 색상
+						FString::Printf(TEXT("Friend: %s"), *FriendNickname)  // 메시지 내용
+					);
+				}
+				FString Target = TEXT("parkjoungwan");
+				if (FriendNickname == Target)
+				{
+					if (GEngine)
+					{
+						GEngine->AddOnScreenDebugMessage(
+							-1,                                // 메세지 ID, -1로 설정하면 새로운 메시지를 추가
+							5.0f,                              // 메시지가 화면에 표시될 시간 (초)
+							FColor::Green,                     // 메시지 색상
+							FString::Printf(TEXT("Find: %s"), *FriendNickname)  // 메시지 내용
+						);
+					}
+					FUniqueNetIdPtr FriendId = Friend->GetUserId();
+					InviteFriendToGame(FriendId);
+					break;
+				}
+			}
+		}
+		else
+		{
+			if (GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("친구 리스트를 가져오지 못했습니다."));
+			}
+		}
+	}
+	else
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("온라인 친구 인터페이스를 사용할 수 없습니다."));
+		}
+	}
+}
+
+void UGI_Zoomies::InviteFriendToGame(FUniqueNetIdPtr FriendId)
+{
+	if (session_interface_.IsValid())
+	{
+		// 초대 보내기
+		bool bInviteSent = session_interface_->SendSessionInviteToFriend(0, NAME_GameSession, *FriendId);
+		if (bInviteSent)
+		{
+			if (GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("친구에게 초대를 보냈습니다."));
+			}
+			UE_LOG(LogTemp, Log, TEXT("success to send invite"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Fail to send invite"));
+		}
 	}
 }

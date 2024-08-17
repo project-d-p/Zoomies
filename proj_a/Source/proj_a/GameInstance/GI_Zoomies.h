@@ -27,7 +27,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void OnSessionFailure();
 	void SetupSteamInvite();
+	UFUNCTION(BlueprintCallable, Category = "Network")
 	void ShowSteamInviteOverlay();
+	void ReadFriendList();
+	void OnFriendsListReadComplete(int32 LocalUserNum, bool bWasSuccessful, const FString& ListName, const FString& ErrorStr);
+	void LogFriendsNicknames();
+	void InviteFriendToGame(FUniqueNetIdPtr FriendId);
 
 	int player_count = 0;
 private:
