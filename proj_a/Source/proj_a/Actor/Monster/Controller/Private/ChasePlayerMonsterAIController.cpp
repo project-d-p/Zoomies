@@ -9,25 +9,23 @@
 
 void AChasePlayerMonsterAIController::MoveToPlayer()
 {
-	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), PlayerIndex);
-
-	if (PlayerCharacter)
+	if (ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), PlayerIndex))
 	{
-		float AcceptanceRadius = 50.0f;
+		float AcceptanceRadius = 100.0f;
 		bool bStopOnOverlap = true;
 		bool bUsePathfinding = true;
 		bool bCanStrafe = false;
 		TSubclassOf<UNavigationQueryFilter> FilterClass = nullptr;
 		bool bAllowPartialPath = true;
-		
-		MoveToActor(
-			PlayerCharacter,
-			AcceptanceRadius,
-			bStopOnOverlap,
-			bUsePathfinding,
-			bCanStrafe,
-			FilterClass,
-			bAllowPartialPath);
+
+		EPathFollowingRequestResult::Type MoveResult = MoveToActor(
+		PlayerCharacter,
+		AcceptanceRadius,
+		bStopOnOverlap,
+		bUsePathfinding,
+		bCanStrafe,
+		FilterClass,
+		bAllowPartialPath);
 	}
 }
 
@@ -62,7 +60,10 @@ void AChasePlayerMonsterAIController::SetRandomPlayerIndex()
 void AChasePlayerMonsterAIController::SimulateMovement(float delta_time)
 {
 	Super::SimulateMovement(delta_time);
+	FNetLogger::LogWarning(TEXT("%s started movement!"), *GetPawn()->GetName());
 	if (!GetMovementAllowed())
+	{
 		return;
+	}
 	MoveToPlayer();
 }

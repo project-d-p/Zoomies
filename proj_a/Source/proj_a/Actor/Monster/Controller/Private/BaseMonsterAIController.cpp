@@ -72,16 +72,16 @@ void ABaseMonsterAIController::SimulateMovement(float delta_time)
 	{
 		const float SafeDistance = 300.0f;
 		const float CloseDistance = 100.0f;
-
+	
 		TArray<AActor*> NearbyMonsters;
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseMonsterCharacter::StaticClass(), NearbyMonsters);
-
+	
 		for (AActor* NearbyMonster : NearbyMonsters)
 		{
 			if (NearbyMonster != GetPawn())
 			{
 				float Distance = FVector::Dist(GetPawn()->GetActorLocation(), NearbyMonster ->GetActorLocation());
-
+	
 				if (Distance < CloseDistance)
 				{
 					CrowdFollowingComp->SetCrowdSeparationWeight(100.0f);

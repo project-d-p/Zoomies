@@ -22,12 +22,13 @@ struct FMonsterOptimizationData
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category="MonsterOptimizationData")
 	ADPCharacter* ClosestPlayer;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category="MonsterOptimizationData")
 	float Interval;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category="MonsterOptimizationData")
 	float Timer;
+	UPROPERTY(EditAnywhere, Category="MonsterOptimizationData")
 	float Dist = 0.0f;
 
 	FMonsterOptimizationData()
@@ -56,7 +57,7 @@ public:
 	virtual UServerChatManager* GetChatManager() const override { return ChatManager; }
 	
 	// monster
-	enum { NUM_OF_MAX_MONSTERS = 1 };
+	enum { NUM_OF_MAX_MONSTERS = 100 };
 	std::vector<ABaseMonsterAIController*> monster_controllers_;
 	std::vector<int32> empty_monster_slots_;
 
@@ -134,6 +135,6 @@ private:
 	const float PLAY_TIME = 300.f;
 
 	/* For Monster Movement Manage (Interval & Process) */
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category = "Debug")
 	TMap<ABaseMonsterCharacter*, FMonsterOptimizationData> MonsterOptimizationData;
 };

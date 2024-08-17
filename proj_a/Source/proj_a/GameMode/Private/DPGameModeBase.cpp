@@ -81,8 +81,8 @@ void ADPGameModeBase::UpdateMonsterData(ABaseMonsterCharacter* InMonster)
 	if (ClosestPlayer)
 	{
 		float MoveInterval = CalculateMoveInterval(MinDistance);
-		FNetLogger::EditerLog(FColor::Green, TEXT("Monster: %s, ClosestPlayer: %s, Distance: %f, Interval: %f"),
-			*InMonster->GetName(), *ClosestPlayer->GetName(), MinDistance, MoveInterval);
+		// FNetLogger::EditerLog(FColor::Green, TEXT("Monster: %s, ClosestPlayer: %s, Distance: %f, Interval: %f"),
+		// 	*InMonster->GetName(), *ClosestPlayer->GetName(), MinDistance, MoveInterval);
 		
 		FMonsterOptimizationData MOD;
 		MOD.ClosestPlayer = ClosestPlayer;
@@ -152,7 +152,7 @@ bool ADPGameModeBase::ShouldProcessMonster(ABaseMonsterCharacter* InMonster, flo
 	float& MonsterTimer = MonsterOptimizationData.FindOrAdd(InMonster).Timer;
 	MonsterTimer += delta_time;
 
-	float MonsterInterval = MonsterOptimizationData.FindOrAdd(InMonster).Interval;
+	const float MonsterInterval = MonsterOptimizationData.Find(InMonster)->Interval;
 	if (MonsterTimer < MonsterInterval)
 	{
 		return false;
@@ -320,38 +320,44 @@ void ADPGameModeBase::MonsterMoveSimulate(float delta_time)
 	static float player_search_timer = 0.f;
 	player_search_timer += delta_time;
 	
-	for (auto& mc : monster_controllers_)
+	for (auto mc : monster_controllers_)
 	{
 		if (!mc)
 		{
 			continue;
 		}
-	
+		
 		ABaseMonsterCharacter* M = mc->GetPawn<ABaseMonsterCharacter>();
-	
+		
 		if (!M || !IsValid(M))
 		{
 			RemoveMonsterData(M);
 			continue;
 		}
-	
+		
 		if (player_search_timer >= PLAYER_SEARCH_INTERVAL)
 		{
 			UpdateMonsterData(M);
 			M->GetMovementComponent()->PrimaryComponentTick.TickInterval = CalculateTickInterval(M);
-			player_search_timer = 0.f;
 		}
-	
+		
 		if (ShouldProcessMonster(M, delta_time))
 		{
 			mc->SimulateMovement(delta_time);
 		}
 	}
+	if (player_search_timer >= PLAYER_SEARCH_INTERVAL)
+	{
+		player_search_timer = 0.f;
+	}
 }
 
 float ADPGameModeBase::CalculateTickInterval(ABaseMonsterCharacter* InMonster)
 {
-	const float Dist = MonsterOptimizationData.Find(InMonster)->Dist;
+	FMonsterOptimizationData* MD = MonsterOptimizationData.Find(InMonster);
+	if (!MD)
+		return 0.f;
+	const float Dist = MD->Dist;
 	if (Dist >= 10000.0f)
 	{
 		return 1.f;
