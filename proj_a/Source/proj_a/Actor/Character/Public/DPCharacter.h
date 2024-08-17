@@ -62,8 +62,8 @@ public:	// component
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
 	UAnimMontage* characterMontage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
-	UMaterialInstanceDynamic* dynamicMaterialInstance;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
+	//UMaterialInstanceDynamic* dynamicMaterialInstance;
 
 	UPROPERTY()
 	TSubclassOf<UNameTag> NameTag_BP;

@@ -227,15 +227,15 @@ void ADPCharacter::BeginPlay()
 		NameTag_WidgetComponent->SetVisibility(false);
 	}
 	
-	if (GetMesh()) {
-		UMaterialInterface* Material = GetMesh()->GetMaterial(0);
-		if (Material) {
-			dynamicMaterialInstance = UMaterialInstanceDynamic::Create(Material, this);
-			GetMesh()->SetMaterial(0, dynamicMaterialInstance);
-		}
-	}
-	if (dynamicMaterialInstance)
-		dynamicMaterialInstance->SetVectorParameterValue(FName("color"), FVector4(0.f, 0.f, 1.f, 1.f));
+	//if (GetMesh()) {
+	//	UMaterialInterface* Material = GetMesh()->GetMaterial(0);
+	//	if (Material) {
+	//		dynamicMaterialInstance = UMaterialInstanceDynamic::Create(Material, this);
+	//		GetMesh()->SetMaterial(0, dynamicMaterialInstance);
+	//	}
+	//}
+	//if (dynamicMaterialInstance)
+	//	dynamicMaterialInstance->SetVectorParameterValue(FName("color"), FVector4(0.f, 0.f, 1.f, 1.f));
 
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AReturnTriggerVolume::StaticClass(), FoundActors);
