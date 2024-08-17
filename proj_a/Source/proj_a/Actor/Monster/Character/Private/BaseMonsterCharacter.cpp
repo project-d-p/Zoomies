@@ -27,6 +27,8 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
     GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->bRequestedMoveUseAcceleration = false;
     bUseControllerRotationYaw = false;
+
+	GetCharacterMovement()->PrimaryComponentTick.TickInterval = 0.033f;
 	
 	// arrowSparkle = CreateDefaultSubobject<UArrowComponent>(TEXT("arrowComponent"));
 	// arrowSparkle->SetupAttachment(GetMesh());

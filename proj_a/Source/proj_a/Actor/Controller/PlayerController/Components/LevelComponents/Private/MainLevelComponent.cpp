@@ -72,7 +72,7 @@ void UMainLevelComponent::AddAimMessage(const Message& message)
 	AimQueue.push(message);
 }
 
-ABaseMonsterCharacter* UMainLevelComponent::GetCurrentTarget() const
+const TargetInfo& UMainLevelComponent::GetCurrentTarget() const
 {
 	return CurrentTarget;
 }
@@ -124,12 +124,23 @@ bool UMainLevelComponent::IsCatchable(FHitResult& HitResult)
 {
 	ADPPlayerController* PlayerController = GetPlayerController();
 	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
+	FVector Start = Character->GetCameraLocation();
 
-	if (CatchRay->HitDetect(Character, Character->GetActorLocation(), PlayerController->GetControlRotation(), 300.0f, HitResult, false))
+	FVector ImpactPoint = Start + Character->GetControlRotation().Vector() * 3000.0f;
+	if (CatchRay->HitDetect(Character, Start, PlayerController->GetControlRotation(), 3000.0f, HitResult, false))
 	{
-		
+		ImpactPoint = HitResult.ImpactPoint;
 	}
+
+	FVector Direction = (ImpactPoint - Character->GetActorLocation()).GetSafeNormal();
 	
+	if (CatchRay->HitDetect(Character, Character->GetActorLocation(), Direction.Rotation(), 300.0f, HitResult, false))
+	{
+		CurrentTarget.Location = Character->GetActorLocation();
+		CurrentTarget.Rotation = Direction.Rotation();
+		return true;
+	}
+	HitResult = FHitResult();
 	return false;
 }
 
@@ -137,27 +148,27 @@ void UMainLevelComponent::ChangeMonsterCatchable(const FHitResult& HitResult)
 {
 	ABaseMonsterCharacter* NewTarget = Cast<ABaseMonsterCharacter>(HitResult.GetActor());
 
-	if (CurrentTarget != NewTarget)
+	if (CurrentTarget.CurrentTarget != NewTarget)
 	{
-		if (CurrentTarget)
+		if (CurrentTarget.CurrentTarget)
 		{
-			CurrentTarget->SetCatchable(false);
+			CurrentTarget.CurrentTarget->SetCatchable(false);
 		}
 		if (NewTarget)
 		{
 			if (NewTarget->GetState() == EMonsterState::Faint)
 			{
-				CurrentTarget = NewTarget;
-				CurrentTarget->SetCatchable(true);
+				CurrentTarget.CurrentTarget = NewTarget;
+				CurrentTarget.CurrentTarget->SetCatchable(true);
 			}
 			else
 			{
-				CurrentTarget = nullptr;
+				CurrentTarget.CurrentTarget = nullptr;
 			}
 		}
 		else
 		{
-			CurrentTarget = nullptr;
+			CurrentTarget.CurrentTarget = nullptr;
 		}
 	}
 }
@@ -321,7 +332,7 @@ void UMainLevelComponent::SimulateCatch(UANetworkManager* NetworkManager)
 		FRotator direction = FRotator(catch_message.rotation().x(), catch_message.rotation().y(), catch_message.rotation().z());
 		
 		FHitResult hit_result;
-		if (!CatchRay->HitDetect(Character, start, direction, 300.0f, hit_result))
+		if (!CatchRay->HitDetect(Character, start, direction, 300.0f, hit_result, false))
 		{
 			continue;
 		}
@@ -340,7 +351,7 @@ void UMainLevelComponent::SimulateCatch(UANetworkManager* NetworkManager)
 		{
 			continue ;
 		}
-		this->CurrentTarget = nullptr;
+		this->CurrentTarget.CurrentTarget = nullptr;
 		ABaseMonsterAIController* MAC = Cast<ABaseMonsterAIController>(MC->GetOwner());
 		check(MAC)
 		MAC->RemovePawnAndController();

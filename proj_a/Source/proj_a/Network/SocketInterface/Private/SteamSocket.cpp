@@ -96,6 +96,12 @@ void USteamSocket::SetGameStartCallback(int NumOfPlayers, const TFunction<void()
 {
 	MaxClients = NumOfPlayers;
 	GameStartCallback = Function;
+
+	/* Test */
+	if (NumOfPlayers == 1)
+	{
+		GameStartCallback();
+	}
 }
 
 void USteamSocket::SetAsServer()

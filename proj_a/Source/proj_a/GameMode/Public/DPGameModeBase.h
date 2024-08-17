@@ -73,6 +73,7 @@ public:
 	FTimerHandle TimerHandle_SpawnAI;
 
 	/* For Monster Movement Manage (Interval & Process) */
+	void SpawnNewCharacter(APlayerController* NewPlayer);
 	void UpdateMonsterData(ABaseMonsterCharacter* Monster);
 	std::pair<ADPCharacter*, float> FindClosestPlayer(ABaseMonsterCharacter* Monster);
 	float CalculateMoveInterval(float DistanceToPlayer);
@@ -85,9 +86,10 @@ public:
 	void CheckAllPlayersConnected();
 	void StartGame();
 	virtual void Logout(AController* Exiting) override;
+	virtual void BeginPlay() override;
 	virtual void StartPlay() override;
-	void EndGame();
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	void EndGame();
 	
 	// Called every frame
 	virtual void Tick(float delta_time) override;
@@ -109,7 +111,7 @@ private:
 	void SpawnMonsters(float delta_time);
 
 	// Member variables
-	enum { NUM_OF_MAX_CLIENTS = 2 };
+	enum { NUM_OF_MAX_CLIENTS = 1 };
 
 	// SteamNetworkingSocket* steam_listen_socket_ = nullptr;
 	UPROPERTY()
@@ -129,6 +131,8 @@ private:
 	UServerChatManager* ChatManager;
 	UPROPERTY()
 	UMonsterFactory* MonsterFactory;
+	UPROPERTY()
+	ABlockingBoxVolume* BlockingVolume;
 	bool bStart = false;
 	bool bTimeSet = false;
 	/* Set Play Time */

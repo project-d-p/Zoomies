@@ -43,7 +43,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "effects")
 	class UNiagaraSystem* smokeEffect;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "effects")
-	class UNiagaraSystem* particleEffect;
+	class UNiagaraSystem* particleEffectAnim;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "effects")
+	class UNiagaraSystem* particleEffectPlant;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "effects")
+	class UNiagaraSystem* particleEffectChar;
 	
 	UPROPERTY()
 	class UBaseLevelComponent* OwningLevelComponent = nullptr;

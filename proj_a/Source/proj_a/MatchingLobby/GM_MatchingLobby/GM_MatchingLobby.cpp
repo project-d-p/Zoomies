@@ -126,7 +126,7 @@ void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 		{
 			for (int32 j = 0; j < LobbyPlatforms.Num(); j++)
 			{
-				if (LobbyPlatforms[j]->PC != nullptr)
+				if (LobbyPlatforms[j] && LobbyPlatforms[j]->PC != nullptr)
 				{
 					if (PCs[i] == LobbyPlatforms[j]->PC)
 					{
@@ -143,7 +143,7 @@ void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 			//find the first available platform
 			for (int32 j = 0; j < LobbyPlatforms.Num(); j++)
 			{
-				if (LobbyPlatforms[j]->PC == nullptr)
+				if (LobbyPlatforms[j] && LobbyPlatforms[j]->PC == nullptr)
 				{
 					LobbyPlatforms[j]->SpawnCharacter(PCs[i]);
 					//get GameState and set PlayerController to the Lobby Infos
@@ -178,7 +178,6 @@ void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 					}
 					else
 					{
-						//logging on screen about the error
 						if (GEngine)
 						{
 							GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Error: Player not found in ReadyPlayers"));
