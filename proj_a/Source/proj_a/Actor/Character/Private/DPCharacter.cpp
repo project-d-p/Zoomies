@@ -153,6 +153,34 @@ ADPCharacter::ADPCharacter()
 		StunEffect = STUN.Object;
 		StunEffectComponent->SetAsset(StunEffect);
 	}
+
+	if (UWorld* World = GetWorld())
+	{
+		FString CurrentLevelName = UGameplayStatics::GetCurrentLevelName(World);
+		
+		if (CurrentLevelName == "matchLobby")
+		{
+			if (LobbyInfoWidgetComponent && LobbyInfoWidgetComponent->IsValidLowLevel())
+			{
+				LobbyInfoWidgetComponent->DestroyComponent();
+				LobbyInfoWidgetComponent = nullptr;
+			}
+	
+			LobbyInfoWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("LobbyInfoWidgetComponent"));
+			static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClass(TEXT("/Game/widget/widget_LobbyInfo.widget_LobbyInfo_C"));
+			if (WidgetClass.Succeeded())
+			{
+				LobbyInfoWidgetComponent->SetWidgetClass(WidgetClass.Class);
+			}
+			LobbyInfoWidgetComponent->SetVisibility(true);
+			LobbyInfoWidgetComponent->SetWidgetSpace( EWidgetSpace::World);
+			LobbyInfoWidgetComponent->SetupAttachment(GetMesh());
+			LobbyInfoWidgetComponent->SetRelativeLocation(FVector(0, 0, 650));
+			LobbyInfoWidgetComponent->SetRelativeScale3D(FVector(1.4f, 1.4f, 1.4f));
+			LobbyInfoWidgetComponent->SetDrawSize(FVector2D(260,100));
+			LobbyInfoWidgetComponent->SetRelativeRotation(FRotator(-180, -90, 180));
+		}
+	}
 }
 
 ADPCharacter::~ADPCharacter()

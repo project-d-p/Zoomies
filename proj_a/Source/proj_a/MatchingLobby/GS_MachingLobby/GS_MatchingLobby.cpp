@@ -1,11 +1,11 @@
 #include "GS_MatchingLobby.h"
 
+#include "DPCharacter.h"
 #include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
-#include "proj_a/MatchingLobby/CHAR_MatchingLobby/CHAR_MatchingLobby.h"
 #include "proj_a/MatchingLobby/GM_MatchingLobby/GM_MatchingLobby.h"
 
 AGS_MatchingLobby::AGS_MatchingLobby() {
@@ -25,10 +25,10 @@ void AGS_MatchingLobby::OnRep_LobbyInfo()
 void AGS_MatchingLobby::UpdateLobbyInfo() const
 {
 	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACHAR_MatchingLobby::StaticClass(), FoundActors);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADPCharacter::StaticClass(), FoundActors);
 	for (int32 j = 0; j < FoundActors.Num(); j++)
 	{
-		ACHAR_MatchingLobby* Character = Cast<ACHAR_MatchingLobby>(FoundActors[j]);
+		ADPCharacter* Character = Cast<ADPCharacter>(FoundActors[j]);
 		if (Character && Character->LobbyInfoWidgetComponent)
 		{
 			UUserWidget* Widget = Character->LobbyInfoWidgetComponent->GetUserWidgetObject();
