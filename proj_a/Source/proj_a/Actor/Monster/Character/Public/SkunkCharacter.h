@@ -10,4 +10,6 @@ class PROJ_A_API ASkunkCharacter : public ABaseMonsterCharacter
 
 public:
 	ASkunkCharacter();
+protected:
+	const EAnimal AnimalType = EAnimal::ANIMAL_SKUNK;
 };

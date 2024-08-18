@@ -5,20 +5,7 @@
 
 APenguinCharacter::APenguinCharacter()
 {
-	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_PENGUIN
-	(PathManager::GetMonsterPath(EAnimal::ANIMAL_PENGUIN));
-	if (SK_PENGUIN.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_PENGUIN.Object);
-	}
-
-	/** Loading animations */
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER(
-		PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_PENGUIN));
-	if (ANIM_CHARACTER.Succeeded()) {
-		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
-	}
+	InitMonsterMeshData(AnimalType);
 
 	/** Set the Capsule size */
 	DefaultCP.Radius = 86.f;

@@ -5,20 +5,7 @@
 
 AStingRayCharacter::AStingRayCharacter()
 {
-	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_STINGRAY
-	(PathManager::GetMonsterPath(EAnimal::ANIMAL_STINGRAY));
-	if (SK_STINGRAY.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_STINGRAY.Object);
-	}
-
-	/** Loading animations */
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER(
-		PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_STINGRAY));
-	if (ANIM_CHARACTER.Succeeded()) {
-		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
-	}
+	InitMonsterMeshData(AnimalType);
 
 	/** Set the Capsule size */
 	DefaultCP.Radius = 65.f;

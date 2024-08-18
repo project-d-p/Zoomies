@@ -10,4 +10,6 @@ class PROJ_A_API APenguinCharacter : public ABaseMonsterCharacter
 
 public:
 	APenguinCharacter();
+protected:
+	const EAnimal AnimalType = EAnimal::ANIMAL_PENGUIN;
 };

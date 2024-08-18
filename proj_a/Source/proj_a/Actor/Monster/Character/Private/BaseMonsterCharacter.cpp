@@ -28,7 +28,7 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
 	GetCharacterMovement()->bRequestedMoveUseAcceleration = false;
     bUseControllerRotationYaw = false;
 
-	GetCharacterMovement()->PrimaryComponentTick.TickInterval = 0.033f;
+	// GetCharacterMovement()->PrimaryComponentTick.TickInterval = 0.033f;
 	
 	// arrowSparkle = CreateDefaultSubobject<UArrowComponent>(TEXT("arrowComponent"));
 	// arrowSparkle->SetupAttachment(GetMesh());
@@ -95,6 +95,60 @@ void ABaseMonsterCharacter::BeginPlay()
 
 	GetCapsuleComponent()->SetCollisionObjectType(ECC_MonsterChannel);
 	GetMesh()->SetCollisionObjectType(ECC_MonsterChannel);
+}
+
+/** Static storage for loaded meshes and animations */
+static std::map<EAnimal, USkeletalMesh*> SkeletalMeshMap;
+static std::map<EAnimal, USkeletalMesh*> SkeletalMeshTransparencyMap;
+static std::map<EAnimal, UClass*> AnimClassMap;
+
+void ABaseMonsterCharacter::InitMonsterMeshData(EAnimal AT)
+{
+	/** Loading models */
+	if (!SkeletalMeshMap.contains(AT))
+	{
+		ConstructorHelpers::FObjectFinder<USkeletalMesh> SK(
+			PathManager::GetMonsterPath(AT));
+		if (SK.Succeeded())
+		{
+			SkeletalMeshMap[AT] = SK.Object;
+		}
+	}
+	else
+	{
+		GetMesh()->SetSkeletalMesh(SkeletalMeshMap[AT]);
+	}
+
+	/** Load TransparencyMesh */
+	if (!SkeletalMeshTransparencyMap.contains(AT))
+	{
+		ConstructorHelpers::FObjectFinder<USkeletalMesh> SkeletalMeshFinder(
+			PathManager::GetMonsterTransparencyMeshPath(AT));
+		if (SkeletalMeshFinder.Succeeded())
+		{
+			SkeletalMeshTransparencyMap[AT]= SkeletalMeshFinder.Object;
+		}
+	}
+	else
+	{
+		OSK = SkeletalMeshTransparencyMap[AT];	
+	}
+
+	/** Load Animations */
+	if (!AnimClassMap.contains(AT))
+	{
+		ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER(
+			PathManager::GetMonsterAnimationPath(AT));
+		if (ANIM_CHARACTER.Succeeded())
+		{
+			AnimClassMap[AT] = ANIM_CHARACTER.Class;
+		}
+	}
+	else
+	{
+		GetMesh()->SetAnimInstanceClass(AnimClassMap[AT]);
+	}
+	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 }
 
 void ABaseMonsterCharacter::SyncPosition()
@@ -184,38 +238,6 @@ void ABaseMonsterCharacter::TakeMonsterDamage(float Dmg)
 	}
 }
 
-void ABaseMonsterCharacter::SetMeshOpacity(float Opacity)
-{
-	USkeletalMeshComponent* MeshComponent = GetMesh();
-	if (!MeshComponent)
-	{
-		UE_LOG(LogTemp, Error, TEXT("Invalid Mesh Component"));
-		return;
-	}
-
-	int32 MaterialCount = MeshComponent->GetNumMaterials();
-	for (int32 i = 0; i < MaterialCount; ++i)
-	{
-		UMaterialInterface* Material = MeshComponent->GetMaterial(i);
-		if (!Material) continue;
-
-		UMaterialInstanceDynamic* DynamicMaterial = Cast<UMaterialInstanceDynamic>(Material);
-		if (!DynamicMaterial)
-		{
-			DynamicMaterial = UMaterialInstanceDynamic::Create(Material, this);
-			if (!DynamicMaterial)
-			{
-				UE_LOG(LogTemp, Error, TEXT("Failed to create Dynamic Material for index %d"), i);
-				continue;
-			}
-			MeshComponent->SetMaterial(i, DynamicMaterial);
-		}
-		DynamicMaterial->SetScalarParameterValue(FName("Opacity"), Opacity);
-		DynamicMaterial->UpdateCachedData();
-	}
-	MeshComponent->MarkRenderStateDirty();
-}
-
 void ABaseMonsterCharacter::OnRep_FaintCharacterMotion()
 {
 	GetCapsuleComponent()->SetCapsuleRadius(FaintCP.Radius);
@@ -225,7 +247,7 @@ void ABaseMonsterCharacter::OnRep_FaintCharacterMotion()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_PlayerChannel, ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECC_PlayerChannel, ECR_Ignore);
 	GetMesh()->SetRelativeTransform(CB_FaintStateMtx);
-	SetMeshOpacity(0.5f);
+	GetMesh()->SetSkeletalMesh(OSK);
 }
 
 ABaseMonsterCharacter::~ABaseMonsterCharacter()

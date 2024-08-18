@@ -5,20 +5,7 @@
 
 AGiraffeCharacter::AGiraffeCharacter()
 {
-	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_GIRAFFE
-	(PathManager::GetMonsterPath(EAnimal::ANIMAL_GIRAFFE));
-	if (SK_GIRAFFE.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_GIRAFFE.Object);
-	}
-
-	/** Loading animations */
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_GIRAFFE));
-	if (ANIM_CHARACTER.Succeeded()) {
-		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
-	}
+	InitMonsterMeshData(AnimalType);
 
 	/** Set the Capsule size */
 	DefaultCP.Radius = 56.f;

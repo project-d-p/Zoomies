@@ -10,4 +10,6 @@ class PROJ_A_API AWhaleCharacter : public ABaseMonsterCharacter
 
 public:
 	AWhaleCharacter();
+protected:
+	const EAnimal AnimalType = EAnimal::ANIMAL_WHALE;
 };

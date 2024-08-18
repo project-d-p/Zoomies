@@ -15,6 +15,7 @@
 #include "IChatGameMode.h"
 #include "ServerTimerManager.h"
 #include "MonsterFactory.h"
+#include "BlockingBoxVolume.h"
 #include "DPGameModeBase.generated.h"
 
 USTRUCT()
@@ -116,7 +117,6 @@ private:
 	// SteamNetworkingSocket* steam_listen_socket_ = nullptr;
 	UPROPERTY()
 	UANetworkManager* NetworkManager = nullptr;
-	
 	
 	float time_accumulator_ = 0.0f;
 	int gun_fire_ = 0;

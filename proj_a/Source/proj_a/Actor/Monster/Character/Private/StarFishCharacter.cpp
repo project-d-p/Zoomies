@@ -5,20 +5,7 @@
 
 AStarFishCharacter::AStarFishCharacter()
 {
-	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_STARFISH
-	(PathManager::GetMonsterPath(EAnimal::ANIMAL_STAR_FISH));
-	if (SK_STARFISH.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_STARFISH.Object);
-	}
-
-	/** Loading animations */
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_STAR_FISH));
-	if (ANIM_CHARACTER.Succeeded()) {
-		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
-	}
+	InitMonsterMeshData(AnimalType);
 	
 	/** Set the Capsule size */
 	DefaultCP.Radius = 25.f;

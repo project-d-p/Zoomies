@@ -5,20 +5,7 @@
 
 ASquidCharacter::ASquidCharacter()
 {
-	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SQUID
-	(PathManager::GetMonsterPath(EAnimal::ANIMAL_SQUID));
-	if (SK_SQUID.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_SQUID.Object);
-	}
-
-	/** Loading animations */
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER(
-		PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_SQUID));
-	if (ANIM_CHARACTER.Succeeded()) {
-		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
-	}
+	InitMonsterMeshData(AnimalType);
 
 	/** Set the Capsule size */
 	DefaultCP.Radius = 64.f;

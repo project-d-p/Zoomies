@@ -10,4 +10,6 @@ class PROJ_A_API AStingRayCharacter : public ABaseMonsterCharacter
 
 public:
 	AStingRayCharacter();
+protected:
+	const EAnimal AnimalType = EAnimal::ANIMAL_STINGRAY;
 };

@@ -5,20 +5,7 @@
 
 ALobsterCharacter::ALobsterCharacter()
 {
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_LOBSTER
-	(PathManager::GetMonsterPath(EAnimal::ANIMAL_LOBSTER));
-	/** Loading models */
-	if (SK_LOBSTER.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_LOBSTER.Object);
-	}
-
-	/** Loading animations */
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_LOBSTER));
-	if (ANIM_CHARACTER.Succeeded()) {
-		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
-	}
+	InitMonsterMeshData(AnimalType);
 
 	/** Set the Capsule size */
 	DefaultCP.Radius = 100.f;
