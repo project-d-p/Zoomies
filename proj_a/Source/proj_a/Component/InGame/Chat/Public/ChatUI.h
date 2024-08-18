@@ -53,4 +53,5 @@ private:
 	UScrollBox* ChatScrollBox = nullptr;
 	UPROPERTY()
 	UVerticalBox* ChatLogBox = nullptr;
+	FInputModeDataBase* PreviousInputMode; 
 };

@@ -7,7 +7,7 @@ AEelCharacter::AEelCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_EEL
-	(PathManager::GetPath(EMonster::EEL));
+	(PathManager::GetMonsterPath(EAnimal::ANIMAL_EEL));
 	if (SK_EEL.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_EEL.Object);
 	}
@@ -15,7 +15,7 @@ AEelCharacter::AEelCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER(
-		TEXT("/Game/animation/animals/eelAnimation.eelAnimation_C"));
+		PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_EEL));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}

@@ -2,7 +2,7 @@
 
 #include "DPCharacter.h"
 #include "DPPlayerController.h"
-#include "LocalizationDescriptor.h"
+#include "IChatGameState.h"
 #include "ResultLevelGameState.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
@@ -16,205 +16,104 @@ AResultLevelGameMode::AResultLevelGameMode()
 	PlayerControllerClass = ADPPlayerController::StaticClass();
 	PlayerStateClass = ADPPlayerState::StaticClass();
 	GameStateClass = AResultLevelGameState::StaticClass();
+
+	ChatManager = CreateDefaultSubobject<UServerChatManager>(TEXT("ChatManager"));
 }
 
 AResultLevelGameMode::~AResultLevelGameMode()
 {
 }
 
-/* Seamless Travel : Reuse PlayerController for Server */
 void AResultLevelGameMode::PostSeamlessTravel()
 {
-	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
-	if (!GameInstance) return;
-
-	FVector Location[2] = {
-		{377.379388,44.683849,87.312484},
-		{377.379388,75.275560,87.312482}
-	};
-
-	ADPCharacter* NewCharacter = GetWorld()->SpawnActor<ADPCharacter>(DefaultPawnClass, Location[0], FRotator::ZeroRotator);
-	ADPPlayerController* PlayerController = Cast<ADPPlayerController>(GameInstance->LocalController);
-	
-	if (PlayerController && PlayerController->IsLocalPlayerController())
-	{
-		if (!NewCharacter)
-		{
-			return ;
-		}
-		PlayerController->Possess(NewCharacter);
-		PlayerController->SwitchLevelComponent(ELevelComponentType::RESULT);
-	}
-}
-
-void AResultLevelGameMode::BeginPlay()
-{
-	this->SetPlayerScores();
-	
-	// for (auto& PlayerScore : PlayerScores)
-	// {
-	// 	FNetLogger::LogError(TEXT("PlayerName: %s"), *PlayerScore.PlayerName);
-	// 	FNetLogger::LogError(TEXT("PlayerJob: %d"), (int32)PlayerScore.PlayerJob);
-	// 	FNetLogger::LogError(TEXT("Scores: %d, %d, %d, %d, %d"), PlayerScore.Scores[0], PlayerScore.Scores[1], PlayerScore.Scores[2], PlayerScore.Scores[3], PlayerScore.Scores[4]);
-	// 	FNetLogger::LogError(TEXT("bIsDetected: %d"), PlayerScore.bIsDetected);
-	// }
-
-	OnSimpleEvent.Broadcast();
-
-	Super::BeginPlay();
+	Super::PostSeamlessTravel();
 }
 
 void AResultLevelGameMode::Logout(AController* Exiting)
 {
+	// Clear the session when the player leaves the game
 	Super::Logout(Exiting);
 }
 
-TArray<int32> AResultLevelGameMode::CalculateScores(ADPPlayerController* Controller)
+void AResultLevelGameMode::SpawnNewPlayerPawn(AController* PC)
 {
-	TArray<int32> Scores;
-
-	Scores.SetNum(5);
-
-	UPrivateScoreManager* ScoreManager = Controller->GetPrivateScoreManagerComponent();
-	if (!ScoreManager)
+	// ï¿½ï¿½ Ä³ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ä³ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	static int i = 0;
+	if (i == 2)
 	{
-		return Scores;
-	}
-	FNetLogger::LogError(TEXT("ScoreManager is valid"));
-
-	TArray<TArray<EAnimal>> CapturedAnimals = ScoreManager->GetCapturedAnimals();
-	TArray<FScoreData> ScoreDatas = ScoreManager->GetScoreDatas();
-
-	int BaseScore = 0;
-	int BaseScoreAlpha = 0;
-	int AddMulScore = 0;
-	int MulMulScore = 1;
-	
-	for (int32 i = 0; i < ScoreDatas.Num(); i++)
-	{
-		BaseScore += CapturedAnimals[i].Num() * 100;
-		BaseScoreAlpha += ScoreDatas[i].baseScore;
-		AddMulScore += ScoreDatas[i].addMulScore;
-		MulMulScore *= ScoreDatas[i].mulMulScore;
-	}
-
-	Scores[0] = BaseScore;
-	Scores[1] = BaseScoreAlpha;
-	Scores[2] = BaseScoreAlpha * (AddMulScore == 0 ? 1 : AddMulScore);
-	Scores[3] = Scores[2] * MulMulScore;
-	Scores[4] = Scores[3];
-	
-	return Scores;
-}
-
-TArray<FAnimalList> AResultLevelGameMode::GetCapturedAnimals(ADPPlayerController* Controller)
-{
-	TArray<FAnimalList> CapturedAnimals;
-
-	UPrivateScoreManager* ScoreManager = Controller->GetPrivateScoreManagerComponent();
-	if (!ScoreManager)
-	{
-		return CapturedAnimals;
+		i = 0;
 	}
 	
-	for (const TArray<EAnimal>& Animals : ScoreManager->GetCapturedAnimals())
-	{
-		FAnimalList AnimalList;
-		AnimalList.Animals = Animals;
-		CapturedAnimals.Add(AnimalList);
-	}
-	
-	return CapturedAnimals;
-}
-
-void AResultLevelGameMode::SetPlayerScores()
-{
-	FString PlayerName("TEST");
-	EPlayerJob PlayerJob = EPlayerJob::JOB_ARCHAEOLOGIST;
-	TArray<int32> Scores[5] = {
-		{0, 100, 500, 200, 10},
-		{500, 200, 100, 8000, 900000},
-		{300, 200, 100, 800, 400},
-		{200, 100, 800, 100, 200000}
+	FVector Location[2] = {
+		{-527.514681,-128.409500,85.462503},
+		{-527.514681,138.648437,85.462503}
 	};
-	TArray<FAnimalList> CapturedAnimals;
-	bool bIsDetected = false;
 
-	// for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-	// {
-	//     ADPPlayerController* PlayerController = Cast<ADPPlayerController>(*Iterator);
-	//     if (!PlayerController)
-	//     {
-	//         return ;
-	//     }
-	//     ADPPlayerState* PlayerState = Cast<ADPPlayerState>(PlayerController->PlayerState);
-	//     if (!PlayerState)
-	//     {
-	//         return ;
-	//     }
+	FVector SpawnLocation = Location[i++];  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
 
-	for (int i = 0; i < 4; i++) {
-		FPlayerScore PlayerScore;
-
-		// PlayerScore.PlayerName = PlayerState->GetPlayerName();
-		// PlayerScore.PlayerJob = PlayerState->GetPlayerJob();
-		// PlayerScore.Scores = this->CalculateScores(PlayerController);
-		// PlayerScore.CapturedAnimals = this->GetCapturedAnimals(PlayerController);
-		// PlayerScore.bIsDetected = false;
-
-		/* Test */
-		PlayerScore.PlayerName = PlayerName;
-		PlayerName += "_";
-		PlayerScore.PlayerJob = PlayerJob;
-		PlayerScore.Scores = Scores[i];
-
-		// PlayerScore.CapturedAnimals = this->GetCapturedAnimals(PlayerController);
-		PlayerScore.bIsDetected = false;
-
-		PlayerScores.Add(PlayerScore);
+	ADPCharacter* NewCharacter = GetWorld()->SpawnActor<ADPCharacter>(DefaultPawnClass, SpawnLocation, FRotator::ZeroRotator);
+	if (NewCharacter)
+	{
+		PC->Possess(NewCharacter);
 	}
+
+	ADPPlayerController* PlayerController = Cast<ADPPlayerController>(PC);
+	if (PlayerController)
+	{
+		PlayerController->SwitchLevelComponent(ELevelComponentType::RESULT);
+	}
+	///
+	ADPPlayerState* PS = PlayerController->GetPlayerState<ADPPlayerState>();
+	check(PS)
+	FFinalScoreData fd = PS->GetFinalScoreData();
+	UE_LOG(LogTemp, Warning, TEXT("Player Name : %s"), *PS->GetPlayerName());
+	for (int k = 0; k < fd.CapturedAnimals.Num(); k++)
+	{
+		for (int j = 0; j < fd.CapturedAnimals[k].Num(); j++)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Captured Animals : %d"), fd.CapturedAnimals[k][j]);
+		}
+	}
+	for (int k = 0; k < fd.ScoreDatas.Num(); k++)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Score Data : %d"), fd.ScoreDatas[k].baseScore);
+	}
+	UE_LOG(LogTemp, Warning, TEXT("Is Detected : %d"), fd.bIsDetected);
+	///
 }
 
-/* Seamless Travel : Reuse PlayerController for Clients */
+/* Seamless Travel : Reuse PlayerControllers */
 void AResultLevelGameMode::HandleSeamlessTravelPlayer(AController*& C)
 {
-	APlayerController* PC = Cast<APlayerController>(C);
-	FNetLogger::LogError(TEXT("Handling seamless travel for: %d"), PC->GetUniqueID());
-	if (PC && PC->Player)
-	{
-		// ±âÁ¸ ÄÁÆ®·Ñ·¯¸¦ À¯Áö
-		FNetLogger::LogError(TEXT("Keeping existing PlayerController for seamless travel: %s"), *PC->GetName());
-        
-		// ÇÊ¿äÇÑ ÃÊ±âÈ­¸¸ ¼öÇà
-		InitSeamlessTravelPlayer(C);
-		GenericPlayerInitialization(C);
-        
-		// »õ Ä³¸¯ÅÍ »ý¼º ¾øÀÌ ±âÁ¸ Ä³¸¯ÅÍ Àç»ç¿ë ·ÎÁ÷ ±¸Çö
-		static int i = 1;
-		if (i == 2)
-		{
-			i = 0;
-		}
-		FVector Location[2] = {
-			{377.379388,44.683849,87.312484},
-			{377.379388,75.275560,87.312482}
-		};
+	Super::HandleSeamlessTravelPlayer(C);
 
-		FVector SpawnLocation = Location[i++];  // ÀûÀýÇÑ ½ºÆù À§Ä¡ ¼³Á¤
-		ADPCharacter* NewCharacter = GetWorld()->SpawnActor<ADPCharacter>(DefaultPawnClass, SpawnLocation, FRotator::ZeroRotator);
-		if (NewCharacter)
-		{
-			PC->Possess(NewCharacter);
-		}
-		ADPPlayerController* PlayerController = Cast<ADPPlayerController>(PC);
-		if (PlayerController)
-		{
-			PlayerController->SwitchLevelComponent(ELevelComponentType::RESULT);
-		}
-	}
-	else
+	SpawnNewPlayerPawn(C);
+	this->CurrentPlayerCount += 1;
+	CheckPlayersAllTraveled();
+}
+
+void AResultLevelGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+}
+
+void AResultLevelGameMode::CheckPlayersAllTraveled()
+{
+	UGI_Zoomies* GI = Cast<UGI_Zoomies>(GetGameInstance());
+	check(GI)
+
+	AResultLevelGameState* GS = Cast<AResultLevelGameState>(GetWorld()->GetGameState());
+	check(GS)
+
+	if (CurrentPlayerCount == GI->player_count)
 	{
-		// ÇÃ·¹ÀÌ¾î ÄÁÆ®·Ñ·¯°¡ ¾ø´Â °æ¿ì¿¡ ´ëÇÑ Ã³¸®
-		Super::HandleSeamlessTravelPlayer(C);
+		FTimerHandle StartTimerHandle;
+		FTimerDelegate StartTimerDelegate;
+
+		StartTimerDelegate.BindLambda([this, GS]()
+		{
+			GS->MulticastPlayersAllTraveled();
+		});
+		GetWorld()->GetTimerManager().SetTimer(StartTimerHandle, StartTimerDelegate, 1.0f, false);
 	}
 }

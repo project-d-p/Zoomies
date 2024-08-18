@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "ChatManager.h"
-#include "ClientSocket.h"
 #include "proj_a/Component/InGame/Score/PrivateScoreManager.h"
 #include "BaseLevelComponent.h"
 #include "ELevelComponentType.h"
@@ -27,22 +26,31 @@ public:
 	virtual void GetSeamlessTravelActorList(bool bToTransitionMap, TArray<AActor*>& ActorList) override;
 	virtual void AcknowledgePossession(APawn* P) override;
 	
-	void SendChatMessageToServer(const FString& Message);
-	void ReceiveChatMessage(const FString& SenderName, const FString& Message);
-	void InitChatManager(UChatUI* ChatUI);
+	UFUNCTION(Server, Reliable)
+	void ServerSendChatMessage(const FString& SenderName, const FString& Message);
 
 	/* Switch level component Called By GameMode & GameState */
 	void SwitchLevelComponent(ELevelComponentType Type);
 
 	/* Get Level Component */
+	UFUNCTION(BlueprintCallable)
 	UBaseLevelComponent* GetLevelComponent() const;
 
 	UPlayerScoreComp* GetScoreManagerComponent() const;
 	UPrivateScoreManager* GetPrivateScoreManagerComponent() const;
-	UClientSocket* GetClientSocket() const;
+
+	UANetworkManager* GetNetworkManager() const;
 
 	void ReleaseMemory();
 
+	UFUNCTION(Client, Reliable)
+	void ClientDestroySession();
+
+	/// TEST
+	UFUNCTION(Client, Reliable)
+	void ConnectToServer(ELevelComponentType Type);
+	///
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -52,15 +60,17 @@ protected:
 private:
 	void DeactiveCurrentComponent();
 	void ActivateComponent(ELevelComponentType Type);
-	
+
+	// Move To PlayerState
 	UPROPERTY(VisibleAnywhere)
 	UPrivateScoreManager* PrivateScoreManager;
+
 	UPROPERTY()
-	UChatManager* ChatManager = nullptr;
-	UPROPERTY()
-	UClientSocket* Socket = nullptr;
+	UANetworkManager* NetworkManager = nullptr;
+
 	UPROPERTY()
 	TMap<uint32, UBaseLevelComponent*> LevelComponents;
+
 	UPROPERTY()
 	UBaseLevelComponent* ActiveComponent;
 };

@@ -7,7 +7,7 @@ ASkunkCharacter::ASkunkCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SKUNK
-	(PathManager::GetPath(EMonster::SKUNK));
+	(PathManager::GetMonsterPath(EAnimal::ANIMAL_SKUNK));
 	if (SK_SKUNK.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_SKUNK.Object);
 	}
@@ -15,7 +15,7 @@ ASkunkCharacter::ASkunkCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER(
-		TEXT("/Game/animation/animals/skunkAnimation.skunkAnimation_C"));
+		PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_SKUNK));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}

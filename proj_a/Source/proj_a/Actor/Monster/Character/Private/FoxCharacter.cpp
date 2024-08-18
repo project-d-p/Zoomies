@@ -7,7 +7,7 @@ AFoxCharacter::AFoxCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_FOX
-	(PathManager::GetPath(EMonster::FOX));
+	(PathManager::GetMonsterPath(EAnimal::ANIMAL_FOX));
     if (SK_FOX.Succeeded()) {
     	GetMesh()->SetSkeletalMesh(SK_FOX.Object);
     }
@@ -15,7 +15,7 @@ AFoxCharacter::AFoxCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(TEXT("/Game/animation/animals/foxAnimation.foxAnimation_C"));
+	(PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_FOX));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}

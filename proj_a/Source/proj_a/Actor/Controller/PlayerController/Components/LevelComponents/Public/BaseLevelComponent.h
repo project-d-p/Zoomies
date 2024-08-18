@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "BaseInputComponent.h"
+#include "ChatManager.h"
 #include "SoundComponent.h"
 #include "BaseLevelComponent.generated.h"
 
@@ -17,6 +18,8 @@ protected:
 
 	UPROPERTY()
 	UBaseInputComponent* InputComponent;
+	UPROPERTY()
+	UChatManager* ChatManager;
 	UPROPERTY()
 	USoundComponent* SoundComponent;
 	

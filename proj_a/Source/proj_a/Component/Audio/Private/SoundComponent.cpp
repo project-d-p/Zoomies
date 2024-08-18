@@ -47,7 +47,6 @@ void USoundComponent::PlayJumpSound() const
 void USoundComponent::PlayShotSound() const
 {
 	UGameplayStatics::PlaySound2D(GetWorld(), ShotSound);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("soundComponent"));
 }
 
 void USoundComponent::PlayAnimalGetDamagedSound() const

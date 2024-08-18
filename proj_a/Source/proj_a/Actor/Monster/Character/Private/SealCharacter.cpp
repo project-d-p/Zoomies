@@ -7,7 +7,7 @@ ASealCharacter::ASealCharacter()
 	/** Loading models */
 	
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SEAL
-	(PathManager::GetPath(EMonster::SEAL));
+	(PathManager::GetMonsterPath(EAnimal::ANIMAL_SEAL));
 	if (SK_SEAL.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_SEAL.Object);
 	}
@@ -15,7 +15,7 @@ ASealCharacter::ASealCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER(
-		TEXT("/Game/animation/animals/sealAnimation.sealAnimation_C"));
+		PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_SEAL));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}

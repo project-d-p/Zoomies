@@ -7,7 +7,7 @@ ASaberToothTigerCharacter::ASaberToothTigerCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SABERTOOTHTIGER
-	(PathManager::GetPath(EMonster::SABER_TOOTH_TIGER));
+	(PathManager::GetMonsterPath(EAnimal::ANIMAL_SABER_TOOTH_TIGER));
 	if (SK_SABERTOOTHTIGER.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_SABERTOOTHTIGER.Object);
 	}
@@ -15,7 +15,7 @@ ASaberToothTigerCharacter::ASaberToothTigerCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER(
-		TEXT("/Game/animation/animals/sabertoothTigerAnimation.sabertoothTigerAnimation_C"));
+		PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_SABER_TOOTH_TIGER));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}

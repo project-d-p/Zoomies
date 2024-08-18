@@ -1,6 +1,9 @@
 #include "ResultLevelComponent.h"
 
 #include "BasicInputComponent.h"
+#include "DPPlayerController.h"
+#include "MainInputComponent.h"
+#include "Camera/CameraActor.h"
 
 UResultLevelComponent::UResultLevelComponent()
 {
@@ -8,6 +11,15 @@ UResultLevelComponent::UResultLevelComponent()
 	InputComponent = CreateDefaultSubobject<UBasicInputComponent>(TEXT("InputComponent"));
 
 	InputComponent->SetLevelComponent(this);
+}
+
+void UResultLevelComponent::SetFixedCameraView()
+{
+	ADPPlayerController* PC = Cast<ADPPlayerController>(GetOwner());
+	check(PC)
+	ADPCharacter* Char = Cast<ADPCharacter>(PC->GetCharacter());
+	check(Char)
+	Char->RemoveSpringArm();
 }
 
 void UResultLevelComponent::Activate(bool bReset)

@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "HitScan.h"
 #include "message.pb.h"
+#include "SoundComponent.h"
 #include "DPWeapon.generated.h"
 
 UCLASS()
@@ -21,6 +22,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY()
+	USoundComponent* SoundComponent;
 
 public:	
 	// Called every frame

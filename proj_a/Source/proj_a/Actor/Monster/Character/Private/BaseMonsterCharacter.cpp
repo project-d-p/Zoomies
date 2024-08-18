@@ -5,11 +5,11 @@
 #include "FDataHub.h"
 #include "FNetLogger.h"
 #include "Components/ArrowComponent.h"
-#include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 #include "proj_a.h"
+#include "PathManager.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -137,7 +137,7 @@ void ABaseMonsterCharacter::SetCatchable(bool bCond)
 	if (bCond)
 	{
 		GetMesh()->CustomDepthStencilValue = 3;
-		GetMesh()->MarkRenderStateDirty();	// render ╩Себ ╟╩╫е
+		GetMesh()->MarkRenderStateDirty();	// render О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫
 		widgetComponent->SetVisibility(bCond);
 	}
 	else

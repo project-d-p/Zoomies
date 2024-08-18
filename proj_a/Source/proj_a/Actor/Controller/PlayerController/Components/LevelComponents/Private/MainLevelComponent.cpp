@@ -5,7 +5,9 @@
 #include "DPStateActorComponent.h"
 #include "BaseMonsterCharacter.h"
 #include "DPGameModeBase.h"
+#include "DPInGameState.h"
 #include "DPWeaponActorComponent.h"
+#include "FNetLogger.h"
 #include "HitScan.h"
 #include "MainInputComponent.h"
 #include "MessageMaker.h"
@@ -113,8 +115,9 @@ void UMainLevelComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	}
 	
 	Message msg = MessageMaker::MakePositionMessage(PlayerController);
-	UClientSocket* Socket = PlayerController->GetClientSocket();
-	Socket->AsyncSendPacket(msg);
+
+	UANetworkManager* NetworkManager = PlayerController->GetNetworkManager();
+	NetworkManager->SendData(msg);
 }
 
 bool UMainLevelComponent::IsCatchable(FHitResult& HitResult)
@@ -162,21 +165,20 @@ void UMainLevelComponent::ServerNotifyReturnAnimals_Implementation()
 	ADPPlayerController* PlayerController = GetPlayerController();
 	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
 	if (!Character) return;
-	// °³ÀÎ Á¡¼ö Áõ°¡
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	ADPPlayerState* PlayerState = Cast<ADPPlayerState>(PlayerController->PlayerState);
 	if (!PlayerState)
 	{
 		return ;
 	}
 	
-	// Å¬¶óÀÌ¾ðÆ®ÀÇ µ¿¹° ¹ÝÈ¯ Ã³¸®¸¦ Ã³¸®ÇÑ´Ù.
+	// Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯ Ã³ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Ñ´ï¿½.
 	TArray<EAnimal> animals = Character->ReturnMonsters();
 
 	PlayerController->GetPrivateScoreManagerComponent()->IncreasePrivatePlayerScoreByServer(PlayerState->GetPlayerJob(), animals);
 
 	uint32 score = PlayerController->GetPrivateScoreManagerComponent()->GetPrivatePlayerScore();
 	FString playerName = PlayerState->GetPlayerName();
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Score[%s] : %d"), *playerName, score);
 	
 	ADPGameModeBase* GM = GetWorld()->GetAuthGameMode<ADPGameModeBase>();
 	if (GM)
@@ -192,7 +194,7 @@ void UMainLevelComponent::ServerNotifyReturnAnimals_Implementation()
 	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 	{
 		ADPPlayerController* PC = Cast<ADPPlayerController>(It->Get());
-		if (PC && PC != PlayerController) // ÀÚ±â ÀÚ½ÅÀ» Á¦¿ÜÇÑ ¸ðµç Å¬¶óÀÌ¾ðÆ®
+		if (PC && PC != PlayerController) // ï¿½Ú±ï¿½ ï¿½Ú½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®
 		{
 			ADPCharacter* OtherCharacter = Cast<ADPCharacter>(PC->GetPawn());
 			OtherCharacter->ClientNotifyAnimalReturn(PlayerState->GetPlayerName());
@@ -202,8 +204,8 @@ void UMainLevelComponent::ServerNotifyReturnAnimals_Implementation()
 
 bool UMainLevelComponent::ServerNotifyReturnAnimals_Validate()
 {
-	// È£ÃâÀÌ À¯È¿ÇÑÁö È®ÀÎÇÏ´Â ·ÎÁ÷À» ±¸Çö
-	return true; // À¯È¿¼º °ËÁõÀÌ Ç×»ó ÂüÀÎ °æ¿ì
+	// È£ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¿ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	return true; // ï¿½ï¿½È¿ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×»ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 }
 
 void UMainLevelComponent::HandlePosition(const ActorPosition& ActorPosition)
@@ -267,7 +269,7 @@ void UMainLevelComponent::SetState(const ActorPosition& ActorPosition)
 	}
 }
 
-void UMainLevelComponent::SimulateGunFire(SteamNetworkingSocket* SteamSocket)
+void UMainLevelComponent::SimulateGunFire(UANetworkManager* NetworkManager)
 {
 	ADPPlayerController* PlayerController = GetPlayerController();
 	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
@@ -299,11 +301,11 @@ void UMainLevelComponent::SimulateGunFire(SteamNetworkingSocket* SteamSocket)
 				Character->weaponComponent->SpawnEffects(hit_result, final_direction);
 			}
 		}
-		SteamSocket->PushUdpFlushMessage(fire);
+		NetworkManager->SendData(fire);
 	}
 }
 
-void UMainLevelComponent::SimulateCatch(SteamNetworkingSocket* SteamSocket)
+void UMainLevelComponent::SimulateCatch(UANetworkManager* NetworkManager)
 {
 	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
 	if (!Character) return;
@@ -344,11 +346,11 @@ void UMainLevelComponent::SimulateCatch(SteamNetworkingSocket* SteamSocket)
 		reply.set_target(TCHAR_TO_UTF8(*monster_type));
 		*catch_.mutable_catch_() = reply;
 		FString TestString = UTF8_TO_TCHAR(reply.target().c_str());
-		SteamSocket->PushUdpFlushMessage(catch_);
+		NetworkManager->SendData(catch_);
 	}
 }
 
-void UMainLevelComponent::SimulateAim(SteamNetworkingSocket* SteamSocket)
+void UMainLevelComponent::SimulateAim(UANetworkManager* NetworkManager)
 {
 	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
 	if (!Character) return;
@@ -365,6 +367,6 @@ void UMainLevelComponent::SimulateAim(SteamNetworkingSocket* SteamSocket)
 		{
 			Character->StopAimAnimation();
 		}
-		SteamSocket->PushUdpFlushMessage(aimState);
+		NetworkManager->SendData(aimState);
 	}
 }

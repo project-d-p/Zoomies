@@ -7,7 +7,7 @@ AOctopusCharacter::AOctopusCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_OCTOPUS
-	(PathManager::GetPath(EMonster::OCTOPUS));
+	(PathManager::GetMonsterPath(EAnimal::ANIMAL_OCTOPUS));
 	if (SK_OCTOPUS.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_OCTOPUS.Object);
 	}
@@ -15,7 +15,7 @@ AOctopusCharacter::AOctopusCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(TEXT("/Game/animation/animals/octopusAnimation.octopusAnimation_C"));
+	(PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_OCTOPUS));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}

@@ -7,7 +7,7 @@ AStarFishCharacter::AStarFishCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_STARFISH
-	(PathManager::GetPath(EMonster::STAR_FISH));
+	(PathManager::GetMonsterPath(EAnimal::ANIMAL_STAR_FISH));
 	if (SK_STARFISH.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_STARFISH.Object);
 	}
@@ -15,7 +15,7 @@ AStarFishCharacter::AStarFishCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(TEXT("/Game/animation/animals/starFishAnimation.starFishAnimation_C"));
+	(PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_STAR_FISH));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}

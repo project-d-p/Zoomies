@@ -6,7 +6,7 @@ ACrabCharacter::ACrabCharacter()
 {
 	/** Loading models */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CRAB
-	(PathManager::GetPath(EMonster::CRAB));
+	(PathManager::GetMonsterPath(EAnimal::ANIMAL_CRAB));
 	if (SK_CRAB.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(SK_CRAB.Object);
 	}
@@ -14,7 +14,7 @@ ACrabCharacter::ACrabCharacter()
 	/** Loading animations */
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(TEXT("/Game/animation/animals/crabAnimation.crabAnimation_C"));
+	(PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_CRAB));
 	if (ANIM_CHARACTER.Succeeded()) {
 		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
 	}
