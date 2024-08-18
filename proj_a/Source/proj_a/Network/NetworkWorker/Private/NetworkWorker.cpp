@@ -1,6 +1,5 @@
 #include "NetworkWorker.h"
 
-#include "FNetLogger.h"
 #include "ISocketInterface.h"
 #include "message.pb.h"
 
@@ -49,7 +48,7 @@ void UNetworkWorker::Stop()
 
 UNetworkWorker::~UNetworkWorker()
 {
-	if (SocketInterface)
+	if (SocketInterface->IsValidLowLevel())
 	{
 		SocketInterface->ConditionalBeginDestroy();
 		SocketInterface = nullptr;
