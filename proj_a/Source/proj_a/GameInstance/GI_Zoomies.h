@@ -21,6 +21,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void StartMatchMaking();
 	IOnlineSessionPtr GetOnlineSessionInterface() const;
+	TArray<TSharedRef<FOnlineFriend>> FriendsList;
 
 	/* Number of players before Seamless Travel */
 	bool ResetSession();
@@ -30,7 +31,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void ShowSteamInviteOverlay();
 	void ReadFriendList();
-	void OnFriendsListReadComplete(int32 LocalUserNum, bool bWasSuccessful, const FString& ListName, const FString& ErrorStr);
 	void LogFriendsNicknames();
 	void InviteFriendToGame(FUniqueNetIdPtr FriendId);
 	UPROPERTY(VisibleAnywhere, Category = "Network")

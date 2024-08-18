@@ -354,20 +354,7 @@ void UGI_Zoomies::ReadFriendList()
 	IOnlineFriendsPtr Friends = online_subsystem_->GetFriendsInterface();
 	if (Friends.IsValid())
 	{
-		Friends->ReadFriendsList(0, EFriendsLists::ToString(EFriendsLists::Default),
-			FOnReadFriendsListComplete::CreateUObject(this, &ThisClass::OnFriendsListReadComplete));
-	}
-}
-
-void UGI_Zoomies::OnFriendsListReadComplete(int32 LocalUserNum, bool bWasSuccessful, const FString& ListName, const FString& ErrorStr)
-{
-	if (bWasSuccessful)
-	{
-		UE_LOG(LogTemp, Log, TEXT("success to get friends list"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Fail to get firends List: %s"), *ErrorStr);
+		Friends->ReadFriendsList(0, EFriendsLists::ToString(EFriendsLists::Default));
 	}
 }
 
@@ -376,7 +363,6 @@ void UGI_Zoomies::LogFriendsNicknames()
 	IOnlineFriendsPtr Friends = online_subsystem_->GetFriendsInterface();
 	if (Friends.IsValid())
 	{
-		TArray<TSharedRef<FOnlineFriend>> FriendsList;
 		FString ListName = TEXT("Default");
 
 		if (Friends->GetFriendsList(0, ListName, FriendsList))
