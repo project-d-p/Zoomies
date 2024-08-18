@@ -62,6 +62,15 @@ public:	// component
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
 	UAnimMontage* characterMontage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
+	UMaterialInstanceDynamic* dynamicMaterialInstance;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MatchLobby", meta = (AllowPrivateAccess = "true"))
+	class UWidgetComponent* userInfoWidget;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MatchLobby")
+	UWidgetComponent* LobbyInfoWidgetComponent = nullptr;
+
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
 	//UMaterialInstanceDynamic* dynamicMaterialInstance;
 

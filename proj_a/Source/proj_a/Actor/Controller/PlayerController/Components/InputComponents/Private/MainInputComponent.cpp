@@ -64,6 +64,11 @@ UMainInputComponent::UMainInputComponent()
 	(TEXT("/Game/input/ia_return.ia_return"));
 	if (IA_RETURN.Succeeded())
 		ReturnAction = IA_RETURN.Object;
+	
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_RUN
+	(TEXT("/Game/input/ia_run.ia_run"));
+	if (IA_RUN.Succeeded())
+		RunAction = IA_RUN.Object;
 }
 
 void UMainInputComponent::Activate(bool bReset)
@@ -84,34 +89,37 @@ void UMainInputComponent::BindMainLevelActions()
 	if (!PlayerController) return ;
 	if (!PlayerController->IsLocalController()) return ;
 	
-	// Mapping Context �߰�
+	// Mapping Context
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 	{
 		SubSystem->AddMappingContext(MainLevelContext, 0);
 	}
 
-	// Enhanced Input Component �������� �� ���ε�
+	// Enhanced Input Component
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 	{
-		// �÷��̾� �̵� ( w, a, d, s )
+		// (w, a, s, d) : Move
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &UMainInputComponent::Move);
-		// �÷��̾� ���� ( space )
+		// (space) : Jump
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &UMainInputComponent::Jump);
-		// ���� ��ȯ ( ���콺 ȸ�� )
+		// (mouse) : Rotate
 		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &UMainInputComponent::Rotate);
-		//	�ൿ, �� �߻�/�� ��ġ/�ͷ� ��ġ ( ���콺 ��Ŭ�� )
+		// (left mouse button) : Active
 		EnhancedInputComponent->BindAction(ActiveAction, ETriggerEvent::Triggered, this, &UMainInputComponent::Active);
-		//	����, ���� ����/�� ȸ�� ( ���콺 ��ũ�� )
+		// scroll up, down : Additional Setting
 		EnhancedInputComponent->BindAction(AdditionalSettingAction, ETriggerEvent::Triggered, this, &UMainInputComponent::AdditionalSetting);
-		//	���� ( ���콺 ��Ŭ�� )
+		// (right mouse button) : Aim
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &UMainInputComponent::Aim);	// 	key down
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &UMainInputComponent::AimReleased);
-		//	���, ä�� ���� ( esc - UE �����Ϳ��� �⺻ ����Ű ���� �ʿ� )
+		// (esc) : Cancel
 		EnhancedInputComponent->BindAction(CancelAction, ETriggerEvent::Triggered, this, &UMainInputComponent::ActionCancel);
-		// ��ȹ (f)
+		// (f) : Catch
 		EnhancedInputComponent->BindAction(CatchAction, ETriggerEvent::Started, this, &UMainInputComponent::CatchAnimals);
-		// ���� ��ȯ (q)
+		// (q) : Return
 		EnhancedInputComponent->BindAction(ReturnAction, ETriggerEvent::Started, this, &UMainInputComponent::ReturningAnimals);
+		// (shift) : Run
+		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Triggered, this, &UMainInputComponent::Run); // key down
+		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &UMainInputComponent::RunReleased); // key up
 	}
 }
 
@@ -120,13 +128,13 @@ void UMainInputComponent::UnbindMainLevelActions()
 	ADPPlayerController* PlayerController = GetPlayerController();
 	if (!PlayerController) return ;
 
-	// Enhanced Input Component ���ε� ����
+	// Enhanced Input Component
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 	{
 		EnhancedInputComponent->ClearActionBindings();
 	}
 
-	// Mapping Context ����
+	// Mapping Context
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 	{
 		if (MainLevelContext)
@@ -218,7 +226,7 @@ void UMainInputComponent::Active(const FInputActionValue& value)
 		}
 		FHitResult hit_result;
 		Character->PlayFireAnimation();
-		// ���� �߻� ��ġ��, ������ �˾ƾ� ��.
+		
 		FRotator final_direction;
 		if (Character->weaponComponent->Attack(PlayerController, hit_result, final_direction))
 		{
@@ -444,4 +452,20 @@ void UMainInputComponent::ReturningAnimals(const FInputActionValue& value)
 	{
 		Character->ReturnTriggerVolume->SpawnReturnEffect(animals);
 	}
+}
+
+void UMainInputComponent::Run(const FInputActionValue& value)
+{
+	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
+	if (!Character) return ;
+
+	Character->GetCharacterMovement()->MaxWalkSpeed = 1000.0f;
+}
+
+void UMainInputComponent::RunReleased(const FInputActionValue& value)
+{
+	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
+	if (!Character) return ;
+
+	Character->GetCharacterMovement()->MaxWalkSpeed = 600.0f;
 }

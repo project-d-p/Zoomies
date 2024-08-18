@@ -30,6 +30,8 @@ private:
 	void ActionCancel(const FInputActionValue& value);
 	void CatchAnimals(const FInputActionValue& value);
 	void ReturningAnimals(const FInputActionValue& value);
+	void Run(const FInputActionValue& value);
+	void RunReleased(const FInputActionValue& value);
 
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputMappingContext* MainLevelContext;
@@ -52,4 +54,6 @@ private:
 	class UInputAction* CatchAction;
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* ReturnAction;
+	UPROPERTY(VisibleAnywhere, Category = Input)
+	class UInputAction* RunAction;
 };

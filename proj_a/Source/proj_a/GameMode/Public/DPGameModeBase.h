@@ -7,8 +7,10 @@
 #include "ServerChatManager.h"
 #include "GameFramework/GameModeBase.h"
 #include <queue>
+#include <thread>
 
 #include "ANetworkManager.h"
+#include "BlockingBoxVolume.h"
 #include "message.pb.h"
 #include "ServerMessageHandler.h"
 #include "DPPlayerController.h"
@@ -36,7 +38,7 @@ public:
 	virtual UServerChatManager* GetChatManager() const override { return ChatManager; }
 	
 	// monster
-	enum { NUM_OF_MAX_MONSTERS = 2 };
+	enum { NUM_OF_MAX_MONSTERS = 10 };
 	std::vector<ABaseMonsterAIController*> monster_controllers_;
 	std::vector<int32> empty_monster_slots_;
 
@@ -56,9 +58,10 @@ public:
 	// Called when the game starts or when spawned
 	virtual void PostLogin(APlayerController* newPlayer) override;
 	virtual void Logout(AController* Exiting) override;
+	virtual void BeginPlay() override;
 	virtual void StartPlay() override;
-	void EndGame();
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	void EndGame();
 	
 	// Called every frame
 	virtual void Tick(float delta_time) override;
@@ -80,7 +83,7 @@ private:
 	void SpawnMonsters(float delta_time);
 
 	// Member variables
-	enum { NUM_OF_MAX_CLIENTS = 2 };
+	enum { NUM_OF_MAX_CLIENTS = 4 };
 
 	// SteamNetworkingSocket* steam_listen_socket_ = nullptr;
 	UPROPERTY()
@@ -100,6 +103,8 @@ private:
 	UServerChatManager* ChatManager;
 	UPROPERTY()
 	UMonsterFactory* MonsterFactory;
+	UPROPERTY()
+	ABlockingBoxVolume* BlockingVolume;
 	bool bStart = false;
 	bool bTimeSet = false;
 };

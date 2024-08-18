@@ -63,8 +63,7 @@ void AGM_Lobby::BeginPlay()
 			}
 		}
 	}
-
 	ADPPlayerController* controller = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
-	controller->SwitchLevelComponent(ELevelComponentType::MAIN);
+	controller->SwitchLevelComponent(ELevelComponentType::LOBBY);
 }
 

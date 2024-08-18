@@ -182,6 +182,36 @@ ADPCharacter::ADPCharacter()
 
 }
 
+
+	if (UWorld* World = GetWorld())
+	{
+		FString CurrentLevelName = UGameplayStatics::GetCurrentLevelName(World);
+		
+		if (CurrentLevelName == "matchLobby")
+		{
+			if (LobbyInfoWidgetComponent && LobbyInfoWidgetComponent->IsValidLowLevel())
+			{
+				LobbyInfoWidgetComponent->DestroyComponent();
+				LobbyInfoWidgetComponent = nullptr;
+			}
+	
+			LobbyInfoWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("LobbyInfoWidgetComponent"));
+			static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClass(TEXT("/Game/widget/widget_LobbyInfo.widget_LobbyInfo_C"));
+			if (WidgetClass.Succeeded())
+			{
+				LobbyInfoWidgetComponent->SetWidgetClass(WidgetClass.Class);
+			}
+			LobbyInfoWidgetComponent->SetVisibility(true);
+			LobbyInfoWidgetComponent->SetWidgetSpace( EWidgetSpace::World);
+			LobbyInfoWidgetComponent->SetupAttachment(GetMesh());
+			LobbyInfoWidgetComponent->SetRelativeLocation(FVector(0, 0, 650));
+			LobbyInfoWidgetComponent->SetRelativeScale3D(FVector(1.4f, 1.4f, 1.4f));
+			LobbyInfoWidgetComponent->SetDrawSize(FVector2D(260,100));
+			LobbyInfoWidgetComponent->SetRelativeRotation(FRotator(-180, -90, 180));
+		}
+	}
+}
+
 ADPCharacter::~ADPCharacter()
 {
 }
@@ -189,24 +219,42 @@ ADPCharacter::~ADPCharacter()
 void ADPCharacter::SetNameTag()
 {
 	APlayerState* PS = GetPlayerState();
-	if (!PS)
+	if (IsValid(PS))
 	{
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+		FString Name = PS->GetPlayerName();
+		if (IsValid(NameTag_Instance))
 		{
-			SetNameTag();
-		}), 0.1f, false);
-		return ;
+			NameTag_Instance->SetName(Name);
+		}
+		else
+		{
+			FNetLogger::LogError(TEXT("No NameTag_Instance"));
+		}
+		if (IsValid(NameTag_WidgetComponent) && !IsLocallyControlled())
+		{
+			NameTag_WidgetComponent->SetVisibility(true);
+		}
+		else
+		{
+			FNetLogger::LogError(TEXT("No NameTagWidgetComponent || IsLocallyControlled"));
+		}
 	}
-
-	FString Name = PS->GetPlayerName();
-	if (NameTag_Instance)
+	else
 	{
-		NameTag_Instance->SetName(Name);
-	}
-	if (NameTag_WidgetComponent && !IsLocallyControlled())
-	{
-		NameTag_WidgetComponent->SetVisibility(true);
+		static int32 RetryCount = 0;
+		if (RetryCount < 5) // 최대 5회만 시도
+		{
+			RetryCount++;
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+			{
+				SetNameTag();
+			}), 0.1f, false);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to set NameTag after multiple attempts."));
+		}
 	}
 }
 
@@ -302,7 +350,6 @@ void ADPCharacter::Tick(float DeltaTime)
 	{
 		CheckCollisionWithMonster();
 	}
-
 }
 
 // Called to bind functionality to input

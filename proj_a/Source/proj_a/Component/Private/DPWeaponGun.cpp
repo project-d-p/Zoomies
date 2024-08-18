@@ -142,10 +142,19 @@ void ADPWeaponGun::SpawnEffects(const FHitResult& HitResult, const FRotator& rot
 	}
 	if (trail)
 	{
+
 		// 방향 설정: 월드 방향을 로컬 방향으로 변환
 		FVector WorldDirection = (ImpactPoint - muzzle->GetComponentLocation()).GetSafeNormal();
 		// FVector LocalDirection = muzzle->GetComponentTransform().InverseTransformVectorNoScale(WorldDirection);
-		trail->SetVectorParameter(FName("Direction_FIRE"), WorldDirection * 7'000.f); // 1000.f은 속도 조절을 위한 스칼라 값
+		trail->SetVectorParameter(FName("Direction_FIRE"), WorldDirection * 9'000.f); // 속도 조절을 위한 스칼라 값
+
+		// 거리 계산
+		float Distance = FVector::Dist(muzzle->GetComponentLocation(), ImpactPoint);
+		float Speed = 7000.0f; // WorldDirection에 곱한 속도 값과 일치시켜야 함
+		float TimeToImpact = Distance / Speed;
+
+		// 수명 설정 (Niagara에서 직접 수명을 설정)
+		trail->SetFloatParameter(FName("LifeSpan"), TimeToImpact);
 	}
 	
 	if (smokeEffect && muzzle) {
