@@ -16,6 +16,8 @@ class PROJ_A_API UPrivateScoreManager : public UActorComponent
 public:	
 	UPrivateScoreManager();
 
+	TArray<TArray<EAnimal>> GetCapturedAnimals() const;
+	TArray<FScoreData> GetScoreDatas() const;
 	int32 GetPrivatePlayerScore() const;
 	void IncreasePrivatePlayerScore(const EPlayerJob& playerJob,const TArray<EAnimal>& animals);
 	void IncreasePrivatePlayerScoreByServer(const EPlayerJob& playerJob, const TArray<EAnimal>& animals);

@@ -12,6 +12,18 @@ void UPrivateScoreManager::BeginPlay()
 	Super::BeginPlay();
 }
 
+TArray<TArray<EAnimal>> UPrivateScoreManager::GetCapturedAnimals() const
+{
+	return CapturedAnimals;
+}
+
+TArray<FScoreData> UPrivateScoreManager::GetScoreDatas() const
+{
+	return ScoreDatas;
+}
+
+
+
 int32 UPrivateScoreManager::GetPrivatePlayerScore() const
 {
 	return PrivatePlayerScore;
