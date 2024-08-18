@@ -9,6 +9,7 @@
 #include "PlayerScoreComp.h"
 #include "Components/TextBlock.h"
 #include "../../../Component/InGame/Score/ScoreUiPrivate.h"
+#include "Blueprint/WidgetTree.h"
 #include "GameFramework/PlayerState.h"
 
 void UDPIngameWidget::NativeConstruct()
@@ -75,11 +76,11 @@ void UDPIngameWidget::FindAndUpdateTextBlocks(UWidget* ParentWidget)
 	}
 	else if (UUserWidget* UserWidget = Cast<UUserWidget>(ParentWidget))
 	{
-		UWidgetTree* WidgetTree = UserWidget->WidgetTree;
-		if (WidgetTree)
+		UWidgetTree* LocalWidgets = UserWidget->WidgetTree;
+		if (LocalWidgets)
 		{
 			TArray<UWidget*> AllWidgets;
-			WidgetTree->GetAllWidgets(AllWidgets);
+			LocalWidgets->GetAllWidgets(AllWidgets);
 			for (UWidget* ChildWidget : AllWidgets)
 			{
 				FindAndUpdateTextBlocks(ChildWidget);
