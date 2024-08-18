@@ -119,6 +119,7 @@ void UGI_Zoomies::CreateSession()
 	session_settings_->bUsesPresence = true; // Use presence for the session
 	session_settings_->bAllowInvites = true;
 	// session_settings_->bAllowJoinViaPresenceFriendsOnly
+	
 	if (bIsOnline)
 	{
 		session_settings_->bUseLobbiesIfAvailable = true; // Use lobbies if available
