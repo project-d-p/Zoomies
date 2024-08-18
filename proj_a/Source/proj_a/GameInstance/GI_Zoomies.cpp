@@ -70,14 +70,17 @@ void UGI_Zoomies::CreateSession()
 {
 	FNetLogger::LogError(TEXT("CreateSession_t"));
 	session_settings_ = MakeShareable(new FOnlineSessionSettings());
-	// session_settings_->bIsLANMatch = false;
-	session_settings_->bIsLANMatch = true; // for LAN testing
-	session_settings_->NumPublicConnections = 4;
-	session_settings_->bShouldAdvertise = true;
-	session_settings_->bAllowJoinInProgress = true;
-	session_settings_->bUsesPresence = true;
-	session_settings_->bAllowInvites = true; 
-	session_settings_->bAllowJoinViaPresenceFriendsOnly = false;
+	// session create 시
+	session_settings_->bIsLANMatch = false;
+	session_settings_->NumPublicConnections = 4; // Number of players
+	session_settings_->bShouldAdvertise = true; // Advertise the session to others
+	session_settings_->bAllowJoinInProgress = true; // Allow joining in progress
+	session_settings_->bAllowJoinViaPresence = true; // Allow joining via presence (show sessions to players in current regions)
+	// Presence and lobby settings
+	session_settings_->bUsesPresence = true; // Use presence for the session
+	session_settings_->bUseLobbiesIfAvailable = true; // Use lobbies if available
+
+	SessionName = FName(*FString::Printf(TEXT("GameSession_%s"), *FGuid::NewGuid().ToString()));
 	
 	// add delegate to handle the result of created session
 	session_settings_->Set(
@@ -88,7 +91,7 @@ void UGI_Zoomies::CreateSession()
 		FOnCreateSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onCreateComplete));
     
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
-	session_interface_->CreateSession(*local_player->GetPreferredUniqueNetId(), NAME_GameSession, *session_settings_);
+	session_interface_->CreateSession(*local_player->GetPreferredUniqueNetId(), SessionName, *session_settings_);
 }
 
 void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
@@ -393,19 +396,18 @@ void UGI_Zoomies::LogFriendsNicknames()
 						FColor::Green,                     // 메시지 색상
 						FString::Printf(TEXT("Friend: %s"), *FriendNickname)  // 메시지 내용
 					);
+					FString SessionNameString = SessionName.ToString();
+					
+					GEngine->AddOnScreenDebugMessage(
+						-1,                                // 메세지 ID, -1로 설정하면 새로운 메시지를 추가
+						5.0f,                              // 메시지가 화면에 표시될 시간 (초)
+						FColor::Green,                     // 메시지 색상
+						FString::Printf(TEXT("Friend: %s"), *SessionNameString)  // 메시지 내용
+					);
 				}
 				FString Target = TEXT("parkjoungwan");
 				if (FriendNickname == Target)
 				{
-					if (GEngine)
-					{
-						GEngine->AddOnScreenDebugMessage(
-							-1,                                // 메세지 ID, -1로 설정하면 새로운 메시지를 추가
-							5.0f,                              // 메시지가 화면에 표시될 시간 (초)
-							FColor::Green,                     // 메시지 색상
-							FString::Printf(TEXT("Find: %s"), *FriendNickname)  // 메시지 내용
-						);
-					}
 					FUniqueNetIdPtr FriendId = Friend->GetUserId();
 					InviteFriendToGame(FriendId);
 					break;
@@ -434,7 +436,7 @@ void UGI_Zoomies::InviteFriendToGame(FUniqueNetIdPtr FriendId)
 	if (session_interface_.IsValid())
 	{
 		// 초대 보내기
-		bool bInviteSent = session_interface_->SendSessionInviteToFriend(0, NAME_GameSession, *FriendId);
+		bool bInviteSent = session_interface_->SendSessionInviteToFriend(0, SessionName, *FriendId);
 		if (bInviteSent)
 		{
 			if (GEngine)

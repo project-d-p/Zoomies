@@ -33,6 +33,8 @@ public:
 	void OnFriendsListReadComplete(int32 LocalUserNum, bool bWasSuccessful, const FString& ListName, const FString& ErrorStr);
 	void LogFriendsNicknames();
 	void InviteFriendToGame(FUniqueNetIdPtr FriendId);
+	UPROPERTY(VisibleAnywhere, Category = "Network")
+	FName SessionName = "";
 
 	int player_count = 0;
 private:
@@ -59,13 +61,11 @@ private:
 	void OnDestroyComplete(FName session_name, bool bWasSuccessful);
 	FDelegateHandle dh_on_destroy_complete;
 
-
 	int count = 0;
 	int max_count = 5;
 	bool is_steamAPI_init = false;
 	bool is_online_session_steam_init=false;
 
-	
 	FTimerHandle UnusedHandle;
 	void CheckSteamInit();
 	void InitSteamAPI();
