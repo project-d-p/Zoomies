@@ -56,6 +56,9 @@ public:	// component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UMonsterSlotComponent* monsterSlotComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PostProcess")
+	class UPostProcessComponent* postProcessComponent;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
 	UAnimMontage* characterMontage;
 
@@ -67,6 +70,9 @@ public:	// component
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MatchLobby")
 	UWidgetComponent* LobbyInfoWidgetComponent = nullptr;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
+	//UMaterialInstanceDynamic* dynamicMaterialInstance;
 
 	UPROPERTY()
 	TSubclassOf<UNameTag> NameTag_BP;
@@ -152,4 +158,6 @@ public:
 	float speed{ 0.f };
 	bool isAim{ false };
 	bool mIsAtReturnPlace{ true };
+	UPROPERTY(BlueprintReadWrite)
+	bool isKnockback{ false };
 };

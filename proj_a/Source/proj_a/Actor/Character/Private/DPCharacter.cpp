@@ -23,6 +23,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "DSP/LFO.h"
+#include "Components/PostProcessComponent.h"
+#include "Materials/MaterialInstanceConstant.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerState.h"
@@ -167,6 +169,17 @@ ADPCharacter::ADPCharacter()
 		NameTag_WidgetComponent->SetWorldScale3D(FVector(0.6f, 0.6f, 0.6f));
 	}
 
+	postProcessComponent = CreateDefaultSubobject<UPostProcessComponent>(TEXT("postProcessComponent"));
+	postProcessComponent->SetupAttachment(RootComponent);
+
+	static ConstructorHelpers::FObjectFinder<UMaterialInstanceConstant> PostProcessMaterial
+	(TEXT("MaterialInstanceConstant'/Game/material/postprocess/mpp_dizzle_Inst.mpp_dizzle_Inst'"));
+	if (PostProcessMaterial.Succeeded())
+	{
+		postProcessComponent->AddOrUpdateBlendable(PostProcessMaterial.Object, 1.0f);
+		postProcessComponent->BlendWeight = 0.0f;
+	}
+
 	if (UWorld* World = GetWorld())
 	{
 		FString CurrentLevelName = UGameplayStatics::GetCurrentLevelName(World);
@@ -259,15 +272,15 @@ void ADPCharacter::BeginPlay()
 		NameTag_WidgetComponent->SetVisibility(false);
 	}
 	
-	if (GetMesh()) {
-		UMaterialInterface* Material = GetMesh()->GetMaterial(0);
-		if (Material) {
-			dynamicMaterialInstance = UMaterialInstanceDynamic::Create(Material, this);
-			GetMesh()->SetMaterial(0, dynamicMaterialInstance);
-		}
-	}
-	if (dynamicMaterialInstance)
-		dynamicMaterialInstance->SetVectorParameterValue(FName("color"), FVector4(0.f, 0.f, 1.f, 1.f));
+	//if (GetMesh()) {
+	//	UMaterialInterface* Material = GetMesh()->GetMaterial(0);
+	//	if (Material) {
+	//		dynamicMaterialInstance = UMaterialInstanceDynamic::Create(Material, this);
+	//		GetMesh()->SetMaterial(0, dynamicMaterialInstance);
+	//	}
+	//}
+	//if (dynamicMaterialInstance)
+	//	dynamicMaterialInstance->SetVectorParameterValue(FName("color"), FVector4(0.f, 0.f, 1.f, 1.f));
 
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AReturnTriggerVolume::StaticClass(), FoundActors);
@@ -504,6 +517,9 @@ void ADPCharacter::ApplyStunEffect()
 	{
 		StunEffectComponent->Activate(true);
 	}
+	if (IsLocallyControlled()) {
+		postProcessComponent->BlendWeight = 1.f;
+	}
 }
 
 void ADPCharacter::RemoveStunEffect()
@@ -527,6 +543,9 @@ void ADPCharacter::RemoveStunEffect()
 	}
 	StunEffectComponent->Deactivate();
 	// TODO: Invincible Effect
+	if (IsLocallyControlled()) {
+		postProcessComponent->BlendWeight = 0.f;
+	}
 }
 
 void ADPCharacter::ApplyKockback_Implementation(const FHitResult& HitResult)
@@ -568,6 +587,7 @@ void ADPCharacter::ApplyKockback_Implementation(const FHitResult& HitResult)
 			{
 				// Reset Movement Mode
 				MovementComponent->SetMovementMode(PreviousMovementMode);
+				isKnockback = false;
 			}
 		}, 0.5f, false);
 	}
