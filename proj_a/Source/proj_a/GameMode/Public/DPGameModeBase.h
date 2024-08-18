@@ -58,7 +58,7 @@ public:
 	virtual UServerChatManager* GetChatManager() const override { return ChatManager; }
 	
 	// monster
-	enum { NUM_OF_MAX_MONSTERS = 100 };
+	enum { NUM_OF_MAX_MONSTERS = 10 };
 	std::vector<ABaseMonsterAIController*> monster_controllers_;
 	std::vector<int32> empty_monster_slots_;
 
@@ -112,7 +112,7 @@ private:
 	void SpawnMonsters(float delta_time);
 
 	// Member variables
-	enum { NUM_OF_MAX_CLIENTS = 1 };
+	enum { NUM_OF_MAX_CLIENTS = 4 };
 
 	// SteamNetworkingSocket* steam_listen_socket_ = nullptr;
 	UPROPERTY()

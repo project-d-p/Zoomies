@@ -274,7 +274,7 @@ void ADPGameModeBase::Logout(AController* Exiting)
 void ADPGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	BlockingVolume = GetWorld()->SpawnActor<ABlockingBoxVolume>(ABlockingBoxVolume::StaticClass(), FVector(0.0f, 0.0f, 0.0f), FRotator(0.0f, 0.0f, 0.0f));
 }
 

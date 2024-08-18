@@ -11,6 +11,7 @@
 #include "MainLevelComponent.h"
 #include "ResultLevelComponent.h"
 #include "CompileMode.h"
+#include "LobbyLevelComponent.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 DEFINE_LOG_CATEGORY(LogNetwork);
@@ -27,12 +28,14 @@ ADPPlayerController::ADPPlayerController()
 	
 	UBaseLevelComponent* MainLevelComponet = CreateDefaultSubobject<UMainLevelComponent>(TEXT("MainLevelComponent"));
 	UBaseLevelComponent* ResultLevelComponet = CreateDefaultSubobject<UResultLevelComponent>(TEXT("ResultLevelComponent"));
+	UBaseLevelComponent* LobbyLevelComponent = CreateDefaultSubobject<ULobbyLevelComponent>(TEXT("LobbyLevelComponent"));
 
 	MainLevelComponet->InitializeController(this);
 	ResultLevelComponet->InitializeController(this);
 	
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::MAIN), MainLevelComponet);
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::RESULT), ResultLevelComponet);
+	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::LOBBY), LobbyLevelComponent);
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::NONE), nullptr);
 }
 
