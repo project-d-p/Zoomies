@@ -180,9 +180,6 @@ ADPCharacter::ADPCharacter()
 		postProcessComponent->BlendWeight = 0.0f;
 	}
 
-}
-
-
 	if (UWorld* World = GetWorld())
 	{
 		FString CurrentLevelName = UGameplayStatics::GetCurrentLevelName(World);
