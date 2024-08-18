@@ -35,6 +35,8 @@ void UDPIngameWidget::NativeConstruct()
 		ScoreUiInitializer.Player3ScoreText = player3Score_Text;
 		ScoreUI->InitScoreUi(ScoreUiInitializer);
 	}
+	
+	FindAndUpdateTextBlocks(this);
 
 	ScoreUI_Private = NewObject<UScoreUiPrivate>(this);
 	if (ScoreUI_Private)
@@ -42,6 +44,80 @@ void UDPIngameWidget::NativeConstruct()
 		FPrivateScoreUiInitializer PrivateScoreUiInitializer;
 		PrivateScoreUiInitializer.InWorld = GetWorld();
 		PrivateScoreUiInitializer.ScoreTextPrivate = score_Text_Private;
+		PrivateScoreUiInitializer.ScoreTextPrivate_Front = scoreFront;
+		PrivateScoreUiInitializer.ScoreTextPrivate_Back = scoreBack;
+		PrivateScoreUiInitializer.ScoreTextPrivate_Job = scoreJob;
+		PrivateScoreUiInitializer.ScoreTextPrivate_Total = scoreTotal;
 		ScoreUI_Private->InitScoreUiPrivate(PrivateScoreUiInitializer);
+	}
+}
+
+void UDPIngameWidget::FindAndUpdateTextBlocks(UWidget* ParentWidget)
+{
+	if (!ParentWidget)
+		return;
+
+	if (UTextBlock* TextBlock = Cast<UTextBlock>(ParentWidget))
+	{
+		if (TextBlock->GetName() == "Text_Title")
+		{
+			UpdateTextBlock(TextBlock);
+		}
+	}
+
+	if (UPanelWidget* PanelWidget = Cast<UPanelWidget>(ParentWidget))
+	{
+		for (int32 i = 0; i < PanelWidget->GetChildrenCount(); ++i)
+		{
+			UWidget* ChildWidget = PanelWidget->GetChildAt(i);
+			FindAndUpdateTextBlocks(ChildWidget);
+		}
+	}
+	else if (UUserWidget* UserWidget = Cast<UUserWidget>(ParentWidget))
+	{
+		UWidgetTree* WidgetTree = UserWidget->WidgetTree;
+		if (WidgetTree)
+		{
+			TArray<UWidget*> AllWidgets;
+			WidgetTree->GetAllWidgets(AllWidgets);
+			for (UWidget* ChildWidget : AllWidgets)
+			{
+				FindAndUpdateTextBlocks(ChildWidget);
+			}
+		}
+	}
+}
+
+void UDPIngameWidget::UpdateTextBlock(UTextBlock* TextBlock)
+{
+	if (!TextBlock)
+		return;
+
+	UObject* Outer = TextBlock->GetOuter()->GetOuter();
+	FString OuterName = Outer ? Outer->GetName() : "Unknown";
+
+	if (OuterName.Contains("WBP_InGame_ScoreBox_Front"))
+	{
+		// TextBlock->SetText(FText::FromString("12"));
+		scoreFront = TextBlock;
+	}
+	else if (OuterName.Contains("WBP_InGame_ScoreBox_Back"))
+	{
+		// TextBlock->SetText(FText::FromString("34"));
+		scoreBack = TextBlock;
+	}
+	else if (OuterName.Contains("WBP_InGame_ScoreBox_Job"))
+	{
+		// TextBlock->SetText(FText::FromString("jobbb"));
+		scoreJob = TextBlock;
+	}
+	else if (OuterName.Contains("WBP_InGame_ScoreBox_Total"))
+	{
+		// TextBlock->SetText(FText::FromString("totallll"));
+		scoreTotal = TextBlock;
+	}
+	else
+	{
+		TextBlock->SetText(FText::FromString("else"));
 	}
 }
