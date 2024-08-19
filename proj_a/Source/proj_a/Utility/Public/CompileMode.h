@@ -7,8 +7,6 @@
 //     0       |    1     : LAN
 //     1       |    0     : Editor
 
-#define EDITOR_MODE 1
-
 #ifndef EDITOR_MODE
 	#define EDITOR_MODE 0
 #endif

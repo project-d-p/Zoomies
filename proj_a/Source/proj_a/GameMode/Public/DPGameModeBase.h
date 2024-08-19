@@ -136,7 +136,7 @@ private:
 	bool bStart = false;
 	bool bTimeSet = false;
 	/* Set Play Time */
-	const float PLAY_TIME = 300.f;
+	const float PLAY_TIME = 240.f;
 
 	/* For Monster Movement Manage (Interval & Process) */
 	UPROPERTY(EditAnywhere, Category = "Debug")
