@@ -22,7 +22,7 @@ private:
 	void Active(const FInputActionValue& value);
 	
 	UPROPERTY(VisibleAnywhere, Category = Input)
-	class UInputMappingContext* MainLevelContext;
+	class UInputMappingContext* LobbyLevelContext;
 	
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* ActiveAction;
