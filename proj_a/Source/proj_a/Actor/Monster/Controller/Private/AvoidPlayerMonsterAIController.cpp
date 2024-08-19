@@ -45,7 +45,7 @@ void AAvoidPlayerMonsterAIController::MoveToRandomTargetLocation()
 
 void AAvoidPlayerMonsterAIController::RunEQSQuery()
 {
-	UEnvQuery* Query = LoadObject<UEnvQuery>(
+	static UEnvQuery* Query = LoadObject<UEnvQuery>(
 		nullptr,
 			TEXT("/Game/EQS/EQS_CheckDistanceToPlayer.EQS_CheckDistanceToPlayer"));
 	if (Query)

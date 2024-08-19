@@ -242,7 +242,7 @@ void ADPCharacter::SetNameTag()
 	else
 	{
 		static int32 RetryCount = 0;
-		if (RetryCount < 5) // ÃÖ´ë 5È¸¸¸ ½Ãµµ
+		if (RetryCount < 5) // ï¿½Ö´ï¿½ 5È¸ï¿½ï¿½ ï¿½Ãµï¿½
 		{
 			RetryCount++;
 			FTimerHandle TimerHandle;
@@ -463,8 +463,7 @@ void ADPCharacter::UpdateNameTagRotation()
 			}
 			FVector CameraLocation = PlayerController->PlayerCameraManager->GetCameraLocation();
 			FRotator NewRotation = (CameraLocation - NameTag_WidgetComponent->GetComponentLocation()).Rotation();
-            
-			// ¿ÀÁ÷ Yaw È¸Àü¸¸ Àû¿ë
+           
 			NewRotation.Pitch = 0.0f;
 			NewRotation.Roll = 0.0f;
             
@@ -564,7 +563,7 @@ void ADPCharacter::RemoveStunEffect()
 
 void ADPCharacter::ApplyKockback_Implementation(const FHitResult& HitResult)
 {
-	// Ãæµ¹ ÁöÁ¡¿¡¼­ Ä³¸¯ÅÍ À§Ä¡·ÎÀÇ ¹æÇâÀ» °è»ê
+	// ï¿½æµ¹ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ä³ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 	FVector KnockbackDirection = GetActorLocation() - HitResult.ImpactPoint;
 	// FVector KnockbackDirection = -HitResult.ImpactNormal;
 	KnockbackDirection.Z = 20.0f;
@@ -578,10 +577,10 @@ void ADPCharacter::ApplyKockback_Implementation(const FHitResult& HitResult)
 		KnockbackDirection = GetActorForwardVector() * -1;
 	}
 
-	// ³Ë¹é ¼Óµµ ¼³Á¤
+	// ï¿½Ë¹ï¿½ ï¿½Óµï¿½ ï¿½ï¿½ï¿½ï¿½
 	float KnockbackSpeed = 2000.0f;
 
-	// Character Movement Component °¡Á®¿À±â
+	// Character Movement Component ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
 	if (MovementComponent)
 	{

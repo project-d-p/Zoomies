@@ -16,7 +16,9 @@ private:
 	const float EQSQueryTime = 0.5;
 	const float DeSpawnTime = 10.0f;
 
+	UPROPERTY(EditAnywhere, Category = "Timer")
 	float elapsed_EQSQueryTime = 0;
+	UPROPERTY(EditAnywhere, Category = "Timer")
 	float elapsed_DeSpawnTime = 0;
 	
 	FVector CachedSafeLocation;

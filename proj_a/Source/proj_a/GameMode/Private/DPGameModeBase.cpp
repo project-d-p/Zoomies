@@ -170,7 +170,7 @@ float ADPGameModeBase::CalculateMoveInterval(float DistanceToPlayer)
     return MAX_INTERVAL;
 }
 
-bool ADPGameModeBase::ShouldProcessMonster(ABaseMonsterCharacter* InMonster, float& delta_time)
+bool ADPGameModeBase:: ShouldProcessMonster(ABaseMonsterCharacter* InMonster, float& delta_time)
 {
 	float& MonsterTimer = MonsterOptimizationData.FindOrAdd(InMonster).Timer;
 	MonsterTimer += delta_time;
@@ -316,7 +316,6 @@ void ADPGameModeBase::Tick(float delta_time)
 			bTimeSet = true;
 			TimerManager->StartTimer<ADPInGameState>(PLAY_TIME, &ADPGameModeBase::EndGame, this);
 		}
-
 		this->ProcessData(delta_time);
 #if EDITOR_MODE != 1
 	}
@@ -356,7 +355,7 @@ void ADPGameModeBase::MonsterMoveSimulate(float delta_time)
 	constexpr float PLAYER_SEARCH_INTERVAL = 0.5f;
 	static float player_search_timer = 0.f;
 	player_search_timer += delta_time;
-	
+
 	for (auto mc : monster_controllers_)
 	{
 		if (!mc)
@@ -377,10 +376,11 @@ void ADPGameModeBase::MonsterMoveSimulate(float delta_time)
 			UpdateMonsterData(M);
 			M->GetMovementComponent()->PrimaryComponentTick.TickInterval = CalculateTickInterval(M);
 		}
-		
-		if (ShouldProcessMonster(M, delta_time))
+
+		float tTime = delta_time;
+		if (ShouldProcessMonster(M, tTime))
 		{
-			mc->SimulateMovement(delta_time);
+			mc->SimulateMovement(tTime);
 		}
 	}
 	if (player_search_timer >= PLAYER_SEARCH_INTERVAL)
@@ -413,7 +413,7 @@ void ADPGameModeBase::SpawnMonsters(float delta_time)
 {
 	static float spawn_timer = 0.0f;
 	constexpr float spawn_interval = 0.1f;
-
+	
 	spawn_timer += delta_time;
 	if (spawn_timer >= spawn_interval)
 	{
