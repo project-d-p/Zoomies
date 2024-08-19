@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Interfaces/OnlineFriendsInterface.h"
 #include "TYPE_MatchingLobby.generated.h"
 
 #define MAX_USERS 2
@@ -39,6 +40,19 @@ struct FCurrentSessionInfo
 
 	UPROPERTY(BlueprintReadWrite, Category = "Session")
 	FString SessionID;
+};
+
+USTRUCT(BlueprintType)
+struct FFriendInfo
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadOnly, Category = "Friends")
+	FText FriendNickname;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Friends")
+	FString FriendId;
 };
 
 UCLASS()

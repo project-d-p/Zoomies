@@ -34,11 +34,6 @@ void AGM_MatchingLobby::PostLogin(APlayerController* NewPlayer) {
 	{
 		PC->SetCineCameraView();
 	}
-	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
-	if (IsValid(GameInstance))
-	{
-		GameInstance->ReadFriendList();
-	}
 	CheckAndUpdateLobbyPlatform();
 }
 
@@ -57,6 +52,11 @@ void AGM_MatchingLobby::Logout(AController* Exiting) {
 void AGM_MatchingLobby::BeginPlay() {
 	Super::BeginPlay();
 	FindAndStoreLobbyPlatforms();
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (IsValid(GameInstance))
+	{
+		GameInstance->LoadFriendsList();
+	}
 }
 
 void AGM_MatchingLobby::CheckReadyToStart() 

@@ -167,7 +167,7 @@ ADPCharacter::ADPCharacter()
 			}
 	
 			LobbyInfoWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("LobbyInfoWidgetComponent"));
-			static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClass(TEXT("/Game/widget/widget_LobbyInfo.widget_LobbyInfo_C"));
+			static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClass(TEXT("/Game/widget/WBP_MatchLobby/widget_LobbyInfo.widget_LobbyInfo_C"));
 			if (WidgetClass.Succeeded())
 			{
 				LobbyInfoWidgetComponent->SetWidgetClass(WidgetClass.Class);

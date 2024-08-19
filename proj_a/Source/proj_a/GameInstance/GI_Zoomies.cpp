@@ -7,6 +7,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Online/OnlineSessionNames.h"
 #include "Interfaces/OnlineFriendsInterface.h"
+#include "OnlineSubsystemUtils.h"
+#include "proj_a/MatchingLobby/TYPE_MatchingLobby/TYPE_MatchingLobby.h"
 
 void UGI_Zoomies::Init()
 {
@@ -23,6 +25,11 @@ void UGI_Zoomies::StartMatchMaking()
 IOnlineSessionPtr UGI_Zoomies::GetOnlineSessionInterface() const
 {
 	return session_interface_;
+}
+
+IOnlineSubsystem* UGI_Zoomies::GetOnlineSubsystemInterface() const
+{
+	return online_subsystem_;
 }
 
 void UGI_Zoomies::FindSession()
@@ -317,30 +324,9 @@ void UGI_Zoomies::InitOnlineSubsystemSteam()
 		}
 		UE_LOG(LogTemp, Log, TEXT("Online Subsystem steam init failed"));
 	}
-}
-
-void UGI_Zoomies::SetupSteamInvite()
-{
-	IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
-	if (Subsystem && Subsystem->GetSubsystemName() == "Steam")
+	else
 	{
-		IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
-		if (SessionInterface.IsValid())
-		{
-			FString InviteUrl;
-			if (SessionInterface->GetResolvedConnectString(NAME_GameSession, InviteUrl))
-			{
-				// Steam Rich Presence 설정
-				if (SteamFriends())
-				{
-					SteamFriends()->SetRichPresence("connect", TCHAR_TO_UTF8(*InviteUrl));
-                    
-					// 추가 정보 설정 (선택사항)
-					SteamFriends()->SetRichPresence("status", "In Game");
-					SteamFriends()->SetRichPresence("steam_display", "#StatusInGame");
-				}
-			}
-		}
+		ReadFriendList();
 	}
 }
 
@@ -358,7 +344,7 @@ void UGI_Zoomies::ReadFriendList()
 	}
 }
 
-void UGI_Zoomies::LogFriendsNicknames()
+void UGI_Zoomies::LoadFriendsList()
 {
 	IOnlineFriendsPtr Friends = online_subsystem_->GetFriendsInterface();
 	if (Friends.IsValid())
@@ -367,37 +353,14 @@ void UGI_Zoomies::LogFriendsNicknames()
 
 		if (Friends->GetFriendsList(0, ListName, FriendsList))
 		{
-			// 친구 리스트 순회
 			for (auto Friend : FriendsList)
 			{
-				// 친구의 닉네임 가져오기
+				FFriendInfo NewFriend;
 				FString FriendNickname = Friend->GetDisplayName();
-
-				// 디버그 메시지 출력
-				if (GEngine)
-				{
-					GEngine->AddOnScreenDebugMessage(
-						-1,                                // 메세지 ID, -1로 설정하면 새로운 메시지를 추가
-						5.0f,                              // 메시지가 화면에 표시될 시간 (초)
-						FColor::Green,                     // 메시지 색상
-						FString::Printf(TEXT("Friend: %s"), *FriendNickname)  // 메시지 내용
-					);
-					FString SessionNameString = SessionName.ToString();
-					
-					GEngine->AddOnScreenDebugMessage(
-						-1,                                // 메세지 ID, -1로 설정하면 새로운 메시지를 추가
-						5.0f,                              // 메시지가 화면에 표시될 시간 (초)
-						FColor::Green,                     // 메시지 색상
-						FString::Printf(TEXT("Friend: %s"), *SessionNameString)  // 메시지 내용
-					);
-				}
-				FString Target = TEXT("parkjoungwan");
-				if (FriendNickname == Target)
-				{
-					FUniqueNetIdPtr FriendId = Friend->GetUserId();
-					InviteFriendToGame(FriendId);
-					break;
-				}
+				FUniqueNetIdPtr FriendId = Friend->GetUserId();
+				NewFriend.FriendNickname = FText::FromString(FriendNickname);
+				NewFriend.FriendId = FriendId->ToString();
+				FriendsArray.Add(NewFriend);
 			}
 		}
 		else
@@ -414,6 +377,83 @@ void UGI_Zoomies::LogFriendsNicknames()
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("온라인 친구 인터페이스를 사용할 수 없습니다."));
 		}
+	}
+}
+
+void UGI_Zoomies::LogFriendsNicknames()
+{
+	for (int32 i = 0; i < FriendsArray.Num(); ++i)
+	{
+		const FFriendInfo& Friend = FriendsArray[i];
+		FString Message = FString::Printf(TEXT("Friend Nickname: %s, Friend ID: %s"),
+										  *Friend.FriendNickname.ToString(), *Friend.FriendId);
+		
+		// 화면에 디버그 메시지 출력
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, Message);
+		if (Friend.FriendNickname.ToString() == "parkjoungwan")
+		{
+			//convert Friend.FriendId to FUniqueNetIdPtr
+			IOnlineIdentityPtr IdentityInterface = online_subsystem_->GetIdentityInterface();
+			FUniqueNetIdPtr netid = IdentityInterface->CreateUniquePlayerId(Friend.FriendId);
+			InviteFriendToGame(netid);
+		}
+	}
+}
+
+void UGI_Zoomies::makeFriendList()
+{
+	IOnlineFriendsPtr Friends = online_subsystem_->GetFriendsInterface();
+	if (Friends.IsValid())
+	{
+		FString ListName = TEXT("Default");
+
+		if (Friends->GetFriendsList(0, ListName, FriendsList))
+		{
+			static ConstructorHelpers::FClassFinder<UUserWidget> FriendListWidgetClassFinder(TEXT("/Game/widget/WBP_MatchLobby/WBP_FriendList.WBP_FriendList_C"));
+			if (FriendListWidgetClassFinder.Succeeded())
+			{
+				FriendListWidget = CreateWidget<UUserWidget>(GetWorld(), FriendListWidgetClassFinder.Class);
+				if (FriendListWidget)
+				{
+					UScrollBox* ScrollBox = Cast<UScrollBox>(FriendListWidget->GetWidgetFromName(TEXT("SB_FriendList")));
+					if (ScrollBox)
+					{
+						for (auto& Friend : FriendsList)
+						{
+							FString FriendNickname = Friend->GetDisplayName();
+
+							static ConstructorHelpers::FClassFinder<UUserWidget> SteamIDWidgetClassFinder(TEXT("/Game/widget/WBP_MatchLobbyt/WBP_SteamID.WBP_SteamID_C"));
+							if (SteamIDWidgetClassFinder.Succeeded())
+							{
+								// WBP_SteamID load
+								UUserWidget* SteamIDWidget = CreateWidget<UUserWidget>(GetWorld(), SteamIDWidgetClassFinder.Class);
+								if (SteamIDWidget)
+								{
+									// T_FriendName set Text
+									UTextBlock* FriendNameTextBlock = Cast<UTextBlock>(SteamIDWidget->GetWidgetFromName(TEXT("T_FriendName")));
+									if (FriendNameTextBlock)
+									{
+										FriendNameTextBlock->SetText(FText::FromString(FriendNickname));
+									}
+									// SteamID add child
+									ScrollBox->AddChild(SteamIDWidget);
+								}
+							}
+						}
+					}
+					// set on screen
+					FriendListWidget->AddToViewport();
+				}
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("Failed to get friends list"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("Failed to get friends interface"));
 	}
 }
 

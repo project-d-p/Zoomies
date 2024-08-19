@@ -6,6 +6,7 @@
 #include "OnlineSubsystem.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "ScoreTypes.h"
+#include "proj_a/MatchingLobby/TYPE_MatchingLobby/TYPE_MatchingLobby.h"
 #include "GI_Zoomies.generated.h"
 
 UCLASS()
@@ -21,21 +22,27 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void StartMatchMaking();
 	IOnlineSessionPtr GetOnlineSessionInterface() const;
+	IOnlineSubsystem* GetOnlineSubsystemInterface() const;
 	TArray<TSharedRef<FOnlineFriend>> FriendsList;
 
 	/* Number of players before Seamless Travel */
 	bool ResetSession();
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void OnSessionFailure();
-	void SetupSteamInvite();
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void ShowSteamInviteOverlay();
 	void ReadFriendList();
+	void LoadFriendsList();
 	void LogFriendsNicknames();
 	void InviteFriendToGame(FUniqueNetIdPtr FriendId);
+	void makeFriendList();
+	
 	UPROPERTY(VisibleAnywhere, Category = "Network")
 	FName SessionName = "";
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MatchLobby")
+	UUserWidget* FriendListWidget = nullptr;
+	UPROPERTY(BlueprintReadOnly, Category = "Friends")
+	TArray<FFriendInfo> FriendsArray;
 	int player_count = 0;
 private:
 	// Online subsystem & session interface pointers
