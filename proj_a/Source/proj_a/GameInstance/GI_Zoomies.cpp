@@ -365,6 +365,10 @@ void UGI_Zoomies::LoadFriendsList()
 				NewFriend.IsOnline = IsOnline;
 				FriendsArray.Add(NewFriend);
 			}
+			FriendsArray.Sort([](const FFriendInfo& A, const FFriendInfo& B)
+			{
+				return A.IsOnline && !B.IsOnline;
+			});
 		}
 		else
 		{
