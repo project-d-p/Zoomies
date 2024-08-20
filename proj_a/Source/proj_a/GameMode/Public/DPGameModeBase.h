@@ -107,4 +107,5 @@ private:
 	ABlockingBoxVolume* BlockingVolume;
 	bool bStart = false;
 	bool bTimeSet = false;
+	bool bWallDisappear = false;
 };

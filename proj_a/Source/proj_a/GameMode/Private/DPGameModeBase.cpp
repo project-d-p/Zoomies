@@ -189,7 +189,7 @@ void ADPGameModeBase::Tick(float delta_time)
 #endif
 		if (bTimeSet == false)
 		{
-			BlockingVolume->DeactiveBlockingVolume();
+			BlockingVolume->DeactiveBlockingVolume(bWallDisappear);
 			bTimeSet = true;
 			for (auto& pair: player_controllers_)
 			{
@@ -203,7 +203,6 @@ void ADPGameModeBase::Tick(float delta_time)
 			}
 			TimerManager->StartTimer<ADPInGameState>(300.f, &ADPGameModeBase::EndGame, this);
 		}
-
 		this->ProcessData(delta_time);
 #if EDITOR_MODE != 1
 	}
@@ -222,8 +221,11 @@ void ADPGameModeBase::ProcessData(float delta_time)
 {
 	message_queue_ = NetworkManager->GetRecievedMessages();
 
-	this->SpawnMonsters(delta_time);
-	this->MonsterMoveSimulate(delta_time);
+	if (bWallDisappear)
+	{
+		this->SpawnMonsters(delta_time);
+		this->MonsterMoveSimulate(delta_time);
+	}
 	while (!this->message_queue_.empty())
 	{
 		Message message = this->message_queue_.front();
