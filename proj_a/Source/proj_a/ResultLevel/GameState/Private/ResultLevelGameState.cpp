@@ -2,6 +2,7 @@
 
 #include "DPCharacter.h"
 #include "DPPlayerController.h"
+#include "EngineUtils.h"
 #include "EnumTypes.h"
 #include "PathManager.h"
 #include "ResultWidgetActor.h"
@@ -242,6 +243,26 @@ void AResultLevelGameState::OnRep_IsAllSet()
 		if (ResultActor)
 		{
 			ResultActor->StartWidget();
+		}
+	}
+}
+
+void AResultLevelGameState::SetWinner()
+{
+	FString Winner = PlayerScores[0].PlayerName;
+	UE_LOG(LogTemp, Warning, TEXT("Winner : %s"), *Winner);
+
+	FString MyName = GetWorld()->GetFirstPlayerController()->PlayerState->GetPlayerName();
+
+	for (TActorIterator<ADPCharacter> It(GetWorld()); It; ++It)
+	{
+		ADPCharacter* Character = *It;
+		if (Character)
+		{
+			if (Character->GetPlayerState()->GetPlayerName() == Winner)
+			{
+				Character->SetCrownMesh();
+			}
 		}
 	}
 }

@@ -80,6 +80,9 @@ public:	// component
 	UNameTag* NameTag_Instance;
 	UPROPERTY()
 	UWidgetComponent* NameTag_WidgetComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	UStaticMesh* Crown;
 	
 	// stun effect
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "effects")
@@ -102,6 +105,8 @@ public:	// component
 	void ApplyKockback(const FHitResult& HitResult);
 	UFUNCTION(NetMulticast, Reliable)
 	void SetNameTag();
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void SetCrownMesh();
 
 	UPROPERTY(ReplicatedUsing=OnRep_SyncInvincible)
 	bool bIsInvincible = false;
@@ -129,6 +134,7 @@ public:	// component
 	
 protected:
 	void ClientNotifyAnimalReturn_Implementation(const FString& player_name);
+	void SetCrownMesh_Implementation();
 	
 private:
 	void UpdateNameTagRotation();
