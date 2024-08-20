@@ -113,7 +113,7 @@ public class proj_a : ModuleRules
             // "AdvancedSessions",
             // "AdvancedSteamSessions"
         });
-		PrivateDependencyModuleNames.AddRange(new string[] { "CinematicCamera" });
+		PrivateDependencyModuleNames.AddRange(new string[] { "CinematicCamera", "Core", "CoreUObject", "Engine", "OnlineSubsystem", "OnlineSubsystemUtils" });
 
 		string SteamSDKPath = Path.Combine(ModuleDirectory, "Steam");
 		if (Directory.Exists(SteamSDKPath))

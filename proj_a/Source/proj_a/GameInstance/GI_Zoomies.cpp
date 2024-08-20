@@ -7,7 +7,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Online/OnlineSessionNames.h"
 #include "Interfaces/OnlineFriendsInterface.h"
-#include "OnlineSubsystemUtils.h"
+#include "Online.h"
+#include "Interfaces/OnlinePresenceInterface.h"
 #include "proj_a/MatchingLobby/TYPE_MatchingLobby/TYPE_MatchingLobby.h"
 
 void UGI_Zoomies::Init()
@@ -358,8 +359,10 @@ void UGI_Zoomies::LoadFriendsList()
 				FFriendInfo NewFriend;
 				FString FriendNickname = Friend->GetDisplayName();
 				FUniqueNetIdPtr FriendId = Friend->GetUserId();
+				bool IsOnline = Friend->GetPresence().bIsOnline;
 				NewFriend.FriendNickname = FText::FromString(FriendNickname);
 				NewFriend.FriendId = FriendId->ToString();
+				NewFriend.IsOnline = IsOnline;
 				FriendsArray.Add(NewFriend);
 			}
 		}
@@ -388,19 +391,34 @@ void UGI_Zoomies::LogFriendsNicknames()
 		FString Message = FString::Printf(TEXT("Friend Nickname: %s, Friend ID: %s"),
 										  *Friend.FriendNickname.ToString(), *Friend.FriendId);
 		
-		// 화면에 디버그 메시지 출력
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, Message);
-		if (Friend.FriendNickname.ToString() == "parkjoungwan")
+	}
+}
+
+void UGI_Zoomies::InviteFriendToGame(FString FriendId)
+{
+	if (session_interface_.IsValid())
+	{
+		IOnlineIdentityPtr IdentityInterface = online_subsystem_->GetIdentityInterface();
+		FUniqueNetIdPtr uniqueNetId = IdentityInterface->CreateUniquePlayerId(FriendId);
+		// 초대 보내기
+		bool bInviteSent = session_interface_->SendSessionInviteToFriend(0, SessionName, *uniqueNetId);
+		if (bInviteSent)
 		{
-			//convert Friend.FriendId to FUniqueNetIdPtr
-			IOnlineIdentityPtr IdentityInterface = online_subsystem_->GetIdentityInterface();
-			FUniqueNetIdPtr netid = IdentityInterface->CreateUniquePlayerId(Friend.FriendId);
-			InviteFriendToGame(netid);
+			if (GEngine)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("친구에게 초대를 보냈습니다."));
+			}
+			UE_LOG(LogTemp, Log, TEXT("success to send invite"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Fail to send invite"));
 		}
 	}
 }
 
-void UGI_Zoomies::makeFriendList()
+/*void UGI_Zoomies::makeFriendList()
 {
 	IOnlineFriendsPtr Friends = online_subsystem_->GetFriendsInterface();
 	if (Friends.IsValid())
@@ -455,25 +473,4 @@ void UGI_Zoomies::makeFriendList()
 	{
 		UE_LOG(LogTemp, Log, TEXT("Failed to get friends interface"));
 	}
-}
-
-void UGI_Zoomies::InviteFriendToGame(FUniqueNetIdPtr FriendId)
-{
-	if (session_interface_.IsValid())
-	{
-		// 초대 보내기
-		bool bInviteSent = session_interface_->SendSessionInviteToFriend(0, SessionName, *FriendId);
-		if (bInviteSent)
-		{
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("친구에게 초대를 보냈습니다."));
-			}
-			UE_LOG(LogTemp, Log, TEXT("success to send invite"));
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Fail to send invite"));
-		}
-	}
-}
+}*/

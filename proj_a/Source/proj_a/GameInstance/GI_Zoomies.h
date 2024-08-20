@@ -34,8 +34,9 @@ public:
 	void ReadFriendList();
 	void LoadFriendsList();
 	void LogFriendsNicknames();
-	void InviteFriendToGame(FUniqueNetIdPtr FriendId);
-	void makeFriendList();
+	UFUNCTION(BlueprintCallable, Category = "Network")
+	void InviteFriendToGame(FString FriendId);
+	//void makeFriendList();
 	
 	UPROPERTY(VisibleAnywhere, Category = "Network")
 	FName SessionName = "";

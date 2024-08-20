@@ -53,6 +53,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Friends")
 	FString FriendId;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "Friends")
+	bool IsOnline;
 };
 
 UCLASS()
