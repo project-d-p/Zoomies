@@ -60,3 +60,8 @@ void ADPPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(ADPPlayerState, PlayerJob);
 	DOREPLIFETIME(ADPPlayerState, Rank);
 }
+
+void ADPPlayerState::SetPlayerRandomJob()
+{
+	PlayerJob = static_cast<EPlayerJob>(FMath::RandRange(0, static_cast<int>(EPlayerJob::JOB_MAX) - 1));
+}

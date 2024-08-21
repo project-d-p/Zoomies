@@ -19,6 +19,7 @@ public:
 	UFUNCTION()
 	EPlayerJob GetPlayerJob() const;
 
+	void SetPlayerRandomJob();
 	void SetFinalScoreData(const FFinalScoreData& InFinalScoreData) { FinalScoreData = InFinalScoreData; }
 	const FFinalScoreData& GetFinalScoreData() const { return FinalScoreData; }
 
@@ -39,7 +40,7 @@ private:
 	UPlayerScoreComp* PlayerScoreComp = nullptr;
 
 	UPROPERTY(Replicated)
-	EPlayerJob PlayerJob = EPlayerJob::JOB_ARCHAEOLOGIST;
+	EPlayerJob PlayerJob;
 
 	FFinalScoreData FinalScoreData;
 

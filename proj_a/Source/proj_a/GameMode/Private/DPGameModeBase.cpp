@@ -106,6 +106,7 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 	ADPPlayerState* player_state = Cast<ADPPlayerState>(newPlayer->PlayerState);
 	check(player_state);
 
+#if LAN_MODE || EDITOR_MODE
 	FString name = player_state->GetPlayerName();
 	std::string key(TCHAR_TO_UTF8(*name));
 	
@@ -114,10 +115,21 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 		player_state->SetPlayerName(name + "1");
 		key = std::string(TCHAR_TO_UTF8(*player_state->GetPlayerName()));
 	}
+#else
+	// Online Mode : Steam ID
+	std::string key(TCHAR_TO_UTF8(*player_state->GetUniqueId()->ToString()));
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Player ID : %s"), *FString(key.c_str()));
+#endif
+	
 	player_controllers_[key] = Cast<ADPPlayerController>(newPlayer);
 	player_controllers_[key]->SwitchLevelComponent(ELevelComponentType::MAIN);
 
-	SpawnNewCharacter(newPlayer); 
+	// Spawn Character in New Place
+	SpawnNewCharacter(newPlayer);
+	
+	// Set Player Random Job
+	player_state->SetPlayerRandomJob();
+	
 	if (!newPlayer->IsLocalController())
 	{
 		player_controllers_[key]->ConnectToServer(ELevelComponentType::MAIN);
