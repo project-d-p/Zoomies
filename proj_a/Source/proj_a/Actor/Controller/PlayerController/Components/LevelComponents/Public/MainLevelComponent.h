@@ -10,6 +10,13 @@ class UPrivateScoreManager;
 class ABaseMonsterCharacter;
 class UDPStateActorComponent;
 
+struct TargetInfo
+{
+	ABaseMonsterCharacter* CurrentTarget;
+	FVector Location;
+	FRotator Rotation;
+};
+
 UCLASS()
 class PROJ_A_API UMainLevelComponent : public UBaseLevelComponent
 {
@@ -33,7 +40,7 @@ public:
 	void AddAimMessage(const Message& message);
 
 	/* Get Current Target[Catchable Monster] */
-	ABaseMonsterCharacter* GetCurrentTarget() const;
+	const TargetInfo& GetCurrentTarget() const;
 	
 	/* Server RPC Called by Client */
 	UFUNCTION(Server, Reliable, WithValidation)
@@ -82,9 +89,8 @@ private:
 	UDPStateActorComponent* StateComponent;
 	UPROPERTY()
 	class UHitScan* CatchRay = nullptr;
-
-	UPROPERTY()
-	ABaseMonsterCharacter* CurrentTarget;
+	
+	TargetInfo CurrentTarget;
 	
 	std::queue<Message> GunQueue;
 	std::queue<Message> CatchQueue;

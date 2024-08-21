@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "DPCharacter.h"
+#include "DPPlayerController.h"
 #include "Engine/GameInstance.h"
 #include "OnlineSubsystem.h"
 #include "Interfaces/OnlineSessionInterface.h"
@@ -23,12 +24,16 @@ public:
 	void StartMatchMaking();
 	IOnlineSessionPtr GetOnlineSessionInterface() const;
 	IOnlineSubsystem* GetOnlineSubsystemInterface() const;
-	TArray<TSharedRef<FOnlineFriend>> FriendsList;
+	UPROPERTY(VisibleAnywhere, Category = "Network")
+	FName SessionName = "";
 
 	/* Number of players before Seamless Travel */
 	bool ResetSession();
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void OnSessionFailure();
+	void ChangeJoinInProgress(bool bCond);
+	void AddBanPlayer(const FString& String);
+
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void ShowSteamInviteOverlay();
 	void ReadFriendList();
@@ -36,14 +41,11 @@ public:
 	void LogFriendsNicknames();
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void InviteFriendToGame(FString FriendId);
-	//void makeFriendList();
 	
-	UPROPERTY(VisibleAnywhere, Category = "Network")
-	FName SessionName = "";
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MatchLobby")
-	UUserWidget* FriendListWidget = nullptr;
+	TArray<TSharedRef<FOnlineFriend>> FriendsList;
 	UPROPERTY(BlueprintReadOnly, Category = "Friends")
 	TArray<FFriendInfo> FriendsArray;
+	
 	int player_count = 0;
 private:
 	// Online subsystem & session interface pointers
@@ -58,7 +60,7 @@ private:
 	void FindSession();
 	void OnFindComplete(bool bWasSuccessful);
 	FDelegateHandle dh_on_find_complete;
-	void JoinSessionBySearchResult(const FOnlineSessionSearchResult& search_result);
+	bool JoinSessionBySearchResult(const FOnlineSessionSearchResult& search_result);
 	void onJoinComplete(FName session_name, EOnJoinSessionCompleteResult::Type result);
 	FDelegateHandle dh_on_join_complete;
 	void CreateSession();
@@ -73,6 +75,7 @@ private:
 	int max_count = 5;
 	bool is_steamAPI_init = false;
 	bool is_online_session_steam_init=false;
+	bool bIsOnline = false;
 
 	FTimerHandle UnusedHandle;
 	void CheckSteamInit();

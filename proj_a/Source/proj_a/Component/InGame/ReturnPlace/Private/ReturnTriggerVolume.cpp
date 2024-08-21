@@ -115,7 +115,7 @@ void AReturnTriggerVolume::InitializeMonsterMeshes()
 
 	for (const auto& AnimalInfo : AnimalInfos)
 	{
-		static ConstructorHelpers::FObjectFinder<USkeletalMesh> SkeletalMeshFinder
+		ConstructorHelpers::FObjectFinder<USkeletalMesh> SkeletalMeshFinder
 		(PathManager::GetMonsterPath(AnimalInfo.AnimalType));
         
 		if (SkeletalMeshFinder.Succeeded())
@@ -200,14 +200,21 @@ void AReturnTriggerVolume::SpawnSingleMonster(EAnimal Animal, int32 Index)
             AnimData.TotalTime = 0.0f;
             AnimData.Index = Index; // Store the index for use in animation
 
+        	TWeakObjectPtr<AReturnTriggerVolume> WeakThis(this);
             // Start the ascension animation
             FTimerDelegate AnimationTimerDelegate;
-			AnimationTimerDelegate.BindUFunction(this, FName("AnimateAnimalMesh"), Mesh);
+			// AnimationTimerDelegate.BindUFunction(this, FName("AnimateAnimalMesh"), Mesh);
+        	AnimationTimerDelegate.BindLambda([WeakThis, Mesh]()
+        	{
+        		if (WeakThis.IsValid() && IsValid(Mesh))
+        		{
+        			WeakThis->AnimateAnimalMesh(Mesh);
+        		}
+        	});
             GetWorld()->GetTimerManager().SetTimer(AnimData.AnimationTimerHandle, AnimationTimerDelegate, 0.016f, true);
 
         	// Schedule mesh destruction
         	FTimerDelegate DestroyTimerDelegate;
-        	TWeakObjectPtr<AReturnTriggerVolume> WeakThis(this);
         	DestroyTimerDelegate.BindLambda([WeakThis, Mesh]()
 			{
 				if (WeakThis.IsValid() && IsValid(Mesh))
@@ -263,8 +270,12 @@ void AReturnTriggerVolume::AnimateAnimalMesh(USkeletalMeshComponent* Mesh)
     Mesh->SetWorldRotation(NewRotation);
 
     // If the animation is complete, stop it
-    if (Progress >= 1.0f)
+    if (Progress < 1.0f)
     {
-        GetWorld()->GetTimerManager().ClearTimer(AnimData.AnimationTimerHandle);
+    	return ;
+    }
+    if (AnimData.AnimationTimerHandle.IsValid())
+    {
+		GetWorld()->GetTimerManager().ClearTimer(AnimData.AnimationTimerHandle);
     }
 }

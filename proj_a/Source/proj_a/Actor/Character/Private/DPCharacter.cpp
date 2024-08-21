@@ -23,6 +23,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "DSP/LFO.h"
+#include "Components/PostProcessComponent.h"
+#include "Materials/MaterialInstanceConstant.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerState.h"
@@ -154,6 +156,30 @@ ADPCharacter::ADPCharacter()
 		StunEffectComponent->SetAsset(StunEffect);
 	}
 
+	static ConstructorHelpers::FClassFinder<UNameTag> NAME_TAG
+	(TEXT("/Game/widget/widget_NameTag.widget_NameTag_C"));
+	if (NAME_TAG.Succeeded())
+	{
+		NameTag_BP = NAME_TAG.Class;
+		
+		NameTag_WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("NameTag_WidgetComponent"));
+		NameTag_WidgetComponent->SetupAttachment(RootComponent);
+		NameTag_WidgetComponent->SetDrawAtDesiredSize(true);
+		NameTag_WidgetComponent->SetRelativeLocation(FVector(0, 0, 100));
+		NameTag_WidgetComponent->SetWorldScale3D(FVector(0.6f, 0.6f, 0.6f));
+	}
+
+	postProcessComponent = CreateDefaultSubobject<UPostProcessComponent>(TEXT("postProcessComponent"));
+	postProcessComponent->SetupAttachment(RootComponent);
+
+	static ConstructorHelpers::FObjectFinder<UMaterialInstanceConstant> PostProcessMaterial
+	(TEXT("MaterialInstanceConstant'/Game/material/postprocess/mpp_dizzle_Inst.mpp_dizzle_Inst'"));
+	if (PostProcessMaterial.Succeeded())
+	{
+		postProcessComponent->AddOrUpdateBlendable(PostProcessMaterial.Object, 1.0f);
+		postProcessComponent->BlendWeight = 0.0f;
+	}
+
 	if (UWorld* World = GetWorld())
 	{
 		FString CurrentLevelName = UGameplayStatics::GetCurrentLevelName(World);
@@ -187,20 +213,74 @@ ADPCharacter::~ADPCharacter()
 {
 }
 
+void ADPCharacter::SetNameTag()
+{
+	APlayerState* PS = GetPlayerState();
+	if (IsValid(PS))
+	{
+		FString Name = PS->GetPlayerName();
+		if (IsValid(NameTag_Instance))
+		{
+			NameTag_Instance->SetName(Name);
+		}
+		else
+		{
+			FNetLogger::LogError(TEXT("No NameTag_Instance"));
+		}
+		if (IsValid(NameTag_WidgetComponent) && !IsLocallyControlled())
+		{
+			NameTag_WidgetComponent->SetVisibility(true);
+		}
+		else
+		{
+			FNetLogger::LogError(TEXT("No NameTagWidgetComponent || IsLocallyControlled"));
+		}
+	}
+	else
+	{
+		static int32 RetryCount = 0;
+		if (RetryCount < 5) // 최대 5회만 시도
+		{
+			RetryCount++;
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+			{
+				SetNameTag();
+			}), 0.1f, false);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to set NameTag after multiple attempts."));
+		}
+	}
+}
+
+
 // Called when the game starts or when spawned
 void ADPCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (GetMesh()) {
-		UMaterialInterface* Material = GetMesh()->GetMaterial(0);
-		if (Material) {
-			dynamicMaterialInstance = UMaterialInstanceDynamic::Create(Material, this);
-			GetMesh()->SetMaterial(0, dynamicMaterialInstance);
-		}
+	if (!NameTag_BP)
+	{
+		check(false);
 	}
-	if (dynamicMaterialInstance)
-		dynamicMaterialInstance->SetVectorParameterValue(FName("color"), FVector4(0.f, 0.f, 1.f, 1.f));
+	NameTag_Instance = CreateWidget<UNameTag>(GetWorld(), NameTag_BP);
+	if (NameTag_Instance)
+	{
+		NameTag_WidgetComponent->SetWidget(NameTag_Instance);
+		NameTag_WidgetComponent->SetVisibility(false);
+	}
+	
+	//if (GetMesh()) {
+	//	UMaterialInterface* Material = GetMesh()->GetMaterial(0);
+	//	if (Material) {
+	//		dynamicMaterialInstance = UMaterialInstanceDynamic::Create(Material, this);
+	//		GetMesh()->SetMaterial(0, dynamicMaterialInstance);
+	//	}
+	//}
+	//if (dynamicMaterialInstance)
+	//	dynamicMaterialInstance->SetVectorParameterValue(FName("color"), FVector4(0.f, 0.f, 1.f, 1.f));
 
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AReturnTriggerVolume::StaticClass(), FoundActors);
@@ -215,6 +295,7 @@ void ADPCharacter::BeginPlay()
 	constructionComponent->placeWall = false;
 	constructionComponent->placeturret = false;
 	bUseControllerRotationYaw = false;
+	SetNameTag();
 }
 
 // Called every frame
@@ -228,6 +309,11 @@ void ADPCharacter::Tick(float DeltaTime)
 	}
 	else
 		UE_LOG(LogTemp, Warning, TEXT("null GetCharacterMovement"));
+	
+	if (!IsLocallyControlled())
+	{
+		UpdateNameTagRotation();
+	}
 
 	if (UWorld* World = GetWorld())
 	{
@@ -355,6 +441,35 @@ void ADPCharacter::ClientNotifyAnimalReturn_Implementation(const FString& player
 	FDataHub::PushReturnAnimalDA(player_name, true);
 }
 
+void ADPCharacter::UpdateNameTagRotation()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return ;
+	}
+	if (NameTag_WidgetComponent)
+	{
+		APlayerController* PlayerController = World->GetFirstPlayerController();
+		if (PlayerController)
+		{
+			// FNetLogger::LogError(TEXT("Here is Wrong! : PlayerController"));
+			if (!PlayerController->PlayerCameraManager)
+			{
+				return ;
+			}
+			FVector CameraLocation = PlayerController->PlayerCameraManager->GetCameraLocation();
+			FRotator NewRotation = (CameraLocation - NameTag_WidgetComponent->GetComponentLocation()).Rotation();
+            
+			// 오직 Yaw 회전만 적용
+			NewRotation.Pitch = 0.0f;
+			NewRotation.Roll = 0.0f;
+            
+			NameTag_WidgetComponent->SetWorldRotation(NewRotation);
+		}
+	}
+}
+
 void ADPCharacter::CheckCollisionWithMonster()
 {
 	FHitResult HitResult;
@@ -402,6 +517,9 @@ void ADPCharacter::ApplyStunEffect()
 	{
 		StunEffectComponent->Activate(true);
 	}
+	if (IsLocallyControlled()) {
+		postProcessComponent->BlendWeight = 1.f;
+	}
 }
 
 void ADPCharacter::RemoveStunEffect()
@@ -410,13 +528,88 @@ void ADPCharacter::RemoveStunEffect()
 	if (HasAuthority())
 	{
 		bIsStunned = false;
+		bIsInvincible = true;
+		FTimerHandle TimerInvincibleHandle;
+		FTimerDelegate TimerInvincibleDelegate;
+		TWeakObjectPtr<ADPCharacter> WeakThis(this);
+		TimerInvincibleDelegate.BindLambda([WeakThis, this]()
+		{
+			if (WeakThis.IsValid())
+			{
+				bIsInvincible = false;
+			}
+		});
+		GetWorld()->GetTimerManager().SetTimer(TimerInvincibleHandle, TimerInvincibleDelegate, 2.0f, false);
 	}
 	StunEffectComponent->Deactivate();
+	// TODO: Invincible Effect
+	if (IsLocallyControlled()) {
+		postProcessComponent->BlendWeight = 0.f;
+	}
+}
+
+void ADPCharacter::ApplyKockback_Implementation(const FHitResult& HitResult)
+{
+	// 충돌 지점에서 캐릭터 위치로의 방향을 계산
+	FVector KnockbackDirection = GetActorLocation() - HitResult.ImpactPoint;
+	// FVector KnockbackDirection = -HitResult.ImpactNormal;
+	KnockbackDirection.Z = 20.0f;
+    
+	if (!KnockbackDirection.IsNearlyZero())
+	{
+		KnockbackDirection.Normalize();
+	}
+	else
+	{
+		KnockbackDirection = GetActorForwardVector() * -1;
+	}
+
+	// 넉백 속도 설정
+	float KnockbackSpeed = 2000.0f;
+
+	// Character Movement Component 가져오기
+	UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
+	if (MovementComponent)
+	{
+		// Save previous movement mode
+		EMovementMode PreviousMovementMode = MovementComponent->MovementMode;
+
+		// Set Falling Movement Mode
+		MovementComponent->SetMovementMode(MOVE_Falling);
+
+		// Set Knockback Velocity
+		MovementComponent->Velocity = KnockbackDirection * KnockbackSpeed;
+
+		FTimerHandle ResetTimerHandle;
+		TWeakObjectPtr<ADPCharacter> WeakThis(this);
+		GetWorldTimerManager().SetTimer(ResetTimerHandle, [WeakThis, this, MovementComponent, PreviousMovementMode]() {
+			if (WeakThis.IsValid())
+			{
+				// Reset Movement Mode
+				MovementComponent->SetMovementMode(PreviousMovementMode);
+				isKnockback = false;
+			}
+		}, 0.5f, false);
+	}
+}
+
+void ADPCharacter::OnRep_SyncInvincible()
+{
+}
+
+bool ADPCharacter::IsInvincible()
+{
+	return bIsInvincible;
 }
 
 void ADPCharacter::OnServerHit(const FHitResult& HitResult)
 {
 	if (this->IsStunned())
+	{
+		return ;
+	}
+
+	if (this->IsInvincible())
 	{
 		return ;
 	}
@@ -431,6 +624,7 @@ void ADPCharacter::OnServerHit(const FHitResult& HitResult)
 	{
 		return ;
 	}
+	this->ApplyKockback(HitResult);
 	this->ApplyStunEffect();
 	
 	FTimerDelegate timerCollisionDelegate;
@@ -457,6 +651,12 @@ void ADPCharacter::OnRep_SyncStunned()
 	{
 		this->RemoveStunEffect();
 	}
+}
+
+FVector ADPCharacter::GetCameraLocation() const
+{
+	FVector cameraLocation = camera->GetComponentLocation();
+	return cameraLocation;
 }
 
 void ADPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

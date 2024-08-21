@@ -56,7 +56,16 @@ void USteamSocketP2P::ActivateClient()
 
 USteamSocketP2P::~USteamSocketP2P()
 {
-	
+	if (m_ListenSocket != k_HSteamListenSocket_Invalid)
+	{
+		SteamNetworkingSockets()->CloseListenSocket(m_ListenSocket);
+		m_ListenSocket = k_HSteamListenSocket_Invalid;
+	}
+	if (m_Connection != k_HSteamNetConnection_Invalid)
+	{
+		SteamNetworkingSockets()->CloseConnection(m_Connection, 0, nullptr, false);
+		m_Connection = k_HSteamNetConnection_Invalid;
+	}
 }
 
 CSteamID USteamSocketP2P::GetHostSteamID()

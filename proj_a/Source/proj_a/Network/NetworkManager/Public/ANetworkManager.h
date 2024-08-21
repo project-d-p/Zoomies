@@ -8,7 +8,7 @@
 #include "ENetworkTypeZoomies.h"
 #include "ANetworkManager.generated.h"
 
-UCLASS(Abstract)
+UCLASS()
 class UANetworkManager : public UObject
 {
 	GENERATED_BODY()

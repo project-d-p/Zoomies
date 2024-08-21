@@ -56,8 +56,8 @@ private:
     UPROPERTY(VisibleAnywhere)
     class UArrowComponent* arrowComponent;
 
-    //UPROPERTY(VisibleAnywhere)
-    //UAudioComponent* foxAudioComponent;
+    UPROPERTY(VisibleAnywhere)
+    UAudioComponent* foxAudioComponent;
 
     UPROPERTY(EditAnywhere, Category = "Animation")
     UAnimSequence* foxAnim;

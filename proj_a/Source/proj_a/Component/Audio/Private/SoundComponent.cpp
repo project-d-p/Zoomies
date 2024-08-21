@@ -37,6 +37,15 @@ USoundComponent::USoundComponent()
 	}
 	else
 		AnimalFaintSound = nullptr;
+
+	static ConstructorHelpers::FObjectFinder<USoundAttenuation> AttenuationSettings
+	(TEXT("/Game/sounds/dp_animalSoundAttenuation.dp_animalSoundAttenuation"));
+	if (AttenuationSettings.Succeeded()) {
+		JumpSound->AttenuationSettings = AttenuationSettings.Object;
+		ShotSound->AttenuationSettings = AttenuationSettings.Object;
+		AnimalGetDamagedSound->AttenuationSettings = AttenuationSettings.Object;
+		AnimalFaintSound->AttenuationSettings = AttenuationSettings.Object;
+	}
 }
 
 void USoundComponent::PlayJumpSound() const

@@ -9,9 +9,8 @@
 #include "HitScan.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
-#include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
-#include "EntitySystem/MovieSceneEntitySystemTypes.h"
+#include "BaseMonsterCharacter.h"
+#include "Engine/StaticMeshActor.h"
 #include "GameFramework/Character.h"
 
 ADPWeaponGun::ADPWeaponGun()
@@ -47,10 +46,22 @@ ADPWeaponGun::ADPWeaponGun()
 		smokeEffect = SMOKE.Object;
 	}
 	
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> PARTICLE
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> PARTICLE_ANIMAL
 	(TEXT("/Game/effect/ns_animalHitScrew.ns_animalHitScrew"));
-	if (PARTICLE.Succeeded()) {
-		particleEffect = PARTICLE.Object;
+	if (PARTICLE_ANIMAL.Succeeded()) {
+		particleEffectAnim = PARTICLE_ANIMAL.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> PARTICLE_PLANT
+	(TEXT("/Game/effect/ns_animalHitPlant.ns_animalHitPlant"));
+	if (PARTICLE_PLANT.Succeeded()) {
+		particleEffectPlant = PARTICLE_PLANT.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> PARTICLE_CHAR
+	(TEXT("/Game/effect/ns_animalHit.ns_animalHit"));
+	if (PARTICLE_CHAR.Succeeded()) {
+		particleEffectChar = PARTICLE_CHAR.Object;
 	}
 }
 
@@ -63,7 +74,7 @@ void ADPWeaponGun::BeginPlay()
 
 bool ADPWeaponGun::Attack(ADPPlayerController* controller, FHitResult& result, FRotator& info)
 {
-	const FVector start_aim_pos = controller->GetCharacter()->FindComponentByClass<UCameraComponent>()->GetComponentLocation();
+	const FVector start_aim_pos = Cast<ADPCharacter>(controller->GetCharacter())->GetCameraLocation();
 	const FRotator aim_direction = controller->GetControlRotation();
 
 	FVector impact_point;
@@ -131,10 +142,19 @@ void ADPWeaponGun::SpawnEffects(const FHitResult& HitResult, const FRotator& rot
 	}
 	if (trail)
 	{
+
 		// 방향 설정: 월드 방향을 로컬 방향으로 변환
 		FVector WorldDirection = (ImpactPoint - muzzle->GetComponentLocation()).GetSafeNormal();
 		// FVector LocalDirection = muzzle->GetComponentTransform().InverseTransformVectorNoScale(WorldDirection);
-		trail->SetVectorParameter(FName("Direction_FIRE"), WorldDirection * 7'000.f); // 1000.f은 속도 조절을 위한 스칼라 값
+		trail->SetVectorParameter(FName("Direction_FIRE"), WorldDirection * 9'000.f); // 속도 조절을 위한 스칼라 값
+
+		// 거리 계산
+		float Distance = FVector::Dist(muzzle->GetComponentLocation(), ImpactPoint);
+		float Speed = 7000.0f; // WorldDirection에 곱한 속도 값과 일치시켜야 함
+		float TimeToImpact = Distance / Speed;
+
+		// 수명 설정 (Niagara에서 직접 수명을 설정)
+		trail->SetFloatParameter(FName("LifeSpan"), TimeToImpact);
 	}
 	
 	if (smokeEffect && muzzle) {
@@ -158,17 +178,35 @@ void ADPWeaponGun::SpawnEffects(const FHitResult& HitResult, const FRotator& rot
 
 void ADPWeaponGun::SpawnHitEffect(const FHitResult& HitResult)
 {
+	if (HitResult.GetActor() == nullptr)
+	{
+		return;
+	}
 	FVector ImpactPoint = HitResult.ImpactPoint;
 	FVector ImpactNormal = HitResult.ImpactNormal;
 
 	FRotator ParticleRotation = ImpactNormal.Rotation();
-	if (particleEffect)
+
+	UNiagaraSystem* particleEffect = nullptr;
+
+	FNetLogger::LogError(TEXT("%s"), *HitResult.GetActor()->GetName());
+	if (HitResult.GetActor()->IsA<ADPCharacter>() || HitResult.GetActor()->GetName().Contains("21"))
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-			GetWorld(),
-			particleEffect,
-			ImpactPoint,
-			ParticleRotation
-		);
+		particleEffect = particleEffectChar;
 	}
+	else if (HitResult.GetActor()->IsA<ABaseMonsterCharacter>())
+	{
+		particleEffect = particleEffectAnim;
+	}
+	else if (HitResult.GetActor()->IsA<AStaticMeshActor>())
+	{
+		particleEffect = particleEffectPlant;
+	}
+
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		GetWorld(),
+		particleEffect,
+		ImpactPoint,
+		ParticleRotation
+	);
 }
