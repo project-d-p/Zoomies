@@ -39,7 +39,7 @@ void USteamSocketP2P::ActivateClient()
 	identityRemote.SetSteamID(this->GetHostSteamID());
 
 
-	int nRemoteVirtualPort = 0; // »ó´ë¹æÀÇ °¡»ó Æ÷Æ® ¹øÈ£¿Í ÀÏÄ¡ÇØ¾ß ÇÔ
+	int nRemoteVirtualPort = 0; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ® ï¿½ï¿½È£ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½Ø¾ï¿½ ï¿½ï¿½
 	m_Connection = SteamNetworkingSockets()->ConnectP2P(identityRemote, nRemoteVirtualPort, 0, nullptr);
 
 	if (m_Connection == k_HSteamNetConnection_Invalid)
@@ -75,7 +75,7 @@ CSteamID USteamSocketP2P::GetHostSteamID()
 
 	IOnlineSessionPtr SessionPtr = OnlineSub->GetSessionInterface();
 	check(SessionPtr);
-
+	
 	FNamedOnlineSession* Session = SessionPtr->GetNamedSession(NAME_GameSession);
 	check(Session);
 

@@ -464,11 +464,6 @@ void UGI_Zoomies::InitOnlineSubsystemSteam()
 	}
 }
 
-void UGI_Zoomies::ShowSteamInviteOverlay()
-{
-	LogFriendsNicknames();
-}
-
 void UGI_Zoomies::ReadFriendList()
 {
 	IOnlineFriendsPtr Friends = online_subsystem_->GetFriendsInterface();
@@ -517,18 +512,6 @@ void UGI_Zoomies::LoadFriendsList()
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("온라인 친구 인터페이스를 사용할 수 없습니다."));
 		}
-	}
-}
-
-void UGI_Zoomies::LogFriendsNicknames()
-{
-	for (int32 i = 0; i < FriendsArray.Num(); ++i)
-	{
-		const FFriendInfo& Friend = FriendsArray[i];
-		FString Message = FString::Printf(TEXT("Friend Nickname: %s, Friend ID: %s"),
-										  *Friend.FriendNickname.ToString(), *Friend.FriendId);
-		
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, Message);
 	}
 }
 

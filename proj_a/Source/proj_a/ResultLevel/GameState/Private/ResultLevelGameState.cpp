@@ -218,7 +218,7 @@ void AResultLevelGameState::EndPlay(const EEndPlayReason::Type EndPlayReason)
     	IOnlineSessionPtr SessionInt = GameInstance->GetOnlineSessionInterface();
     	if (SessionInt.IsValid())
     	{
-    		SessionInt->DestroySession(NAME_GameSession);
+    		SessionInt->DestroySession(GameInstance->SessionName);
     	}
     }
 }

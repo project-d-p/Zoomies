@@ -34,11 +34,8 @@ public:
 	void ChangeJoinInProgress(bool bCond);
 	void AddBanPlayer(const FString& String);
 
-	UFUNCTION(BlueprintCallable, Category = "Network")
-	void ShowSteamInviteOverlay();
 	void ReadFriendList();
 	void LoadFriendsList();
-	void LogFriendsNicknames();
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void InviteFriendToGame(FString FriendId);
 	

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DPCharacter.h"
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/ArrowComponent.h"
@@ -28,7 +29,7 @@ public:
 	APlayerController* PC = nullptr;
 	
 	UPROPERTY(VisibleAnywhere)
-	AActor* CurrentCharacter;
+	ADPCharacter* CurrentCharacter;
 
 private:
 	UPROPERTY(VisibleAnywhere)

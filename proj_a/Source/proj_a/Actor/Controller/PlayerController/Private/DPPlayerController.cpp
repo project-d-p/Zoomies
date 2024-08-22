@@ -110,7 +110,7 @@ void ADPPlayerController::ClientDestroySession_Implementation()
 		IOnlineSessionPtr SessionInt = GameInstance->GetOnlineSessionInterface();
 		if (SessionInt.IsValid())
 		{
-			SessionInt->DestroySession(NAME_GameSession);
+			SessionInt->DestroySession(GameInstance->SessionName);
 		}
 	}
 }

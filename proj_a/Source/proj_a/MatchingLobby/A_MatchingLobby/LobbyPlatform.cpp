@@ -6,6 +6,7 @@
 #include "Engine/StaticMeshActor.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
+#include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
 #include "UObject/ConstructorHelpers.h"
 
 ALobbyPlatform::ALobbyPlatform()
@@ -45,6 +46,14 @@ void ALobbyPlatform::SpawnCharacter(APlayerController* PlayerController)
 		ADPCharacter::StaticClass(),
  		ArrowComponent->GetComponentTransform(),
  		SpawnParams);
+	
+	APC_MatchingLobby* PC_MatchingLobby = Cast<APC_MatchingLobby>(PC);
+	if (PC_MatchingLobby && CurrentCharacter)
+	{
+		PC_MatchingLobby->Possess(CurrentCharacter);
+
+		PC_MatchingLobby->SetCineCameraView();
+	}
  }
 
 void ALobbyPlatform::Clear_Platform()
