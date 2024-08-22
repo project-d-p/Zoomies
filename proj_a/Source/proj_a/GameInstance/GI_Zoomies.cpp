@@ -284,6 +284,7 @@ void UGI_Zoomies::OnSessionFailure()
 			}
 			World->ServerTravel(TEXT("lobbyLevel?closed"), true);
 			session_interface_->DestroySession(SessionName);
+			SessionName = "";
 		}
 		else
 		{
@@ -364,12 +365,11 @@ bool UGI_Zoomies::ResetSession()
 	{
 		if (session_interface_->GetNamedSession(SessionName) != nullptr)
 		{
-			// Register OnDestroySessionComplete delegate
 			dh_on_destroy_complete = session_interface_->AddOnDestroySessionCompleteDelegate_Handle(
 				FOnDestroySessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::OnDestroyComplete)
 			);
-			// Destroy the current session
 			session_interface_->DestroySession(SessionName);
+			SessionName = "";
 			return true;
 		}
 	}
@@ -485,44 +485,63 @@ void UGI_Zoomies::ReadFriendList()
 
 void UGI_Zoomies::LoadFriendsList()
 {
-	IOnlineFriendsPtr Friends = online_subsystem_->GetFriendsInterface();
-	if (Friends.IsValid())
-	{
-		FString ListName = TEXT("Default");
+    if (!online_subsystem_)
+    {
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("온라인 서브시스템이 초기화되지 않았습니다."));
+        }
+        return;
+    }
 
-		if (Friends->GetFriendsList(0, ListName, FriendsList))
-		{
-			for (auto Friend : FriendsList)
-			{
-				FFriendInfo NewFriend;
-				FString FriendNickname = Friend->GetDisplayName();
-				FUniqueNetIdPtr FriendId = Friend->GetUserId();
-				bool IsOnline = Friend->GetPresence().bIsOnline;
-				NewFriend.FriendNickname = FText::FromString(FriendNickname);
-				NewFriend.FriendId = FriendId->ToString();
-				NewFriend.IsOnline = IsOnline;
-				FriendsArray.Add(NewFriend);
-			}
-			FriendsArray.Sort([](const FFriendInfo& A, const FFriendInfo& B)
-			{
-				return A.IsOnline && !B.IsOnline;
-			});
-		}
-		else
-		{
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("친구 리스트를 가져오지 못했습니다."));
-			}
-		}
-	}
-	else
-	{
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("온라인 친구 인터페이스를 사용할 수 없습니다."));
-		}
-	}
+    IOnlineFriendsPtr Friends = online_subsystem_->GetFriendsInterface();
+    if (Friends.IsValid())
+    {
+        FString ListName = TEXT("Default");
+
+        if (Friends->GetFriendsList(0, ListName, FriendsList))
+        {
+            for (auto Friend : FriendsList)
+            {
+                FFriendInfo NewFriend;
+                FString FriendNickname = Friend->GetDisplayName();
+                FUniqueNetIdPtr FriendId = Friend->GetUserId();
+
+                if (!FriendId.IsValid())
+                {
+                    if (GEngine)
+                    {
+                        GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("유효하지 않은 친구 ID를 건너뜁니다."));
+                    }
+                    continue;
+                }
+
+                NewFriend.FriendNickname = FText::FromString(FriendNickname);
+                NewFriend.FriendId = FriendId->ToString();
+                NewFriend.IsOnline = Friend->GetPresence().bIsOnline;
+                FriendsArray.Add(NewFriend);
+            }
+
+            FriendsArray.Sort([](const FFriendInfo& A, const FFriendInfo& B)
+            {
+                return A.IsOnline && !B.IsOnline;
+            });
+        }
+        else
+        {
+            if (GEngine)
+            {
+                GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("친구 리스트를 가져오지 못했습니다."));
+            }
+        }
+    }
+    else
+    {
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("온라인 친구 인터페이스를 사용할 수 없습니다."));
+        }
+    }
 }
 
 void UGI_Zoomies::InviteFriendToGame(FString FriendId)
@@ -531,7 +550,6 @@ void UGI_Zoomies::InviteFriendToGame(FString FriendId)
 	{
 		IOnlineIdentityPtr IdentityInterface = online_subsystem_->GetIdentityInterface();
 		FUniqueNetIdPtr uniqueNetId = IdentityInterface->CreateUniquePlayerId(FriendId);
-		// 초대 보내기
 		bool bInviteSent = session_interface_->SendSessionInviteToFriend(0, SessionName, *uniqueNetId);
 		if (bInviteSent)
 		{
