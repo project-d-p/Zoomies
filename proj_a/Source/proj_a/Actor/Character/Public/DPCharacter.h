@@ -100,6 +100,8 @@ public:	// component
 
 	UFUNCTION(NetMulticast, Reliable)
 	void ApplyKockback(const FHitResult& HitResult);
+	UFUNCTION(NetMulticast, Reliable)
+	void SetNameTag();
 
 	UPROPERTY(ReplicatedUsing=OnRep_SyncInvincible)
 	bool bIsInvincible = false;
@@ -129,7 +131,6 @@ protected:
 	void ClientNotifyAnimalReturn_Implementation(const FString& player_name);
 	
 private:
-	void SetNameTag();
 	void UpdateNameTagRotation();
 	void CheckCollisionWithMonster();
 	void OnServerHit(const FHitResult& HitResult);
