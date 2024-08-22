@@ -11,7 +11,6 @@
 #include "proj_a/MatchingLobby/PS_MatchingLobby/PS_MatchingLobby.h"
 #include "Kismet/GameplayStatics.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
-#include "proj_a/MatchingLobby/SteamInvite/SteamInvite.h"
 
 AGM_MatchingLobby::AGM_MatchingLobby() {
 	GameStateClass = AGS_MatchingLobby::StaticClass();

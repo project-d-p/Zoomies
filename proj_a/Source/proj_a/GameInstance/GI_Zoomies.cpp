@@ -193,9 +193,19 @@ bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& se
 	
 	dh_on_join_complete = session_interface_->AddOnJoinSessionCompleteDelegate_Handle(
 		FOnJoinSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onJoinComplete));
-    
+	SessionName = FName(*search_result.Session.GetSessionIdStr());
+
+	if (GEngine)
+	{
+		//log on screen SessionName
+		GEngine->AddOnScreenDebugMessage(
+			-1,
+			30.f,
+			FColor::Green,
+			FString::Printf(TEXT("Joining Session: %s"), *SessionName.ToString()));
+	}
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
-	session_interface_->JoinSession(*local_player->GetPreferredUniqueNetId(), NAME_GameSession, search_result);
+	session_interface_->JoinSession(*local_player->GetPreferredUniqueNetId(), SessionName, search_result);
 	return true;
 }
 
@@ -257,10 +267,10 @@ void UGI_Zoomies::OnSessionFailure()
 				IOnlineSessionPtr Sessions = OnlineSubsystem->GetSessionInterface();
 				if (Sessions.IsValid())
 				{
-					FNamedOnlineSession* Session = Sessions->GetNamedSession(NAME_GameSession);
+					FNamedOnlineSession* Session = Sessions->GetNamedSession(SessionName);
 					if (Session)
 					{
-						Sessions->EndSession(NAME_GameSession);
+						Sessions->EndSession(SessionName);
 					}
 				}
 			}
@@ -273,7 +283,7 @@ void UGI_Zoomies::OnSessionFailure()
 				}
 			}
 			World->ServerTravel(TEXT("lobbyLevel?closed"), true);
-			session_interface_->DestroySession(NAME_GameSession);
+			session_interface_->DestroySession(SessionName);
 		}
 		else
 		{
@@ -281,7 +291,7 @@ void UGI_Zoomies::OnSessionFailure()
 			if (CurrentPlayerController)
 			{
 				CurrentPlayerController->ClientTravel(TEXT("lobbyLevel?closed"), ETravelType::TRAVEL_Absolute);
-				session_interface_->DestroySession(NAME_GameSession);
+				session_interface_->DestroySession(SessionName);
 			}
 		}
 	}
@@ -291,7 +301,7 @@ void UGI_Zoomies::ChangeJoinInProgress(bool bCond)
 {
 	IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
 	IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
-	FNamedOnlineSession* ExistingSession = SessionInterface->GetNamedSession(NAME_GameSession);
+	FNamedOnlineSession* ExistingSession = SessionInterface->GetNamedSession(SessionName);
 
 	if (ExistingSession != nullptr)
 	{
@@ -305,7 +315,7 @@ void UGI_Zoomies::ChangeJoinInProgress(bool bCond)
 		UpdatedSessionSettings.bShouldAdvertise = false;
 
 		// 세션 설정 업데이트
-		SessionInterface->UpdateSession(NAME_GameSession, UpdatedSessionSettings);
+		SessionInterface->UpdateSession(SessionName, UpdatedSessionSettings);
 	}
 }
 
@@ -313,7 +323,7 @@ void UGI_Zoomies::AddBanPlayer(const FString& String)
 {
 	IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
 	IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
-	FNamedOnlineSession* ExistingSession = SessionInterface->GetNamedSession(NAME_GameSession);
+	FNamedOnlineSession* ExistingSession = SessionInterface->GetNamedSession(SessionName);
 
 	if (ExistingSession != nullptr)
 	{
@@ -330,7 +340,7 @@ void UGI_Zoomies::AddBanPlayer(const FString& String)
 		BanList += String + TEXT(",");
 		UpdatedSessionSettings.Set(FName("BanList"), BanList, EOnlineDataAdvertisementType::ViaOnlineService);
 
-		SessionInterface->UpdateSession(NAME_GameSession, UpdatedSessionSettings);
+		SessionInterface->UpdateSession(SessionName, UpdatedSessionSettings);
 	}
 }
 
@@ -352,14 +362,14 @@ bool UGI_Zoomies::ResetSession()
 {
 	if (session_interface_.IsValid())
 	{
-		if (session_interface_->GetNamedSession(NAME_GameSession) != nullptr)
+		if (session_interface_->GetNamedSession(SessionName) != nullptr)
 		{
 			// Register OnDestroySessionComplete delegate
 			dh_on_destroy_complete = session_interface_->AddOnDestroySessionCompleteDelegate_Handle(
 				FOnDestroySessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::OnDestroyComplete)
 			);
 			// Destroy the current session
-			session_interface_->DestroySession(NAME_GameSession);
+			session_interface_->DestroySession(SessionName);
 			return true;
 		}
 	}

@@ -4,7 +4,6 @@
 #include "CineCameraActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "OnlineSessionSettings.h"
-#include "proj_a/MatchingLobby/SteamInvite/SteamInvite.h"
 #include "proj_a/MatchingLobby/GM_MatchingLobby/GM_MatchingLobby.h"
 #include "proj_a/MatchingLobby/GS_MachingLobby/GS_MatchingLobby.h"
 

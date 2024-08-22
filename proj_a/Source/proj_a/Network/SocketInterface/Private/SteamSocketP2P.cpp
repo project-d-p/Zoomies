@@ -4,6 +4,7 @@
 #include "isteamnetworkingutils.h"
 #include "OnlineSessionSettings.h"
 #include "SteamSocketIP.h"
+#include "Engine/World.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 UISocketInterface* USteamSocketP2P::Clone() const
@@ -39,7 +40,7 @@ void USteamSocketP2P::ActivateClient()
 	identityRemote.SetSteamID(this->GetHostSteamID());
 
 
-	int nRemoteVirtualPort = 0; // ������ ���� ��Ʈ ��ȣ�� ��ġ�ؾ� ��
+	int nRemoteVirtualPort = 0;
 	m_Connection = SteamNetworkingSockets()->ConnectP2P(identityRemote, nRemoteVirtualPort, 0, nullptr);
 
 	if (m_Connection == k_HSteamNetConnection_Invalid)
@@ -70,13 +71,26 @@ USteamSocketP2P::~USteamSocketP2P()
 
 CSteamID USteamSocketP2P::GetHostSteamID()
 {
+	UGI_Zoomies* GameInstance = nullptr;
+	if (UWorld* World = GetWorld())
+	{
+		GameInstance = Cast<UGI_Zoomies>(World->GetGameInstance());
+		if (GameInstance)
+		{
+			IOnlineSessionPtr SessionInt = GameInstance->GetOnlineSessionInterface();
+			if (SessionInt.IsValid())
+			{
+				SessionInt->DestroySession(GameInstance->SessionName);
+			}
+		}
+	}
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
 	check(OnlineSub);
 
 	IOnlineSessionPtr SessionPtr = OnlineSub->GetSessionInterface();
 	check(SessionPtr);
 	
-	FNamedOnlineSession* Session = SessionPtr->GetNamedSession(NAME_GameSession);
+	FNamedOnlineSession* Session = SessionPtr->GetNamedSession(GameInstance->SessionName);
 	check(Session);
 
 	TSharedPtr<const FUniqueNetId> hostNetID = Session->OwningUserId;
