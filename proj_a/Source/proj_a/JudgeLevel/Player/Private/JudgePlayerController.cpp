@@ -26,8 +26,9 @@ AJudgePlayerController::AJudgePlayerController()
 void AJudgePlayerController::SetOccupationeName_Implementation(int index, const FString& Name)
 {
 	// XXX: If the client experiences slow loading times, issues may arise with the code below.
-	// TODO: Address this after alpha testing.
-	check(JudgeLevelUI)
+	if (JudgeLevelUI)
+		return ;
+	// check(JudgeLevelUI)
 	JudgeLevelUI->SetBlockContent(ETextBlockType::Occupation, index, Name);
 }
 
@@ -72,7 +73,8 @@ void AJudgePlayerController::RequestUIData_Implementation()
 	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 	{
 		AJudgePlayerController* JPS = Cast<AJudgePlayerController>(*It);
-		check(JPS)
+		if (!JPS)
+			continue;
 		JPS->InitializeUI(GM->GetUiData());
 	}
 }

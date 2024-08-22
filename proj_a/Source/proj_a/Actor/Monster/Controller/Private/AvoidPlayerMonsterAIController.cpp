@@ -12,6 +12,17 @@
 
 DEFINE_LOG_CATEGORY(LogMonsterAI);
 
+AAvoidPlayerMonsterAIController::AAvoidPlayerMonsterAIController()
+{
+	Query = LoadObject<UEnvQuery>(
+		nullptr,
+			TEXT("/Game/EQS/EQS_CheckDistanceToPlayer.EQS_CheckDistanceToPlayer"));
+	if (!Query)
+	{
+		UE_LOG(LogMonsterAI, Error, TEXT("Failed to load EQS Query"));
+	}
+}
+
 bool AAvoidPlayerMonsterAIController::IsMovingToTarget() const
 {
 	return GetPathFollowingComponent() && GetPathFollowingComponent()->HasValidPath();
@@ -45,12 +56,10 @@ void AAvoidPlayerMonsterAIController::MoveToRandomTargetLocation()
 
 void AAvoidPlayerMonsterAIController::RunEQSQuery()
 {
-	static UEnvQuery* Query = LoadObject<UEnvQuery>(
-		nullptr,
-			TEXT("/Game/EQS/EQS_CheckDistanceToPlayer.EQS_CheckDistanceToPlayer"));
-	if (Query)
+	if (Query && IsQueryFinished)
 	{
 		FEnvQueryRequest QueryRequest(Query, GetPawn());
+		IsQueryFinished = false;
 		QueryRequest.Execute(EEnvQueryRunMode::SingleResult, this, &AAvoidPlayerMonsterAIController::OnQueryFinished);
 	}
 }
@@ -77,6 +86,7 @@ void AAvoidPlayerMonsterAIController::OnQueryFinished(TSharedPtr<FEnvQueryResult
 	{
 		MoveToRandomTargetLocation();
 	}
+	IsQueryFinished = true;
 }
 
 void AAvoidPlayerMonsterAIController::BeginPlay()

@@ -1,5 +1,6 @@
 ﻿#include "JudgeGameMode.h"
 
+#include "CompileMode.h"
 #include "FNetLogger.h"
 #include "JudgeGameState.h"
 #include "JudgePlayerController.h"
@@ -72,7 +73,7 @@ void AJudgeGameMode::ProcessVotingResults()
         PS->SetIsDetected(true);
     }
 
-    constexpr int TOTAL_PLAYER = 4;
+    constexpr int TOTAL_PLAYER = Zoomies::MAX_PLAYERS;
     if (CurrentPlayerIndex == TOTAL_PLAYER)
     {
         EndTimer();
@@ -99,7 +100,7 @@ void AJudgeGameMode::ProcessVotingResults()
 
 void AJudgeGameMode::EndTimer()
 {
-    constexpr int TOTAL_PLAYER = 4;
+    constexpr int TOTAL_PLAYER = Zoomies::MAX_PLAYERS;
     if (CurrentPlayerIndex++ < TOTAL_PLAYER)
     {
         AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();

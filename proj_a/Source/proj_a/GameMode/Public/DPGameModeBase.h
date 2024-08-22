@@ -16,6 +16,7 @@
 #include "ServerTimerManager.h"
 #include "MonsterFactory.h"
 #include "BlockingBoxVolume.h"
+#include "CompileMode.h"
 #include "DPGameModeBase.generated.h"
 
 USTRUCT()
@@ -58,7 +59,7 @@ public:
 	virtual UServerChatManager* GetChatManager() const override { return ChatManager; }
 	
 	// monster
-	enum { NUM_OF_MAX_MONSTERS = 20 };
+	enum { NUM_OF_MAX_MONSTERS = Zoomies::MAX_MONSTERS };
 	std::vector<ABaseMonsterAIController*> monster_controllers_;
 	std::vector<int32> empty_monster_slots_;
 
@@ -112,7 +113,7 @@ private:
 	void SpawnMonsters(float delta_time);
 
 	// Member variables
-	enum { NUM_OF_MAX_CLIENTS = 4 };
+	enum { NUM_OF_MAX_CLIENTS = Zoomies::MAX_PLAYERS };
 
 	// SteamNetworkingSocket* steam_listen_socket_ = nullptr;
 	UPROPERTY()
@@ -136,7 +137,7 @@ private:
 	bool bStart = false;
 	bool bTimeSet = false;
 	/* Set Play Time */
-	const float PLAY_TIME = 240.f;
+	const float PLAY_TIME = Zoomies::GAME_TIME;
 
 	/* For Monster Movement Manage (Interval & Process) */
 	UPROPERTY(EditAnywhere, Category = "Debug")
