@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
 #include "proj_a/MatchingLobby/GM_MatchingLobby/GM_MatchingLobby.h"
+#include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
 
 AGS_MatchingLobby::AGS_MatchingLobby() {
 	// Set Players Num. need to be Set
@@ -83,6 +84,7 @@ bool AGS_MatchingLobby::AreAllPlayersReady()
 		}
 	}
 	FindFastestPlayer();
+	RemovePlayerInputComponent();
 	return true;
 }
 
@@ -121,6 +123,18 @@ void AGS_MatchingLobby::ReportPing_Implementation(APlayerState* ReportingPlayer,
 	{
 		LowestAveragePing = AveragePing;
 		BestHostPlayer = ReportingPlayer;
+	}
+}
+
+void AGS_MatchingLobby::RemovePlayerInputComponent()
+{
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		APC_MatchingLobby* PC = Cast<APC_MatchingLobby>(*Iterator);
+		if (PC)
+		{
+			PC->DeactiveCurrentComponent();
+		}
 	}
 }
 
