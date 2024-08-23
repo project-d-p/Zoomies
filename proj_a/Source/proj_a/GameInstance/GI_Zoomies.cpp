@@ -494,6 +494,11 @@ void UGI_Zoomies::LoadFriendsList()
         return;
     }
 
+	if (FriendsArray.Num() > 0)
+	{
+		FriendsArray.Empty();
+	}
+
     IOnlineFriendsPtr Friends = online_subsystem_->GetFriendsInterface();
     if (Friends.IsValid())
     {
