@@ -61,11 +61,24 @@ ADPCharacter::ADPCharacter()
 
 	sceneCaptureSpringArm->SetupAttachment(RootComponent);
 	sceneCapture->SetupAttachment(sceneCaptureSpringArm);
-
+	
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CHARACTER
 	(TEXT("/Game/model/steve/StickManForMixamo.StickManForMixamo"));
-	if (SK_CHARACTER.Succeeded()) {
+	if (SK_CHARACTER.Succeeded()) 
+	{
 		GetMesh()->SetSkeletalMesh(SK_CHARACTER.Object);
+
+		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(GetMesh()->GetMaterial(0), this, TEXT("DynamicMaterial"));
+		
+		// if (DynamicMaterial)
+		// {
+			ConstructorHelpers::FObjectFinder<UTexture2D> NewRenderTarget(TEXT("/Game/customCharacter/test.test"));
+			// if (NewRenderTarget.Succeeded())
+			// {
+				DynamicMaterial->SetTextureParameterValue(TEXT("renderTarget"), NewRenderTarget.Object);
+				GetMesh()->SetMaterial(0, DynamicMaterial);
+			// }
+		// }
 	}
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -90.f), FRotator(0.f, 270.f, 0.f));
