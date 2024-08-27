@@ -9,14 +9,7 @@
 APC_MatchingLobby::APC_MatchingLobby()
 {
 	bIsReady = false;
-}
-
-void APC_MatchingLobby::AcknowledgePossession(APawn* P)
-{
-	Super::AcknowledgePossession(P);
-
-	ADPCharacter* DPCharacter = Cast<ADPCharacter>(P);
-	DPCharacter->SetReplicatingMovement(true);
+	LevelComponent = CreateDefaultSubobject<ULC_MatchLobby>(TEXT("ULC_MatchLobby"));
 }
 
 void APC_MatchingLobby::ServerSetReady_Implementation(bool pIsReady)
@@ -47,7 +40,7 @@ void APC_MatchingLobby::BeginPlay()
 	Super::BeginPlay();
 
 	bShowMouseCursor = true;
-	ActivateCurrentComponent(this);
+	SetInputMode(FInputModeGameOnly());
 }
 
 void APC_MatchingLobby::SetCineCameraView()
@@ -75,14 +68,12 @@ void APC_MatchingLobby::SetCineCameraView()
 
 void APC_MatchingLobby::ActivateCurrentComponent(APC_MatchingLobby* LocalPlayerController)
 {
-	LevelComponent = CreateDefaultSubobject<ULC_MatchLobby>(TEXT("ULC_MatchLobby"));
 	if (LevelComponent)
 	{
 		LevelComponent->PrimaryComponentTick.bCanEverTick = true;
 		LevelComponent->Activate(true);
 		LevelComponent->SetComponentTickEnabled(true);
 		LevelComponent->RegisterComponent();
-
 		if (LocalPlayerController)
 		{
 			LevelComponent->Set_PC(LocalPlayerController);
@@ -101,6 +92,10 @@ void APC_MatchingLobby::ActivateCurrentComponent(APC_MatchingLobby* LocalPlayerC
 		if (UIC_MatchLobby* IC_Local = LevelComponent->GetInputComponent())
 		{
 			IC_Local->Activate(true);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("PC_MatchingLobby::InputComponent is nullptr"));
 		}
 	}
 }
@@ -129,6 +124,23 @@ void APC_MatchingLobby::DeactiveCurrentComponent()
 void APC_MatchingLobby::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-	LevelComponent->Set_CHAR(InPawn);
-	LevelComponent->GetInputComponent()->Set_CHAR(InPawn);
+	ActivateCurrentComponent(this);
+
+	if (LevelComponent)
+	{
+		LevelComponent->Set_CHAR(InPawn);
+		LevelComponent->GetInputComponent()->Set_CHAR(InPawn);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PC_MatchingLobby::LevelComponent is nullptr"));
+	}
+}
+
+void APC_MatchingLobby::AcknowledgePossession(APawn* P)
+{
+	Super::AcknowledgePossession(P);
+
+	ADPCharacter* DPCharacter = Cast<ADPCharacter>(P);
+	DPCharacter->SetReplicatingMovement(true);
 }

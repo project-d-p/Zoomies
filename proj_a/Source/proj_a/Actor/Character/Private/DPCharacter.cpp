@@ -191,7 +191,7 @@ ADPCharacter::ADPCharacter()
 				LobbyInfoWidgetComponent->DestroyComponent();
 				LobbyInfoWidgetComponent = nullptr;
 			}
-	
+
 			LobbyInfoWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("LobbyInfoWidgetComponent"));
 			static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClass(TEXT("/Game/widget/WBP_MatchLobby/widget_LobbyInfo.widget_LobbyInfo_C"));
 			if (WidgetClass.Succeeded())
@@ -199,12 +199,8 @@ ADPCharacter::ADPCharacter()
 				LobbyInfoWidgetComponent->SetWidgetClass(WidgetClass.Class);
 			}
 			LobbyInfoWidgetComponent->SetVisibility(true);
-			LobbyInfoWidgetComponent->SetWidgetSpace( EWidgetSpace::World);
-			LobbyInfoWidgetComponent->SetupAttachment(GetMesh());
-			LobbyInfoWidgetComponent->SetRelativeLocation(FVector(0, 0, 650));
-			LobbyInfoWidgetComponent->SetRelativeScale3D(FVector(1.4f, 1.4f, 1.4f));
-			LobbyInfoWidgetComponent->SetDrawSize(FVector2D(260,100));
-			LobbyInfoWidgetComponent->SetRelativeRotation(FRotator(-180, -90, 180));
+			LobbyInfoWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+			LobbyInfoWidgetComponent->SetDrawSize(FVector2D(260, 100));
 		}
 	}
 }

@@ -13,21 +13,37 @@ UIC_MatchLobby::UIC_MatchLobby()
 	(TEXT("/Game/input/imc_character.imc_character"));
 	if (DEFAULT_CONTEXT.Succeeded())
 		InputMappingContext = DEFAULT_CONTEXT.Object;
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("IC_MatchLobby::Failed to load InputMappingContext"));
+	}
 
 	static ConstructorHelpers::FObjectFinder<UInputAction>IA_MOVE
 	(TEXT("/Game/input/ia_move.ia_move"));
 	if (IA_MOVE.Succeeded())
 		MoveAction = IA_MOVE.Object;
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("IC_MatchLobby::Failed to load MoveAction"));
+	}
 
 	static ConstructorHelpers::FObjectFinder<UInputAction>IA_JUMP
 	(TEXT("/Game/input/ia_jump.ia_jump"));
 	if (IA_JUMP.Succeeded())
 		JumpAction = IA_JUMP.Object;
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("IC_MatchLobby::Failed to load JumpAction"));
+	}
 
 	static ConstructorHelpers::FObjectFinder<UInputAction>IA_ROTATE
 	(TEXT("/Game/input/ia_rotate.ia_rotate"));
 	if (IA_ROTATE.Succeeded())
 		RotateAction = IA_ROTATE.Object;
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("IC_MatchLobby::Failed to load RotateAction"));
+	}
 }
 
 void UIC_MatchLobby::Activate(bool bReset)
@@ -71,6 +87,10 @@ void UIC_MatchLobby::BindMatchLobbyActions()
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &UIC_MatchLobby::Move);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &UIC_MatchLobby::Jump);
 		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &UIC_MatchLobby::Rotate);
+		if (!MoveAction || !JumpAction || !RotateAction)
+		{
+			UE_LOG(LogTemp, Error, TEXT("IC_MatchLobby::One or more InputActions are not valid"));
+		}
 	}
 	else
 	{
@@ -113,10 +133,10 @@ void UIC_MatchLobby::UnbindMatchLobbyActions()
 void UIC_MatchLobby::Move(const FInputActionValue& value)
 {
 	APC_MatchingLobby* PlayerController = Get_PC(); 
-	ADPCharacter* Character = Cast<ADPCharacter>(Get_PC());
+	ADPCharacter* Character = Cast<ADPCharacter>(Get_CHAR());
 	if (!Character)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Can't found PlayerCharacter"));
+		UE_LOG(LogTemp, Warning, TEXT("IC_MatchLobby::Can't found PlayerCharacter"));
 		return ;
 	}
 	if (Character->IsStunned())
@@ -126,8 +146,8 @@ void UIC_MatchLobby::Move(const FInputActionValue& value)
 	const FVector2D actionValue = value.Get<FVector2D>();
 	const FRotator controlRotation = PlayerController->GetControlRotation();
 
-	const FVector forwardVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
-	const FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
+	const FVector forwardVector = -FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
+	const FVector rightVector = -FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
 
 	Character->AddMovementInput(forwardVector, actionValue.X);
 	Character->AddMovementInput(rightVector, actionValue.Y);
@@ -135,7 +155,7 @@ void UIC_MatchLobby::Move(const FInputActionValue& value)
 
 void UIC_MatchLobby::Jump(const FInputActionValue& value)
 {
-	ADPCharacter* Character = Cast<ADPCharacter>(Get_PC());
+	ADPCharacter* Character = Cast<ADPCharacter>(Get_CHAR());
 	if (!Character)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("IC_MatchLobby::Can't found PlayerCharacter"));
@@ -150,7 +170,7 @@ void UIC_MatchLobby::Jump(const FInputActionValue& value)
 
 void UIC_MatchLobby::Rotate(const FInputActionValue& value)
 {
-	ADPCharacter* Character = Cast<ADPCharacter>(Get_PC());
+	ADPCharacter* Character = Cast<ADPCharacter>(Get_CHAR());
 	if (!Character)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("IC_MatchLobby::Can't found PlayerCharacter"));
@@ -173,30 +193,38 @@ APawn* UIC_MatchLobby::Get_CHAR()
 	if (PC_MatchLobby != nullptr)
 	{
 		CHAR_MatchLobby = PC_MatchLobby->GetPawn();
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("GetPawn from MatchLobbyController"));
-		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("IC_MatchLobby::PlayerController is nullptr."));
+		UE_LOG(LogTemp, Warning, TEXT("IC_MatchLobby::Charactor is nullptr."));
 	}
 	return CHAR_MatchLobby;
 }
 
 void UIC_MatchLobby::Set_PC(APC_MatchingLobby* Apc_MatchingLobby)
 {
+	if (Apc_MatchingLobby == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("IC_MatchLobby::PlayerController is nullptr."));
+	}
 	PC_MatchLobby = Apc_MatchingLobby;
 }
 
 void UIC_MatchLobby::Set_CHAR(APawn* Pawn)
 {
+	if (Pawn == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("IC_MatchLobby::Pawn is nullptr."));
+	}
 	CHAR_MatchLobby = Pawn;
 }
 
 void UIC_MatchLobby::Set_LC(ULC_MatchLobby* Lc_MatchLobby)
 {
+	if (Lc_MatchLobby == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("IC_MatchLobby::LevelComponent is nullptr."));
+	}
 	OwningLevelComponent = Lc_MatchLobby;
 }
 
