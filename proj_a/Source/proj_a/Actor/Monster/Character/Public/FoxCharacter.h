@@ -10,4 +10,6 @@ class PROJ_A_API AFoxCharacter : public ABaseMonsterCharacter
 
 public:
 	AFoxCharacter();
+protected:
+	const EAnimal AnimalType = EAnimal::ANIMAL_FOX;
 };

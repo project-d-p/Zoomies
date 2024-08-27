@@ -5,20 +5,7 @@
 
 ASlothCharacter::ASlothCharacter()
 {
-	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_SLOTH
-	(PathManager::GetMonsterPath(EAnimal::ANIMAL_SLOTH));
-	if (SK_SLOTH.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_SLOTH.Object);
-	}
-
-	/** Loading animations */
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_SLOTH));
-	if (ANIM_CHARACTER.Succeeded()) {
-		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
-	}
+	InitMonsterMeshData(AnimalType);
 	
 	/** Set the Capsule size */
 	DefaultCP.Radius = 120.f;

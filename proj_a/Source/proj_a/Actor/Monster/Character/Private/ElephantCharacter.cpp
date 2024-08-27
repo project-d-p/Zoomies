@@ -5,20 +5,7 @@
 
 AElephantCharacter::AElephantCharacter()
 {
-	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_ELEPHANT
-	(PathManager::GetMonsterPath(EAnimal::ANIMAL_ELEPHANT));
-	if (SK_ELEPHANT.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_ELEPHANT.Object);
-	}
-
-	/** Loading animations */
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER(
-		PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_ELEPHANT));
-	if (ANIM_CHARACTER.Succeeded()) {
-		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
-	}
+	InitMonsterMeshData(AnimalType);
 
 	/** Set the Capsule size */
 	GetCapsuleComponent()->SetCapsuleRadius(65.f);

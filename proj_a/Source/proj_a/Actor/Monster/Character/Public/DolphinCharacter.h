@@ -10,4 +10,6 @@ class PROJ_A_API ADolphinCharacter : public ABaseMonsterCharacter
 
 public:
 	ADolphinCharacter();
+protected:
+	const EAnimal AnimalType = EAnimal::ANIMAL_DOLPHIN;
 };

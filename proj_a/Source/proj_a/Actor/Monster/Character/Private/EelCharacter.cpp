@@ -5,20 +5,7 @@
 
 AEelCharacter::AEelCharacter()
 {
-	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_EEL
-	(PathManager::GetMonsterPath(EAnimal::ANIMAL_EEL));
-	if (SK_EEL.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_EEL.Object);
-	}
-
-	/** Loading animations */
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER(
-		PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_EEL));
-	if (ANIM_CHARACTER.Succeeded()) {
-		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
-	}
+	InitMonsterMeshData(AnimalType);
 
 	/** Set the Capsule size */
 	DefaultCP.Radius = 34.f;

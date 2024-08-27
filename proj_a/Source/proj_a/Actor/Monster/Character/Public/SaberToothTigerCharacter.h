@@ -10,4 +10,6 @@ class PROJ_A_API ASaberToothTigerCharacter : public ABaseMonsterCharacter
 
 public:
 	ASaberToothTigerCharacter();
+protected:
+	const EAnimal AnimalType = EAnimal::ANIMAL_SABER_TOOTH_TIGER;
 };

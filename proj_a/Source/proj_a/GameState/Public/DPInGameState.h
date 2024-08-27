@@ -20,6 +20,9 @@ public:
 	virtual UChatManager* GetChatManager() const override { return ChatManager; }
 	UClientTimerManager* GetTimerManager() const { return TimerManager; }
 
+	void AddConnectedPlayer() { ConnectedPlayers++; }
+	bool AreAllPlayersConnected() { return ConnectedPlayers == ExpectedPlayers; }
+	
 	/*
 	 * TEST: COMMENT
 	UPROPERTY(ReplicatedUsing=OnRep_ServerTraveled)
@@ -29,6 +32,9 @@ protected:
 	virtual void AddPlayerState(APlayerState* PlayerState) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	int32 ConnectedPlayers = 0;
+	const int32 ExpectedPlayers = 4;
+	
 	/*
 	 * TEST: COMMENT
 	UFUNCTION()

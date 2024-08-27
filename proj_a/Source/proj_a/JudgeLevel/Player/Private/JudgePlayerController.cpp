@@ -26,29 +26,35 @@ AJudgePlayerController::AJudgePlayerController()
 void AJudgePlayerController::SetOccupationeName_Implementation(int index, const FString& Name)
 {
 	// XXX: If the client experiences slow loading times, issues may arise with the code below.
-	// TODO: Address this after alpha testing.
-	check(JudgeLevelUI)
+	if (JudgeLevelUI)
+		return ;
+	// check(JudgeLevelUI)
 	JudgeLevelUI->SetBlockContent(ETextBlockType::Occupation, index, Name);
 }
 
 void AJudgePlayerController::InitializeUI_Implementation(const FUIInitData UIData)
 {
-	check(JudgeLevelUI)
-	for (int32 i = 0; i < UIData.PlayerData.Num(); i++)
+	if (JudgeLevelUI)
 	{
-		const FPlayerInitData& PlayerData = UIData.PlayerData[i];
+		for (int32 i = 0; i < UIData.PlayerData.Num(); i++)
+		{
+			const FPlayerInitData& PlayerData = UIData.PlayerData[i];
     
-		JudgeLevelUI->SetBlockContent(ETextBlockType::Id, i, PlayerData.PlayerName);
-		JudgeLevelUI->SetBlockContent(ETextBlockType::Score, i, FString::FromInt(PlayerData.Score));
-		JudgeLevelUI->SetBlockContent(ETextBlockType::Occupation, i, PlayerData.Occupation);
+			JudgeLevelUI->SetBlockContent(ETextBlockType::Id, i, PlayerData.PlayerName);
+			JudgeLevelUI->SetBlockContent(ETextBlockType::Score, i, FString::FromInt(PlayerData.Score));
+			JudgeLevelUI->SetBlockContent(ETextBlockType::Occupation, i, PlayerData.Occupation);
+		}
+		JudgeLevelUI->SetVoterName(UIData.VoterName);
 	}
-	JudgeLevelUI->SetVoterName(UIData.VoterName);
+	GetWorldTimerManager().ClearTimer(TH);
 }
 
 void AJudgePlayerController::SetVoterName_Implementation(const FString& Name)
 {
-	check(JudgeLevelUI)
-	JudgeLevelUI->SetVoterName(Name);
+	if (JudgeLevelUI)
+	{
+		JudgeLevelUI->SetVoterName(Name);
+	}
 }
 
 void AJudgePlayerController::ServerSendChatMessage_Implementation(const FString& SenderName, const FString& Message)
@@ -61,18 +67,22 @@ void AJudgePlayerController::ServerSendChatMessage_Implementation(const FString&
 void AJudgePlayerController::ReturnVote_Implementation(EPlayerJob Type)
 {
 	AJudgeGameMode* GM = Cast<AJudgeGameMode>(GetWorld()->GetAuthGameMode());
-	check(GM)
-	GM->AddVote(Type);
+	if (GM)
+	{
+		GM->AddVote(Type);
+	}
 }
 
 void AJudgePlayerController::RequestUIData_Implementation()
 {
 	AJudgeGameMode* GM = Cast<AJudgeGameMode>(GetWorld()->GetAuthGameMode());
-	check(GM)
+	if (!GM)
+		return ;
 	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 	{
 		AJudgePlayerController* JPS = Cast<AJudgePlayerController>(*It);
-		check(JPS)
+		if (!JPS)
+			continue;
 		JPS->InitializeUI(GM->GetUiData());
 	}
 }
@@ -89,9 +99,8 @@ void AJudgePlayerController::BeginPlay()
 		JudgeLevelUI->AddToViewport();
 		IsBeginPlay = true;
 		bShowMouseCursor = true;
-
-		FTimerHandle TH;
-		GetWorldTimerManager().SetTimer(TH, this, &AJudgePlayerController::RequestUIData, 1.f, false);
+		
+		GetWorldTimerManager().SetTimer(TH, this, &AJudgePlayerController::RequestUIData, 1.f, true);
 	}
 }
 
