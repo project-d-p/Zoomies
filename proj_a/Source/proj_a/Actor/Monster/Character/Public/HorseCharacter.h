@@ -10,4 +10,6 @@ class PROJ_A_API AHorseCharacter : public ABaseMonsterCharacter
 
 public:
 	AHorseCharacter();
+protected:
+	const EAnimal AnimalType = EAnimal::ANIMAL_HORSE;
 };

@@ -1,6 +1,5 @@
 #include "BaseMonsterCharacter.h"
 
-#include "BaseMonsterAIController.h"
 #include "DPCharacter.h"
 #include "FDataHub.h"
 #include "FNetLogger.h"
@@ -9,7 +8,6 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 #include "proj_a.h"
-#include "PathManager.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -27,9 +25,10 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
 	GetMesh()->SetCollisionResponseToAllChannels(ECR_Block);
 	
     GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->bRequestedMoveUseAcceleration = false;
     bUseControllerRotationYaw = false;
 
-	GetCharacterMovement()->PrimaryComponentTick.TickInterval = 0.033f;
+	// GetCharacterMovement()->PrimaryComponentTick.TickInterval = 0.033f;
 	
 	// arrowSparkle = CreateDefaultSubobject<UArrowComponent>(TEXT("arrowComponent"));
 	// arrowSparkle->SetupAttachment(GetMesh());
@@ -95,6 +94,61 @@ void ABaseMonsterCharacter::BeginPlay()
 		widgetComponent->SetVisibility(false);
 
 	GetCapsuleComponent()->SetCollisionObjectType(ECC_MonsterChannel);
+	GetMesh()->SetCollisionObjectType(ECC_MonsterChannel);
+}
+
+/** Static storage for loaded meshes and animations */
+static std::map<EAnimal, USkeletalMesh*> SkeletalMeshMap;
+static std::map<EAnimal, USkeletalMesh*> SkeletalMeshTransparencyMap;
+static std::map<EAnimal, UClass*> AnimClassMap;
+
+void ABaseMonsterCharacter::InitMonsterMeshData(EAnimal AT)
+{
+	/** Loading models */
+	if (!SkeletalMeshMap.contains(AT))
+	{
+		ConstructorHelpers::FObjectFinder<USkeletalMesh> SK(
+			PathManager::GetMonsterPath(AT));
+		if (SK.Succeeded())
+		{
+			SkeletalMeshMap[AT] = SK.Object;
+		}
+	}
+	else
+	{
+		GetMesh()->SetSkeletalMesh(SkeletalMeshMap[AT]);
+	}
+
+	/** Load TransparencyMesh */
+	if (!SkeletalMeshTransparencyMap.contains(AT))
+	{
+		ConstructorHelpers::FObjectFinder<USkeletalMesh> SkeletalMeshFinder(
+			PathManager::GetMonsterTransparencyMeshPath(AT));
+		if (SkeletalMeshFinder.Succeeded())
+		{
+			SkeletalMeshTransparencyMap[AT]= SkeletalMeshFinder.Object;
+		}
+	}
+	else
+	{
+		OSK = SkeletalMeshTransparencyMap[AT];	
+	}
+
+	/** Load Animations */
+	if (!AnimClassMap.contains(AT))
+	{
+		ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER(
+			PathManager::GetMonsterAnimationPath(AT));
+		if (ANIM_CHARACTER.Succeeded())
+		{
+			AnimClassMap[AT] = ANIM_CHARACTER.Class;
+		}
+	}
+	else
+	{
+		GetMesh()->SetAnimInstanceClass(AnimClassMap[AT]);
+	}
+	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 }
 
 void ABaseMonsterCharacter::SyncPosition()
@@ -139,7 +193,7 @@ void ABaseMonsterCharacter::SetCatchable(bool bCond)
 	if (bCond)
 	{
 		GetMesh()->CustomDepthStencilValue = 3;
-		GetMesh()->MarkRenderStateDirty();	// render ���� ����
+		GetMesh()->MarkRenderStateDirty();	// render 
 		widgetComponent->SetVisibility(bCond);
 	}
 	else
@@ -188,7 +242,12 @@ void ABaseMonsterCharacter::OnRep_FaintCharacterMotion()
 {
 	GetCapsuleComponent()->SetCapsuleRadius(FaintCP.Radius);
 	GetCapsuleComponent()->SetCapsuleHalfHeight(FaintCP.HalfHeight);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_MonsterChannel, ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_MonsterChannel, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_PlayerChannel, ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_PlayerChannel, ECR_Ignore);
 	GetMesh()->SetRelativeTransform(CB_FaintStateMtx);
+	GetMesh()->SetSkeletalMesh(OSK);
 }
 
 ABaseMonsterCharacter::~ABaseMonsterCharacter()

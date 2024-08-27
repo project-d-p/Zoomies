@@ -8,7 +8,6 @@
 #include "BaseInputComponent.h"
 #include "ClientNetworkManager.h"
 #include "JudgeGameMode.h"
-#include "JudgeLevelComponent.h"
 #include "MainLevelComponent.h"
 #include "ResultLevelComponent.h"
 #include "CompileMode.h"

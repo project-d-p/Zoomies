@@ -5,20 +5,7 @@
 
 ALionCharacter::ALionCharacter()
 {
-	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_LION
-	(PathManager::GetMonsterPath(EAnimal::ANIMAL_LION));
-	if (SK_LION.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_LION.Object);
-	}
-
-	/** Loading animations */
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_LION));
-	if (ANIM_CHARACTER.Succeeded()) {
-		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
-	}
+	InitMonsterMeshData(AnimalType);
 
 	/** Set the Capsule size */
 	DefaultCP.Radius = 74.f;

@@ -5,20 +5,7 @@
 
 ADolphinCharacter::ADolphinCharacter()
 {
-	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_DOLPHIN
-	(PathManager::GetMonsterPath(EAnimal::ANIMAL_DOLPHIN));
-	if (SK_DOLPHIN.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_DOLPHIN.Object);
-	}
-
-	/** Loading animations */
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER(
-		PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_DOLPHIN));
-	if (ANIM_CHARACTER.Succeeded()) {
-		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
-	}
+	InitMonsterMeshData(AnimalType);
 	
 	/** Set the Capsule size */
 	DefaultCP.Radius = 61.f;

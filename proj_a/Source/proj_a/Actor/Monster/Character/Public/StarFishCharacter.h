@@ -10,4 +10,6 @@ class PROJ_A_API AStarFishCharacter : public ABaseMonsterCharacter
 
 public:
 	AStarFishCharacter();
+protected:
+	const EAnimal AnimalType = EAnimal::ANIMAL_STAR_FISH;
 };

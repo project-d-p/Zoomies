@@ -18,16 +18,17 @@ class PROJ_A_API ABaseMonsterAIController : public AAIController, public ICrowdA
 	GENERATED_BODY()
 
 public:
-	ABaseMonsterAIController();
+	ABaseMonsterAIController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	int32 GetMonsterId() const { return Cast<ABaseMonsterCharacter>(GetCharacter())->MonsterId; }
 	void RemovePawnAndController();
 	void TakeMonsterDamage(float dmg);
-	virtual void SimulateMovement(float delta_time) {}
+	virtual void SimulateMovement(float delta_time);
 
 	int32 index = -1;
 
 protected:
 	bool GetMovementAllowed();
+	virtual void BeginPlay() override;
 	
 	UPROPERTY()
 	UBT_Monster* BehaviorTreeAsset;
