@@ -7,6 +7,7 @@
 #include "proj_a/MatchingLobby/GM_MatchingLobby/GM_MatchingLobby.h"
 #include "proj_a/MatchingLobby/GS_MachingLobby/GS_MatchingLobby.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include "proj_a/GameInstance/GI_Zoomies.h"
 
 void APC_MatchingLobby::ServerSetReady_Implementation(bool pIsReady)
 {
@@ -44,6 +45,11 @@ void APC_MatchingLobby::BeginPlay()
 	
 	FInputModeUIOnly InputMode;
 	SetInputMode(InputMode);
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (IsValid(GameInstance))
+	{
+		GameInstance->LoadFriendsList();
+	}
 }
 
 void APC_MatchingLobby::SetCineCameraView()
