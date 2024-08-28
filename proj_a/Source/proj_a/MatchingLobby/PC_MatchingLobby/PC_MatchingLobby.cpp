@@ -151,6 +151,21 @@ void APC_MatchingLobby::AcknowledgePossession(APawn* P)
 {
 	Super::AcknowledgePossession(P);
 
-	ADPCharacter* DPCharacter = Cast<ADPCharacter>(P);
-	DPCharacter->SetReplicatingMovement(true);
+	//ADPCharacter* DPCharacter = Cast<ADPCharacter>(P);
+	//DPCharacter->SetReplicatingMovement(true);
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		ADPCharacter* DPCharacter = Cast<ADPCharacter>(P);
+		if (!DPCharacter)
+		{
+			return ;
+		}
+		
+		if (UWorld* World = GetWorld())
+		{
+			FString CurrentLevelName = World->GetMapName();
+			DPCharacter->SetReplicatingMovement(true);
+			ActivateCurrentComponent(this);
+		}
+	}
 }
