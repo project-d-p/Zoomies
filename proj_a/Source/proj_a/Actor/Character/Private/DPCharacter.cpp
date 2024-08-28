@@ -208,6 +208,20 @@ ADPCharacter::ADPCharacter()
 			LobbyInfoWidgetComponent->SetRelativeScale3D(FVector(1.4f, 1.4f, 1.4f));
 			LobbyInfoWidgetComponent->SetDrawSize(FVector2D(260,100));
 			LobbyInfoWidgetComponent->SetRelativeRotation(FRotator(-180, -90, 180));
+			// Adjust for back view
+			LobbyInfoWidgetComponentBack = CreateDefaultSubobject<UWidgetComponent>(TEXT("LobbyInfoWidgetComponentBack"));
+			if (WidgetClass.Succeeded())
+			{
+				LobbyInfoWidgetComponentBack->SetWidgetClass(WidgetClass.Class);
+			}
+			LobbyInfoWidgetComponentBack->SetVisibility(true);
+			LobbyInfoWidgetComponentBack->SetWidgetSpace(EWidgetSpace::World);
+			LobbyInfoWidgetComponentBack->SetupAttachment(GetMesh());
+			LobbyInfoWidgetComponentBack->SetRelativeLocation(FVector(0, 0, 650));
+			LobbyInfoWidgetComponentBack->SetRelativeScale3D(FVector(1.4f, 1.4f, 1.4f));
+			LobbyInfoWidgetComponentBack->SetDrawSize(FVector2D(260, 100));
+			LobbyInfoWidgetComponentBack->SetRelativeRotation(FRotator(0, -90, 0));
+
 		}
 	}
 }

@@ -1,5 +1,6 @@
 #include "GS_MatchingLobby.h"
 
+#include "CompileMode.h"
 #include "DPCharacter.h"
 #include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -33,10 +34,12 @@ void AGS_MatchingLobby::UpdateLobbyInfo() const
 		if (Character && Character->LobbyInfoWidgetComponent)
 		{
 			UUserWidget* Widget = Character->LobbyInfoWidgetComponent->GetUserWidgetObject();
-			if (Widget)
+			UUserWidget* WidgetBack = Character->LobbyInfoWidgetComponentBack->GetUserWidgetObject();
+			if (Widget && WidgetBack)
 			{
 				FString Command = FString::Printf(TEXT("Update %d"), j);
 				Widget->CallFunctionByNameWithArguments(*Command, *GLog, nullptr, true);
+				WidgetBack->CallFunctionByNameWithArguments(*Command, *GLog, nullptr, true);
 			}
 			else
 			{

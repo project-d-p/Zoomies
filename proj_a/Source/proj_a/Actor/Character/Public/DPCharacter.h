@@ -69,6 +69,9 @@ public:	// component
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MatchLobby")
 	UWidgetComponent* LobbyInfoWidgetComponent = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MatchLobby")
+	UWidgetComponent* LobbyInfoWidgetComponentBack = nullptr;
 
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
 	//UMaterialInstanceDynamic* dynamicMaterialInstance;
