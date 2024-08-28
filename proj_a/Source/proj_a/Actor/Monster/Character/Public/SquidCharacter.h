@@ -10,4 +10,6 @@ class PROJ_A_API ASquidCharacter : public ABaseMonsterCharacter
 
 public:
 	ASquidCharacter();
+protected:
+	const EAnimal AnimalType = EAnimal::ANIMAL_SQUID;
 };

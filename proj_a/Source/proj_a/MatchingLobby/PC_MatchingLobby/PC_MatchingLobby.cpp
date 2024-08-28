@@ -2,8 +2,13 @@
 
 #include "CineCameraActor.h"
 #include "Kismet/GameplayStatics.h"
+#include "OnlineSessionSettings.h"
+#include "GameFramework/PlayerState.h"
+#include "Kismet/GameplayStatics.h"
 #include "proj_a/MatchingLobby/GM_MatchingLobby/GM_MatchingLobby.h"
 #include "proj_a/MatchingLobby/GS_MachingLobby/GS_MatchingLobby.h"
+#include "Interfaces/OnlineSessionInterface.h"
+#include "proj_a/GameInstance/GI_Zoomies.h"
 #include "proj_a/MatchingLobby/A_MatchingLobby/LC_MatchLobby.h"
 
 APC_MatchingLobby::APC_MatchingLobby()
@@ -41,6 +46,11 @@ void APC_MatchingLobby::BeginPlay()
 
 	bShowMouseCursor = true;
 	SetInputMode(FInputModeGameOnly());
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (IsValid(GameInstance))
+	{
+		GameInstance->LoadFriendsList();
+	}
 }
 
 void APC_MatchingLobby::SetCineCameraView()

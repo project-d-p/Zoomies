@@ -3,6 +3,7 @@
 #include "DPCharacter.h"
 
 #include "BaseMonsterCharacter.h"
+#include "ChasePlayerMonsterAIController.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "DPHpActorComponent.h"
@@ -127,6 +128,8 @@ ADPCharacter::ADPCharacter()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionObjectType(ECC_PlayerChannel);
+	GetMesh()->SetCollisionObjectType(ECC_PlayerChannel);
 
 	// Enable hit events
 	GetCapsuleComponent()->SetNotifyRigidBodyCollision(true);
@@ -456,8 +459,7 @@ void ADPCharacter::UpdateNameTagRotation()
 			}
 			FVector CameraLocation = PlayerController->PlayerCameraManager->GetCameraLocation();
 			FRotator NewRotation = (CameraLocation - NameTag_WidgetComponent->GetComponentLocation()).Rotation();
-            
-			// ���� Yaw ȸ���� ����
+           
 			NewRotation.Pitch = 0.0f;
 			NewRotation.Roll = 0.0f;
             
@@ -491,6 +493,17 @@ void ADPCharacter::CheckCollisionWithMonster()
 		{
 			if (ABaseMonsterCharacter* MC = Cast<ABaseMonsterCharacter>(HitResult.GetActor()))
 			{
+				/* Only ChasePlayerMonsterAIController can hit the player */
+				AChasePlayerMonsterAIController* HC = Cast<AChasePlayerMonsterAIController>(MC->GetController());
+				if (!HC)
+					continue;
+				
+				ACharacter* TargetPlayer = UGameplayStatics::GetPlayerCharacter(GetWorld(), HC->GetPlayerIndex());
+				if (TargetPlayer && TargetPlayer == this)
+				{
+					/* Monster collided with its current target player; initiate search for a new player target */
+					HC->SetRandomPlayerIndex();
+				}
 				OnServerHit(HitResult);
 			}
 		}

@@ -45,20 +45,20 @@ void UBasicInputComponent::BindBasicLevelActions()
 	if (!PlayerController) return ;
 	if (!PlayerController->IsLocalController()) return ;
 
-	// Mapping Context Ãß°¡
+	// Mapping Context ì¶”ê°€
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 	{
 		SubSystem->AddMappingContext(BasicLevelContext, 0);
 	}
 
-	// Enhanced Input Component °¡Á®¿À±â ¹× ¹ÙÀÎµù
+	// Enhanced Input Component ê°€ì ¸ì˜¤ê¸° ë° ë°”ì¸ë”©
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 	{
-		// ÇÃ·¹ÀÌ¾î ÀÌµ¿ ( w, a, d, s )
+		// í”Œë ˆì´ì–´ ì´ë™ ( w, a, d, s )
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &UBasicInputComponent::Move);
-		// ÇÃ·¹ÀÌ¾î Á¡ÇÁ ( space )
+		// í”Œë ˆì´ì–´ ì í”„ ( space )
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &UBasicInputComponent::Jump);
-		// ½ÃÁ¡ º¯È¯ ( ¸¶¿ì½º È¸Àü )
+		// ì‹œì  ë³€í™˜ ( ë§ˆìš°ìŠ¤ íšŒì „ )
 		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &UBasicInputComponent::Rotate);
 	}
 }
@@ -68,13 +68,13 @@ void UBasicInputComponent::UnbindBasicLevelActions()
 	ADPPlayerController* PlayerController = GetPlayerController();
 	if (PlayerController) return ;
 
-	// Enhanced Input Component ¹ÙÀÎµù Á¦°Å
+	// Enhanced Input Component ë°”ì¸ë”© ì œê±°
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 	{
 		EnhancedInputComponent->ClearActionBindings();
 	}
 
-	// Mapping Context Á¦°Å
+	// Mapping Context ì œê±°
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 	{
 		if (BasicLevelContext)

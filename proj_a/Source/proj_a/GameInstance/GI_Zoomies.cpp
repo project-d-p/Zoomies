@@ -195,15 +195,6 @@ bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& se
 		FOnJoinSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onJoinComplete));
 	SessionName = FName(*search_result.Session.GetSessionIdStr());
 
-	if (GEngine)
-	{
-		//log on screen SessionName
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			30.f,
-			FColor::Green,
-			FString::Printf(TEXT("Joining Session: %s"), *SessionName.ToString()));
-	}
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
 	session_interface_->JoinSession(*local_player->GetPreferredUniqueNetId(), SessionName, search_result);
 	return true;

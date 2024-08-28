@@ -6,7 +6,7 @@
 #include "Interfaces/OnlineFriendsInterface.h"
 #include "TYPE_MatchingLobby.generated.h"
 
-#define MAX_USERS 4
+#define MAX_USERS Zoomies::MAX_PLAYERS
 #define GAME_APPID "480"
 
 USTRUCT(BlueprintType)

@@ -1,5 +1,6 @@
 #include "GM_MatchingLobby.h"
 
+#include "CompileMode.h"
 #include "DPCharacter.h"
 #include "isteamfriends.h"
 #include "isteamuser.h"
@@ -49,16 +50,6 @@ void AGM_MatchingLobby::Logout(AController* Exiting) {
 void AGM_MatchingLobby::BeginPlay() {
 	Super::BeginPlay();
 	FindAndStoreLobbyPlatforms();
-	
-	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
-	if (IsValid(GameInstance))
-	{
-		GameInstance->LoadFriendsList();
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AGM_MatchingLobby::BeginPlay: GameInstance is not valid"));
-	}
 }
 
 void AGM_MatchingLobby::CheckReadyToStart() 
