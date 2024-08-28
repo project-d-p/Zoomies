@@ -46,7 +46,7 @@ void APC_MatchingLobby::BeginPlay()
 	FInputModeUIOnly InputMode;
 	SetInputMode(InputMode);
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
-	if (IsValid(GameInstance))
+	if (IsValid(GameInstance) && GameInstance->FriendsArray.Num() == 0)
 	{
 		GameInstance->LoadFriendsList();
 	}
