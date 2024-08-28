@@ -82,7 +82,6 @@ void AGM_MatchingLobby::FindAndStoreLobbyPlatforms()
 	if (FoundActors.Num() != MAX_USERS)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AGM_MatchingLobby::FindAndStoreLobbyPlatforms: FoundActors.Num() != MAX_USERS"));
-		return;
 	}
 	
 	for (AActor* Actor : FoundActors)

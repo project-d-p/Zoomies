@@ -202,8 +202,12 @@ ADPCharacter::ADPCharacter()
 				LobbyInfoWidgetComponent->SetWidgetClass(WidgetClass.Class);
 			}
 			LobbyInfoWidgetComponent->SetVisibility(true);
-			LobbyInfoWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
-			LobbyInfoWidgetComponent->SetDrawSize(FVector2D(260, 100));
+			LobbyInfoWidgetComponent->SetWidgetSpace( EWidgetSpace::World);
+			LobbyInfoWidgetComponent->SetupAttachment(GetMesh());
+			LobbyInfoWidgetComponent->SetRelativeLocation(FVector(0, 0, 650));
+			LobbyInfoWidgetComponent->SetRelativeScale3D(FVector(1.4f, 1.4f, 1.4f));
+			LobbyInfoWidgetComponent->SetDrawSize(FVector2D(260,100));
+			LobbyInfoWidgetComponent->SetRelativeRotation(FRotator(-180, -90, 180));
 		}
 	}
 }
@@ -294,7 +298,15 @@ void ADPCharacter::BeginPlay()
 	constructionComponent->placeWall = false;
 	constructionComponent->placeturret = false;
 	bUseControllerRotationYaw = false;
-	SetNameTag();
+	if (UWorld* World = GetWorld())
+	{
+		FString CurrentLevelName = UGameplayStatics::GetCurrentLevelName(World);
+		
+		if (CurrentLevelName != "matchLobby")
+		{
+			SetNameTag();
+		}
+	}
 }
 
 // Called every frame
@@ -559,7 +571,6 @@ void ADPCharacter::RemoveStunEffect()
 
 void ADPCharacter::ApplyKockback_Implementation(const FHitResult& HitResult)
 {
-	// �浹 �������� ĳ���� ��ġ���� ������ ���
 	FVector KnockbackDirection = GetActorLocation() - HitResult.ImpactPoint;
 	// FVector KnockbackDirection = -HitResult.ImpactNormal;
 	KnockbackDirection.Z = 20.0f;
@@ -573,10 +584,9 @@ void ADPCharacter::ApplyKockback_Implementation(const FHitResult& HitResult)
 		KnockbackDirection = GetActorForwardVector() * -1;
 	}
 
-	// �˹� �ӵ� ����
 	float KnockbackSpeed = 2000.0f;
 
-	// Character Movement Component ��������
+	// Character Movement Component
 	UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
 	if (MovementComponent)
 	{
