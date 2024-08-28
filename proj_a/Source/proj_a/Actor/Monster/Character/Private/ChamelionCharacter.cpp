@@ -4,20 +4,7 @@
 
 AChamelionCharacter::AChamelionCharacter()
 {
-	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK
-	(PathManager::GetMonsterPath(EAnimal::ANIMAL_CHAMELEON));
-	if (SK.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK.Object);
-	}
-
-	/** Loading animations */
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_CHAMELEON));
-	if (ANIM_CHARACTER.Succeeded()) {
-		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
-	}
+	InitMonsterMeshData(AnimalType);
 
 	/** Set the Capsule size */
 	DefaultCP.Radius = 88.f;

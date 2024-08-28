@@ -5,20 +5,7 @@
 
 AOctopusCharacter::AOctopusCharacter()
 {
-	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_OCTOPUS
-	(PathManager::GetMonsterPath(EAnimal::ANIMAL_OCTOPUS));
-	if (SK_OCTOPUS.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_OCTOPUS.Object);
-	}
-
-	/** Loading animations */
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_OCTOPUS));
-	if (ANIM_CHARACTER.Succeeded()) {
-		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
-	}
+	InitMonsterMeshData(AnimalType);
 
 	/** Set the Capsule size */
 	DefaultCP.Radius = 100.f;

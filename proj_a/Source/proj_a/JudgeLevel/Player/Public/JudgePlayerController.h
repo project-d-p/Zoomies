@@ -64,8 +64,12 @@ protected:
 	
 private:
 	bool IsBeginPlay = false;
+
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UJudgeLevelUI> JudgeLevelUI_BP;
+
 	UPROPERTY()
 	UJudgeLevelUI* JudgeLevelUI;
+
+	FTimerHandle TH;
 };

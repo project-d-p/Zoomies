@@ -98,6 +98,103 @@ void ADPGameModeBase::SpawnNewCharacter(APlayerController* NewPlayer)
 	NewPlayer->GetCharacter()->SetActorLocation(SpawnLocation);
 }
 
+void ADPGameModeBase::UpdateMonsterData(ABaseMonsterCharacter* InMonster)
+{
+	auto [ClosestPlayer, MinDistance] = FindClosestPlayer(InMonster);
+	if (ClosestPlayer)
+	{
+		float MoveInterval = CalculateMoveInterval(MinDistance);
+		// FNetLogger::EditerLog(FColor::Green, TEXT("Monster: %s, ClosestPlayer: %s, Distance: %f, Interval: %f"),
+		// 	*InMonster->GetName(), *ClosestPlayer->GetName(), MinDistance, MoveInterval);
+		
+		FMonsterOptimizationData MOD;
+		MOD.ClosestPlayer = ClosestPlayer;
+		MOD.Interval = MoveInterval;
+		MOD.Dist = MinDistance;
+		if (FMonsterOptimizationData* ExistingData = MonsterOptimizationData.Find(InMonster))
+		{
+			MOD.Timer = ExistingData->Timer;
+		}
+		MonsterOptimizationData.Add(InMonster, MOD);
+	}
+}
+
+std::pair<ADPCharacter*, float> ADPGameModeBase::FindClosestPlayer(ABaseMonsterCharacter* InMonster)
+{
+	ADPCharacter* ClosestPlayer = nullptr;
+	float MinDistance = TNumericLimits<float>::Max();
+
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		APlayerController* PC = It->Get();
+		if (!PC)
+		{
+			FNetLogger::LogError(TEXT("Failed to get PlayerController. (Method: FindClosestPlayer)"));
+			return std::make_pair(nullptr, MinDistance);
+		}
+		
+		ADPCharacter* PlayerCharacter = Cast<ADPCharacter>(PC->GetPawn());
+		if (!PlayerCharacter)
+		{
+			FNetLogger::LogError(TEXT("Failed to get PlayerCharacter. (Method: FindClosestPlayer)"));
+			return std::make_pair(nullptr, MinDistance);
+		}
+		
+		float DistanceToPlayer = FVector::Dist(InMonster->GetActorLocation(), PlayerCharacter->GetActorLocation());
+		if (DistanceToPlayer < MinDistance)
+		{
+			MinDistance = DistanceToPlayer;
+			ClosestPlayer = PlayerCharacter;
+		}
+	}
+	return std::make_pair(ClosestPlayer, MinDistance);
+}
+
+float ADPGameModeBase::CalculateMoveInterval(float DistanceToPlayer)
+{
+	/* Distance Setting */
+	constexpr float CLOSE_DISTANCE = 1500.f;
+	constexpr float FAR_DISTANCE = 4000.f;
+	/* interval Setting */
+	constexpr float MIN_INTERVAL = 0.033f;
+	constexpr float MAX_INTERVAL = 1.0f;
+
+    if (DistanceToPlayer <= CLOSE_DISTANCE)
+    {
+        return MIN_INTERVAL;
+    }
+    if (DistanceToPlayer <= FAR_DISTANCE)
+    {
+        return FMath::Lerp(MIN_INTERVAL, MAX_INTERVAL, (DistanceToPlayer - CLOSE_DISTANCE) / (FAR_DISTANCE - CLOSE_DISTANCE));
+    }
+    return MAX_INTERVAL;
+}
+
+bool ADPGameModeBase:: ShouldProcessMonster(ABaseMonsterCharacter* InMonster, float& delta_time)
+{
+	float& MonsterTimer = MonsterOptimizationData.FindOrAdd(InMonster).Timer;
+	MonsterTimer += delta_time;
+
+	const float MonsterInterval = MonsterOptimizationData.Find(InMonster)->Interval;
+	if (MonsterTimer < MonsterInterval)
+	{
+		return false;
+	}
+
+	float tmp = MonsterTimer;
+	delta_time = tmp;
+	MonsterTimer = 0.f;
+	return true;
+}
+
+void ADPGameModeBase::RemoveMonsterData(ABaseMonsterCharacter* InMonster)
+{
+	if (InMonster)
+	{
+		MonsterOptimizationData.Remove(InMonster);
+	}
+}
+
 void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 {
 	Super::PostLogin(newPlayer);
@@ -134,6 +231,32 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 	{
 		player_controllers_[key]->ConnectToServer(ELevelComponentType::MAIN);
 	}
+
+	ADPInGameState* GS = GetGameState<ADPInGameState>();
+	check(GS)
+	if (GS)
+	{
+		GS->AddConnectedPlayer();
+		CheckAllPlayersConnected();
+	}
+	else
+	{
+		FNetLogger::LogError(TEXT("Fail to cast ADPInGameState."));
+	}
+}
+
+void ADPGameModeBase::CheckAllPlayersConnected()
+{
+	ADPInGameState* GS = GetGameState<ADPInGameState>();
+	check(GS)
+	if (GS && GS->AreAllPlayersConnected())
+	{
+		StartGame();
+	}
+}
+
+void ADPGameModeBase::StartGame()
+{
 }
 
 void ADPGameModeBase::Logout(AController* Exiting)
@@ -213,7 +336,7 @@ void ADPGameModeBase::Tick(float delta_time)
 				}
 				Character->SetNameTag();
 			}
-			TimerManager->StartTimer<ADPInGameState>(300.f, &ADPGameModeBase::EndGame, this);
+			TimerManager->StartTimer<ADPInGameState>(PLAY_TIME, &ADPGameModeBase::EndGame, this);
 		}
 		this->ProcessData(delta_time);
 #if EDITOR_MODE != 1
@@ -254,20 +377,68 @@ void ADPGameModeBase::ProcessData(float delta_time)
 
 void ADPGameModeBase::MonsterMoveSimulate(float delta_time)
 {
-	for (auto& mc: monster_controllers_)
+	constexpr float PLAYER_SEARCH_INTERVAL = 0.5f;
+	static float player_search_timer = 0.f;
+	player_search_timer += delta_time;
+
+	for (auto mc : monster_controllers_)
 	{
-		if (mc != nullptr)
+		if (!mc)
 		{
-			mc->SimulateMovement(delta_time);
+			continue;
+		}
+		
+		ABaseMonsterCharacter* M = mc->GetPawn<ABaseMonsterCharacter>();
+		
+		if (!M || !IsValid(M))
+		{
+			RemoveMonsterData(M);
+			continue;
+		}
+		
+		if (player_search_timer >= PLAYER_SEARCH_INTERVAL)
+		{
+			UpdateMonsterData(M);
+			M->GetMovementComponent()->PrimaryComponentTick.TickInterval = CalculateTickInterval(M);
+		}
+
+		float tTime = delta_time;
+		if (ShouldProcessMonster(M, tTime))
+		{
+			mc->SimulateMovement(tTime);
 		}
 	}
+	if (player_search_timer >= PLAYER_SEARCH_INTERVAL)
+	{
+		player_search_timer = 0.f;
+	}
+}
+
+float ADPGameModeBase::CalculateTickInterval(ABaseMonsterCharacter* InMonster)
+{
+	FMonsterOptimizationData* MD = MonsterOptimizationData.Find(InMonster);
+	if (!MD)
+		return 0.f;
+	const float Dist = MD->Dist;
+	if (Dist >= 10000.0f)
+	{
+		return 1.f;
+	}
+
+	/* Total of 0~5 steps, including 10000 */
+	int32 Step = FMath::FloorToInt(Dist / 2000.0f);
+	if (Step == 0)
+	{
+		return 0;
+	}
+	return 0.033f * (1 << (Step - 1));
 }
 
 void ADPGameModeBase::SpawnMonsters(float delta_time)
 {
 	static float spawn_timer = 0.0f;
-	constexpr float spawn_interval = 0.0f;
-
+	constexpr float spawn_interval = 0.1f;
+	
 	spawn_timer += delta_time;
 	if (spawn_timer >= spawn_interval)
 	{
@@ -277,6 +448,7 @@ void ADPGameModeBase::SpawnMonsters(float delta_time)
 			if ((monster_controllers_[idx] = MonsterFactory->RandomMonsterSpawn(idx)) != nullptr)
 				empty_monster_slots_.pop_back();
 		}
+		spawn_timer = 0.0f;
 	}
 }
 

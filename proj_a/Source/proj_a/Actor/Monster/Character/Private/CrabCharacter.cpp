@@ -4,20 +4,7 @@
 
 ACrabCharacter::ACrabCharacter()
 {
-	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CRAB
-	(PathManager::GetMonsterPath(EAnimal::ANIMAL_CRAB));
-	if (SK_CRAB.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_CRAB.Object);
-	}
-
-	/** Loading animations */
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_CRAB));
-	if (ANIM_CHARACTER.Succeeded()) {
-		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
-	}
+	InitMonsterMeshData(AnimalType);
 
 	/** Set the Capsule size */
 	DefaultCP.Radius = 91.f;

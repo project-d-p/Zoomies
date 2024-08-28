@@ -7,17 +7,38 @@
 #include "ServerChatManager.h"
 #include "GameFramework/GameModeBase.h"
 #include <queue>
-#include <thread>
 
 #include "ANetworkManager.h"
-#include "BlockingBoxVolume.h"
 #include "message.pb.h"
 #include "ServerMessageHandler.h"
 #include "DPPlayerController.h"
 #include "IChatGameMode.h"
 #include "ServerTimerManager.h"
 #include "MonsterFactory.h"
+#include "BlockingBoxVolume.h"
+#include "CompileMode.h"
 #include "DPGameModeBase.generated.h"
+
+USTRUCT()
+struct FMonsterOptimizationData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, Category="MonsterOptimizationData")
+	ADPCharacter* ClosestPlayer;
+	UPROPERTY(EditAnywhere, Category="MonsterOptimizationData")
+	float Interval;
+	UPROPERTY(EditAnywhere, Category="MonsterOptimizationData")
+	float Timer;
+	UPROPERTY(EditAnywhere, Category="MonsterOptimizationData")
+	float Dist = 0.0f;
+
+	FMonsterOptimizationData()
+		: ClosestPlayer(nullptr)
+		, Interval(1.0f)
+		, Timer(0.0f)
+	{}
+};
 
 /**
  * 
@@ -38,7 +59,7 @@ public:
 	virtual UServerChatManager* GetChatManager() const override { return ChatManager; }
 	
 	// monster
-	enum { NUM_OF_MAX_MONSTERS = 10 };
+	enum { NUM_OF_MAX_MONSTERS = Zoomies::MAX_MONSTERS };
 	std::vector<ABaseMonsterAIController*> monster_controllers_;
 	std::vector<int32> empty_monster_slots_;
 
@@ -53,10 +74,19 @@ public:
 	UScoreManagerComp* ScoreManager;
 	FTimerHandle TimerHandle_SpawnAI;
 
+	/* For Monster Movement Manage (Interval & Process) */
 	void SpawnNewCharacter(APlayerController* NewPlayer);
-
+	void UpdateMonsterData(ABaseMonsterCharacter* Monster);
+	std::pair<ADPCharacter*, float> FindClosestPlayer(ABaseMonsterCharacter* Monster);
+	float CalculateMoveInterval(float DistanceToPlayer);
+	bool ShouldProcessMonster(ABaseMonsterCharacter* Monster, float& delta_time);
+	void RemoveMonsterData(ABaseMonsterCharacter* Monster);
+	float CalculateTickInterval(ABaseMonsterCharacter* InMonster);
+	
 	// Called when the game starts or when spawned
 	virtual void PostLogin(APlayerController* newPlayer) override;
+	void CheckAllPlayersConnected();
+	void StartGame();
 	virtual void Logout(AController* Exiting) override;
 	virtual void BeginPlay() override;
 	virtual void StartPlay() override;
@@ -83,12 +113,11 @@ private:
 	void SpawnMonsters(float delta_time);
 
 	// Member variables
-	enum { NUM_OF_MAX_CLIENTS = 2 };
+	enum { NUM_OF_MAX_CLIENTS = Zoomies::MAX_PLAYERS };
 
 	// SteamNetworkingSocket* steam_listen_socket_ = nullptr;
 	UPROPERTY()
 	UANetworkManager* NetworkManager = nullptr;
-	
 	
 	float time_accumulator_ = 0.0f;
 	int gun_fire_ = 0;
@@ -107,5 +136,11 @@ private:
 	ABlockingBoxVolume* BlockingVolume;
 	bool bStart = false;
 	bool bTimeSet = false;
+	/* Set Play Time */
+	const float PLAY_TIME = Zoomies::GAME_TIME;
+
+	/* For Monster Movement Manage (Interval & Process) */
+	UPROPERTY(EditAnywhere, Category = "Debug")
+	TMap<ABaseMonsterCharacter*, FMonsterOptimizationData> MonsterOptimizationData;
 	bool bWallDisappear = false;
 };

@@ -5,6 +5,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
 #include "PathManager.h"
+#include "proj_a.h"
 #include "Evaluation/IMovieSceneEvaluationHook.h"
 
 AReturnTriggerVolume::AReturnTriggerVolume()
@@ -16,7 +17,8 @@ AReturnTriggerVolume::AReturnTriggerVolume()
 	TriggerSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	TriggerSphere->SetCollisionObjectType(ECollisionChannel::ECC_WorldStatic);
 	TriggerSphere->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	TriggerSphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+	// TriggerSphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+	TriggerSphere->SetCollisionResponseToChannel(ECC_PlayerChannel, ECollisionResponse::ECR_Overlap);
 	RootComponent = TriggerSphere;
 
 	TriggerSphere->OnComponentBeginOverlap.AddDynamic(this, &AReturnTriggerVolume::OnOverlapBegin);
