@@ -53,7 +53,7 @@ void USoundComponent::PlayJumpSound() const
 {
 	AudioComponent->SetSound(JumpSound);
 	AudioComponent->Play();
-	UGameplayStatics::PlaySound2D(GetWorld(), JumpSound);
+	//UGameplayStatics::PlaySound2D(GetWorld(), JumpSound);
 }
 
 void USoundComponent::PlayShotSound() const
