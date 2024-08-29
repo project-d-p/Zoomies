@@ -31,6 +31,7 @@ public:
 
 	void ActivateCurrentComponent(APC_MatchingLobby* LocalPlayerController);
 	void DeactiveCurrentComponent();
+	UUserWidget* GetWidgetByName(UUserWidget* ParentWidget, const FString& WidgetName);
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* InPawn) override;

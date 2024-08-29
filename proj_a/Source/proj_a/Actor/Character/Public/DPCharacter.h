@@ -162,4 +162,7 @@ public:
 	bool mIsAtReturnPlace{ true };
 	UPROPERTY(BlueprintReadWrite)
 	bool isKnockback{ false };
+
+	UPROPERTY(BlueprintReadWrite)
+	bool canInteract{ false };
 };

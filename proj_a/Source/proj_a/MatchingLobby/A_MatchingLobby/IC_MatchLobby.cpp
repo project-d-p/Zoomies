@@ -5,6 +5,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "LC_MatchLobby.h"
 #include "Kismet/GameplayStatics.h"
+#include "proj_a/MatchingLobby/GM_MatchingLobby/GM_MatchingLobby.h"
 #include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
 
 UIC_MatchLobby::UIC_MatchLobby()
@@ -43,6 +44,15 @@ UIC_MatchLobby::UIC_MatchLobby()
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("IC_MatchLobby::Failed to load RotateAction"));
+	}
+	
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_INTERACT
+	(TEXT("/Game/input/ia_interact.ia_interact"));
+	if (IA_INTERACT.Succeeded())
+		InteractAction = IA_INTERACT.Object;
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("IC_MatchLobby::Failed to load InteractAction"));
 	}
 }
 
@@ -87,6 +97,7 @@ void UIC_MatchLobby::BindMatchLobbyActions()
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &UIC_MatchLobby::Move);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &UIC_MatchLobby::Jump);
 		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &UIC_MatchLobby::Rotate);
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &UIC_MatchLobby::Interact);
 		if (!MoveAction || !JumpAction || !RotateAction)
 		{
 			UE_LOG(LogTemp, Error, TEXT("IC_MatchLobby::One or more InputActions are not valid"));
@@ -181,6 +192,26 @@ void UIC_MatchLobby::Rotate(const FInputActionValue& value)
 
 	Character->AddControllerYawInput(actionValue.X);
 	Character->AddControllerPitchInput(actionValue.Y);
+}
+
+void UIC_MatchLobby::Interact(const FInputActionValue& value)
+{
+	ADPCharacter* Character = Cast<ADPCharacter>(Get_CHAR());
+	if (!Character)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("IC_MatchLobby::Can't found PlayerCharacter"));
+		return ;
+	}
+	if (Character->canInteract)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("IC_MatchLobby::Interact function called."));
+		AGM_MatchingLobby* GM = Cast<AGM_MatchingLobby>(UGameplayStatics::GetGameMode(GetWorld()));
+		GM->UpdateUIVisibility();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("IC_MatchLobby::Interact function called but canInteract is false."));
+	}
 }
 
 APC_MatchingLobby* UIC_MatchLobby::Get_PC() const

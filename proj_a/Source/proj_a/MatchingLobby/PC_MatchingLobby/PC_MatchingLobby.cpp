@@ -4,7 +4,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "OnlineSessionSettings.h"
 #include "GameFramework/PlayerState.h"
-#include "Kismet/GameplayStatics.h"
 #include "proj_a/MatchingLobby/GM_MatchingLobby/GM_MatchingLobby.h"
 #include "proj_a/MatchingLobby/GS_MachingLobby/GS_MatchingLobby.h"
 #include "Interfaces/OnlineSessionInterface.h"
@@ -168,4 +167,15 @@ void APC_MatchingLobby::AcknowledgePossession(APawn* P)
 			ActivateCurrentComponent(this);
 		}
 	}
+}
+
+
+UUserWidget* APC_MatchingLobby::GetWidgetByName(UUserWidget* ParentWidget, const FString& WidgetName)
+{
+	if (ParentWidget)
+	{
+		UWidget* FoundWidget = Cast<UWidget>(ParentWidget->GetWidgetFromName(FName(*WidgetName)));
+		return Cast<UUserWidget>(FoundWidget);
+	}
+	return nullptr;
 }
