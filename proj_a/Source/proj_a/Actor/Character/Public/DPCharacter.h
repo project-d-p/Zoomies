@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "CharacterPositionSync.h"
+#include "DynamicTextureComponent.h"
 #include "NameTag.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -54,7 +55,8 @@ public:	// component
 	class UDPStateActorComponent* stateComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UMonsterSlotComponent* monsterSlotComponent;
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UDynamicTextureComponent* DynamicTextureComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PostProcess")
 	class UPostProcessComponent* postProcessComponent;
 
@@ -159,4 +161,14 @@ public:
 	bool mIsAtReturnPlace{ true };
 	UPROPERTY(BlueprintReadWrite)
 	bool isKnockback{ false };
+
+	/* texture */
+	uint8* TextureData;  // 텍스처 데이터를 저장할 배열
+	UPROPERTY()
+	UTexture2D* DynamicTexture;  // 동적 텍스처 오브젝트
+	FUpdateTextureRegion2D* TextureRegion;
+	UPROPERTY(EditDefaultsOnly)
+	int32 TextureWidth = 1024;
+	UPROPERTY(EditDefaultsOnly)
+	int32 TextureHeight = 1024;
 };

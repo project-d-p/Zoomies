@@ -111,6 +111,9 @@ public class proj_a : ModuleRules
 			"NavigationSystem",
 			"Niagara",
             "GameplayCameras",
+            "RHI",
+            "RenderCore",
+            "ImageWrapper",
         });
 		PrivateDependencyModuleNames.AddRange(new string[] { "CinematicCamera" });
 

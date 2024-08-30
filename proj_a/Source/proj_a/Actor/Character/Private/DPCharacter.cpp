@@ -12,6 +12,7 @@
 #include "DPWeaponActorComponent.h"
 #include "DPStateActorComponent.h"
 #include "DPWeaponGun.h"
+#include "DynamicTextureComponent.h"
 #include "FDataHub.h"
 #include "FNetLogger.h"
 #include "MonsterSlotComponent.h"
@@ -66,19 +67,20 @@ ADPCharacter::ADPCharacter()
 	(TEXT("/Game/model/steve/StickManForMixamo.StickManForMixamo"));
 	if (SK_CHARACTER.Succeeded()) 
 	{
+		DynamicTextureComponent = CreateDefaultSubobject<UDynamicTextureComponent>(TEXT("DynamicTextureComponent"));
+		DynamicTextureComponent->InitializeTexture();
+		const FString FilePath = FPaths::ProjectContentDir() + TEXT("customCharacter/test4.png");
+		DynamicTextureComponent->LoadTextureFromFile(FilePath);
+		
 		GetMesh()->SetSkeletalMesh(SK_CHARACTER.Object);
 
-		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(GetMesh()->GetMaterial(0), this, TEXT("DynamicMaterial"));
+		dynamicMaterialInstance = UMaterialInstanceDynamic::Create(GetMesh()->GetMaterial(0), this, TEXT("DynamicMaterial"));
 		
-		// if (DynamicMaterial)
-		// {
-			ConstructorHelpers::FObjectFinder<UTexture2D> NewRenderTarget(TEXT("/Game/customCharacter/test.test"));
-			// if (NewRenderTarget.Succeeded())
-			// {
-				DynamicMaterial->SetTextureParameterValue(TEXT("renderTarget"), NewRenderTarget.Object);
-				GetMesh()->SetMaterial(0, DynamicMaterial);
-			// }
-		// }
+		if (dynamicMaterialInstance)
+		{
+			dynamicMaterialInstance->SetTextureParameterValue(TEXT("renderTarget"), DynamicTextureComponent->GetDynamicTexture());
+			GetMesh()->SetMaterial(0, dynamicMaterialInstance);
+		}
 	}
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -90.f), FRotator(0.f, 270.f, 0.f));
