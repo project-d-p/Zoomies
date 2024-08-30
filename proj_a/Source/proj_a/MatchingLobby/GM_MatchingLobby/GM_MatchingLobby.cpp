@@ -6,6 +6,7 @@
 #include "isteamuser.h"
 #include "isteamutils.h"
 #include "steamclientpublic.h"
+#include "Components/BackgroundBlur.h"
 #include "GameFramework/PlayerState.h"
 #include "proj_a/MatchingLobby/GS_MachingLobby/GS_MatchingLobby.h"
 #include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
@@ -232,7 +233,7 @@ void AGM_MatchingLobby::UpdateUIVisibility()
 	{
 		APC_MatchingLobby* PC = Cast<APC_MatchingLobby>(GetWorld()->GetFirstPlayerController());
 		UUserWidget* WarningExitWidget = Cast<UUserWidget>(PC->GetWidgetByName(MatchLobbyWidget, TEXT("WBP_Warning_ExitWidget")));
-		UWidget* BackgroundBlurWidget = Cast<UWidget>(PC->GetWidgetByName(MatchLobbyWidget, TEXT("BackgroundBlur")));
+		UBackgroundBlur* BlurBackgroundWidget = Cast<UBackgroundBlur>(MatchLobbyWidget->GetWidgetFromName(FName(TEXT("BackgroundBlur"))));
 
 		if (WarningExitWidget)
 		{
@@ -244,14 +245,14 @@ void AGM_MatchingLobby::UpdateUIVisibility()
 			UE_LOG(LogTemp, Warning, TEXT("UpdateUIVisibility: WBP_Warning_ExitWidget not found."));
 		}
 
-		if (BackgroundBlurWidget)
+		if (BlurBackgroundWidget)
 		{
-			BackgroundBlurWidget->SetVisibility(ESlateVisibility::Visible); // 또는 ESlateVisibility::Hidden
-			UE_LOG(LogTemp, Log, TEXT("UpdateUIVisibility: BackgroundBlur visibility updated."));
+			BlurBackgroundWidget->SetVisibility(ESlateVisibility::Visible); // 또는 ESlateVisibility::Hidden
+			UE_LOG(LogTemp, Log, TEXT("UpdateUIVisibility: Blur_BackGround visibility updated."));
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("UpdateUIVisibility: BackgroundBlur not found."));
+			UE_LOG(LogTemp, Warning, TEXT("UpdateUIVisibility: Blur_BackGround not found."));
 		}
 	}
 	else
@@ -259,3 +260,4 @@ void AGM_MatchingLobby::UpdateUIVisibility()
 		UE_LOG(LogTemp, Warning, TEXT("UpdateUIVisibility: MatchLobbyWidget is nullptr."));
 	}
 }
+
