@@ -110,31 +110,14 @@ bool UDynamicTextureComponent::LoadTextureFromFile(const FString& FilePath)
 		FNetLogger::EditerLog(FColor::Red, TEXT("Failed to load file: %s"), *FilePath);
 		return false;
 	}
-	//
-	// UTexture2D* BC6HTexture = UTexture2D::CreateTransient(TextureWidth, TextureHeight, PF_BC6H);
-	// if (!BC6HTexture)
-	// {
-	// 	return false;
-	// }
-	// BC6HTexture->CompressionSettings = TC_HDR;
-	// BC6HTexture->SRGB = 0;
-	// BC6HTexture->Filter = TF_Nearest;
-	// BC6HTexture->AddToRoot();
-	// BC6HTexture->UpdateResource();
-	//
-	// void* TextureData = BC6HTexture->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
-	// FMemory::Memcpy(TextureData, FileData.GetData(), FileData.Num());
-	// BC6HTexture->GetPlatformData()->Mips[0].BulkData.Unlock();
-	//
-	// BC6HTexture->UpdateResource();
-	// return true;
+
 	IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
-	TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::HDR);
+	TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::PNG);
 	
 	if (ImageWrapper.IsValid() && ImageWrapper->SetCompressed(FileData.GetData(), FileData.Num()))
 	{
 		TArray<uint8> RawData;
-		if (ImageWrapper->GetRaw(ERGBFormat::BGRE, 8, RawData))
+		if (ImageWrapper->GetRaw(ERGBFormat::RGBA, 8, RawData))
 		{
 			int32 ImageWidth = ImageWrapper->GetWidth();
 			int32 ImageHeight = ImageWrapper->GetHeight();
@@ -147,7 +130,7 @@ bool UDynamicTextureComponent::LoadTextureFromFile(const FString& FilePath)
 	
 			const uint32 TextureTotalPixels = TextureWidth * TextureHeight;
 			float* FloatTextureData = reinterpret_cast<float*>(TextureData);
-	
+			
 			for (uint32 i = 0; i < TextureTotalPixels; i++)
 			{
 				FloatTextureData[i * 4] = RawData.GetData()[i * 4] / 255.0f;
@@ -156,7 +139,7 @@ bool UDynamicTextureComponent::LoadTextureFromFile(const FString& FilePath)
 				FloatTextureData[i * 4 + 3] = RawData.GetData()[i * 4 + 3] / 255.0f;
 			}
 			
-			// FMemory::Memcpy(TextureData, RawData.GetData(), TextureWidth * TextureHeight * 4);
+			// FMemory::Memcpy(TextureData, RawData.GetData(), TextureWidth * TextureHeight * 4 * 2);
 	
 			UpdateTexture(DynamicTexture);
 			return true;
