@@ -6,6 +6,10 @@ USoundComponent::USoundComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	AudioComponent->SetupAttachment(this);
+	AudioComponent->bAutoActivate = false;
+
 	static ConstructorHelpers::FObjectFinder<USoundBase> SoundAsset
 	(TEXT("/Game/sounds/effect/character/jump_Cue.jump_Cue"));
 	if (SoundAsset.Succeeded()) {
@@ -41,29 +45,31 @@ USoundComponent::USoundComponent()
 	static ConstructorHelpers::FObjectFinder<USoundAttenuation> AttenuationSettings
 	(TEXT("/Game/sounds/dp_animalSoundAttenuation.dp_animalSoundAttenuation"));
 	if (AttenuationSettings.Succeeded()) {
-		JumpSound->AttenuationSettings = AttenuationSettings.Object;
-		ShotSound->AttenuationSettings = AttenuationSettings.Object;
-		AnimalGetDamagedSound->AttenuationSettings = AttenuationSettings.Object;
-		AnimalFaintSound->AttenuationSettings = AttenuationSettings.Object;
+		AudioComponent->AttenuationSettings = AttenuationSettings.Object;
 	}
 }
 
 void USoundComponent::PlayJumpSound() const
 {
-	UGameplayStatics::PlaySound2D(GetWorld(), JumpSound);
+	AudioComponent->SetSound(JumpSound);
+	AudioComponent->Play();
+	//UGameplayStatics::PlaySound2D(GetWorld(), JumpSound);
 }
 
 void USoundComponent::PlayShotSound() const
 {
-	UGameplayStatics::PlaySound2D(GetWorld(), ShotSound);
+	AudioComponent->SetSound(ShotSound);
+	AudioComponent->Play();
 }
 
 void USoundComponent::PlayAnimalGetDamagedSound() const
 {
-	UGameplayStatics::PlaySound2D(GetWorld(), AnimalGetDamagedSound);
+	AudioComponent->SetSound(AnimalGetDamagedSound);
+	AudioComponent->Play();
 }
 
 void USoundComponent::PlayAnimalFaintSound() const
 {
-	UGameplayStatics::PlaySound2D(GetWorld(), AnimalFaintSound);
+	AudioComponent->SetSound(AnimalFaintSound);
+	AudioComponent->Play();
 }

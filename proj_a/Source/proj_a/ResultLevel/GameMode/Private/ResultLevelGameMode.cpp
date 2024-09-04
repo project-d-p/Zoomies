@@ -112,6 +112,22 @@ void AResultLevelGameMode::CheckPlayersAllTraveled()
 		StartTimerDelegate.BindLambda([this, GS]()
 		{
 			GS->MulticastPlayersAllTraveled();
+
+			for (auto it = GetWorld()->GetPlayerControllerIterator(); it; ++it)
+			{
+				ADPPlayerController* Controller = Cast<ADPPlayerController>(*it);
+				if (Controller == nullptr)
+				{
+					continue;
+				}
+				ADPCharacter* Character = Cast<ADPCharacter>(Controller->GetCharacter());
+				if (Character == nullptr)
+				{
+					check(false)
+				}
+				Character->SetNameTag();
+			}
+			
 		});
 		GetWorld()->GetTimerManager().SetTimer(StartTimerHandle, StartTimerDelegate, 1.0f, false);
 	}

@@ -2,10 +2,16 @@
 #include "DPPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "FNetLogger.h"
 #include "MainInputComponent.h"
 
 ULobbyInputComponent::ULobbyInputComponent()
 {
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext>DEFAULT_CONTEXT
+	(TEXT("/Game/input/imc_character.imc_character"));
+	if (DEFAULT_CONTEXT.Succeeded())
+		LobbyLevelContext = DEFAULT_CONTEXT.Object;
+	
 	static ConstructorHelpers::FObjectFinder<UInputAction>IA_ACTIVE
 	(TEXT("/Game/input/ia_active.ia_active"));
 	if (IA_ACTIVE.Succeeded())
@@ -33,7 +39,7 @@ void ULobbyInputComponent::BindMainLevelActions()
 	// Mapping Context
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 	{
-		SubSystem->AddMappingContext(MainLevelContext, 0);
+		SubSystem->AddMappingContext(LobbyLevelContext, 0);
 	}
 
 	// Enhanced Input Component
@@ -58,9 +64,9 @@ void ULobbyInputComponent::UnbindMainLevelActions()
 	// Mapping Context
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 	{
-		if (MainLevelContext)
+		if (LobbyLevelContext)
 		{
-			SubSystem->RemoveMappingContext(MainLevelContext);
+			SubSystem->RemoveMappingContext(LobbyLevelContext);
 		}
 	}
 }
