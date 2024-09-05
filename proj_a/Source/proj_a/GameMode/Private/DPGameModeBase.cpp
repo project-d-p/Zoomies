@@ -324,7 +324,7 @@ void ADPGameModeBase::Tick(float delta_time)
 				}
 				Character->SetNameTag();
 			}
-			TimerManager->StartTimer<ADPInGameState>(300.f, &ADPGameModeBase::EndGame, this);
+			TimerManager->StartTimer<ADPInGameState>(PLAY_TIME, &ADPGameModeBase::EndGame, this);
 		}
 		this->ProcessData(delta_time);
 #if EDITOR_MODE != 1

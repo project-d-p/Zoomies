@@ -27,9 +27,9 @@ FUIInitData AJudgeGameMode::GetUiData()
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         AJudgePlayerController* PC = Cast<AJudgePlayerController>(*It);
-        check(PC)
         AJudgePlayerState* PS = Cast<AJudgePlayerState>(PC->PlayerState);
-        check(PS)
+        if (!PC || !PS)
+            return UIData;
         FPlayerInitData PlayerData;
         PlayerData.PlayerName = PS->GetPlayerName();
         PlayerData.Score = PS->GetScore();
@@ -37,6 +37,7 @@ FUIInitData AJudgeGameMode::GetUiData()
     }
     // for now, following code is temporary. (Current player index)
     UIData.VoterName = Cast<AJudgePlayerState>(GetWorld()->GetGameState<AJudgeGameState>()->PlayerArray[CurrentPlayerIndex])->GetPlayerName();
+    UIData.bInitSuccessful = true;
     return UIData;
 }
 
