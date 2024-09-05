@@ -32,6 +32,7 @@ ADPPlayerController::ADPPlayerController()
 
 	MainLevelComponet->InitializeController(this);
 	ResultLevelComponet->InitializeController(this);
+	LobbyLevelComponent->InitializeController(this);
 	
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::MAIN), MainLevelComponet);
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::RESULT), ResultLevelComponet);
