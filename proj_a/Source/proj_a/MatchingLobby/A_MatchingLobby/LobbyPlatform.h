@@ -16,9 +16,7 @@ class PROJ_A_API ALobbyPlatform : public AActor
 
 public:
 	ALobbyPlatform();
-
-public:
-
+	
 	UFUNCTION(BlueprintCallable, Category = "Events")
 	void SpawnCharacter(APlayerController* PlayerController);
 
@@ -40,6 +38,4 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ACharacter> CharacterClass;
-
-
 };

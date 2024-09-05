@@ -314,8 +314,19 @@ void ADPGameModeBase::Tick(float delta_time)
 		{
 			BlockingVolume->DeactiveBlockingVolume();
 			bTimeSet = true;
-			TimerManager->StartTimer<ADPInGameState>(PLAY_TIME, &ADPGameModeBase::EndGame, this);
+			for (auto& pair: player_controllers_)
+			{
+				ADPPlayerController* Controller = pair.second;
+				ADPCharacter* Character = Cast<ADPCharacter>(Controller->GetCharacter());
+				if (Character == nullptr)
+				{
+					check(false)
+				}
+				Character->SetNameTag();
+			}
+			TimerManager->StartTimer<ADPInGameState>(300.f, &ADPGameModeBase::EndGame, this);
 		}
+
 		this->ProcessData(delta_time);
 #if EDITOR_MODE != 1
 	}

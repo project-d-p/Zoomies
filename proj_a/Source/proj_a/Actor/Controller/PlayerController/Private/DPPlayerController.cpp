@@ -32,6 +32,7 @@ ADPPlayerController::ADPPlayerController()
 
 	MainLevelComponet->InitializeController(this);
 	ResultLevelComponet->InitializeController(this);
+	LobbyLevelComponent->InitializeController(this);
 	
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::MAIN), MainLevelComponet);
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::RESULT), ResultLevelComponet);
@@ -123,7 +124,6 @@ void ADPPlayerController::ConnectToServer_Implementation(ELevelComponentType Typ
 #else
 	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
 #endif
-	
 	SwitchLevelComponent(Type);
 }
 

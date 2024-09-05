@@ -99,7 +99,6 @@ void UDPIngameWidget::UpdateTextBlock(UTextBlock* TextBlock)
 
 	if (OuterName.Contains("WBP_InGame_ScoreBox_Front"))
 	{
-		// TextBlock->SetText(FText::FromString("12"));
 		scoreFront = TextBlock;
 	}
 	else if (OuterName.Contains("WBP_InGame_ScoreBox_Back"))

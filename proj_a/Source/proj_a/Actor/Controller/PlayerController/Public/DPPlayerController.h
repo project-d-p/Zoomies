@@ -46,10 +46,8 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ClientDestroySession();
 
-	/// TEST
 	UFUNCTION(Client, Reliable)
 	void ConnectToServer(ELevelComponentType Type);
-	///
 	
 protected:
 	virtual void BeginPlay() override;

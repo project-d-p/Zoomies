@@ -51,8 +51,11 @@ void ALobbyPlatform::SpawnCharacter(APlayerController* PlayerController)
 	if (PC_MatchingLobby && CurrentCharacter)
 	{
 		PC_MatchingLobby->Possess(CurrentCharacter);
-
 		PC_MatchingLobby->SetCineCameraView();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ALobbyPlatform::SpawnCharacter: Failed to cast PC_MatchingLobby"));
 	}
  }
 

@@ -26,10 +26,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<ALobbyPlatform*> LobbyPlatforms;
 	FTimerHandle UnusedHandle;
+	UPROPERTY(BlueprintReadOnly, Category = "UI")
+	UUserWidget* MatchLobbyWidget;
+	void UpdateUIVisibility();
 
 private:
 	void SetPlayerIdMap() const;
 	void StartGame_t() const;
+	void getMatchLobbyUI();
 	FString InviteURL;
 protected:
 	bool bIsLobbyPlatformReady = false;

@@ -6,6 +6,7 @@
 #include "isteamuser.h"
 #include "isteamutils.h"
 #include "steamclientpublic.h"
+#include "Components/BackgroundBlur.h"
 #include "GameFramework/PlayerState.h"
 #include "proj_a/MatchingLobby/GS_MachingLobby/GS_MatchingLobby.h"
 #include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
@@ -17,41 +18,40 @@ AGM_MatchingLobby::AGM_MatchingLobby() {
 	GameStateClass = AGS_MatchingLobby::StaticClass();
 	PlayerControllerClass = APC_MatchingLobby::StaticClass();
 	PlayerStateClass = APS_MatchingLobby::StaticClass();
-	DefaultPawnClass = nullptr; 
+	DefaultPawnClass = nullptr;
 }
 
 void AGM_MatchingLobby::PostLogin(APlayerController* NewPlayer) {
 	Super::PostLogin(NewPlayer);
-	//Set the host player index
 	AGS_MatchingLobby* GS = GetGameState<AGS_MatchingLobby>();
+	
 	if (GS->HostPlayerIndex == -1)
 	{
 		GS->HostPlayerIndex = NewPlayer->PlayerState->GetPlayerId();
 	}
-	PCs.Add(NewPlayer);
 	
-	if (APC_MatchingLobby* PC = Cast<APC_MatchingLobby>(NewPlayer))
-	{
-		PC->SetCineCameraView();
-	}
+	PCs.Add(NewPlayer);
 	CheckAndUpdateLobbyPlatform();
 }
 
 void AGM_MatchingLobby::Logout(AController* Exiting) {
 	Super::Logout(Exiting);
 
-	//Remove the player from the list of players
 	if (APlayerController* ExitingPlayer = Cast<APlayerController>(Exiting))
 	{
 		PCs.Remove(ExitingPlayer);
 	}
-	//Update the lobby platform
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AGM_MatchingLobby::Logout: Exiting is not a PlayerController"));
+	}
 	CheckAndUpdateLobbyPlatform();
 }
 
 void AGM_MatchingLobby::BeginPlay() {
 	Super::BeginPlay();
 	FindAndStoreLobbyPlatforms();
+	getMatchLobbyUI();
 }
 
 void AGM_MatchingLobby::CheckReadyToStart() 
@@ -81,7 +81,11 @@ void AGM_MatchingLobby::FindAndStoreLobbyPlatforms()
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ALobbyPlatform::StaticClass(), FoundActors);
 
 	LobbyPlatforms.Init(nullptr, MAX_USERS);
-
+	if (FoundActors.Num() != MAX_USERS)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AGM_MatchingLobby::FindAndStoreLobbyPlatforms: FoundActors.Num() != MAX_USERS"));
+	}
+	
 	for (AActor* Actor : FoundActors)
 	{
 		if (Actor->Tags.Num() > 0)
@@ -95,6 +99,7 @@ void AGM_MatchingLobby::FindAndStoreLobbyPlatforms()
 			}
 		}
 	}
+	
 	bIsLobbyPlatformReady = true;
 }
 
@@ -122,7 +127,7 @@ void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 	{
 		bool bIsPlayerOnPlatform = false;
 		
-		//check player is already on platform
+		//if player is on platform, set bIsPlayerOnPlatform to true
 		if (LobbyPlatforms.IsValidIndex(i))
 		{
 			for (int32 j = 0; j < LobbyPlatforms.Num(); j++)
@@ -141,13 +146,11 @@ void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 		//if player is not on platform, spawn character on platform
 		if (!bIsPlayerOnPlatform)
 		{
-			//find the first available platform
 			for (int32 j = 0; j < LobbyPlatforms.Num(); j++)
 			{
 				if (LobbyPlatforms[j] && LobbyPlatforms[j]->PC == nullptr)
 				{
 					LobbyPlatforms[j]->SpawnCharacter(PCs[i]);
-					//get GameState and set PlayerController to the Lobby Infos
 					if (AGS_MatchingLobby* GS = GetGameState<AGS_MatchingLobby>())
 					{
 						FString steam_username = PCs[i]->PlayerState->GetPlayerName();
@@ -161,7 +164,7 @@ void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 			}
 		}
 	}
-
+	
 	for (int32 i = 0; i < LobbyPlatforms.Num(); i++)
 	{
 		if (LobbyPlatforms[i])
@@ -179,13 +182,82 @@ void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 					}
 					else
 					{
-						if (GEngine)
-						{
-							GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Error: Player not found in ReadyPlayers"));
-						}
+						UE_LOG(LogTemp, Warning, TEXT("AGM_MatchingLobby::UpdatePlayerOnPlatform: playerIndex is out of range"));
 					}
 				}
 			}
 		}
 	}
 }
+
+void AGM_MatchingLobby::getMatchLobbyUI()
+{
+	// UI 위젯 클래스의 경로 설정
+	FString WidgetPath = TEXT("/Game/widget/WBP_MatchLobby/widget_match_ready.widget_match_ready_C");
+
+	// UClass를 로드
+	UClass* WidgetClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *WidgetPath));
+
+	if (WidgetClass != nullptr)
+	{
+		// 위젯을 생성하고 화면에 추가
+		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+		if (PlayerController)
+		{
+			MatchLobbyWidget = CreateWidget<UUserWidget>(PlayerController, WidgetClass);
+
+			if (MatchLobbyWidget != nullptr)
+			{
+				MatchLobbyWidget->AddToViewport();
+				UE_LOG(LogTemp, Log, TEXT("AGM_MatchingLobby::getMatchLobbyUI: Widget successfully created and added to viewport."));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("AGM_MatchingLobby::getMatchLobbyUI: MatchLobbyWidget is nullptr after creation."));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AGM_MatchingLobby::getMatchLobbyUI: PlayerController is nullptr."));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AGM_MatchingLobby::getMatchLobbyUI: Unable to load widget class from path: %s"), *WidgetPath);
+	}
+}
+
+void AGM_MatchingLobby::UpdateUIVisibility()
+{
+	if (MatchLobbyWidget)
+	{
+		APC_MatchingLobby* PC = Cast<APC_MatchingLobby>(GetWorld()->GetFirstPlayerController());
+		UUserWidget* WarningExitWidget = Cast<UUserWidget>(PC->GetWidgetByName(MatchLobbyWidget, TEXT("WBP_Warning_ExitWidget")));
+		UBackgroundBlur* BlurBackgroundWidget = Cast<UBackgroundBlur>(MatchLobbyWidget->GetWidgetFromName(FName(TEXT("BackgroundBlur"))));
+
+		if (WarningExitWidget)
+		{
+			WarningExitWidget->SetVisibility(ESlateVisibility::Visible); // 또는 ESlateVisibility::Hidden
+			UE_LOG(LogTemp, Log, TEXT("UpdateUIVisibility: WBP_Warning_ExitWidget visibility updated."));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("UpdateUIVisibility: WBP_Warning_ExitWidget not found."));
+		}
+
+		if (BlurBackgroundWidget)
+		{
+			BlurBackgroundWidget->SetVisibility(ESlateVisibility::Visible); // 또는 ESlateVisibility::Hidden
+			UE_LOG(LogTemp, Log, TEXT("UpdateUIVisibility: Blur_BackGround visibility updated."));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("UpdateUIVisibility: Blur_BackGround not found."));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UpdateUIVisibility: MatchLobbyWidget is nullptr."));
+	}
+}
+

@@ -194,7 +194,7 @@ ADPCharacter::ADPCharacter()
 				LobbyInfoWidgetComponent->DestroyComponent();
 				LobbyInfoWidgetComponent = nullptr;
 			}
-	
+
 			LobbyInfoWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("LobbyInfoWidgetComponent"));
 			static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClass(TEXT("/Game/widget/WBP_MatchLobby/widget_LobbyInfo.widget_LobbyInfo_C"));
 			if (WidgetClass.Succeeded())
@@ -208,6 +208,20 @@ ADPCharacter::ADPCharacter()
 			LobbyInfoWidgetComponent->SetRelativeScale3D(FVector(1.4f, 1.4f, 1.4f));
 			LobbyInfoWidgetComponent->SetDrawSize(FVector2D(260,100));
 			LobbyInfoWidgetComponent->SetRelativeRotation(FRotator(-180, -90, 180));
+			// Adjust for back view
+			LobbyInfoWidgetComponentBack = CreateDefaultSubobject<UWidgetComponent>(TEXT("LobbyInfoWidgetComponentBack"));
+			if (WidgetClass.Succeeded())
+			{
+				LobbyInfoWidgetComponentBack->SetWidgetClass(WidgetClass.Class);
+			}
+			LobbyInfoWidgetComponentBack->SetVisibility(true);
+			LobbyInfoWidgetComponentBack->SetWidgetSpace(EWidgetSpace::World);
+			LobbyInfoWidgetComponentBack->SetupAttachment(GetMesh());
+			LobbyInfoWidgetComponentBack->SetRelativeLocation(FVector(0, 0, 650));
+			LobbyInfoWidgetComponentBack->SetRelativeScale3D(FVector(1.4f, 1.4f, 1.4f));
+			LobbyInfoWidgetComponentBack->SetDrawSize(FVector2D(260, 100));
+			LobbyInfoWidgetComponentBack->SetRelativeRotation(FRotator(0, -90, 0));
+
 		}
 	}
 }
@@ -216,48 +230,53 @@ ADPCharacter::~ADPCharacter()
 {
 }
 
-void ADPCharacter::SetNameTag()
+void ADPCharacter::SetNameTag_Implementation()
 {
 	APlayerState* PS = GetPlayerState();
-	if (IsValid(PS))
+	if (!PS)
 	{
-		FString Name = PS->GetPlayerName();
-		if (IsValid(NameTag_Instance))
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
 		{
-			NameTag_Instance->SetName(Name);
-		}
-		else
-		{
-			FNetLogger::LogError(TEXT("No NameTag_Instance"));
-		}
-		if (IsValid(NameTag_WidgetComponent) && !IsLocallyControlled())
-		{
-			NameTag_WidgetComponent->SetVisibility(true);
-		}
-		else
-		{
-			FNetLogger::LogError(TEXT("No NameTagWidgetComponent || IsLocallyControlled"));
-		}
+			SetNameTag();
+		}), 0.1f, false);
+		return ;
 	}
-	else
+
+	FString Name = PS->GetPlayerName();
+	if (NameTag_Instance)
 	{
-		static int32 RetryCount = 0;
-		if (RetryCount < 5) // �ִ� 5ȸ�� �õ�
-		{
-			RetryCount++;
-			FTimerHandle TimerHandle;
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
-			{
-				SetNameTag();
-			}), 0.1f, false);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Failed to set NameTag after multiple attempts."));
-		}
+		NameTag_Instance->SetName(Name);
+	}
+	if (NameTag_WidgetComponent && !IsLocallyControlled())
+	{
+		NameTag_WidgetComponent->SetVisibility(true);
 	}
 }
 
+// void ADPCharacter::SetNameTag()
+// {
+// 	APlayerState* PS = GetPlayerState();
+// 	if (!PS)
+// 	{
+// 		FTimerHandle TimerHandle;
+// 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+// 		{
+// 			SetNameTag();
+// 		}), 0.1f, false);
+// 		return ;
+// 	}
+//
+// 	FString Name = PS->GetPlayerName();
+// 	if (NameTag_Instance)
+// 	{
+// 		NameTag_Instance->SetName(Name);
+// 	}
+// 	if (NameTag_WidgetComponent && !IsLocallyControlled())
+// 	{
+// 		NameTag_WidgetComponent->SetVisibility(true);
+// 	}
+// }
 
 // Called when the game starts or when spawned
 void ADPCharacter::BeginPlay()
@@ -298,7 +317,15 @@ void ADPCharacter::BeginPlay()
 	constructionComponent->placeWall = false;
 	constructionComponent->placeturret = false;
 	bUseControllerRotationYaw = false;
-	SetNameTag();
+	if (UWorld* World = GetWorld())
+	{
+		FString CurrentLevelName = UGameplayStatics::GetCurrentLevelName(World);
+		
+		if (CurrentLevelName != "matchLobby")
+		{
+			SetNameTag();
+		}
+	}
 }
 
 // Called every frame
@@ -563,7 +590,6 @@ void ADPCharacter::RemoveStunEffect()
 
 void ADPCharacter::ApplyKockback_Implementation(const FHitResult& HitResult)
 {
-	// �浹 �������� ĳ���� ��ġ���� ������ ���
 	FVector KnockbackDirection = GetActorLocation() - HitResult.ImpactPoint;
 	// FVector KnockbackDirection = -HitResult.ImpactNormal;
 	KnockbackDirection.Z = 20.0f;
@@ -577,10 +603,9 @@ void ADPCharacter::ApplyKockback_Implementation(const FHitResult& HitResult)
 		KnockbackDirection = GetActorForwardVector() * -1;
 	}
 
-	// �˹� �ӵ� ����
 	float KnockbackSpeed = 2000.0f;
 
-	// Character Movement Component ��������
+	// Character Movement Component
 	UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
 	if (MovementComponent)
 	{
@@ -595,6 +620,7 @@ void ADPCharacter::ApplyKockback_Implementation(const FHitResult& HitResult)
 
 		FTimerHandle ResetTimerHandle;
 		TWeakObjectPtr<ADPCharacter> WeakThis(this);
+		isKnockback = true;
 		GetWorldTimerManager().SetTimer(ResetTimerHandle, [WeakThis, this, MovementComponent, PreviousMovementMode]() {
 			if (WeakThis.IsValid())
 			{

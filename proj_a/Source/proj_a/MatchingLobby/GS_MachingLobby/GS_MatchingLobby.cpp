@@ -1,5 +1,6 @@
 #include "GS_MatchingLobby.h"
 
+#include "CompileMode.h"
 #include "DPCharacter.h"
 #include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -7,6 +8,7 @@
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
 #include "proj_a/MatchingLobby/GM_MatchingLobby/GM_MatchingLobby.h"
+#include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
 
 AGS_MatchingLobby::AGS_MatchingLobby() {
 	// Set Players Num. need to be Set
@@ -32,10 +34,12 @@ void AGS_MatchingLobby::UpdateLobbyInfo() const
 		if (Character && Character->LobbyInfoWidgetComponent)
 		{
 			UUserWidget* Widget = Character->LobbyInfoWidgetComponent->GetUserWidgetObject();
-			if (Widget)
+			UUserWidget* WidgetBack = Character->LobbyInfoWidgetComponentBack->GetUserWidgetObject();
+			if (Widget && WidgetBack)
 			{
 				FString Command = FString::Printf(TEXT("Update %d"), j);
 				Widget->CallFunctionByNameWithArguments(*Command, *GLog, nullptr, true);
+				WidgetBack->CallFunctionByNameWithArguments(*Command, *GLog, nullptr, true);
 			}
 			else
 			{
@@ -83,6 +87,7 @@ bool AGS_MatchingLobby::AreAllPlayersReady()
 		}
 	}
 	FindFastestPlayer();
+	RemovePlayerInputComponent();
 	return true;
 }
 
@@ -121,6 +126,18 @@ void AGS_MatchingLobby::ReportPing_Implementation(APlayerState* ReportingPlayer,
 	{
 		LowestAveragePing = AveragePing;
 		BestHostPlayer = ReportingPlayer;
+	}
+}
+
+void AGS_MatchingLobby::RemovePlayerInputComponent()
+{
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		APC_MatchingLobby* PC = Cast<APC_MatchingLobby>(*Iterator);
+		if (PC)
+		{
+			PC->DeactiveCurrentComponent();
+		}
 	}
 }
 

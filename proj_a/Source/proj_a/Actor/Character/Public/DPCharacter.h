@@ -69,6 +69,9 @@ public:	// component
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MatchLobby")
 	UWidgetComponent* LobbyInfoWidgetComponent = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MatchLobby")
+	UWidgetComponent* LobbyInfoWidgetComponentBack = nullptr;
 
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
 	//UMaterialInstanceDynamic* dynamicMaterialInstance;
@@ -99,6 +102,8 @@ public:	// component
 
 	UFUNCTION(NetMulticast, Reliable)
 	void ApplyKockback(const FHitResult& HitResult);
+	UFUNCTION(NetMulticast, Reliable)
+	void SetNameTag();
 
 	UPROPERTY(ReplicatedUsing=OnRep_SyncInvincible)
 	bool bIsInvincible = false;
@@ -128,7 +133,6 @@ protected:
 	void ClientNotifyAnimalReturn_Implementation(const FString& player_name);
 	
 private:
-	void SetNameTag();
 	void UpdateNameTagRotation();
 	void CheckCollisionWithMonster();
 	void OnServerHit(const FHitResult& HitResult);
@@ -159,4 +163,7 @@ public:
 	bool mIsAtReturnPlace{ true };
 	UPROPERTY(BlueprintReadWrite)
 	bool isKnockback{ false };
+
+	UPROPERTY(BlueprintReadWrite)
+	bool canInteract{ false };
 };
