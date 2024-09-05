@@ -10,4 +10,6 @@ class PROJ_A_API AGiraffeCharacter : public ABaseMonsterCharacter
 
 public:
 	AGiraffeCharacter();
+protected:
+	const EAnimal AnimalType = EAnimal::ANIMAL_GIRAFFE;
 };

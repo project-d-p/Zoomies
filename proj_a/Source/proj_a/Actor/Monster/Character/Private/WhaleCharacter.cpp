@@ -5,20 +5,7 @@
 
 AWhaleCharacter::AWhaleCharacter()
 {
-	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_WHALE
-	(PathManager::GetMonsterPath(EAnimal::ANIMAL_WHALE));
-	if (SK_WHALE.Succeeded()) {
-		GetMesh()->SetSkeletalMesh(SK_WHALE.Object);
-	}
-
-	/** Loading animations */
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER(
-		PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_WHALE));
-	if (ANIM_CHARACTER.Succeeded()) {
-		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
-	}
+	InitMonsterMeshData(AnimalType);
 
 	/** Set the Capsule size */
 	DefaultCP.Radius = 65.f;

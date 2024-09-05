@@ -10,4 +10,6 @@ class PROJ_A_API ACrabCharacter : public ABaseMonsterCharacter
 
 public:
 	ACrabCharacter();
+protected:
+	const EAnimal AnimalType = EAnimal::ANIMAL_CRAB;
 };

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <map>
+
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "PathManager.h"
@@ -28,6 +30,7 @@ public:
 	virtual ~ABaseMonsterCharacter() override;
 	
 	void TakeMonsterDamage(float Dmg);
+
 	UFUNCTION()
 	void OnRep_FaintCharacterMotion();
 	void ScaleCapsuleSize(float ScaleFactor);
@@ -52,19 +55,22 @@ private:
 
 	UPROPERTY(ReplicatedUsing=OnRep_FaintCharacterMotion)
 	EMonsterState CurrentState = EMonsterState::Idle;
-
+	
 	float MoveSpeed;
 	
 protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void BeginPlay() override;
+	void InitMonsterMeshData(EAnimal AT);
 	virtual void Tick(float DeltaTime) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void SyncPosition();
 	bool bCaught = false;
-
+	
 	FTransform MeshAdjMtx;
 	FTransform FaintStateMtx;
 	FTransform CB_FaintStateMtx;
+	UPROPERTY(EditAnywhere, Category = "Mesh")
+	USkeletalMesh* OSK;
 };

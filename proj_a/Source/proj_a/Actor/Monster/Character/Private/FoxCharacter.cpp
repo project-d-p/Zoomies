@@ -5,20 +5,7 @@
 
 AFoxCharacter::AFoxCharacter()
 {
-	/** Loading models */
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_FOX
-	(PathManager::GetMonsterPath(EAnimal::ANIMAL_FOX));
-    if (SK_FOX.Succeeded()) {
-    	GetMesh()->SetSkeletalMesh(SK_FOX.Object);
-    }
-
-	/** Loading animations */
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_CHARACTER
-	(PathManager::GetMonsterAnimationPath(EAnimal::ANIMAL_FOX));
-	if (ANIM_CHARACTER.Succeeded()) {
-		GetMesh()->SetAnimInstanceClass(ANIM_CHARACTER.Class);
-	}
+	InitMonsterMeshData(AnimalType);
 
 	/** Set the Capsule size */
 	DefaultCP.Radius = 72.f;

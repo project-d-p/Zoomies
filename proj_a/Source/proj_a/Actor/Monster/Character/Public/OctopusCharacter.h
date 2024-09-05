@@ -10,4 +10,6 @@ class PROJ_A_API AOctopusCharacter : public ABaseMonsterCharacter
 
 public:
 	AOctopusCharacter();
+protected:
+	const EAnimal AnimalType = EAnimal::ANIMAL_OCTOPUS;
 };

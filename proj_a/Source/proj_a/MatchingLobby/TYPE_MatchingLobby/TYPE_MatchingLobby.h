@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "TYPE_MatchingLobby.generated.h"
 
-#define MAX_USERS 2
+#define MAX_USERS Zoomies::MAX_PLAYERS
 #define GAME_APPID "480"
 
 USTRUCT(BlueprintType)
