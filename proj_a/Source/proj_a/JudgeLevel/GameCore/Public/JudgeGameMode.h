@@ -35,6 +35,8 @@ struct FUIInitData
     TArray<FPlayerInitData> PlayerData;
     UPROPERTY()
     FString VoterName;
+    UPROPERTY()
+    bool bInitSuccessful = false;
 };
 
 UCLASS()
