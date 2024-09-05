@@ -25,6 +25,11 @@ UBasicInputComponent::UBasicInputComponent()
 	(TEXT("/Game/input/ia_rotate.ia_rotate"));
 	if (IA_ROTATE.Succeeded())
 		RotateAction = IA_ROTATE.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_RUN
+	(TEXT("/Game/input/ia_run.ia_run"));
+	if (IA_RUN.Succeeded())
+		RunAction = IA_RUN.Object;
 }
 
 void UBasicInputComponent::Activate(bool bReset)
@@ -60,6 +65,8 @@ void UBasicInputComponent::BindBasicLevelActions()
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &UBasicInputComponent::Jump);
 		// 시점 변환 ( 마우스 회전 )
 		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &UBasicInputComponent::Rotate);
+		// 달리기 ( shift )
+		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Triggered, this, &UBasicInputComponent::Run);
 	}
 }
 
@@ -125,4 +132,12 @@ void UBasicInputComponent::Rotate(const FInputActionValue& value)
 
 	Character->AddControllerYawInput(actionValue.X);
 	Character->AddControllerPitchInput(actionValue.Y);
+}
+
+void UBasicInputComponent::Run(const FInputActionValue& value)
+{
+	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
+	if (!Character) return ;
+
+	Character->GetCharacterMovement()->MaxWalkSpeed = 1000.0f;
 }

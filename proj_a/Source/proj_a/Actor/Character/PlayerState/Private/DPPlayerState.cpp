@@ -30,6 +30,30 @@ void ADPPlayerState::OnRep_Rank()
 {
 }
 
+void ADPPlayerState::OnRep_Job()
+{
+	switch (PlayerJob)
+	{
+	case EPlayerJob::JOB_ARCHAEOLOGIST:
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Job : JOB_ARCHAEOLOGIST"));
+		break;
+	case EPlayerJob::JOB_POACHER:
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Job : JOB_POACHER"));
+		break;
+	case EPlayerJob::JOB_RINGMASTER:
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Job : JOB_RINGMASTER"));
+		break;
+	case EPlayerJob::JOB_TERRORIST:
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Job : JOB_TERRORIST"));
+		break;
+	case EPlayerJob::JOB_ENVIRONMENTALIST:
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Job : JOB_ENVIRONMENTALIST"));
+		break;
+	default:
+		break;
+	}
+}
+
 void ADPPlayerState::CopyProperties(APlayerState* PlayerState)
 {
 	Super::CopyProperties(PlayerState);

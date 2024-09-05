@@ -32,6 +32,11 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerSetRank(int InRank);
 
+	UPROPERTY(ReplicatedUsing = OnRep_Job, BlueprintReadWrite, Category = "PlayerJob")
+	EPlayerJob PlayerJob;
+
+	UFUNCTION()
+	void OnRep_Job();
 protected:
 	virtual void CopyProperties(APlayerState* PlayerState) override;
 	
@@ -39,8 +44,6 @@ private:
 	UPROPERTY()
 	UPlayerScoreComp* PlayerScoreComp = nullptr;
 
-	UPROPERTY(Replicated)
-	EPlayerJob PlayerJob;
 
 	FFinalScoreData FinalScoreData;
 
