@@ -23,7 +23,7 @@ public:
 	void AddConnectedPlayer() { ConnectedPlayers++; }
 	bool AreAllPlayersConnected() { return ConnectedPlayers == ExpectedPlayers; }
 
-	UFUNCTION(NetMulticast)
+	UFUNCTION(NetMulticast, Reliable)
 	void MulticastPlayerJob() const;
 	
 	/*
