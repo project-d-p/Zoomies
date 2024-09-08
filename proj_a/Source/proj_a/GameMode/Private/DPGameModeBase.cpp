@@ -257,6 +257,11 @@ void ADPGameModeBase::CheckAllPlayersConnected()
 
 void ADPGameModeBase::StartGame()
 {
+	ADPInGameState* GS = GetGameState<ADPInGameState>();
+	if (GS)
+	{
+		GS->MulticastPlayerJob();
+	}
 }
 
 void ADPGameModeBase::Logout(AController* Exiting)
