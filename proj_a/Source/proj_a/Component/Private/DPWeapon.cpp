@@ -4,6 +4,7 @@
 #include "DPWeapon.h"
 
 #include "DPPlayerController.h"
+#include "MovieSceneSequenceID.h"
 //#include "DPCharacter.h"
 
 // Sets default values
