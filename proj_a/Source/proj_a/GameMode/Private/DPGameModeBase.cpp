@@ -260,7 +260,10 @@ void ADPGameModeBase::StartGame()
 	ADPInGameState* GS = GetGameState<ADPInGameState>();
 	if (GS)
 	{
-		GS->MulticastPlayerJob();
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([GS]() {
+			GS->MulticastPlayerJob();
+		}), 5.0f, false); 
 	}
 }
 

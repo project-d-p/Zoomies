@@ -27,8 +27,10 @@ FUIInitData AJudgeGameMode::GetUiData()
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         AJudgePlayerController* PC = Cast<AJudgePlayerController>(*It);
+        if (!PC)
+            return UIData;
         AJudgePlayerState* PS = Cast<AJudgePlayerState>(PC->PlayerState);
-        if (!PC || !PS)
+        if (!PS)
             return UIData;
         FPlayerInitData PlayerData;
         PlayerData.PlayerName = PS->GetPlayerName();
