@@ -1,11 +1,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
+#include "Components/SceneComponent.h"
+#include "Components/AudioComponent.h"
 #include "SoundComponent.generated.h"
 
 UCLASS()
-class USoundComponent : public UActorComponent
+class USoundComponent : public USceneComponent
 {
 	GENERATED_BODY()
 public:
@@ -24,4 +25,8 @@ public:
 	USoundBase* AnimalGetDamagedSound;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	USoundBase* AnimalFaintSound;
+
+private:
+	UPROPERTY()
+	UAudioComponent* AudioComponent;
 };
