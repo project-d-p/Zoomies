@@ -263,7 +263,7 @@ void ADPGameModeBase::StartGame()
 		FTimerHandle TimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([GS]() {
 			GS->MulticastPlayerJob();
-		}), 5.0f, false); 
+		}), 20.0f, false); 
 	}
 }
 
