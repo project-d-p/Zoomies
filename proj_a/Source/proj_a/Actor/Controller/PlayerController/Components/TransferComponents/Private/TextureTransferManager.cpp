@@ -5,24 +5,38 @@
 
 void UTextureTransferManager::RequestTextureToServer_Implementation(int32 PlayerId)
 {
-	ADPCharacter* C = FindCharacterByPlayerId(PlayerId);
-	UDynamicTextureComponent* dynamicTextureComp = C->GetDynamicTextureComponent();
-	if (dynamicTextureComp && dynamicTextureComp->bCustomTextureUploaded == true)
+	ADPCharacter* Character = FindCharacterByPlayerId(PlayerId);
+	if (!Character)
 	{
-		UTexture2D* CustomTexture = dynamicTextureComp->GetDynamicTexture();
-		if (CustomTexture)
-		{	
-			SendLargeDataInChunks(
-					C->SerializeTexture(CustomTexture).CompressedTextureData,
-					PlayerId);
-		}
+		RetryRequestTexture(PlayerId);
+		return;
+	}
+
+	UDynamicTextureComponent* DynamicTextureComp = Character->GetDynamicTextureComponent();
+	if (!DynamicTextureComp || !DynamicTextureComp->bCustomTextureUploaded)
+	{
+		RetryRequestTexture(PlayerId);
+		return;
+	}
+
+	UTexture2D* CustomTexture = DynamicTextureComp->GetDynamicTexture();
+	if (CustomTexture)
+	{
+		SendLargeDataInChunks(
+			Character->SerializeTexture(CustomTexture).CompressedTextureData,
+			PlayerId);
 	}
 	else
 	{
-		FTimerDelegate TimerDelegate;
-		TimerDelegate.BindLambda([this, PlayerId]() { RequestTextureToServer(PlayerId); });
-		GetWorld()->GetTimerManager().SetTimerForNextTick(TimerDelegate);
+		RetryRequestTexture(PlayerId);
 	}
+}
+
+void UTextureTransferManager::RetryRequestTexture(int32 PlayerId)
+{
+	FTimerDelegate TimerDelegate;
+	TimerDelegate.BindLambda([this, PlayerId]() { RequestTextureToServer(PlayerId); });
+	GetWorld()->GetTimerManager().SetTimerForNextTick(TimerDelegate);
 }
 
 void UTextureTransferManager::OnTextureTransferComplete(const int32 Key)

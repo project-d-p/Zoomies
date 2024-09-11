@@ -16,4 +16,6 @@ public:
 	UFUNCTION()
 	void OnTextureTransferComplete(const int32 Key);
 	ADPCharacter* FindCharacterByPlayerId(int32 PlayerId) const;
+private:
+	void RetryRequestTexture(int32 PlayerId);
 };
