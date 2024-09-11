@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TextureTransferManager.h"
 #include "GameFramework/PlayerController.h"
 #include "proj_a/MatchingLobby/SteamInvite/SteamInvite.h"
 #include "proj_a/MatchingLobby/TYPE_MatchingLobby/TYPE_MatchingLobby.h"
@@ -12,6 +13,7 @@ class PROJ_A_API APC_MatchingLobby : public APlayerController
 	GENERATED_BODY()
 
 public:
+	APC_MatchingLobby();
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSetReady(bool pIsReady);
 
@@ -27,8 +29,13 @@ public:
 	void ShowSteamInviteDialog();
 
 	bool GetIsReady();
+	
+	UTextureTransferManager* GetTextureTransferManager() const { return TextureTransferManager; }
 private:
+	UPROPERTY()
 	USteamInvite* SteamInvite = nullptr;
+	UPROPERTY()
+	UTextureTransferManager* TextureTransferManager = nullptr;
 protected:
 	virtual void BeginPlay() override;
 private:

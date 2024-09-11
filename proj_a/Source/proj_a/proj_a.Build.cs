@@ -55,6 +55,7 @@ public class proj_a : ModuleRules
 			"proj_a/Actor/Controller/PlayerController/Public",
 			"proj_a/Actor/Controller/PlayerController/Components/InputComponents/Public",
 			"proj_a/Actor/Controller/PlayerController/Components/LevelComponents/Public",
+			"proj_a/Actor/Controller/PlayerController/Components/TransferComponents/Public",
 			"proj_a/Actor/Character/Public",
 			"proj_a/Actor/Character/CharacterPositionSync/Public",
 			"proj_a/Actor/Character/PlayerState/Public",

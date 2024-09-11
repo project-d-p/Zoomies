@@ -13,6 +13,20 @@
 #include "DPCharacter.generated.h"
 
 class ABaseMonsterCharacter;
+class UTextureTransferManager;
+
+USTRUCT()
+struct FSerializedTextureData
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	TArray<uint8> CompressedTextureData;
+	UPROPERTY()
+	int32 Width = 0;
+	UPROPERTY()
+	int32 Height = 0;
+};
 
 UCLASS()
 class PROJ_A_API ADPCharacter : public ACharacter
@@ -28,7 +42,6 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -44,6 +57,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "References")
 	class AReturnTriggerVolume* ReturnTriggerVolume; 
 
+	UFUNCTION()
+	void OnTransferComplete(const TArray<uint8>& FullData);
 public:	// component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UDPHpActorComponent* hpComponent;
@@ -55,8 +70,6 @@ public:	// component
 	class UDPStateActorComponent* stateComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UMonsterSlotComponent* monsterSlotComponent;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UDynamicTextureComponent* DynamicTextureComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PostProcess")
 	class UPostProcessComponent* postProcessComponent;
 
@@ -71,9 +84,6 @@ public:	// component
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MatchLobby")
 	UWidgetComponent* LobbyInfoWidgetComponent = nullptr;
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
-	//UMaterialInstanceDynamic* dynamicMaterialInstance;
 
 	UPROPERTY()
 	TSubclassOf<UNameTag> NameTag_BP;
@@ -125,7 +135,10 @@ public:	// component
 	bool IsAtReturnPlace() const;
 
 	void RemoveSpringArm();
-	
+
+	UDynamicTextureComponent* GetDynamicTextureComponent() const { return DynamicTextureComponent; }
+	bool TryGetPlayerStateAndTransferManager(APlayerState*& OutPS, UTextureTransferManager*& OutTTM);
+	FSerializedTextureData SerializeTexture(UTexture2D* Texture);
 protected:
 	void ClientNotifyAnimalReturn_Implementation(const FString& player_name);
 	
@@ -135,6 +148,14 @@ private:
 	void CheckCollisionWithMonster();
 	void OnServerHit(const FHitResult& HitResult);
 
+	/* For Character Custom Texture */
+	void LoadTexture();
+	UTexture2D* DeserializeTexture(FSerializedTextureData& InData);
+	void UpdateTexture(UTexture2D* NewTexture);
+	UPROPERTY()
+	UDynamicTextureComponent* DynamicTextureComponent;
+	//
+	
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* springArm;
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -161,14 +182,4 @@ public:
 	bool mIsAtReturnPlace{ true };
 	UPROPERTY(BlueprintReadWrite)
 	bool isKnockback{ false };
-
-	/* texture */
-	uint8* TextureData;  // 텍스처 데이터를 저장할 배열
-	UPROPERTY()
-	UTexture2D* DynamicTexture;  // 동적 텍스처 오브젝트
-	FUpdateTextureRegion2D* TextureRegion;
-	UPROPERTY(EditDefaultsOnly)
-	int32 TextureWidth = 1024;
-	UPROPERTY(EditDefaultsOnly)
-	int32 TextureHeight = 1024;
 };

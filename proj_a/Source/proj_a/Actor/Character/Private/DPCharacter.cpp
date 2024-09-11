@@ -29,8 +29,10 @@
 #include "Materials/MaterialInstanceConstant.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/GameSession.h"
 #include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
+#include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
 #include "Serialization/BulkDataRegistry.h"
 
 // Sets default values
@@ -62,25 +64,25 @@ ADPCharacter::ADPCharacter()
 
 	sceneCaptureSpringArm->SetupAttachment(RootComponent);
 	sceneCapture->SetupAttachment(sceneCaptureSpringArm);
-	
+
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CHARACTER
 	(TEXT("/Game/model/steve/StickManForMixamo.StickManForMixamo"));
-	if (SK_CHARACTER.Succeeded()) 
+	if (SK_CHARACTER.Succeeded())
 	{
 		DynamicTextureComponent = CreateDefaultSubobject<UDynamicTextureComponent>(TEXT("DynamicTextureComponent"));
 		DynamicTextureComponent->InitializeTexture();
-		const FString FilePath = FPaths::ProjectContentDir() + TEXT("customCharacter/test4.png");
-		DynamicTextureComponent->LoadTextureFromFile(FilePath);
+		// const FString FilePath = FPaths::ProjectContentDir() + TEXT("customCharacter/test4.exr");
+		// DynamicTextureComponent->LoadTextureFromFile(FilePath);
 		
 		GetMesh()->SetSkeletalMesh(SK_CHARACTER.Object);
 
 		dynamicMaterialInstance = UMaterialInstanceDynamic::Create(GetMesh()->GetMaterial(0), this, TEXT("DynamicMaterial"));
 		
-		if (dynamicMaterialInstance)
-		{
-			dynamicMaterialInstance->SetTextureParameterValue(TEXT("renderTarget"), DynamicTextureComponent->GetDynamicTexture());
-			GetMesh()->SetMaterial(0, dynamicMaterialInstance);
-		}
+		// if (dynamicMaterialInstance)
+		// {
+		// 	dynamicMaterialInstance->SetTextureParameterValue(TEXT("renderTarget"), DynamicTextureComponent->GetDynamicTexture());
+		// 	GetMesh()->SetMaterial(0, dynamicMaterialInstance);
+		// }
 	}
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -90.f), FRotator(0.f, 270.f, 0.f));
@@ -227,6 +229,158 @@ ADPCharacter::ADPCharacter()
 	}
 }
 
+bool ADPCharacter::TryGetPlayerStateAndTransferManager(APlayerState*& OutPS, UTextureTransferManager*& OutTTM)
+{
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (!PC)
+	{
+		return false;
+	}
+
+	if (ADPPlayerController* DPPC = Cast<ADPPlayerController>(PC))
+	{
+		OutTTM = DPPC->GetTextureTransferManager();
+		OutPS = DPPC->GetPlayerState<APlayerState>();
+		return (OutPS != nullptr && OutTTM != nullptr);
+	}
+	else if (APC_MatchingLobby* LobbyPC = Cast<APC_MatchingLobby>(PC))
+	{
+		OutTTM = LobbyPC->GetTextureTransferManager();
+		OutPS = LobbyPC->GetPlayerState<APlayerState>();
+		return (OutPS != nullptr && OutTTM != nullptr);
+	}
+
+	return false;
+}
+
+void ADPCharacter::LoadTexture()
+{
+	if (DynamicTextureComponent)
+	{
+		const FString FilePath = FPaths::ProjectContentDir() + TEXT("customCharacter/test4.exr");
+		DynamicTextureComponent->LoadTextureFromFile(FilePath);
+		UTexture2D* CustomTexture = DynamicTextureComponent->GetDynamicTexture();
+
+		APlayerState* PS = nullptr;
+		UTextureTransferManager* TTM = nullptr;
+		if (!TryGetPlayerStateAndTransferManager(PS, TTM))
+		{
+			GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ADPCharacter::LoadTexture);
+			return ;
+		}
+		if (HasLocalNetOwner())
+		{
+			if (GetWorld()->GetNetMode() != NM_Standalone && !HasAuthority())
+			{
+				TTM->SendLargeDataInChunks(
+					SerializeTexture(CustomTexture).CompressedTextureData,
+					PS->GetPlayerId());
+			}
+			UpdateTexture(CustomTexture);
+		}
+		else
+		{
+			if (HasAuthority()) return ;
+			if (!GetPlayerState())
+			{
+				GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ADPCharacter::LoadTexture);
+				return ;
+			}
+			TTM->RequestTextureToServer(GetPlayerState()->GetPlayerId());
+		}
+	}
+}
+
+void ADPCharacter::OnTransferComplete(const TArray<uint8>& FullData)
+{
+	if (FullData.Num() > 0)
+	{
+		FSerializedTextureData TextureData;
+		TextureData.CompressedTextureData = FullData;
+		TextureData.Width = 1024;
+		TextureData.Height = 1024;
+		UTexture2D* Texture = DeserializeTexture(TextureData);
+		UpdateTexture(Texture);
+	}
+}
+
+FSerializedTextureData ADPCharacter::SerializeTexture(UTexture2D* Texture)
+{
+	FSerializedTextureData OutData;
+	if (Texture && Texture->GetPlatformData())
+	{
+		FTexturePlatformData* PlatformData = Texture->GetPlatformData();
+		FTexture2DMipMap* Mip = &PlatformData->Mips[0];
+
+		OutData.Width = Mip->SizeX;
+		OutData.Height = Mip->SizeY;
+
+		FByteBulkData* RawImageData = &Mip->BulkData;
+		FLinearColor* RawImageDataPtr = static_cast<FLinearColor*>( RawImageData->Lock( LOCK_READ_ONLY ) );
+		// const void* DataPointer = Mip.BulkData.Lock(LOCK_READ_ONLY);
+		if (RawImageDataPtr)
+		{
+			// uint8* dd =  DynamicTextureComponent->TextureData;
+			const TArray64<uint8>& dd = DynamicTextureComponent->CompressTextureDataToEXR();
+			const int32 BytesPerPixel = GPixelFormats[PlatformData->PixelFormat].BlockBytes;
+			const int32 DataSize = Texture->GetSizeX() * Texture->GetSizeY() * BytesPerPixel;
+			// const int32 DataSize = 1024;
+			OutData.CompressedTextureData.SetNumUninitialized(dd.Num());
+			FMemory::Memcpy(OutData.CompressedTextureData.GetData(), dd.GetData(), dd.Num());
+			Mip->BulkData.Unlock();
+		}
+
+		// void* TextureDataPointer = Mip->BulkData.Lock(LOCK_READ_WRITE);
+		// if (TextureDataPointer)
+		// {
+		// 	TArray64<uint8> dd = DynamicTextureComponent->DecompressEXRToRawData(OutData.CompressedTextureData, OutData.Width, OutData.Height);
+		// 	// FMemory::Memzero(TextureDataPointer, Mip.SizeX * Mip.SizeY * 16);
+		// 	FMemory::Memcpy(TextureDataPointer, dd.GetData(), dd.Num());
+		// 	Mip->BulkData.Unlock();
+		// }
+		
+		// UpdateTexture(Texture);
+	}
+	return OutData;
+}
+
+UTexture2D* ADPCharacter::DeserializeTexture(FSerializedTextureData& InData)
+{
+	if (InData.CompressedTextureData.Num() == 0 || InData.Width <= 0 || InData.Height <= 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Invalid serialized texture data."));
+		return nullptr;
+	}
+	
+	UTexture2D* Texture = DynamicTextureComponent->GetDynamicTexture();
+
+	FTexturePlatformData* PlatformData = Texture->GetPlatformData();
+	FTexture2DMipMap* Mip = &PlatformData->Mips[0];
+
+	Mip->SizeX = InData.Width;
+	Mip->SizeY = InData.Height;
+
+	void* TextureDataPointer = Mip->BulkData.Lock(LOCK_READ_WRITE);
+	if (TextureDataPointer)
+	{
+		TArray64<uint8> dd = DynamicTextureComponent->DecompressEXRToRawData(InData.CompressedTextureData, InData.Width, InData.Height);
+		FMemory::Memcpy(TextureDataPointer, dd.GetData(), dd.Num());
+		Mip->BulkData.Unlock();
+	}
+	Texture->UpdateResource();
+	
+	return Texture;
+}
+
+void ADPCharacter::UpdateTexture(UTexture2D* NewTexture)
+{
+	if (NewTexture && dynamicMaterialInstance)
+	{
+		dynamicMaterialInstance->SetTextureParameterValue(TEXT("renderTarget"), NewTexture);
+		GetMesh()->SetMaterial(0, dynamicMaterialInstance);
+	}
+}
+
 ADPCharacter::~ADPCharacter()
 {
 }
@@ -257,7 +411,7 @@ void ADPCharacter::SetNameTag()
 	else
 	{
 		static int32 RetryCount = 0;
-		if (RetryCount < 5) // �ִ� 5ȸ�� �õ�
+		if (RetryCount < 5)
 		{
 			RetryCount++;
 			FTimerHandle TimerHandle;
@@ -272,7 +426,6 @@ void ADPCharacter::SetNameTag()
 		}
 	}
 }
-
 
 // Called when the game starts or when spawned
 void ADPCharacter::BeginPlay()
@@ -290,16 +443,8 @@ void ADPCharacter::BeginPlay()
 		NameTag_WidgetComponent->SetVisibility(false);
 	}
 	
-	//if (GetMesh()) {
-	//	UMaterialInterface* Material = GetMesh()->GetMaterial(0);
-	//	if (Material) {
-	//		dynamicMaterialInstance = UMaterialInstanceDynamic::Create(Material, this);
-	//		GetMesh()->SetMaterial(0, dynamicMaterialInstance);
-	//	}
-	//}
-	//if (dynamicMaterialInstance)
-	//	dynamicMaterialInstance->SetVectorParameterValue(FName("color"), FVector4(0.f, 0.f, 1.f, 1.f));
-
+	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ADPCharacter::LoadTexture);
+	
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AReturnTriggerVolume::StaticClass(), FoundActors);
 	if (FoundActors.Num() > 0)
@@ -320,7 +465,7 @@ void ADPCharacter::BeginPlay()
 void ADPCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
 	if (GetCharacterMovement()) {
 		currentVelocity = GetCharacterMovement()->Velocity;
 		speed = currentVelocity.Size();

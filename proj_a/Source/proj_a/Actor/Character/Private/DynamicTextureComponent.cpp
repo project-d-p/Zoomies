@@ -30,7 +30,6 @@ void UDynamicTextureComponent::InitializeTexture()
 
 	FillTexture(FLinearColor::Red);
 	FlushRenderingCommands();
-	UpdateTexture(DynamicTexture);
 }
 
 void UDynamicTextureComponent::FillTexture(FLinearColor Color)
@@ -47,7 +46,7 @@ void UDynamicTextureComponent::FillTexture(FLinearColor Color)
 	}
 }
 
-void UDynamicTextureComponent::UpdateTexture(UTexture2D* inTexture, bool bFreeData)
+void UDynamicTextureComponent::UpdateTexture(UTexture2D* inTexture, uint8* InSrcData, bool bFreeData)
 {
 	if (inTexture == nullptr)
 	{
@@ -66,12 +65,12 @@ void UDynamicTextureComponent::UpdateTexture(UTexture2D* inTexture, bool bFreeDa
 	};
 
 	FUpdateTextureRegionsData* RegionData = new FUpdateTextureRegionsData;
-	RegionData->Texture2DResource = (FTexture2DResource*)inTexture->GetResource();
+	RegionData->Texture2DResource = static_cast<FTexture2DResource*>(inTexture->GetResource());
 	RegionData->TextureRHI = RegionData->Texture2DResource->GetTexture2DRHI();
 	RegionData->Regions = TextureRegion;
 	RegionData->SrcPitch = TextureWidth * 4 * sizeof(float);
 	RegionData->SrcBpp = 4 * sizeof(float);
-	RegionData->SrcData = TextureData;
+	RegionData->SrcData = InSrcData;
 
 	if (!RegionData->TextureRHI || !RegionData->SrcData)
 	{
@@ -100,6 +99,7 @@ void UDynamicTextureComponent::UpdateTexture(UTexture2D* inTexture, bool bFreeDa
 
 			delete RegionData;
 		});
+	FlushRenderingCommands();
 }
 
 bool UDynamicTextureComponent::LoadTextureFromFile(const FString& FilePath)
@@ -107,46 +107,75 @@ bool UDynamicTextureComponent::LoadTextureFromFile(const FString& FilePath)
 	TArray<uint8> FileData;
 	if (!FFileHelper::LoadFileToArray(FileData, *FilePath))
 	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("Failed to load file: %s"), *FilePath);
 		return false;
 	}
 
 	IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
-	TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::PNG);
+	TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::EXR);
 	
 	if (ImageWrapper.IsValid() && ImageWrapper->SetCompressed(FileData.GetData(), FileData.Num()))
 	{
 		TArray<uint8> RawData;
-		if (ImageWrapper->GetRaw(ERGBFormat::RGBA, 8, RawData))
+		if (ImageWrapper->GetRaw(ERGBFormat::RGBAF, 32, RawData))
 		{
 			int32 ImageWidth = ImageWrapper->GetWidth();
 			int32 ImageHeight = ImageWrapper->GetHeight();
 	
 			if (ImageWidth != TextureWidth || ImageHeight != TextureHeight)
 			{
-				FNetLogger::EditerLog(FColor::Red, TEXT("Texture size mismatch: %s"), *FilePath);
 				return false;
 			}
 	
 			const uint32 TextureTotalPixels = TextureWidth * TextureHeight;
-			float* FloatTextureData = reinterpret_cast<float*>(TextureData);
-			
-			for (uint32 i = 0; i < TextureTotalPixels; i++)
-			{
-				FloatTextureData[i * 4] = RawData.GetData()[i * 4] / 255.0f;
-				FloatTextureData[i * 4 + 1] = RawData.GetData()[i * 4 + 1] / 255.0f;
-				FloatTextureData[i * 4 + 2] = RawData.GetData()[i * 4 + 2] / 255.0f;
-				FloatTextureData[i * 4 + 3] = RawData.GetData()[i * 4 + 3] / 255.0f;
-			}
-			
-			// FMemory::Memcpy(TextureData, RawData.GetData(), TextureWidth * TextureHeight * 4 * 2);
+			FMemory::Memcpy(TextureData, RawData.GetData(), TextureTotalPixels * 4 * 4);
 	
-			UpdateTexture(DynamicTexture);
+			UpdateTexture(DynamicTexture, TextureData);
 			return true;
 		}
 	}
-	FNetLogger::EditerLog(FColor::Red, TEXT("Failed 2 load image: %s"), *FilePath);
 	return false;
+}
+
+TArray64<uint8> UDynamicTextureComponent::CompressTextureDataToEXR()
+{
+	if (TextureData == nullptr)
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("TextureData is null"));
+		return TArray64<uint8>();
+	}
+
+	IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
+	TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::EXR);
+
+	if (!ImageWrapper.IsValid())
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("Failed to create EXR image wrapper"));
+		return TArray64<uint8>();
+	}
+
+	ImageWrapper->SetRaw(TextureData, TextureWidth * TextureHeight * 4 * sizeof(float), TextureWidth, TextureHeight, ERGBFormat::RGBAF, 32);
+	const TArray64<uint8>& CompressedData = ImageWrapper->GetCompressed();
+	return CompressedData;
+}
+
+TArray64<uint8> UDynamicTextureComponent::DecompressEXRToRawData(const TArray<uint8>& CompressedData, int32& OutWidth, int32& OutHeight)
+{
+	IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
+	TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::EXR);
+
+	if (!ImageWrapper.IsValid() || !ImageWrapper->SetCompressed(CompressedData.GetData(), CompressedData.Num()))
+	{
+		return TArray64<uint8>();
+	}
+
+	TArray64<uint8> RawData;
+	if (ImageWrapper->GetRaw(ERGBFormat::RGBAF, 32, RawData))
+	{
+		OutWidth = ImageWrapper->GetWidth();
+		OutHeight = ImageWrapper->GetHeight();
+		return RawData;
+	}
+	return TArray64<uint8>();
 }
 
 UDynamicTextureComponent::~UDynamicTextureComponent()
