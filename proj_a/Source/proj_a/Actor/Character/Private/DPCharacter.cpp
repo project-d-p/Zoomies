@@ -257,37 +257,52 @@ void ADPCharacter::LoadTexture()
 {
 	if (DynamicTextureComponent)
 	{
-		const FString FilePath = FPaths::ProjectContentDir() + TEXT("customCharacter/test4.exr");
+		const FString FilePath = FPaths::ProjectContentDir() + TEXT("customCharacter/customImage.png");
 		DynamicTextureComponent->LoadTextureFromFile(FilePath);
 		UTexture2D* CustomTexture = DynamicTextureComponent->GetDynamicTexture();
-
+		
 		APlayerState* PS = nullptr;
 		UTextureTransferManager* TTM = nullptr;
-		if (!TryGetPlayerStateAndTransferManager(PS, TTM))
+		if (!CustomTexture || !TryGetPlayerStateAndTransferManager(PS, TTM))
 		{
 			GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ADPCharacter::LoadTexture);
 			return ;
 		}
+		
 		if (HasLocalNetOwner())
 		{
-			if (GetWorld()->GetNetMode() != NM_Standalone && !HasAuthority())
-			{
-				TTM->SendLargeDataInChunks(
-					SerializeTexture(CustomTexture).CompressedTextureData,
-					PS->GetPlayerId());
-			}
-			UpdateTexture(CustomTexture);
+			HandleLocalNetOwner(CustomTexture, PS, TTM);
 		}
 		else
 		{
-			if (HasAuthority()) return ;
-			if (!GetPlayerState())
-			{
-				GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ADPCharacter::LoadTexture);
-				return ;
-			}
-			TTM->RequestTextureToServer(GetPlayerState()->GetPlayerId());
+			HandleRemoteNetOwner(PS, TTM);
 		}
+	}
+}
+
+void ADPCharacter::HandleLocalNetOwner(UTexture2D* CustomTexture, APlayerState* PS, UTextureTransferManager* TTM)
+{
+	if (GetWorld()->GetNetMode() != NM_Standalone)
+	{
+		if (HasAuthority())
+		{
+			DynamicTextureComponent->bCustomTextureUploaded = true;
+		}
+		else
+		{
+			TTM->SendLargeDataInChunks(
+				SerializeTexture(CustomTexture).CompressedTextureData,
+				PS->GetPlayerId());
+		}
+	}
+	UpdateTexture(CustomTexture);
+}
+
+void ADPCharacter::HandleRemoteNetOwner(APlayerState* PS, UTextureTransferManager* TTM)
+{
+	if (!HasAuthority())
+	{
+		TTM->RequestTextureToServer(PS->GetPlayerId());
 	}
 }
 
