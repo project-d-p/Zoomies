@@ -180,7 +180,7 @@ Message MessageMaker::MakeAimMessage(ADPPlayerController* controller, bool bAim)
 #if EDITOR_MODE
 	msg.set_player_id(TCHAR_TO_UTF8(*controller->PlayerState->GetPlayerName()));
 #elif LAN_MODE
-	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetPlayerName()));
+	msg.set_player_id(TCHAR_TO_UTF8(*controller->PlayerState->GetPlayerName()));
 #else
 	msg.set_player_id(TCHAR_TO_UTF8(*controller->PlayerState->GetUniqueId()->ToString()));
 #endif
