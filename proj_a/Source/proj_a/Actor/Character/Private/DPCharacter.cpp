@@ -290,9 +290,8 @@ void ADPCharacter::HandleLocalNetOwner(UTexture2D* CustomTexture, APlayerState* 
 		}
 		else
 		{
-			TTM->SendLargeDataInChunks(
-				SerializeTexture(CustomTexture).CompressedTextureData,
-				PS->GetPlayerId());
+			FDataTransferParams Params(SerializeTexture(CustomTexture).CompressedTextureData, PS->GetPlayerId());
+			TTM->SendLargeDataInChunks(Params);
 		}
 	}
 	UpdateTexture(CustomTexture);

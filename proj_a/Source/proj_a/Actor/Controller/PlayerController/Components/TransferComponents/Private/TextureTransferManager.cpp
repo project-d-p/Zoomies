@@ -26,9 +26,8 @@ void UTextureTransferManager::RequestTextureToServer_Implementation(int32 Player
 		return;
 	}
 
-	SendLargeDataInChunks(
-		Character->SerializeTexture(CustomTexture).CompressedTextureData,
-		PlayerId);
+	FDataTransferParams Params(Character->SerializeTexture(CustomTexture).CompressedTextureData, PlayerId);
+	SendLargeDataInChunks(Params);
 }
 
 void UTextureTransferManager::RetryRequestTexture(int32 PlayerId)

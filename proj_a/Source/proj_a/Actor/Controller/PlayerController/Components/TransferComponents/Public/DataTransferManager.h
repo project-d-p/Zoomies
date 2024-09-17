@@ -35,6 +35,37 @@ struct FDataTransferInfo
 	bool bDataTransferComplete = false;
 };
 
+USTRUCT()
+struct FDataTransferParams
+{
+	GENERATED_BODY()
+
+	TArray<uint8> Data;
+	int32 PlayerId;
+	int32 ChunkSize;
+	int32 TotalChunks;
+	int32 StartChunk;
+	int32 ChunksPerTick;
+
+	enum ETransferConstants
+	{
+		CHUNK_SIZE = 1024,
+		CHUNK_PER_TICK = 10
+	};
+	
+	FDataTransferParams() 
+		: PlayerId(0), ChunkSize(CHUNK_SIZE), TotalChunks(0), StartChunk(0), ChunksPerTick(CHUNK_PER_TICK)
+	{}
+	FDataTransferParams(const TArray<uint8>& InData, int32 InPlayerId)
+		: Data(InData), PlayerId(InPlayerId)
+	{
+		ChunkSize = CHUNK_SIZE;
+		TotalChunks = FMath::CeilToInt(static_cast<float>(Data.Num()) / ChunkSize);
+		StartChunk = 0;
+		ChunksPerTick = CHUNK_PER_TICK;
+	}
+};
+
 UCLASS()
 class UDataTransferManager : public UActorComponent
 {
@@ -43,7 +74,7 @@ class UDataTransferManager : public UActorComponent
 public:
 	FOnDataTransferComplete OnDataTransferComplete;
 	void RemoveDataTransferInfo(int32 Key) { DataTransferMap.Remove(Key); }
-	void SendLargeDataInChunks(const TArray<uint8>& Data, int32 PlayerId, int32 ChunkSize = 1024);
+	void SendLargeDataInChunks(FDataTransferParams Params);
 	
 	UFUNCTION(Server, Reliable)
 	void ReceiveDataChunkForServer(const FDataChunkInfo DataChunkInfo);
@@ -51,9 +82,11 @@ public:
 	void ReceiveDataChunkForClient(const FDataChunkInfo DataChunkInfo);
 
 protected:
+	void SendDataChunks(FDataTransferParams Params);
 	void HandleReceivedData(const FDataChunkInfo& DataChunkInfo);
 	void ResetData(int32 Key);
-
+	bool CanSendDataWithoutOverflow(const TArray<uint8>& Data, UFunction* Function, const FDataChunkInfo& ChunkInfo);
+	
 	TMap<int32, FDataTransferInfo> DataTransferMap;
 	int32 ExpectedTotalChunks = 0;
 };
