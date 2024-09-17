@@ -12,12 +12,12 @@
 #endif
 
 #ifndef LAN_MODE
-	#define LAN_MODE 1
+	#define LAN_MODE 0
 #endif
 
 namespace Zoomies	
 {
 	constexpr int MAX_MONSTERS = 5;
-	constexpr int MAX_PLAYERS = 2;
+	constexpr int MAX_PLAYERS = 4;
 	constexpr float GAME_TIME = 15.f;
 }
