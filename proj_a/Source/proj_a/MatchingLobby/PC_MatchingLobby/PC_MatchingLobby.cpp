@@ -8,7 +8,7 @@
 #include "proj_a/MatchingLobby/GS_MachingLobby/GS_MatchingLobby.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
-#include "proj_a/MatchingLobby/A_MatchingLobby/LC_MatchLobby.h"
+#include "proj_a/MatchingLobby/A_MatchingLobby/LevelComponents/LC_MatchLobby.h"
 
 APC_MatchingLobby::APC_MatchingLobby()
 {

@@ -3,7 +3,7 @@
 #include "DPPlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "LC_MatchLobby.h"
+#include "../LevelComponents/LC_MatchLobby.h"
 #include "Kismet/GameplayStatics.h"
 #include "proj_a/MatchingLobby/GM_MatchingLobby/GM_MatchingLobby.h"
 #include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"

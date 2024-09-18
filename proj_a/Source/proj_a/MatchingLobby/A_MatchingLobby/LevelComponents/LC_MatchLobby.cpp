@@ -2,7 +2,7 @@
 
 #include "BasicInputComponent.h"
 #include "MainInputComponent.h"
-#include "IC_MatchLobby.h"
+#include "../InputComponents/IC_MatchLobby.h"
 #include "Camera/CameraActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"

@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "BaseLevelComponent.h"
 #include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
-#include "IC_MatchLobby.h"
+#include "../InputComponents/IC_MatchLobby.h"
 #include "LC_MatchLobby.generated.h"
 
 class UIC_MatchLobby;

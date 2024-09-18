@@ -409,15 +409,6 @@ void UGI_Zoomies::InitSteamAPI()
 	if (!is_steamAPI_init)
 	{
 		UE_LOG(LogTemp, Log, TEXT("SteamAPI init failed"));
-		//logging on Screen if GEngine is available
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(
-				-1,
-				30.f,
-				FColor::Red,
-				FString::Printf(TEXT("SteamAPI init failed")));
-		}
 	}
 	else
 	{
@@ -450,15 +441,6 @@ void UGI_Zoomies::InitOnlineSubsystemSteam()
 	}
 	if (!is_online_session_steam_init)
 	{
-		//logging on Screen if GEngine is available
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(
-				-1,
-				30.f,
-				FColor::Red,
-				FString::Printf(TEXT("Online Subsystem steam init failed")));
-		}
 		UE_LOG(LogTemp, Log, TEXT("Online Subsystem steam init failed"));
 	}
 	else
@@ -480,10 +462,7 @@ void UGI_Zoomies::LoadFriendsList()
 {
     if (!online_subsystem_)
     {
-        if (GEngine)
-        {
-            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("온라인 서브시스템이 초기화되지 않았습니다."));
-        }
+		UE_LOG(LogTemp, Log, TEXT("online subsystem is not valid"));
         return;
     }
 
@@ -507,10 +486,8 @@ void UGI_Zoomies::LoadFriendsList()
 
                 if (!FriendId.IsValid())
                 {
-                    if (GEngine)
-                    {
-                        GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("유효하지 않은 친구 ID를 건너뜁니다."));
-                    }
+                	
+					UE_LOG(LogTemp, Log, TEXT("Invalid Friend ID"));
                     continue;
                 }
 
@@ -527,18 +504,12 @@ void UGI_Zoomies::LoadFriendsList()
         }
         else
         {
-            if (GEngine)
-            {
-                GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("친구 리스트를 가져오지 못했습니다."));
-            }
+			UE_LOG(LogTemp, Log, TEXT("failed to get friends list"));
         }
     }
     else
     {
-        if (GEngine)
-        {
-            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("온라인 친구 인터페이스를 사용할 수 없습니다."));
-        }
+    	UE_LOG(LogTemp, Log, TEXT("online friends interface is not valid"));
     }
 }
 
@@ -551,10 +522,6 @@ void UGI_Zoomies::InviteFriendToGame(FString FriendId)
 		bool bInviteSent = session_interface_->SendSessionInviteToFriend(0, SessionName, *uniqueNetId);
 		if (bInviteSent)
 		{
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("친구에게 초대를 보냈습니다."));
-			}
 			UE_LOG(LogTemp, Log, TEXT("success to send invite"));
 		}
 		else
