@@ -193,7 +193,7 @@ void APC_MatchingLobby::getMatchLobbyUI()
 
 	UClass* WidgetClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *WidgetPath));
 
-	if (WidgetClass != nullptr)
+	if (WidgetClass != nullptr && MatchLobbyWidget == nullptr)
 	{
 		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 		if (PlayerController)

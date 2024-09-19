@@ -17,6 +17,12 @@ void UGI_Zoomies::Init()
 {
 	Super::Init();
 	CheckSteamInit();
+	if (session_interface_.IsValid())
+	{
+		session_interface_->AddOnSessionUserInviteAcceptedDelegate_Handle(
+			FOnSessionUserInviteAcceptedDelegate::CreateUObject(this, &UGI_Zoomies::OnInviteAccepted)
+		);
+	}
 
 #if EDITOR_MODE
 	bIsOnline = false;
@@ -45,6 +51,11 @@ IOnlineSubsystem* UGI_Zoomies::GetOnlineSubsystemInterface() const
 
 void UGI_Zoomies::FindSession()
 {
+	if(!CheckValidation())
+	{
+		UE_LOG( LogTemp, Error, TEXT("FindSession: Validation failed") );
+		return ;
+	}
 	FNetLogger::LogError(TEXT("FindSession_t"));
     
 	// Session search settings 
@@ -75,6 +86,11 @@ void UGI_Zoomies::FindSession()
 
 void UGI_Zoomies::OnFindComplete(bool bWasSuccessful)
 {
+	if(!CheckValidation())
+	{
+		UE_LOG( LogTemp, Error, TEXT("OnFindComplete: Validation failed") );
+		return ;
+	}
 	FNetLogger::LogError(TEXT("OnFindComplete"));
 	// unregister the delegate
 	session_interface_->ClearOnFindSessionsCompleteDelegate_Handle(
@@ -105,6 +121,11 @@ void UGI_Zoomies::OnFindComplete(bool bWasSuccessful)
 
 void UGI_Zoomies::CreateSession()
 {
+	if(!CheckValidation())
+	{
+		UE_LOG( LogTemp, Error, TEXT("CreateSession: Validation failed") );
+		return ;
+	}
 	FNetLogger::LogError(TEXT("CreateSession_t"));
 	session_settings_ = MakeShareable(new FOnlineSessionSettings());
 
@@ -148,7 +169,7 @@ void UGI_Zoomies::CreateSession()
 	dh_on_create_complete = session_interface_->AddOnCreateSessionCompleteDelegate_Handle(
 	   FOnCreateSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onCreateComplete));
 	// set SessionName to Unique
-	SessionName = FName(*FString::Printf(TEXT("GameSession_%s"), *FGuid::NewGuid().ToString()));
+	SessionName = FName(*FString::Printf(TEXT("Zoomies_%s"), *FGuid::NewGuid().ToString()));
 	
 	// Create session
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
@@ -157,6 +178,11 @@ void UGI_Zoomies::CreateSession()
 
 void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
 {
+	if(!CheckValidation())
+	{
+		UE_LOG( LogTemp, Error, TEXT("onCreateComplete: Validation failed") );
+		return ;
+	}
 	// unregister the delegate
 	session_interface_->ClearOnCreateSessionCompleteDelegate_Handle(
 		dh_on_create_complete
@@ -178,6 +204,12 @@ void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
 
 bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& search_result)
 {
+	if(!CheckValidation())
+	{
+		UE_LOG( LogTemp, Error, TEXT("JoinSessionBySearchResult: Validation failed") );
+		return false;
+	}
+	
 	FString BanList;
 	if (search_result.Session.SessionSettings.Get(FName("BanList"), BanList))
 	{
@@ -200,8 +232,40 @@ bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& se
 	return true;
 }
 
+void UGI_Zoomies::OnInviteAccepted(const bool bWasSuccessful, const int32 LocalPlayerNum, TSharedPtr<const FUniqueNetId> UserId, const FOnlineSessionSearchResult& InviteResult)
+{
+	if (!CheckValidation())
+	{
+		UE_LOG(LogTemp, Error, TEXT("OnInviteAccepted: Validation failed"));
+		return;
+	}
+
+	if (bWasSuccessful && InviteResult.IsValid())
+	{
+		UE_LOG(LogTemp, Log, TEXT("OnInviteAccepted: Invite successfully accepted"));
+
+		dh_on_join_complete = session_interface_->AddOnJoinSessionCompleteDelegate_Handle(
+			FOnJoinSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onJoinComplete));
+		
+		SessionName = FName(*InviteResult.Session.GetSessionIdStr());
+
+		const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
+		session_interface_->JoinSession(*local_player->GetPreferredUniqueNetId(), SessionName, InviteResult);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("OnInviteAccepted: Invite was not successful or InviteResult is invalid"));
+	}
+}
+
+
 void UGI_Zoomies::onJoinComplete(FName session_name, EOnJoinSessionCompleteResult::Type result)
 {
+	if(!CheckValidation())
+	{
+		UE_LOG( LogTemp, Error, TEXT("onJoinComplete: Validation failed") );
+		return;
+	}
 	if (result == EOnJoinSessionCompleteResult::Success)
 	{
 		APlayerController* player_controller = GetWorld()->GetFirstPlayerController();
@@ -247,6 +311,11 @@ void UGI_Zoomies::onJoinComplete(FName session_name, EOnJoinSessionCompleteResul
 
 void UGI_Zoomies::OnSessionFailure()
 {
+	if(!CheckValidation())
+	{
+		UE_LOG( LogTemp, Error, TEXT("OnSessionFailure: Validation failed") );
+		return;
+	}
 	UWorld* World = GetWorld();
 	if (World)
 	{
@@ -297,16 +366,12 @@ void UGI_Zoomies::ChangeJoinInProgress(bool bCond)
 
 	if (ExistingSession != nullptr)
 	{
-		// 세션 설정 업데이트
 		FOnlineSessionSettings UpdatedSessionSettings = ExistingSession->SessionSettings;
         
-		// 세션을 비공개로 설정
 		UpdatedSessionSettings.bAllowJoinInProgress = false;
         
-		// 추가적으로 검색 결과에서 숨기기 위해
 		UpdatedSessionSettings.bShouldAdvertise = false;
 
-		// 세션 설정 업데이트
 		SessionInterface->UpdateSession(SessionName, UpdatedSessionSettings);
 	}
 }
@@ -530,4 +595,20 @@ void UGI_Zoomies::InviteFriendToGame(FString FriendId)
 			UE_LOG(LogTemp, Warning, TEXT("Fail to send invite"));
 		}
 	}
+}
+
+
+bool UGI_Zoomies::CheckValidation() const
+{
+	if (!session_interface_.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Session interface is not valid."));
+		return false;
+	}
+	if (online_subsystem_ == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Online subsystem is not valid."));
+		return false;
+	}
+	return true;
 }

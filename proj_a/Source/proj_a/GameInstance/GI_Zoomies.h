@@ -78,4 +78,6 @@ private:
 	void CheckSteamInit();
 	void InitSteamAPI();
 	void InitOnlineSubsystemSteam();
+	bool CheckValidation() const;
+	void OnInviteAccepted(const bool bWasSuccessful, const int32 LocalPlayerNum, TSharedPtr<const FUniqueNetId> UserId, const FOnlineSessionSearchResult& InviteResult);
 };
