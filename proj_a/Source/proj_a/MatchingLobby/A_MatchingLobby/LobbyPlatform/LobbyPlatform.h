@@ -28,6 +28,7 @@ public:
 	
 	UPROPERTY(VisibleAnywhere)
 	ADPCharacter* CurrentCharacter;
+	
 
 private:
 	UPROPERTY(VisibleAnywhere)

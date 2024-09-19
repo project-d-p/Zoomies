@@ -3,6 +3,7 @@
 #include "CineCameraActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "OnlineSessionSettings.h"
+#include "Components/BackgroundBlur.h"
 #include "GameFramework/PlayerState.h"
 #include "proj_a/MatchingLobby/GM_MatchingLobby/GM_MatchingLobby.h"
 #include "proj_a/MatchingLobby/GS_MachingLobby/GS_MatchingLobby.h"
@@ -50,6 +51,14 @@ void APC_MatchingLobby::BeginPlay()
 	{
 		GameInstance->LoadFriendsList();
 	}
+	getMatchLobbyUI();
+}
+
+void APC_MatchingLobby::EndPlay( const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	RemoveMatchLobbyUI();
+	DeactiveCurrentComponent();
 }
 
 void APC_MatchingLobby::SetCineCameraView()
@@ -150,8 +159,6 @@ void APC_MatchingLobby::AcknowledgePossession(APawn* P)
 {
 	Super::AcknowledgePossession(P);
 
-	//ADPCharacter* DPCharacter = Cast<ADPCharacter>(P);
-	//DPCharacter->SetReplicatingMovement(true);
 	if (GetLocalRole() < ROLE_Authority)
 	{
 		ADPCharacter* DPCharacter = Cast<ADPCharacter>(P);
@@ -178,4 +185,86 @@ UUserWidget* APC_MatchingLobby::GetWidgetByName(UUserWidget* ParentWidget, const
 		return Cast<UUserWidget>(FoundWidget);
 	}
 	return nullptr;
+}
+
+void APC_MatchingLobby::getMatchLobbyUI()
+{
+	FString WidgetPath = TEXT("/Game/widget/WBP_MatchLobby/widget_match_ready.widget_match_ready_C");
+
+	UClass* WidgetClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *WidgetPath));
+
+	if (WidgetClass != nullptr)
+	{
+		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+		if (PlayerController)
+		{
+			MatchLobbyWidget = CreateWidget<UUserWidget>(PlayerController, WidgetClass);
+
+			if (MatchLobbyWidget != nullptr)
+			{
+				MatchLobbyWidget->AddToViewport();
+				UE_LOG(LogTemp, Log, TEXT("AGM_MatchingLobby::getMatchLobbyUI: Widget successfully created and added to viewport."));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("AGM_MatchingLobby::getMatchLobbyUI: MatchLobbyWidget is nullptr after creation."));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AGM_MatchingLobby::getMatchLobbyUI: PlayerController is nullptr."));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AGM_MatchingLobby::getMatchLobbyUI: Unable to load widget class from path: %s"), *WidgetPath);
+	}
+}
+
+void APC_MatchingLobby::UpdateUIVisibility() const
+{
+	if (MatchLobbyWidget)
+	{
+		APC_MatchingLobby* PC = Cast<APC_MatchingLobby>(GetWorld()->GetFirstPlayerController());
+		UUserWidget* WarningExitWidget = Cast<UUserWidget>(PC->GetWidgetByName(MatchLobbyWidget, TEXT("WBP_Warning_ExitWidget")));
+		UBackgroundBlur* BlurBackgroundWidget = Cast<UBackgroundBlur>(MatchLobbyWidget->GetWidgetFromName(FName(TEXT("BackgroundBlur"))));
+
+		if (WarningExitWidget)
+		{
+			WarningExitWidget->SetVisibility(ESlateVisibility::Visible); // 또는 ESlateVisibility::Hidden
+			UE_LOG(LogTemp, Log, TEXT("UpdateUIVisibility: WBP_Warning_ExitWidget visibility updated."));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("UpdateUIVisibility: WBP_Warning_ExitWidget not found."));
+		}
+
+		if (BlurBackgroundWidget)
+		{
+			BlurBackgroundWidget->SetVisibility(ESlateVisibility::Visible); // 또는 ESlateVisibility::Hidden
+			UE_LOG(LogTemp, Log, TEXT("UpdateUIVisibility: Blur_BackGround visibility updated."));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("UpdateUIVisibility: Blur_BackGround not found."));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UpdateUIVisibility: MatchLobbyWidget is nullptr."));
+	}
+}
+
+void APC_MatchingLobby::RemoveMatchLobbyUI()
+{
+	if (MatchLobbyWidget != nullptr)
+	{
+		MatchLobbyWidget->RemoveFromParent();
+		MatchLobbyWidget = nullptr;
+		UE_LOG(LogTemp, Log, TEXT("APC_MatchingLobby::RemoveMatchLobbyUI: Widget successfully removed from viewport and cleared."));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APC_MatchingLobby::RemoveMatchLobbyUI: MatchLobbyWidget is nullptr, nothing to remove."));
+	}
 }

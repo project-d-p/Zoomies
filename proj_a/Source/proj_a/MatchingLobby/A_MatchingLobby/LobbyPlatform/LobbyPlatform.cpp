@@ -3,6 +3,7 @@
 #include "LobbyPlatform.h"
 
 #include "DPCharacter.h"
+#include "Components/BackgroundBlur.h"
 #include "Engine/StaticMeshActor.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
@@ -79,3 +80,4 @@ void ALobbyPlatform::Clear_Platform()
 		CurrentCharacter = nullptr;
 	}
 }
+

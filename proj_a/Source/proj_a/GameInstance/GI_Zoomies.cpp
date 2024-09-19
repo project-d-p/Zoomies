@@ -361,6 +361,7 @@ bool UGI_Zoomies::ResetSession()
 			);
 			session_interface_->DestroySession(SessionName);
 			SessionName = "";
+			
 			FriendsList.Empty();
 			FriendsArray.Empty();
 			return true;

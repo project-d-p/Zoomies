@@ -19,7 +19,6 @@ public:
 	void ServerSetReady(bool pIsReady);
 	virtual void AcknowledgePossession(APawn* P) override;
 
-
 	UFUNCTION(BlueprintCallable, Category = "MatchingLobby")
 	void ToggleReadyState();
 	void SetCineCameraView();
@@ -32,10 +31,19 @@ public:
 	void ActivateCurrentComponent(APC_MatchingLobby* LocalPlayerController);
 	void DeactiveCurrentComponent();
 	UUserWidget* GetWidgetByName(UUserWidget* ParentWidget, const FString& WidgetName);
+
+	UPROPERTY(BlueprintReadOnly, Category = "UI")
+	UUserWidget* MatchLobbyWidget;
+	
+	void UpdateUIVisibility() const;
+	void getMatchLobbyUI();
+	void RemoveMatchLobbyUI();
+	
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void OnPossess(APawn* InPawn) override;
 
 private:
-	ULC_MatchLobby* LevelComponent;
+	ULC_MatchLobby* LevelComponent = nullptr;
 };

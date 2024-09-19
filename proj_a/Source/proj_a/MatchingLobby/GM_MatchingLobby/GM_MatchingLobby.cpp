@@ -51,7 +51,6 @@ void AGM_MatchingLobby::Logout(AController* Exiting) {
 void AGM_MatchingLobby::BeginPlay() {
 	Super::BeginPlay();
 	FindAndStoreLobbyPlatforms();
-	getMatchLobbyUI();
 }
 
 void AGM_MatchingLobby::CheckReadyToStart() 
@@ -189,75 +188,3 @@ void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 		}
 	}
 }
-
-void AGM_MatchingLobby::getMatchLobbyUI()
-{
-	// UI 위젯 클래스의 경로 설정
-	FString WidgetPath = TEXT("/Game/widget/WBP_MatchLobby/widget_match_ready.widget_match_ready_C");
-
-	// UClass를 로드
-	UClass* WidgetClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *WidgetPath));
-
-	if (WidgetClass != nullptr)
-	{
-		// 위젯을 생성하고 화면에 추가
-		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-		if (PlayerController)
-		{
-			MatchLobbyWidget = CreateWidget<UUserWidget>(PlayerController, WidgetClass);
-
-			if (MatchLobbyWidget != nullptr)
-			{
-				MatchLobbyWidget->AddToViewport();
-				UE_LOG(LogTemp, Log, TEXT("AGM_MatchingLobby::getMatchLobbyUI: Widget successfully created and added to viewport."));
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("AGM_MatchingLobby::getMatchLobbyUI: MatchLobbyWidget is nullptr after creation."));
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("AGM_MatchingLobby::getMatchLobbyUI: PlayerController is nullptr."));
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AGM_MatchingLobby::getMatchLobbyUI: Unable to load widget class from path: %s"), *WidgetPath);
-	}
-}
-
-void AGM_MatchingLobby::UpdateUIVisibility()
-{
-	if (MatchLobbyWidget)
-	{
-		APC_MatchingLobby* PC = Cast<APC_MatchingLobby>(GetWorld()->GetFirstPlayerController());
-		UUserWidget* WarningExitWidget = Cast<UUserWidget>(PC->GetWidgetByName(MatchLobbyWidget, TEXT("WBP_Warning_ExitWidget")));
-		UBackgroundBlur* BlurBackgroundWidget = Cast<UBackgroundBlur>(MatchLobbyWidget->GetWidgetFromName(FName(TEXT("BackgroundBlur"))));
-
-		if (WarningExitWidget)
-		{
-			WarningExitWidget->SetVisibility(ESlateVisibility::Visible); // 또는 ESlateVisibility::Hidden
-			UE_LOG(LogTemp, Log, TEXT("UpdateUIVisibility: WBP_Warning_ExitWidget visibility updated."));
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("UpdateUIVisibility: WBP_Warning_ExitWidget not found."));
-		}
-
-		if (BlurBackgroundWidget)
-		{
-			BlurBackgroundWidget->SetVisibility(ESlateVisibility::Visible); // 또는 ESlateVisibility::Hidden
-			UE_LOG(LogTemp, Log, TEXT("UpdateUIVisibility: Blur_BackGround visibility updated."));
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("UpdateUIVisibility: Blur_BackGround not found."));
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UpdateUIVisibility: MatchLobbyWidget is nullptr."));
-	}
-}
-

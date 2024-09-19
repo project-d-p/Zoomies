@@ -205,8 +205,14 @@ void UIC_MatchLobby::Interact(const FInputActionValue& value)
 	if (Character->canInteract)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("IC_MatchLobby::Interact function called."));
-		AGM_MatchingLobby* GM = Cast<AGM_MatchingLobby>(UGameplayStatics::GetGameMode(GetWorld()));
-		GM->UpdateUIVisibility();
+		if (PC_MatchLobby != nullptr)
+		{
+			PC_MatchLobby->UpdateUIVisibility();
+		}
+		else
+		{
+			UE_LOG( LogTemp, Warning, TEXT("IC_MatchLobby::PlayerController is nullptr."));
+		}
 	}
 	else
 	{
