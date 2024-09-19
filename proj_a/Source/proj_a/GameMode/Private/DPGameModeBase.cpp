@@ -263,7 +263,7 @@ void ADPGameModeBase::StartGame()
 		FTimerHandle TimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([GS]() {
 			GS->MulticastPlayerJob();
-		}), 20.0f, false); 
+		}), 5.0f, false); 
 	}
 }
 
@@ -279,8 +279,13 @@ void ADPGameModeBase::Logout(AController* Exiting)
 	{
 		return ;
 	}
+	// 여기 고쳐야 함! 이름으로 되어 있음!! SteamID로 바뀌어야 함
+#if LAN_MODE || EDITOR_MODE
 	std::string key(TCHAR_TO_UTF8(*controller->PlayerState->GetPlayerName()));
-	if (player_controllers_.find(key) != player_controllers_.end())
+#else
+	std::string key(TCHAR_TO_UTF8(*controller->PlayerState->GetUniqueId()->ToString()));
+#endif
+	if (player_controllers_.contains(key))
 	{
 		player_controllers_.erase(key);
 	}
