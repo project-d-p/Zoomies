@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CineCameraActor.h"
 #include "GameFramework/PlayerController.h"
 #include "proj_a/MatchingLobby/TYPE_MatchingLobby/TYPE_MatchingLobby.h"
 #include "PC_MatchingLobby.generated.h"
@@ -38,6 +39,10 @@ public:
 	void UpdateUIVisibility() const;
 	void getMatchLobbyUI();
 	void RemoveMatchLobbyUI();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+	ACineCameraActor* FixedCamera = nullptr;
+	void FindCineCamera();
 	
 protected:
 	virtual void BeginPlay() override;

@@ -52,6 +52,7 @@ void APC_MatchingLobby::BeginPlay()
 		GameInstance->LoadFriendsList();
 	}
 	getMatchLobbyUI();
+	FindCineCamera();
 }
 
 void APC_MatchingLobby::EndPlay( const EEndPlayReason::Type EndPlayReason)
@@ -63,25 +64,29 @@ void APC_MatchingLobby::EndPlay( const EEndPlayReason::Type EndPlayReason)
 
 void APC_MatchingLobby::SetCineCameraView()
 {
+	if (FixedCamera == nullptr)
+		FindCineCamera();
+	this->SetViewTargetWithBlend(FixedCamera);
+}
+
+void APC_MatchingLobby::FindCineCamera()
+{
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACineCameraActor::StaticClass(), FoundActors);
 
-	ACineCameraActor* CineCamera = nullptr;
 	for (AActor* Actor : FoundActors)
 	{
 		if (Actor->GetName() == "CineCameraActor_0")
 		{
-			CineCamera = Cast<ACineCameraActor>(Actor);
+			FixedCamera = Cast<ACineCameraActor>(Actor);
 			break;
 		}
 	}
-	if (!CineCamera)
+	if (FixedCamera == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("CineCameraActor not found."));
 		return;
 	}
-
-	this->SetViewTargetWithBlend(CineCamera);
 }
 
 void APC_MatchingLobby::ActivateCurrentComponent(APC_MatchingLobby* LocalPlayerController)

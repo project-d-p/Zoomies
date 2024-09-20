@@ -3,6 +3,7 @@
 #include "DPPlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "CineCameraActor.h"
 #include "../LevelComponents/LC_MatchLobby.h"
 #include "Kismet/GameplayStatics.h"
 #include "proj_a/MatchingLobby/GM_MatchingLobby/GM_MatchingLobby.h"
@@ -155,10 +156,14 @@ void UIC_MatchLobby::Move(const FInputActionValue& value)
 		return ;
 	}
 	const FVector2D actionValue = value.Get<FVector2D>();
-	const FRotator controlRotation = PlayerController->GetControlRotation();
+	const FRotator controlRotation = PlayerController->FixedCamera ? PlayerController->FixedCamera->GetActorRotation() : PlayerController->GetControlRotation();
+	if (!PlayerController->FixedCamera)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("FixedCamera is nullptr"));
+	}
 
-	const FVector forwardVector = -FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
-	const FVector rightVector = -FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
+	const FVector forwardVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
+	const FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);
 
 	Character->AddMovementInput(forwardVector, actionValue.X);
 	Character->AddMovementInput(rightVector, actionValue.Y);
