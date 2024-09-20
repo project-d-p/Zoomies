@@ -34,7 +34,7 @@ public:
 protected:
 	virtual void AddPlayerState(APlayerState* PlayerState) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
+	virtual void BeginPlay() override;
 	int32 ConnectedPlayers = 0;
 	const int32 ExpectedPlayers = 4;
 	
@@ -49,3 +49,4 @@ protected:
 	UPROPERTY()
 	UChatManager* ChatManager;
 };
+

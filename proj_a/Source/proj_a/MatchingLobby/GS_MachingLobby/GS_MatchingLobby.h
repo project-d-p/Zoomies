@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DataManager.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/GameStateBase.h"
 #include "proj_a/MatchingLobby/TYPE_MatchingLobby/TYPE_MatchingLobby.h"
@@ -47,4 +48,8 @@ public:
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void BeginPlay() override;
+	void OnHostMigration(UWorld* World, UDataManager* DataManager);
+	void HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString);
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 };

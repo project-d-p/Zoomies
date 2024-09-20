@@ -44,6 +44,11 @@ void ADPInGameState::MulticastPlayerJob_Implementation() const
 	}
 }
 
+void ADPInGameState::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 void ADPInGameState::AddPlayerState(APlayerState* PlayerState)
 {
 	Super::AddPlayerState(PlayerState);
@@ -56,3 +61,4 @@ void ADPInGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(ADPInGameState, TimerManager);
 	DOREPLIFETIME(ADPInGameState, ScoreManager);
 }
+

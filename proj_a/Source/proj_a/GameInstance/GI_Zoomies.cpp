@@ -12,6 +12,7 @@
 void UGI_Zoomies::Init()
 {
 	Super::Init();
+	network_failure_manager_ = NewObject<UNetworkFailureManager>();
 	CheckSteamInit();
 
 #if EDITOR_MODE
@@ -424,6 +425,7 @@ void UGI_Zoomies::InitOnlineSubsystemSteam()
 		{
 			session_interface_ = online_subsystem_->GetSessionInterface();
 			is_online_session_steam_init = true;
+			network_failure_manager_->Init(session_interface_);
 			if (session_interface_.IsValid())
 			{
 				UE_LOG(
