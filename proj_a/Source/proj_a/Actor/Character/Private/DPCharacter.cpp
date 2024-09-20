@@ -240,13 +240,13 @@ bool ADPCharacter::TryGetPlayerStateAndTransferManager(APlayerState*& OutPS, UTe
 	if (ADPPlayerController* DPPC = Cast<ADPPlayerController>(PC))
 	{
 		OutTTM = DPPC->GetTextureTransferManager();
-		OutPS = DPPC->GetPlayerState<APlayerState>();
+		OutPS = GetPlayerState<APlayerState>();
 		return (OutPS != nullptr && OutTTM != nullptr);
 	}
 	else if (APC_MatchingLobby* LobbyPC = Cast<APC_MatchingLobby>(PC))
 	{
 		OutTTM = LobbyPC->GetTextureTransferManager();
-		OutPS = LobbyPC->GetPlayerState<APlayerState>();
+		OutPS = GetPlayerState<APlayerState>();
 		return (OutPS != nullptr && OutTTM != nullptr);
 	}
 

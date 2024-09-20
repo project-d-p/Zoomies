@@ -32,7 +32,6 @@ void UTextureTransferManager::RequestTextureToServer_Implementation(int32 Player
 
 void UTextureTransferManager::RetryRequestTexture(int32 PlayerId)
 {
-	FNetLogger::EditerLog(FColor::Red, TEXT("RetryRequestTexture PlayerId: %d"), PlayerId);
 	FTimerDelegate TimerDelegate;
 	TimerDelegate.BindLambda([this, PlayerId]() { RequestTextureToServer(PlayerId); });
 	GetWorld()->GetTimerManager().SetTimerForNextTick(TimerDelegate);

@@ -25,7 +25,6 @@ void UDataTransferManager::SendDataChunks(FDataTransferParams Params)
 	const int32& ChunksPerTick = Params.ChunksPerTick;
 	const int32& TotalChunks = Params.TotalChunks;
 	const int32& ChunkSize = Params.ChunkSize;
-	// const int32& ChunkSize = GetOwner()->GetNetConnection()->GetMaxSingleBunchSizeBits();
 	const TArray<uint8>& Data = Params.Data;
 	const int32& PlayerId = Params.PlayerId;
 
