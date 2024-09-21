@@ -1,10 +1,27 @@
 #include "NetworkFailureManager.h"
 
 #include "FNetLogger.h"
+#include "GameMapsSettings.h"
+#include "OnlineSessionSettings.h"
+#include "OnlineSubsystem.h"
+#include "OnlineSubsystemUtils.h"
+#include "Kismet/GameplayStatics.h"
+#include "Online/OnlineSessionNames.h"
+#include "Engine/World.h"
+#include "Engine/GameInstance.h"
+// #include "Engine/GameMapsSettings.h"
+#include "Engine/GameViewportClient.h"
 
-void UNetworkFailureManager::Init(IOnlineSessionPtr session_interface)
+UNetworkFailureManager::UNetworkFailureManager()
 {
-	this->SessionInterface = session_interface;
+	bNextHost = false;
+	DataManager = NewObject<UDataManager>();
+}
+
+void UNetworkFailureManager::Init()
+{
+	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
+	this->SessionInterface = OnlineSubsystem->GetSessionInterface();
 
 	FNetLogger::EditerLog(FColor::Green, TEXT("NetworkFailureManager::Init"));
 	if (GEngine)
@@ -14,13 +31,258 @@ void UNetworkFailureManager::Init(IOnlineSessionPtr session_interface)
 	}
 }
 
+void UNetworkFailureManager::DestroyPreviousSession(FOnSessionDestroyedCallback OnSessionDestroyedCallback)
+{
+	if (SessionInterface.IsValid())
+	{
+		OnDestroyCompleteDelegateHandle = SessionInterface->OnDestroySessionCompleteDelegates.AddLambda([this, OnSessionDestroyedCallback](FName SessionName, bool bWasSuccessful)
+		{
+			this->SessionInterface->OnDestroySessionCompleteDelegates.Remove(this->OnDestroyCompleteDelegateHandle);
+			if (bWasSuccessful)
+			{
+				const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
+				if (GameMapsSettings)
+				{
+					FName DefaultLevel = FName(*GameMapsSettings->GetGameDefaultMap());
+					FNetLogger::EditerLog(FColor::Green, TEXT("Default Level: %s"), *DefaultLevel.ToString());
+					FNetLogger::LogError(TEXT("Default Level: %s"), *DefaultLevel.ToString());
+				
+					FString DefaultLevelWithOption = DefaultLevel.ToString() + TEXT("?closed");
+					FName NewLevelName = FName(*DefaultLevelWithOption);
+				
+					FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnLevelLoaded, OnSessionDestroyedCallback);
+				
+					UGameplayStatics::OpenLevel(this, NewLevelName);
+				}
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Failed to destroy session: %s"), *SessionName.ToString());
+			}
+		});
+
+		SessionInterface->DestroySession(NAME_GameSession);
+	}
+}
+
+void UNetworkFailureManager::OnLevelLoaded(UWorld* LoadedWorld, FOnSessionDestroyedCallback OnSessionDestroyedCallback)
+{
+	// 레벨이 완전히 로드된 후 호출
+	FNetLogger::EditerLog(FColor::Green, TEXT("Level Loaded Successfully"));
+	
+	// 델리게이트 해제
+	FCoreUObjectDelegates::PostLoadMapWithWorld.RemoveAll(this);
+
+	// 함수 포인터 호출
+	(this->*OnSessionDestroyedCallback)(LoadedWorld);
+}
+
+void UNetworkFailureManager::CreateNewSession(UWorld* World)
+{
+	// Online Mode : False
+	// SessionSettings.bIsLANMatch = false;
+	// Lan Mode : True
+	SessionSettings.bIsLANMatch = true;
+	SessionSettings.NumPublicConnections = 4; // Number of players
+	SessionSettings.bShouldAdvertise = true; // Advertise the session to others
+	SessionSettings.bAllowJoinInProgress = true; // Allow joining in progress
+	SessionSettings.bAllowJoinViaPresence = true; // Allow joining via presence (show sessions to players in current regions)
+	SessionSettings.bUsesPresence = true; // Use presence for the session
+	SessionSettings.bAllowInvites = true;
+	if (!SessionSettings.bIsLANMatch)
+	{
+		SessionSettings.bUseLobbiesIfAvailable = true;
+	}
+
+	SessionSettings.Set(SETTING_MAPNAME, DesiredMapName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
+	SessionSettings.Set(FName("SESSION_NAME"), DesiredSessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
+	
+	OnCreateCompleteDelegateHandle = SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UNetworkFailureManager::CreateSessionComplete, World);
+
+	const ULocalPlayer* LocalPlayer = World->GetFirstLocalPlayerFromController();
+	SessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, SessionSettings);
+}
+
+void UNetworkFailureManager::CreateSessionComplete(FName SessionName, bool bWasSuccessful, UWorld* World)
+{
+	if (bWasSuccessful)
+	{
+		FNetLogger::EditerLog(FColor::Green, TEXT("Session Created Successfully"));
+		SessionInterface->OnCreateSessionCompleteDelegates.Remove(OnCreateCompleteDelegateHandle);
+
+		FString MapName = DesiredMapName.ToString();
+		FString TravelURL = FString::Printf(TEXT("%s?listen"), *MapName);
+		World->ServerTravel(TravelURL, true);
+	}
+	else
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("Failed to create session"));
+	}
+}
+
+void UNetworkFailureManager::JoinNewSesssion(UWorld* World)
+{
+	SessionSearch = MakeShareable(new FOnlineSessionSearch());
+	// Online Mode : False
+	// SessionSearch->bIsLanQuery = false;
+	// Lan Mode : True
+	SessionSearch->bIsLanQuery = true;
+	SessionSearch->MaxSearchResults = 10;
+	SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
+	SessionSearch->QuerySettings.Set(SETTING_MAPNAME, DesiredMapName.ToString(), EOnlineComparisonOp::Equals);
+	SessionSearch->QuerySettings.Set(FName("SESSION_NAME"), DesiredSessionName.ToString(), EOnlineComparisonOp::Equals);
+	if (!SessionSearch->bIsLanQuery)
+	{
+		SessionSearch->QuerySettings.Set(SEARCH_LOBBIES, true, EOnlineComparisonOp::Equals);
+	}
+
+	OnFindCompleteDelegateHandle = SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UNetworkFailureManager::FindSessionComplete, World);
+
+	const ULocalPlayer* LocalPlayer = World->GetFirstLocalPlayerFromController();
+	SessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), SessionSearch.ToSharedRef());
+}
+
+void UNetworkFailureManager::FindSessionComplete(bool bWasSuccessful, UWorld* World)
+{
+	SessionInterface->OnFindSessionsCompleteDelegates.Remove(OnFindCompleteDelegateHandle);
+	if (bWasSuccessful)
+	{
+		for (const FOnlineSessionSearchResult& SearchResult : SessionSearch->SearchResults)
+		{
+			FString SessionName;
+			SearchResult.Session.SessionSettings.Get(FName("SESSION_NAME"), SessionName);
+            
+			// 세션 이름 확인
+			if (SessionName == DesiredSessionName) // 원하는 세션 이름과 비교
+			{
+				// 원하는 세션을 찾았으면 그 세션에 접속
+				JoinSession(SearchResult, World);
+				break;
+			}
+		}
+	}
+	else
+	{
+		JoinNewSesssion(World);
+		FNetLogger::EditerLog(FColor::Green,TEXT("Failed to find session: Retrying..."));
+	}
+}
+
+
+void UNetworkFailureManager::JoinSession(const FOnlineSessionSearchResult& SearchResult, UWorld* World)
+{
+	FNetLogger::EditerLog(FColor::Green, TEXT("Joining Session..."));
+	OnJoinCompleteDelegateHandle = SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UNetworkFailureManager::JoinSessionComplete, World);
+	const ULocalPlayer* LocalPlayer = World->GetFirstLocalPlayerFromController();
+	SessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, SearchResult);
+}
+
+void UNetworkFailureManager::JoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result, UWorld* World)
+{
+	SessionInterface->OnJoinSessionCompleteDelegates.Remove(OnJoinCompleteDelegateHandle);
+	if (Result == EOnJoinSessionCompleteResult::Success)
+	{
+		FNetLogger::EditerLog(FColor::Green, TEXT("Joined Session Successfully"));
+		APlayerController* PlayerController = World->GetFirstPlayerController();
+		if (PlayerController)
+		{
+			FString ConnectString;
+			if (SessionInterface->GetResolvedConnectString(SessionName, ConnectString))
+			{
+				FString MapName;
+				FOnlineSessionSettings* SessionSettingBySearch = SessionInterface->GetSessionSettings(SessionName);
+				if (SessionSettingBySearch && SessionSettingBySearch->Get(SETTING_MAPNAME, MapName))
+				{
+					FString URL = FString::Printf(TEXT("%s/%s"), *ConnectString, *MapName);
+					FNetLogger::EditerLog(FColor::Green, TEXT("ClientTravel URL: %s"), *URL);
+					
+					PlayerController->ClientTravel(URL, ETravelType::TRAVEL_Absolute);
+				}
+				else
+				{
+					FNetLogger::LogError(TEXT("Failed to get map name from session settings"));
+				}
+			}
+			else
+			{
+				FNetLogger::LogError(TEXT("Failed to get resolved connect string"));
+			}
+		}
+		else
+		{
+			FNetLogger::LogError(TEXT("PlayerController is null"));
+		}
+	}
+	else
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("Failed to join session"));
+	}
+}
+
 void UNetworkFailureManager::HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type Arg,
-	const FString& String)
+                                                  const FString& String)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Network Failure: %s"), *String);
+	FNetLogger::EditerLog(FColor::Red, TEXT("Network Failure: %s"), *String);
 
-	if (Arg == ENetworkFailure::ConnectionLost || Arg == ENetworkFailure::ConnectionTimeout)
+	if (Arg == ENetworkFailure::ConnectionLost)
 	{
-		OnHostMigrationDelegate.Broadcast(World, DataManager);
+		this->SaveSessionMetaData(World);
+		if (bNextHost)
+		{
+			OnHostMigrationDelegate.Broadcast(World, DataManager);
+			DestroyPreviousSession(&UNetworkFailureManager::CreateNewSession);
+		}
+		else
+		{
+			DestroyPreviousSession(&UNetworkFailureManager::JoinNewSesssion);
+		}
+	}
+}
+
+void UNetworkFailureManager::CreateNewSessionMetaData(UWorld* World, const FUniqueNetIdRepl& NewHostPlayerID)
+{
+	IOnlineIdentityPtr IdentityInterface = Online::GetIdentityInterface(World);
+	if (IdentityInterface.IsValid())
+	{
+		FString PlayerName = IdentityInterface->GetPlayerNickname(*NewHostPlayerID);
+
+		// Create a new session name based on the player's name
+		DesiredSessionName = FName(*FString::Printf(TEXT("Session_%s"), *PlayerName));
+		FNetLogger::EditerLog(FColor::Green, TEXT("New Session Name: %s"), *DesiredSessionName.ToString());
+
+		DesiredMapName = FName(*FString::Printf(TEXT("%s"), *World->GetMapName()));
+		FNetLogger::EditerLog(FColor::Green, TEXT("New Map Name: %s"), *DesiredMapName.ToString());
+	}
+}
+
+void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
+{
+	FNamedOnlineSession* CurrentSession = SessionInterface->GetNamedSession(NAME_GameSession);
+	if (CurrentSession)
+	{
+		/* For Debugging */
+		// if (CurrentSession->RegisteredPlayers.Num() == 2)
+		// {
+		// 	bNextHost = false;
+		// 	FNetLogger::EditerLog(FColor::Red, TEXT("You are the Last Player in the Session"));
+		// 	return ;
+		// }
+		const FUniqueNetIdRepl LocalPlayerID = World->GetFirstLocalPlayerFromController()->GetPreferredUniqueNetId();
+		// const FUniqueNetIdRepl SecondPlayerID = CurrentSession->RegisteredPlayers[1];
+		// if (SecondPlayerID.IsValid() && SecondPlayerID == LocalPlayerID)
+		// {
+			bNextHost = true;
+		// }
+		// else
+		// {
+		// 	bNextHost = false;
+		// }
+		// CreateNewSessionMetaData(World, SecondPlayerID);
+		CreateNewSessionMetaData(World, LocalPlayerID);
+	}
+	else
+	{
+		FNetLogger::EditerLog(FColor::Green, TEXT("CurrentSession is null"));
 	}
 }

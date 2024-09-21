@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "DataManager.h"
+#include "NetworkFailureManager.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/GameStateBase.h"
 #include "proj_a/MatchingLobby/TYPE_MatchingLobby/TYPE_MatchingLobby.h"
@@ -27,7 +28,7 @@ public:
 	float LowestAveragePing;
 	UPROPERTY(Replicated)
 	APlayerState* BestHostPlayer;
-	
+
 	void FindFastestPlayer();
 	void SetHostPlayer(const APlayerState* NewHostPlayer);
 	void UpdateLobbyInfo() const;
@@ -50,6 +51,8 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void BeginPlay() override;
 	void OnHostMigration(UWorld* World, UDataManager* DataManager);
-	void HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString);
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	
+private:
+	FDelegateHandle OnHostMigrationDelegate;
 };

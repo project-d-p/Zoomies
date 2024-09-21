@@ -12,9 +12,11 @@
 void UGI_Zoomies::Init()
 {
 	Super::Init();
-	network_failure_manager_ = NewObject<UNetworkFailureManager>();
 	CheckSteamInit();
-
+	
+	network_failure_manager_ = NewObject<UNetworkFailureManager>();
+	network_failure_manager_->Init();
+	
 #if EDITOR_MODE
 	bIsOnline = false;
 #elif LAN_MODE
@@ -408,11 +410,12 @@ void UGI_Zoomies::InitSteamAPI()
 	}
 	else
 	{
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(
-			TimerHandle,
-			this, &UGI_Zoomies::InitOnlineSubsystemSteam,
-			0.5f, false);
+		// FTimerHandle TimerHandle;
+		// GetWorld()->GetTimerManager().SetTimer(
+		// 	TimerHandle,
+		// 	this, &UGI_Zoomies::InitOnlineSubsystemSteam,
+		// 	0.5f, false);
+		InitOnlineSubsystemSteam();
 	}
 }
 
@@ -425,7 +428,7 @@ void UGI_Zoomies::InitOnlineSubsystemSteam()
 		{
 			session_interface_ = online_subsystem_->GetSessionInterface();
 			is_online_session_steam_init = true;
-			network_failure_manager_->Init(session_interface_);
+			// network_failure_manager_->Init(session_interface_);
 			if (session_interface_.IsValid())
 			{
 				UE_LOG(

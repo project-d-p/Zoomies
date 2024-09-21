@@ -87,58 +87,50 @@ void AGS_MatchingLobby::BeginPlay()
 		if (GameInstance)
 		{
 			FNetLogger::EditerLog(FColor::Red, TEXT("GameInstance is not null"));
-			GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &AGS_MatchingLobby::OnHostMigration);
+			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &AGS_MatchingLobby::OnHostMigration);
 		}
 	}
 }
 
 void AGS_MatchingLobby::OnHostMigration(UWorld* World, UDataManager* DataManager)
 {
-	// UE_LOG(LogTemp, Warning, TEXT("Network Failure: %s"), *ErrorString);
-	
-	// if (FailureType == ENetworkFailure::ConnectionLost || FailureType == ENetworkFailure::ConnectionTimeout)
+	// TArray<AActor*> FoundActors;
+	// UGameplayStatics::GetAllActorsOfClass(World, ADPCharacter::StaticClass(), FoundActors);
+	//
+	// for (AActor* Actor : FoundActors)
 	// {
-		// ¼­¹ö ¿¬°áÀÌ ²÷¾îÁ³À» ¶§ Ã³¸®
-		TArray<AActor*> FoundActors;
-		UGameplayStatics::GetAllActorsOfClass(World, ADPCharacter::StaticClass(), FoundActors);
-	
-		for (AActor* Actor : FoundActors)
-		{
-			ADPCharacter* Character = Cast<ADPCharacter>(Actor);
-			FNetLogger::EditerLog(FColor::Red, TEXT("Character %s was here."), Character->GetPlayerState() ? *Character->GetPlayerState()->GetPlayerName() : TEXT("No PlayerState"));
-		}
-	
-		for (FConstPlayerControllerIterator It = World->GetPlayerControllerIterator(); It; ++It)
-		{
-			APlayerController* PlayerController = It->Get();
-			if (PlayerController)
-			{
-				FNetLogger::EditerLog(FColor::Red, TEXT("PlayerController %d was here."), PlayerController->GetUniqueID());
-			}
-		}
-		
-		FString LevelName = World->GetMapName();
-		UE_LOG(LogTemp, Warning, TEXT("Connection to the server has been lost or timed out."));
-		FNetLogger::EditerLog(FColor::Red, TEXT("Connection to the server has been lost or timed out. in %s"), *LevelName);
+	// 	ADPCharacter* Character = Cast<ADPCharacter>(Actor);
+	// 	FNetLogger::EditerLog(FColor::Red, TEXT("Character %s was here."), Character->GetPlayerState() ? *Character->GetPlayerState()->GetPlayerName() : TEXT("No PlayerState"));
 	// }
-}
-
-void AGS_MatchingLobby::HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType,
-	const FString& ErrorString)
-{
+	//
+	// for (FConstPlayerControllerIterator It = World->GetPlayerControllerIterator(); It; ++It)
+	// {
+	// 	APlayerController* PlayerController = It->Get();
+	// 	if (PlayerController)
+	// 	{
+	// 		FNetLogger::EditerLog(FColor::Red, TEXT("PlayerController %d was here."), PlayerController->GetUniqueID());
+	// 	}
+	// }
+	//
+	// FString LevelName = World->GetMapName();
+	// UE_LOG(LogTemp, Warning, TEXT("Connection to the server has been lost or timed out."));
+	// FNetLogger::EditerLog(FColor::Red, TEXT("Connection to the server has been lost or timed out. in %s"), *LevelName);
 }
 
 void AGS_MatchingLobby::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-	
-	// if (!HasAuthority())
-	// {
-	// 	if (GEngine)
-	// 	{
-	// 		GEngine->OnNetworkFailure().RemoveAll(this);
-	// 	}
-	// }
+
+	// Delegate for handling network failure On This Level
+	if (!HasAuthority())
+	{
+		UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+		if (GameInstance)
+		{
+			FNetLogger::EditerLog(FColor::Red, TEXT("GameInstance is not null"));
+			GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
+		}
+	}
 }
 
 bool AGS_MatchingLobby::AreAllPlayersReady()
@@ -223,10 +215,10 @@ void AGS_MatchingLobby::MulticastShowLoadingWidget_Implementation()
 }
 
 
-// ·ÎÁ÷ ¼ø¼­
-// 1. ³×Æ®¿öÅ© ²÷±è °¨Áö
-// 2. ÇØ´ç ·¹º§¿¡ ÀÖ´ø µ¥ÀÌÅÍµéÀ» ÀúÀå
-// 2-1. °¢ ·¹º§¸¶´Ù ÀúÀåÇÒ µ¥ÀÌÅÍ°¡ ´Ù¸§
-// 3. ÇØ´ç ·¹º§À» ´Ù¸¥ Å¬¶óÀÌ¾ðÆ®°¡ ´Ù½Ã È£½ºÆÃÇÔ
-// 4. ´Ù½Ã È£½ºÆÃµÈ Å¬¶óÀÌ¾ðÆ®°¡ ÀúÀåÇÑ µ¥ÀÌÅÍ¸¦ ºÒ·¯¿È
-// 5. ºÒ·¯¿Â µ¥ÀÌÅÍ¸¦ ±â¹ÝÀ¸·Î ´Ù½Ã °ÔÀÓÀ» ½ÃÀÛÇÔ
+// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+// 1. ï¿½ï¿½Æ®ï¿½ï¿½Å© ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+// 2. ï¿½Ø´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+// 2-1. ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í°ï¿½ ï¿½Ù¸ï¿½
+// 3. ï¿½Ø´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù¸ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½Ù½ï¿½ È£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+// 4. ï¿½Ù½ï¿½ È£ï¿½ï¿½ï¿½Ãµï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½Ò·ï¿½ï¿½ï¿½
+// 5. ï¿½Ò·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
