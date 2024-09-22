@@ -11,6 +11,7 @@
 #include "Engine/GameInstance.h"
 // #include "Engine/GameMapsSettings.h"
 #include "Engine/GameViewportClient.h"
+#include "Algo/Sort.h"
 
 UNetworkFailureManager::UNetworkFailureManager()
 {
@@ -20,13 +21,12 @@ UNetworkFailureManager::UNetworkFailureManager()
 
 void UNetworkFailureManager::Init()
 {
-	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
+	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(/*STEAM_SUBSYSTEM*/);
 	this->SessionInterface = OnlineSubsystem->GetSessionInterface();
 
-	FNetLogger::EditerLog(FColor::Green, TEXT("NetworkFailureManager::Init"));
 	if (GEngine)
 	{
-		FNetLogger::EditerLog(FColor::Green, TEXT("NetworkFailureManager::Init Inside"));
+		FNetLogger::EditerLog(FColor::Green, TEXT("NetworkFailureManager::Init"));
 		GEngine->OnNetworkFailure().AddUObject(this, &UNetworkFailureManager::HandleNetworkFailure);
 	}
 }
@@ -120,7 +120,7 @@ void UNetworkFailureManager::CreateSessionComplete(FName SessionName, bool bWasS
 	}
 }
 
-void UNetworkFailureManager::JoinNewSesssion(UWorld* World)
+void UNetworkFailureManager::JoinNewSession(UWorld* World)
 {
 	SessionSearch = MakeShareable(new FOnlineSessionSearch());
 	// Online Mode : False
@@ -151,7 +151,6 @@ void UNetworkFailureManager::FindSessionComplete(bool bWasSuccessful, UWorld* Wo
 		{
 			FString SessionName;
 			SearchResult.Session.SessionSettings.Get(FName("SESSION_NAME"), SessionName);
-            
 			// 세션 이름 확인
 			if (SessionName == DesiredSessionName) // 원하는 세션 이름과 비교
 			{
@@ -163,8 +162,8 @@ void UNetworkFailureManager::FindSessionComplete(bool bWasSuccessful, UWorld* Wo
 	}
 	else
 	{
-		JoinNewSesssion(World);
 		FNetLogger::EditerLog(FColor::Green,TEXT("Failed to find session: Retrying..."));
+		JoinNewSession(World);
 	}
 }
 
@@ -189,6 +188,12 @@ void UNetworkFailureManager::JoinSessionComplete(FName SessionName, EOnJoinSessi
 			FString ConnectString;
 			if (SessionInterface->GetResolvedConnectString(SessionName, ConnectString))
 			{
+				if (!ValidateAddr(ConnectString))
+				{
+					FNetLogger::EditerLog(FColor::Green, TEXT("Address Invalid, Trying Again .."));
+					SessionInterface->DestroySession(SessionName);
+					JoinNewSession(World);
+				}
 				FString MapName;
 				FOnlineSessionSettings* SessionSettingBySearch = SessionInterface->GetSessionSettings(SessionName);
 				if (SessionSettingBySearch && SessionSettingBySearch->Get(SETTING_MAPNAME, MapName))
@@ -235,7 +240,7 @@ void UNetworkFailureManager::HandleNetworkFailure(UWorld* World, UNetDriver* Net
 		}
 		else
 		{
-			DestroyPreviousSession(&UNetworkFailureManager::JoinNewSesssion);
+			DestroyPreviousSession(&UNetworkFailureManager::JoinNewSession);
 		}
 	}
 }
@@ -249,10 +254,10 @@ void UNetworkFailureManager::CreateNewSessionMetaData(UWorld* World, const FUniq
 
 		// Create a new session name based on the player's name
 		DesiredSessionName = FName(*FString::Printf(TEXT("Session_%s"), *PlayerName));
-		FNetLogger::EditerLog(FColor::Green, TEXT("New Session Name: %s"), *DesiredSessionName.ToString());
+		FNetLogger::EditerLog(FColor::Red, TEXT("New Session Name: %s"), *DesiredSessionName.ToString());
 
 		DesiredMapName = FName(*FString::Printf(TEXT("%s"), *World->GetMapName()));
-		FNetLogger::EditerLog(FColor::Green, TEXT("New Map Name: %s"), *DesiredMapName.ToString());
+		FNetLogger::EditerLog(FColor::Red, TEXT("New Map Name: %s"), *DesiredMapName.ToString());
 	}
 }
 
@@ -262,27 +267,78 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 	if (CurrentSession)
 	{
 		/* For Debugging */
-		// if (CurrentSession->RegisteredPlayers.Num() == 2)
-		// {
-		// 	bNextHost = false;
-		// 	FNetLogger::EditerLog(FColor::Red, TEXT("You are the Last Player in the Session"));
-		// 	return ;
-		// }
+		if (CurrentSession->RegisteredPlayers.Num() == 2)
+		{
+			bNextHost = false;
+			FNetLogger::EditerLog(FColor::Red, TEXT("You are the Last Player in the Session"));
+			return ;
+		}
+		TArray<FUniqueNetIdRepl> RegisteredPlayers;
+		for (int32 i = 0; i < CurrentSession->RegisteredPlayers.Num(); i++)
+		{
+			IOnlineIdentityPtr IdentityInterface = Online::GetIdentityInterface(World);
+			if (IdentityInterface->GetPlayerNickname(*CurrentSession->RegisteredPlayers[i]) == CurrentSession->OwningUserId->ToString())
+			{
+				continue;
+			}
+			// Not Include the First Player(Original Host)
+			RegisteredPlayers.Add(CurrentSession->RegisteredPlayers[i]);
+			FNetLogger::EditerLog(FColor::Blue, TEXT("Player %d: %s"), i, *(IdentityInterface->GetPlayerNickname(*CurrentSession->RegisteredPlayers[i])));
+		}
+		auto CompareByNickname = [&World](const FUniqueNetIdRepl& A, const FUniqueNetIdRepl& B) -> bool
+		{
+			IOnlineIdentityPtr IdentityInterface = Online::GetIdentityInterface(World);
+    
+			if (!A.IsValid() || !B.IsValid() || !IdentityInterface.IsValid())
+			{
+				return false;
+			}
+    
+			FString NicknameA = IdentityInterface->GetPlayerNickname(*A.GetUniqueNetId());
+			FString NicknameB = IdentityInterface->GetPlayerNickname(*B.GetUniqueNetId());
+
+			return NicknameA < NicknameB;  // 문자열을 기준으로 사전순 정렬
+		};
+		// Algo::Sort(RegisteredPlayers, CompareByNickname);
+		RegisteredPlayers.Sort(CompareByNickname);
+		for (int32 i = 0; i < RegisteredPlayers.Num(); i++) {
+			IOnlineIdentityPtr IdentityInterface = Online::GetIdentityInterface(World);
+			FNetLogger::EditerLog(FColor::Cyan, TEXT("Player %d: %s"), i, *(IdentityInterface->GetPlayerNickname(*RegisteredPlayers[i])));
+		}
 		const FUniqueNetIdRepl LocalPlayerID = World->GetFirstLocalPlayerFromController()->GetPreferredUniqueNetId();
-		// const FUniqueNetIdRepl SecondPlayerID = CurrentSession->RegisteredPlayers[1];
-		// if (SecondPlayerID.IsValid() && SecondPlayerID == LocalPlayerID)
-		// {
+		const FUniqueNetIdRepl NextHostID = RegisteredPlayers[0];
+		if (NextHostID.IsValid() && NextHostID == LocalPlayerID)
+		{
 			bNextHost = true;
-		// }
-		// else
-		// {
-		// 	bNextHost = false;
-		// }
-		// CreateNewSessionMetaData(World, SecondPlayerID);
-		CreateNewSessionMetaData(World, LocalPlayerID);
+		}
+		else
+		{
+			bNextHost = false;
+		}
+		CreateNewSessionMetaData(World, NextHostID);
+		// CreateNewSessionMetaData(World, LocalPlayerID);
 	}
 	else
 	{
 		FNetLogger::EditerLog(FColor::Green, TEXT("CurrentSession is null"));
 	}
+}
+
+bool UNetworkFailureManager::ValidateAddr(FString& Addr)
+{
+	FString Address;
+	FString PortStr;
+	if (Addr.Split(":", &Address, &PortStr))
+	{
+		// 포트를 int32로 변환
+		int32 Port = FCString::Atoi(*PortStr);
+
+		// 포트가 0인지 확인
+		if (Port == 0)
+		{
+			FNetLogger::LogError(TEXT("Port is 0, leaving session and retrying"));
+			return false; // 포트가 0이면 더 이상 진행하지 않음
+		}
+	}
+	return true;
 }

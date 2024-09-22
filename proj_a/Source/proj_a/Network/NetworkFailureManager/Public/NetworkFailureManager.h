@@ -18,21 +18,23 @@ class UNetworkFailureManager : public UObject
 	
 public:
 	UNetworkFailureManager();
+	FOnHostMigration& OnHostMigration() { return OnHostMigrationDelegate; }
 	void Init();
+
+private:
 	void DestroyPreviousSession(FOnSessionDestroyedCallback OnSessionDestroyedCallback);
 	void OnLevelLoaded(UWorld* LoadedWorld, FOnSessionDestroyedCallback OnSessionDestroyedCallback);
 	void CreateNewSession(UWorld* World);
 	void CreateSessionComplete(FName SessionName, bool bWasSuccessful, UWorld* World);
-	void JoinNewSesssion(UWorld* World);
+	void JoinNewSession(UWorld* World);
 	void FindSessionComplete(bool bWasSuccessful, UWorld* World);
 	void JoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result, UWorld* World);
 	void JoinSession(const FOnlineSessionSearchResult& SearchResult, UWorld* World);
 	void HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type Arg, const FString& String);
-	FOnHostMigration& OnHostMigration() { return OnHostMigrationDelegate; }
 	void CreateNewSessionMetaData(UWorld* World, const FUniqueNetIdRepl& NewHostPlayerID);
 	void SaveSessionMetaData(UWorld* World);
-
-private:
+	bool ValidateAddr(FString& Addr);
+	
 	IOnlineSessionPtr SessionInterface;
 	FOnHostMigration OnHostMigrationDelegate;
 	FOnlineSessionSettings SessionSettings;
