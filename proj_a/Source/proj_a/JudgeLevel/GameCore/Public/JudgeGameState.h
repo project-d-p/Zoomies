@@ -24,7 +24,7 @@ public:
 	
 protected:
 	virtual void BeginPlay() override;
-	
+
 private:
 	UPROPERTY(Replicated)
 	UClientTimerManager* TimerManager;

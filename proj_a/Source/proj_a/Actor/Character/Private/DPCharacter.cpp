@@ -69,8 +69,8 @@ ADPCharacter::ADPCharacter()
 	(TEXT("/Game/model/steve/StickManForMixamo.StickManForMixamo"));
 	if (SK_CHARACTER.Succeeded())
 	{
-		DynamicTextureComponent = CreateDefaultSubobject<UDynamicTextureComponent>(TEXT("DynamicTextureComponent"));
-		DynamicTextureComponent->InitializeTexture();
+		DynamicTextureComponent = CreateDefaultSubobject<UNetworkedDynamicTextureComponent>(TEXT("UNetworkedDynamicTextureComponent"));
+		
 		// const FString FilePath = FPaths::ProjectContentDir() + TEXT("customCharacter/test4.exr");
 		// DynamicTextureComponent->LoadTextureFromFile(FilePath);
 		
@@ -229,171 +229,171 @@ ADPCharacter::ADPCharacter()
 	}
 }
 
-bool ADPCharacter::TryGetPlayerStateAndTransferManager(APlayerState*& OutPS, UTextureTransferManager*& OutTTM)
-{
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
-	if (!PC)
-	{
-		return false;
-	}
+// bool ADPCharacter::TryGetPlayerStateAndTransferManager(APlayerState*& OutPS, UTextureTransferManager*& OutTTM)
+// {
+// 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+// 	if (!PC)
+// 	{
+// 		return false;
+// 	}
+//
+// 	if (ADPPlayerController* DPPC = Cast<ADPPlayerController>(PC))
+// 	{
+// 		OutTTM = DPPC->GetTextureTransferManager();
+// 		OutPS = GetPlayerState<APlayerState>();
+// 		return (OutPS != nullptr && OutTTM != nullptr);
+// 	}
+// 	else if (APC_MatchingLobby* LobbyPC = Cast<APC_MatchingLobby>(PC))
+// 	{
+// 		OutTTM = LobbyPC->GetTextureTransferManager();
+// 		OutPS = GetPlayerState<APlayerState>();
+// 		return (OutPS != nullptr && OutTTM != nullptr);
+// 	}
+//
+// 	return false;
+// }
+//
+// void ADPCharacter::LoadTexture()
+// {
+// 	if (DynamicTextureComponent)
+// 	{
+// 		const FString FilePath = FPaths::ProjectContentDir() + TEXT("customCharacter/customImage.png");
+// 		DynamicTextureComponent->LoadTextureFromFile(FilePath);
+// 		UTexture2D* CustomTexture = DynamicTextureComponent->GetDynamicTexture();
+// 		
+// 		APlayerState* PS = nullptr;
+// 		UTextureTransferManager* TTM = nullptr;
+// 		if (!CustomTexture || !TryGetPlayerStateAndTransferManager(PS, TTM))
+// 		{
+// 			GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ADPCharacter::LoadTexture);
+// 			return ;
+// 		}
+// 		
+// 		if (HasLocalNetOwner())
+// 		{
+// 			HandleLocalNetOwner(CustomTexture, PS, TTM);
+// 		}
+// 		else
+// 		{
+// 			HandleRemoteNetOwner(PS, TTM);
+// 		}
+// 	}
+// }
 
-	if (ADPPlayerController* DPPC = Cast<ADPPlayerController>(PC))
-	{
-		OutTTM = DPPC->GetTextureTransferManager();
-		OutPS = GetPlayerState<APlayerState>();
-		return (OutPS != nullptr && OutTTM != nullptr);
-	}
-	else if (APC_MatchingLobby* LobbyPC = Cast<APC_MatchingLobby>(PC))
-	{
-		OutTTM = LobbyPC->GetTextureTransferManager();
-		OutPS = GetPlayerState<APlayerState>();
-		return (OutPS != nullptr && OutTTM != nullptr);
-	}
+// void ADPCharacter::HandleLocalNetOwner(UTexture2D* CustomTexture, APlayerState* PS, UTextureTransferManager* TTM)
+// {
+// 	if (GetWorld()->GetNetMode() != NM_Standalone)
+// 	{
+// 		if (HasAuthority())
+// 		{
+// 			DynamicTextureComponent->bCustomTextureUploaded = true;
+// 		}
+// 		else
+// 		{
+// 			FDataTransferParams Params(SerializeTexture(CustomTexture).CompressedTextureData, PS->GetPlayerId());
+// 			TTM->SendLargeDataInChunks(Params);
+// 		}
+// 	}
+// 	UpdateTexture(CustomTexture);
+// }
 
-	return false;
-}
+// void ADPCharacter::HandleRemoteNetOwner(APlayerState* PS, UTextureTransferManager* TTM)
+// {
+// 	if (!HasAuthority())
+// 	{
+// 		TTM->RequestTextureToServer(PS->GetPlayerId());
+// 	}
+// }
 
-void ADPCharacter::LoadTexture()
-{
-	if (DynamicTextureComponent)
-	{
-		const FString FilePath = FPaths::ProjectContentDir() + TEXT("customCharacter/customImage.png");
-		DynamicTextureComponent->LoadTextureFromFile(FilePath);
-		UTexture2D* CustomTexture = DynamicTextureComponent->GetDynamicTexture();
-		
-		APlayerState* PS = nullptr;
-		UTextureTransferManager* TTM = nullptr;
-		if (!CustomTexture || !TryGetPlayerStateAndTransferManager(PS, TTM))
-		{
-			GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ADPCharacter::LoadTexture);
-			return ;
-		}
-		
-		if (HasLocalNetOwner())
-		{
-			HandleLocalNetOwner(CustomTexture, PS, TTM);
-		}
-		else
-		{
-			HandleRemoteNetOwner(PS, TTM);
-		}
-	}
-}
+// void ADPCharacter::OnTransferComplete(const TArray<uint8>& FullData)
+// {
+// 	if (FullData.Num() > 0)
+// 	{
+// 		FSerializedTextureData TextureData;
+// 		TextureData.CompressedTextureData = FullData;
+// 		TextureData.Width = 1024;
+// 		TextureData.Height = 1024;
+// 		UTexture2D* Texture = DeserializeTexture(TextureData);
+// 		UpdateTexture(Texture);
+// 	}
+// }
 
-void ADPCharacter::HandleLocalNetOwner(UTexture2D* CustomTexture, APlayerState* PS, UTextureTransferManager* TTM)
-{
-	if (GetWorld()->GetNetMode() != NM_Standalone)
-	{
-		if (HasAuthority())
-		{
-			DynamicTextureComponent->bCustomTextureUploaded = true;
-		}
-		else
-		{
-			FDataTransferParams Params(SerializeTexture(CustomTexture).CompressedTextureData, PS->GetPlayerId());
-			TTM->SendLargeDataInChunks(Params);
-		}
-	}
-	UpdateTexture(CustomTexture);
-}
+// FSerializedTextureData ADPCharacter::SerializeTexture(UTexture2D* Texture)
+// {
+// 	FSerializedTextureData OutData;
+// 	if (Texture && Texture->GetPlatformData())
+// 	{
+// 		FTexturePlatformData* PlatformData = Texture->GetPlatformData();
+// 		FTexture2DMipMap* Mip = &PlatformData->Mips[0];
+//
+// 		OutData.Width = Mip->SizeX;
+// 		OutData.Height = Mip->SizeY;
+//
+// 		FByteBulkData* RawImageData = &Mip->BulkData;
+// 		FLinearColor* RawImageDataPtr = static_cast<FLinearColor*>( RawImageData->Lock( LOCK_READ_ONLY ) );
+// 		// const void* DataPointer = Mip.BulkData.Lock(LOCK_READ_ONLY);
+// 		if (RawImageDataPtr)
+// 		{
+// 			// uint8* dd =  DynamicTextureComponent->TextureData;
+// 			const TArray64<uint8>& dd = DynamicTextureComponent->CompressTextureDataToEXR();
+// 			const int32 BytesPerPixel = GPixelFormats[PlatformData->PixelFormat].BlockBytes;
+// 			const int32 DataSize = Texture->GetSizeX() * Texture->GetSizeY() * BytesPerPixel;
+// 			// const int32 DataSize = 1024;
+// 			OutData.CompressedTextureData.SetNumUninitialized(dd.Num());
+// 			FMemory::Memcpy(OutData.CompressedTextureData.GetData(), dd.GetData(), dd.Num());
+// 			Mip->BulkData.Unlock();
+// 		}
+//
+// 		// void* TextureDataPointer = Mip->BulkData.Lock(LOCK_READ_WRITE);
+// 		// if (TextureDataPointer)
+// 		// {
+// 		// 	TArray64<uint8> dd = DynamicTextureComponent->DecompressEXRToRawData(OutData.CompressedTextureData, OutData.Width, OutData.Height);
+// 		// 	// FMemory::Memzero(TextureDataPointer, Mip.SizeX * Mip.SizeY * 16);
+// 		// 	FMemory::Memcpy(TextureDataPointer, dd.GetData(), dd.Num());
+// 		// 	Mip->BulkData.Unlock();
+// 		// }
+// 		
+// 		// UpdateTexture(Texture);
+// 	}
+// 	return OutData;
+// }
 
-void ADPCharacter::HandleRemoteNetOwner(APlayerState* PS, UTextureTransferManager* TTM)
-{
-	if (!HasAuthority())
-	{
-		TTM->RequestTextureToServer(PS->GetPlayerId());
-	}
-}
+// UTexture2D* ADPCharacter::DeserializeTexture(FSerializedTextureData& InData)
+// {
+// 	if (InData.CompressedTextureData.Num() == 0 || InData.Width <= 0 || InData.Height <= 0)
+// 	{
+// 		UE_LOG(LogTemp, Warning, TEXT("Invalid serialized texture data."));
+// 		return nullptr;
+// 	}
+// 	
+// 	UTexture2D* Texture = DynamicTextureComponent->GetDynamicTexture();
+//
+// 	FTexturePlatformData* PlatformData = Texture->GetPlatformData();
+// 	FTexture2DMipMap* Mip = &PlatformData->Mips[0];
+//
+// 	Mip->SizeX = InData.Width;
+// 	Mip->SizeY = InData.Height;
+//
+// 	void* TextureDataPointer = Mip->BulkData.Lock(LOCK_READ_WRITE);
+// 	if (TextureDataPointer)
+// 	{
+// 		TArray64<uint8> dd = DynamicTextureComponent->DecompressEXRToRawData(InData.CompressedTextureData, InData.Width, InData.Height);
+// 		FMemory::Memcpy(TextureDataPointer, dd.GetData(), dd.Num());
+// 		Mip->BulkData.Unlock();
+// 	}
+// 	Texture->UpdateResource();
+// 	
+// 	return Texture;
+// }
 
-void ADPCharacter::OnTransferComplete(const TArray<uint8>& FullData)
-{
-	if (FullData.Num() > 0)
-	{
-		FSerializedTextureData TextureData;
-		TextureData.CompressedTextureData = FullData;
-		TextureData.Width = 1024;
-		TextureData.Height = 1024;
-		UTexture2D* Texture = DeserializeTexture(TextureData);
-		UpdateTexture(Texture);
-	}
-}
-
-FSerializedTextureData ADPCharacter::SerializeTexture(UTexture2D* Texture)
-{
-	FSerializedTextureData OutData;
-	if (Texture && Texture->GetPlatformData())
-	{
-		FTexturePlatformData* PlatformData = Texture->GetPlatformData();
-		FTexture2DMipMap* Mip = &PlatformData->Mips[0];
-
-		OutData.Width = Mip->SizeX;
-		OutData.Height = Mip->SizeY;
-
-		FByteBulkData* RawImageData = &Mip->BulkData;
-		FLinearColor* RawImageDataPtr = static_cast<FLinearColor*>( RawImageData->Lock( LOCK_READ_ONLY ) );
-		// const void* DataPointer = Mip.BulkData.Lock(LOCK_READ_ONLY);
-		if (RawImageDataPtr)
-		{
-			// uint8* dd =  DynamicTextureComponent->TextureData;
-			const TArray64<uint8>& dd = DynamicTextureComponent->CompressTextureDataToEXR();
-			const int32 BytesPerPixel = GPixelFormats[PlatformData->PixelFormat].BlockBytes;
-			const int32 DataSize = Texture->GetSizeX() * Texture->GetSizeY() * BytesPerPixel;
-			// const int32 DataSize = 1024;
-			OutData.CompressedTextureData.SetNumUninitialized(dd.Num());
-			FMemory::Memcpy(OutData.CompressedTextureData.GetData(), dd.GetData(), dd.Num());
-			Mip->BulkData.Unlock();
-		}
-
-		// void* TextureDataPointer = Mip->BulkData.Lock(LOCK_READ_WRITE);
-		// if (TextureDataPointer)
-		// {
-		// 	TArray64<uint8> dd = DynamicTextureComponent->DecompressEXRToRawData(OutData.CompressedTextureData, OutData.Width, OutData.Height);
-		// 	// FMemory::Memzero(TextureDataPointer, Mip.SizeX * Mip.SizeY * 16);
-		// 	FMemory::Memcpy(TextureDataPointer, dd.GetData(), dd.Num());
-		// 	Mip->BulkData.Unlock();
-		// }
-		
-		// UpdateTexture(Texture);
-	}
-	return OutData;
-}
-
-UTexture2D* ADPCharacter::DeserializeTexture(FSerializedTextureData& InData)
-{
-	if (InData.CompressedTextureData.Num() == 0 || InData.Width <= 0 || InData.Height <= 0)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Invalid serialized texture data."));
-		return nullptr;
-	}
-	
-	UTexture2D* Texture = DynamicTextureComponent->GetDynamicTexture();
-
-	FTexturePlatformData* PlatformData = Texture->GetPlatformData();
-	FTexture2DMipMap* Mip = &PlatformData->Mips[0];
-
-	Mip->SizeX = InData.Width;
-	Mip->SizeY = InData.Height;
-
-	void* TextureDataPointer = Mip->BulkData.Lock(LOCK_READ_WRITE);
-	if (TextureDataPointer)
-	{
-		TArray64<uint8> dd = DynamicTextureComponent->DecompressEXRToRawData(InData.CompressedTextureData, InData.Width, InData.Height);
-		FMemory::Memcpy(TextureDataPointer, dd.GetData(), dd.Num());
-		Mip->BulkData.Unlock();
-	}
-	Texture->UpdateResource();
-	
-	return Texture;
-}
-
-void ADPCharacter::UpdateTexture(UTexture2D* NewTexture)
-{
-	if (NewTexture && dynamicMaterialInstance)
-	{
-		dynamicMaterialInstance->SetTextureParameterValue(TEXT("renderTarget"), NewTexture);
-		GetMesh()->SetMaterial(0, dynamicMaterialInstance);
-	}
-}
+// void ADPCharacter::UpdateTexture(UTexture2D* NewTexture)
+// {
+// 	if (NewTexture && dynamicMaterialInstance)
+// 	{
+// 		dynamicMaterialInstance->SetTextureParameterValue(TEXT("renderTarget"), NewTexture);
+// 		GetMesh()->SetMaterial(0, dynamicMaterialInstance);
+// 	}
+// }
 
 ADPCharacter::~ADPCharacter()
 {
@@ -463,7 +463,7 @@ void ADPCharacter::BeginPlay()
 		NameTag_WidgetComponent->SetVisibility(false);
 	}
 	
-	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ADPCharacter::LoadTexture);
+	// GetWorld()->GetTimerManager().SetTimerForNextTick(DynamicTextureComponent, &UNetworkedDynamicTextureComponent::LoadTexture);
 	
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AReturnTriggerVolume::StaticClass(), FoundActors);
@@ -479,6 +479,21 @@ void ADPCharacter::BeginPlay()
 	constructionComponent->placeturret = false;
 	bUseControllerRotationYaw = false;
 	// SetNameTag();
+}
+
+void ADPCharacter::TryInItializeDynamicTexture()
+{
+	FNetworkedDynamicTextureComponentInitializer Initializer;
+	Initializer.DynamicMaterialInstance = dynamicMaterialInstance;
+	Initializer.SkeletalMeshComponent = GetMesh();
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (PC)
+	{
+		Initializer.PlayerState = PC->GetPlayerState<APlayerState>();
+		Initializer.TextureTransferManager = PC->FindComponentByClass<UTextureTransferManager>();
+	}
+	if (DynamicTextureComponent->InitializeTexture(Initializer))
+		DynamicTextureComponent->LoadTexture();
 }
 
 // Called every frame
@@ -622,6 +637,20 @@ bool ADPCharacter::IsStunned() const
 void ADPCharacter::ClientNotifyAnimalReturn_Implementation(const FString& player_name)
 {
 	FDataHub::PushReturnAnimalDA(player_name, true);
+}
+
+void ADPCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	TryInItializeDynamicTexture();
+}
+
+void ADPCharacter::OnRep_Controller()
+{
+	Super::OnRep_Controller();
+
+	TryInItializeDynamicTexture();
 }
 
 void ADPCharacter::UpdateNameTagRotation()

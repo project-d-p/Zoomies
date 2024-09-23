@@ -3,6 +3,7 @@
 #include "CompileMode.h"
 #include "FNetLogger.h"
 #include "JudgeGameState.h"
+#include "JudgeLevelComponent.h"
 #include "JudgePlayerController.h"
 #include "JudgePlayerState.h"
 #include "Algo/MaxElement.h"
@@ -13,6 +14,7 @@ AJudgeGameMode::AJudgeGameMode()
 {
     PlayerStateClass = AJudgePlayerState::StaticClass();
     PlayerControllerClass = AJudgePlayerController::StaticClass();
+    // PlayerControllerClass = ADPPlayerController::StaticClass();
     GameStateClass = AJudgeGameState::StaticClass();
     
     TimerManager = CreateDefaultSubobject<UServerTimerManager>(TEXT("TimerManager"));
@@ -27,6 +29,7 @@ FUIInitData AJudgeGameMode::GetUiData()
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         AJudgePlayerController* PC = Cast<AJudgePlayerController>(*It);
+        // ADPPlayerController* PC = Cast<ADPPlayerController>(*It);
         if (!PC)
             return UIData;
         AJudgePlayerState* PS = Cast<AJudgePlayerState>(PC->PlayerState);
@@ -95,7 +98,11 @@ void AJudgeGameMode::ProcessVotingResults()
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         AJudgePlayerController* PC = Cast<AJudgePlayerController>(*It);
+        // ADPPlayerController* PC = Cast<ADPPlayerController>(*It);
         check(PC)
+        // UJudgeLevelComponent* JLC = Cast<UJudgeLevelComponent>(PC->GetLevelComponent());
+        // check(JLC)
+        // JLC->SetOccupationeName(CurrentPlayerIndex - 1, OccupationToString(MostVotedOccupation));
         PC->SetOccupationeName(CurrentPlayerIndex - 1, OccupationToString(MostVotedOccupation));
     }
     TimerManager->StartTimer<AJudgeGameState>(WAIT_TIME, &AJudgeGameMode::EndTimer, this);
@@ -144,7 +151,5 @@ void AJudgeGameMode::HandleStartingNewPlayer_Implementation(APlayerController* N
         W->SpawnActor<ACameraActor>(ACameraActor::StaticClass(), Loc, Rot, SpawnParams);
     check(CamAct)
 
-    AJudgePlayerController* PC = Cast<AJudgePlayerController>(NewPlayer);
-    check(PC)
-    PC->SetViewTarget(CamAct);
+    NewPlayer->SetViewTarget(CamAct);
 }

@@ -12,7 +12,7 @@ void UTextureTransferManager::RequestTextureToServer_Implementation(int32 Player
 		return;
 	}
 
-	UDynamicTextureComponent* DynamicTextureComp = Character->GetDynamicTextureComponent();
+	UNetworkedDynamicTextureComponent* DynamicTextureComp = Character->GetDynamicTextureComponent();
 	if (!DynamicTextureComp || !DynamicTextureComp->bCustomTextureUploaded)
 	{
 		RetryRequestTexture(PlayerId);
@@ -26,7 +26,7 @@ void UTextureTransferManager::RequestTextureToServer_Implementation(int32 Player
 		return;
 	}
 
-	FDataTransferParams Params(Character->SerializeTexture(CustomTexture).CompressedTextureData, PlayerId);
+	FDataTransferParams Params(DynamicTextureComp->SerializeTexture(CustomTexture).CompressedTextureData, PlayerId);
 	SendLargeDataInChunks(Params);
 }
 
@@ -47,7 +47,7 @@ void UTextureTransferManager::OnTextureTransferComplete(const int32 Key)
 	ADPCharacter* C = FindCharacterByPlayerId(Key);
 	if (C)
 	{
-		UDynamicTextureComponent* dynamicTextureComp = C->GetDynamicTextureComponent();
+		UNetworkedDynamicTextureComponent* dynamicTextureComp = C->GetDynamicTextureComponent();
 		if (!dynamicTextureComp)
 		{
 			FTimerDelegate TimerDelegate;
@@ -56,7 +56,7 @@ void UTextureTransferManager::OnTextureTransferComplete(const int32 Key)
 			return;
 		}
 		dynamicTextureComp->bCustomTextureUploaded = true;
-		C->OnTransferComplete(ReceivedData);
+		dynamicTextureComp->OnTransferComplete(ReceivedData);
 		RemoveDataTransferInfo(Key);
 	}
 }

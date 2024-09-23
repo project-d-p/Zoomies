@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "CharacterPositionSync.h"
-#include "DynamicTextureComponent.h"
 #include "NameTag.h"
+#include "NetworkedDynamicTextureComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "proj_a/Component/InGame/Score/Types/ScoreTypes.h"
@@ -15,18 +15,18 @@
 class ABaseMonsterCharacter;
 class UTextureTransferManager;
 
-USTRUCT()
-struct FSerializedTextureData
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-	TArray<uint8> CompressedTextureData;
-	UPROPERTY()
-	int32 Width = 0;
-	UPROPERTY()
-	int32 Height = 0;
-};
+// USTRUCT()
+// struct FSerializedTextureData
+// {
+// 	GENERATED_BODY()
+//
+// 	UPROPERTY()
+// 	TArray<uint8> CompressedTextureData;
+// 	UPROPERTY()
+// 	int32 Width = 0;
+// 	UPROPERTY()
+// 	int32 Height = 0;
+// };
 
 UCLASS()
 class PROJ_A_API ADPCharacter : public ACharacter
@@ -57,8 +57,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "References")
 	class AReturnTriggerVolume* ReturnTriggerVolume; 
 
-	UFUNCTION()
-	void OnTransferComplete(const TArray<uint8>& FullData);
+	// UFUNCTION()
+	// void OnTransferComplete(const TArray<uint8>& FullData);
 public:	// component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UDPHpActorComponent* hpComponent;
@@ -138,11 +138,14 @@ public:	// component
 
 	void RemoveSpringArm();
 
-	UDynamicTextureComponent* GetDynamicTextureComponent() const { return DynamicTextureComponent; }
-	bool TryGetPlayerStateAndTransferManager(APlayerState*& OutPS, UTextureTransferManager*& OutTTM);
-	FSerializedTextureData SerializeTexture(UTexture2D* Texture);
+	UNetworkedDynamicTextureComponent* GetDynamicTextureComponent() const { return DynamicTextureComponent; }
+	// bool TryGetPlayerStateAndTransferManager(APlayerState*& OutPS, UTextureTransferManager*& OutTTM);
+	// FSerializedTextureData SerializeTexture(UTexture2D* Texture);
 protected:
 	void ClientNotifyAnimalReturn_Implementation(const FString& player_name);
+	
+	virtual void OnRep_PlayerState() override;
+	virtual void OnRep_Controller() override;
 	
 private:
 	void UpdateNameTagRotation();
@@ -150,13 +153,14 @@ private:
 	void OnServerHit(const FHitResult& HitResult);
 
 	/* For Character Custom Texture */
-	void LoadTexture();
-	void HandleLocalNetOwner(UTexture2D* CustomTexture, APlayerState* PS, UTextureTransferManager* TTM);
-	void HandleRemoteNetOwner(APlayerState* PS, UTextureTransferManager* TTM);
-	UTexture2D* DeserializeTexture(FSerializedTextureData& InData);
-	void UpdateTexture(UTexture2D* NewTexture);
+	// void LoadTexture();
+	// void HandleLocalNetOwner(UTexture2D* CustomTexture, APlayerState* PS, UTextureTransferManager* TTM);
+	// void HandleRemoteNetOwner(APlayerState* PS, UTextureTransferManager* TTM);
+	// UTexture2D* DeserializeTexture(FSerializedTextureData& InData);
+	// void UpdateTexture(UTexture2D* NewTexture);
+	void TryInItializeDynamicTexture();
 	UPROPERTY()
-	UDynamicTextureComponent* DynamicTextureComponent;
+	UNetworkedDynamicTextureComponent* DynamicTextureComponent;
 	//
 	
 	UPROPERTY(VisibleAnywhere, Category = Camera)
