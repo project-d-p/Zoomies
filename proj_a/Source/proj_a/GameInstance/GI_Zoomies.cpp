@@ -23,14 +23,13 @@ void UGI_Zoomies::Init()
 			FOnSessionUserInviteAcceptedDelegate::CreateUObject(this, &UGI_Zoomies::OnInviteAccepted)
 		);
 	}
-
-#if EDITOR_MODE
-	bIsOnline = false;
-#elif LAN_MODE
-	bIsOnline = false;
-#else
-	bIsOnline = true;
-#endif
+	#if EDITOR_MODE
+		bIsOnline = false;
+	#elif LAN_MODE
+		bIsOnline = false;
+	#else
+		bIsOnline = true;
+	#endif
 }
 
 // matching session Functions
@@ -63,7 +62,6 @@ void UGI_Zoomies::FindSession()
     
 	// Align with CreateSession settings
 	session_search_->bIsLanQuery = !bIsOnline;
-    
 	session_search_->MaxSearchResults = 20;
     
 	// Set query settings based on the online/LAN mode
@@ -239,6 +237,7 @@ void UGI_Zoomies::OnInviteAccepted(const bool bWasSuccessful, const int32 LocalP
 		UE_LOG(LogTemp, Error, TEXT("OnInviteAccepted: Validation failed"));
 		return;
 	}
+	UE_LOG(LogTemp, Error, TEXT("OnInviteAccepted: OnInviteAccepted is called"));
 
 	if (bWasSuccessful && InviteResult.IsValid())
 	{
