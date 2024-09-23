@@ -43,8 +43,7 @@ protected:
 private:
 	UPROPERTY()
 	UPlayerScoreComp* PlayerScoreComp = nullptr;
-
-
+	
 	FFinalScoreData FinalScoreData;
 
 	virtual void BeginPlay() override;

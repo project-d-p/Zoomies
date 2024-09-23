@@ -19,6 +19,7 @@ class UNetworkFailureManager : public UObject
 public:
 	UNetworkFailureManager();
 	FOnHostMigration& OnHostMigration() { return OnHostMigrationDelegate; }
+	UDataManager* GetDataManager() { return DataManager; }
 	void Init();
 
 private:
