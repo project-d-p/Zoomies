@@ -316,7 +316,6 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 			bNextHost = false;
 		}
 		CreateNewSessionMetaData(World, NextHostID);
-		// CreateNewSessionMetaData(World, LocalPlayerID);
 	}
 	else
 	{

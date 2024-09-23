@@ -94,27 +94,6 @@ void AGS_MatchingLobby::BeginPlay()
 
 void AGS_MatchingLobby::OnHostMigration(UWorld* World, UDataManager* DataManager)
 {
-	// TArray<AActor*> FoundActors;
-	// UGameplayStatics::GetAllActorsOfClass(World, ADPCharacter::StaticClass(), FoundActors);
-	//
-	// for (AActor* Actor : FoundActors)
-	// {
-	// 	ADPCharacter* Character = Cast<ADPCharacter>(Actor);
-	// 	FNetLogger::EditerLog(FColor::Red, TEXT("Character %s was here."), Character->GetPlayerState() ? *Character->GetPlayerState()->GetPlayerName() : TEXT("No PlayerState"));
-	// }
-	//
-	// for (FConstPlayerControllerIterator It = World->GetPlayerControllerIterator(); It; ++It)
-	// {
-	// 	APlayerController* PlayerController = It->Get();
-	// 	if (PlayerController)
-	// 	{
-	// 		FNetLogger::EditerLog(FColor::Red, TEXT("PlayerController %d was here."), PlayerController->GetUniqueID());
-	// 	}
-	// }
-	//
-	// FString LevelName = World->GetMapName();
-	// UE_LOG(LogTemp, Warning, TEXT("Connection to the server has been lost or timed out."));
-	// FNetLogger::EditerLog(FColor::Red, TEXT("Connection to the server has been lost or timed out. in %s"), *LevelName);
 }
 
 void AGS_MatchingLobby::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -222,3 +201,13 @@ void AGS_MatchingLobby::MulticastShowLoadingWidget_Implementation()
 // 3. �ش� ������ �ٸ� Ŭ���̾�Ʈ�� �ٽ� ȣ������
 // 4. �ٽ� ȣ���õ� Ŭ���̾�Ʈ�� ������ �����͸� �ҷ���
 // 5. �ҷ��� �����͸� ������� �ٽ� ������ ������
+
+// 1. 현재의 객체가 파괴되도 다음에 접근이 가능해야 함 - 전역적으로 들고 있어야 함.
+
+// ABSTRACT
+// 1. GameInstance
+// 2. 각 클래스마다 자신의 정보를 저장하는 세부적으로 다른 구체화된 클래스를 GameInstance에 선언된
+// 추상 클래스 내부를 계속해서 바꿔줘야 함.
+
+// EVENT
+// 해당 이벤트에 바인딩만 해주면 된다.

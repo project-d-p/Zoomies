@@ -81,6 +81,7 @@ public class proj_a : ModuleRules
 			"proj_a/Network/Public",
 			"proj_a/Network/NetworkFailureManager/Public",
 			"proj_a/Network/DataManager/Public",
+			"proj_a/Network/DataManager/BaseData/public",
 			"proj_a/Network/NetLogger/Public",
 			"proj_a/Network/NetworkManager/Public",
 			"proj_a/Network/NetworkWorker/Public",
