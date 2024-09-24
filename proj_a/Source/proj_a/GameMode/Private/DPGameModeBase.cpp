@@ -379,7 +379,11 @@ void ADPGameModeBase::ProcessData(float delta_time)
 		Message message = this->message_queue_.front();
 		this->message_queue_.pop();
 		ADPPlayerController* controller = this->player_controllers_[message.player_id()];
-		message_handler_.HandleMessage(message)->ExecuteIfBound(controller, message, delta_time);
+		FServerMessageDelegate* delegate = this->message_handler_.HandleMessage(message);
+		if (delegate)
+		{
+			delegate->ExecuteIfBound(controller, message, delta_time);
+		}
 	}
 	this->SimulateAiming();
 	this->SimulateGunFire();
