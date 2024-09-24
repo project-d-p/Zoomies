@@ -16,6 +16,7 @@ void UDataTransferManager::ReceiveDataChunkForServer_Implementation(const FDataC
 
 void UDataTransferManager::SendLargeDataInChunks(FDataTransferParams Params)
 {
+	FNetLogger::EditerLog(FColor::Green, TEXT("SendLargeDataInChunks: %d"), Params.PlayerId);
 	SendDataChunks(Params);
 }
 

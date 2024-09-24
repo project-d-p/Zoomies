@@ -301,6 +301,7 @@ void ADPCharacter::HandleRemoteNetOwner(APlayerState* PS, UTextureTransferManage
 {
 	if (!HasAuthority())
 	{
+		FNetLogger::EditerLog(FColor::Green, TEXT("RequestTextureToServer: %d"), PS->GetPlayerId());
 		TTM->RequestTextureToServer(PS->GetPlayerId());
 	}
 }

@@ -39,6 +39,7 @@ void UTextureTransferManager::RetryRequestTexture(int32 PlayerId)
 
 void UTextureTransferManager::OnTextureTransferComplete(const int32 Key)
 {
+	FNetLogger::EditerLog(FColor::Green, TEXT("TextureTransferComplete Player %d"), Key);
 	FDataTransferInfo& Data = DataTransferMap.FindChecked(Key);
 	TArray<uint8>& ReceivedData = Data.ReceivedDataChunks;
 	if (Data.bDataTransferComplete == false)
