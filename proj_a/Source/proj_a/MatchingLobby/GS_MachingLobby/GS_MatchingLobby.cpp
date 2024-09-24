@@ -83,7 +83,6 @@ void AGS_MatchingLobby::BeginPlay()
 
 	// Delegate for handling network failure On This Level
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
-	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();;
 	if (!HasAuthority())
 	{
 		if (GameInstance)
@@ -92,25 +91,10 @@ void AGS_MatchingLobby::BeginPlay()
 			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &AGS_MatchingLobby::OnHostMigration);
 		}
 	}
-	if (DataManager)
-	{
-		FNetLogger::EditerLog(FColor::Blue, TEXT("DataManager is not null"));
-		UTestData* TestData = DataManager->GetDataAs<UTestData>(TEXT("TestData"));
-		if (TestData)
-		{
-			FNetLogger::EditerLog(FColor::Cyan, TEXT("TestData: %d"), TestData->TestValue);
-		}		
-	}
 }
 
 void AGS_MatchingLobby::OnHostMigration(UWorld* World, UDataManager* DataManager)
 {
-	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
-	UTestData* TestData = NewObject<UTestData>(GameInstance, UTestData::StaticClass());
-	TestData->InitializeData();
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Saving TestData"));
-	TestData->TestValue = 100;
-	DataManager->AddData(TEXT("TestData"), TestData);
 }
 
 void AGS_MatchingLobby::EndPlay(const EEndPlayReason::Type EndPlayReason)
