@@ -1,8 +1,17 @@
 #include "EngineSocket.h"
 
+#include "FNetLogger.h"
 #include "Marshaller.h"
 #include "Sockets.h"
 #include "SocketSubsystem.h"
+
+UEngineSocket::UEngineSocket()
+	: ListenSocket(nullptr)
+	, ClientSocket(nullptr)
+	, MaxClients(0)
+	, bIsServer(false)
+{
+}
 
 UEngineSocket::~UEngineSocket()
 {
@@ -29,12 +38,6 @@ UEngineSocket::~UEngineSocket()
 		ClientSocket->Close();
 		ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(ClientSocket);
 	}
-
-	// 타이머 제거
-	if (UObject::GetWorld())
-	{
-		UObject::GetWorld()->GetTimerManager().ClearTimer(ConnectionTimerHandle);
-	}
 }
 
 UISocketInterface* UEngineSocket::Clone() const
@@ -47,6 +50,8 @@ void UEngineSocket::ActivateServer()
 	Super::ActivateServer();
 
 	SetAsServer();
+	
+	FNetLogger::LogError(TEXT("Server Activated"));
 	
 	// 서버 주소와 포트 설정
 	FString Address = TEXT("0.0.0.0"); // 모든 IP에서 수신
@@ -99,6 +104,8 @@ void UEngineSocket::ActivateServer()
 		check(false);
 		return;
 	}
+
+	FNetLogger::LogError(TEXT("Listening on port %d"), Port);
 }
 
 void UEngineSocket::ActivateClient()
@@ -106,6 +113,8 @@ void UEngineSocket::ActivateClient()
 	Super::ActivateClient();
 
 	SetAsClient();
+
+	FNetLogger::LogError(TEXT("Client Activated"));
 	
 	// 서버 주소와 포트 설정
 	FString ServerAddress = "127.0.0.1"; // 서버 IP 주소로 설정
@@ -163,10 +172,11 @@ void UEngineSocket::RecieveData(const TFunction<void(const Message&)>& Callback)
 {
 	if (bIsServer)
 	{
+		OnServerCallback();
 		// 서버는 모든 클라이언트 소켓에서 데이터 수신
-		for (FSocket* ClientSocket : Connections)
+		for (FSocket* ClientSocket_ : Connections)
 		{
-			HandleIncomingData(ClientSocket, Callback);
+			HandleIncomingData(ClientSocket_, Callback);
 		}
 	}
 	else
@@ -211,10 +221,10 @@ void UEngineSocket::SendData(Message& Msg)
 	if (bIsServer)
 	{
 		// 서버는 모든 클라이언트에게 데이터 전송
-		for (FSocket* ClientSocket : Connections)
+		for (FSocket* ClientSocket_ : Connections)
 		{
 			int32 BytesSent = 0;
-			ClientSocket->Send(Data.GetData(), Data.Num(), BytesSent);
+			ClientSocket_->Send(Data.GetData(), Data.Num(), BytesSent);
 		}
 	}
 	else
@@ -243,12 +253,6 @@ void UEngineSocket::SetGameStartCallback(int NumOfPlayers, const TFunction<void(
 void UEngineSocket::BeginDestroy()
 {
 	Super::BeginDestroy();
-
-	// 연결 수락을 위한 타이머 설정
-	if (GetWorld())
-	{
-		GetWorld()->GetTimerManager().SetTimer(ConnectionTimerHandle, this, &UEngineSocket::OnServerCallback, 0.01f, true);
-	}
 }
 
 void UEngineSocket::AddConnection(FSocket* Connection)

@@ -120,7 +120,8 @@ void ADPPlayerController::ConnectToServer_Implementation(ELevelComponentType Typ
 #if EDITOR_MODE
 	NetworkManager->Initialize(ENetworkTypeZoomies::NONE);
 #elif LAN_MODE
-	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
+	// NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
+	NetworkManager->Initialize(ENetworkTypeZoomies::ENGINE_SOCKET);
 #else
 	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
 #endif

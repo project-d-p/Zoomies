@@ -1,11 +1,20 @@
 #include "ServerNetworkManager.h"
 
+#include "FNetLogger.h"
 #include "ISocketFactory.h"
 #include "ISocketInterface.h"
 #include "NetworkWorker.h"
 
 void UServerNetworkManager::Initialize(ENetworkTypeZoomies SocketType)
 {
+	if (GetWorld())
+	{
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("UServerNetworkManager::Initialize() GetWorld()"));
+	}
+	else
+	{
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Failed UServerNetworkManager::Initialize() GetWorld()"));
+	}
 	UISocketInterface* SocketInterface = SocketFactory->CreateSocketInterface(SocketType);
 	check(SocketInterface);
 	SocketInterface->ActivateServer();

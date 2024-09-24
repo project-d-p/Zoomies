@@ -39,14 +39,6 @@ ADPGameModeBase::ADPGameModeBase()
 #else
 	NetworkManager = CreateDefaultSubobject<UServerNetworkManager>(TEXT("NetworkManager"));
 #endif	
-
-	monster_controllers_.resize(NUM_OF_MAX_MONSTERS, nullptr);
-	empty_monster_slots_.reserve(NUM_OF_MAX_MONSTERS);
-
-	for (int i = 0; i < NUM_OF_MAX_MONSTERS; i++)
-	{
-		empty_monster_slots_.push_back(i);
-	}
 }
 
 void ADPGameModeBase::OnGameStart()
@@ -299,7 +291,28 @@ void ADPGameModeBase::Logout(AController* Exiting)
 void ADPGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+#if EDITOR_MODE
+	NetworkManager->Initialize(ENetworkTypeZoomies::NONE);
+#elif LAN_MODE
+	// NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
+	NetworkManager->Initialize(ENetworkTypeZoomies::ENGINE_SOCKET);
+#else
+	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
+#endif
 	
+	NetworkManager->SetGameStartCallback(NUM_OF_MAX_CLIENTS, [this]()
+	{
+		this->OnGameStart();
+	});
+
+	monster_controllers_.resize(NUM_OF_MAX_MONSTERS, nullptr);
+	empty_monster_slots_.reserve(NUM_OF_MAX_MONSTERS);
+
+	for (int i = 0; i < NUM_OF_MAX_MONSTERS; i++)
+	{
+		empty_monster_slots_.push_back(i);
+	}
 	BlockingVolume = GetWorld()->SpawnActor<ABlockingBoxVolume>(ABlockingBoxVolume::StaticClass(), FVector(0.0f, 0.0f, 0.0f), FRotator(0.0f, 0.0f, 0.0f));
 }
 
@@ -313,19 +326,6 @@ void ADPGameModeBase::EndGame()
 void ADPGameModeBase::StartPlay()
 {
 	Super::StartPlay();
-
-#if EDITOR_MODE
-	NetworkManager->Initialize(ENetworkTypeZoomies::NONE);
-#elif LAN_MODE
-	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
-#else
-	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
-#endif
-	
-	NetworkManager->SetGameStartCallback(NUM_OF_MAX_CLIENTS, [this]()
-	{
-		this->OnGameStart();
-	});
 }
 
 void ADPGameModeBase::Tick(float delta_time)

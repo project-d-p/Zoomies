@@ -46,5 +46,4 @@ private:
 	TFunction<void()> GameStartCallback;
 	int MaxClients;
 	bool bIsServer;
-	FTimerHandle ConnectionTimerHandle;
 };
