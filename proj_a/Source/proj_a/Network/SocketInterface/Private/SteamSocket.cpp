@@ -138,6 +138,11 @@ void USteamSocket::CloseConnection(HSteamNetConnection Connection)
 	SteamNetworkingSockets()->CloseConnection(Connection, 0, nullptr, false);
 }
 
+void USteamSocket::BeginDestroy()
+{
+	Super::BeginDestroy();
+}
+
 void USteamSocket::OnSteamNetConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t* pParam)
 {
 	if (bIsServer)
@@ -220,6 +225,8 @@ void USteamSocket::ActivateServer()
 {
 	Super::ActivateServer();
 
+	SetAsServer();
+	
 	PollGroup = SteamNetworkingSockets()->CreatePollGroup();
 	if (PollGroup == k_HSteamNetPollGroup_Invalid)
 	{
@@ -232,6 +239,8 @@ void USteamSocket::ActivateClient()
 {
 	Super::ActivateClient();
 
+	SetAsClient();
+	
 	PollGroup = SteamNetworkingSockets()->CreatePollGroup();
 	if (PollGroup == k_HSteamNetPollGroup_Invalid)
 	{

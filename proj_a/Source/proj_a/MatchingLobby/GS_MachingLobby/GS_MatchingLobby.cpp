@@ -38,8 +38,14 @@ void AGS_MatchingLobby::UpdateLobbyInfo() const
 			UUserWidget* Widget = Character->LobbyInfoWidgetComponent->GetUserWidgetObject();
 			if (Widget)
 			{
-				FString Command = FString::Printf(TEXT("Update %d"), j);
-				Widget->CallFunctionByNameWithArguments(*Command, *GLog, nullptr, true);
+				// for (int32 i = 0; i < LobbyInfos.Num(); i++)
+				// {
+				// 	if (LobbyInfos[i].Name == Character->GetPlayerState()->GetPlayerName())
+				// 	{
+						FString Command = FString::Printf(TEXT("Update %d"), j);
+						Widget->CallFunctionByNameWithArguments(*Command, *GLog, nullptr, true);
+				// 	}
+				// }
 			}
 			else
 			{
