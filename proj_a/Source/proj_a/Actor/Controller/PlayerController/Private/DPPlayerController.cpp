@@ -11,6 +11,7 @@
 #include "MainLevelComponent.h"
 #include "ResultLevelComponent.h"
 #include "CompileMode.h"
+#include "EngineUtils.h"
 #include "LobbyLevelComponent.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
@@ -24,6 +25,8 @@ ADPPlayerController::ADPPlayerController()
 	NetworkManager = CreateDefaultSubobject<UClientNetworkManager>(TEXT("NetworkManager"));
 #endif
 	
+	TextureTransferManager = CreateDefaultSubobject<UTextureTransferManager>(TEXT("DataTransferManager"));
+	TextureTransferManager->OnDataTransferComplete.BindDynamic(TextureTransferManager, &UTextureTransferManager::OnTextureTransferComplete);
 	PrivateScoreManager = CreateDefaultSubobject<UPrivateScoreManager>(TEXT("PrivateScoreManager"));
 	
 	UBaseLevelComponent* MainLevelComponet = CreateDefaultSubobject<UMainLevelComponent>(TEXT("MainLevelComponent"));

@@ -35,7 +35,7 @@ struct FCurrentSessionInfo
 	FString IPAddress;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Session")
-	int32 Port;
+	int32 Port = 0;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Session")
 	FString SessionID;

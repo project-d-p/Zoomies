@@ -80,10 +80,14 @@ void AJudgePlayerController::RequestUIData_Implementation()
 		return ;
 	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 	{
-		AJudgePlayerController* JPS = Cast<AJudgePlayerController>(*It);
-		if (!JPS)
+		AJudgePlayerController* JPC = Cast<AJudgePlayerController>(*It);
+		if (!JPC)
 			continue;
-		JPS->InitializeUI(GM->GetUiData());
+		FUIInitData Data = GM->GetUiData();
+		if (Data.bInitSuccessful)
+		{
+			JPC->InitializeUI(Data);
+		}
 	}
 }
 

@@ -9,6 +9,7 @@
 #include "BaseLevelComponent.h"
 #include "ELevelComponentType.h"
 #include "MainLevelComponent.h"
+#include "TextureTransferManager.h"
 #include "DPPlayerController.generated.h"
 
 class UPlayerScoreComp;
@@ -38,9 +39,10 @@ public:
 
 	UPlayerScoreComp* GetScoreManagerComponent() const;
 	UPrivateScoreManager* GetPrivateScoreManagerComponent() const;
+	UTextureTransferManager* GetTextureTransferManager() const { return TextureTransferManager; }
 
 	UANetworkManager* GetNetworkManager() const;
-
+	
 	void ReleaseMemory();
 
 	UFUNCTION(Client, Reliable)
@@ -56,7 +58,6 @@ protected:
 	virtual void SetupInputComponent() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void OnPossess(APawn* InPawn) override;
-	
 private:
 	void DeactiveCurrentComponent();
 	void ActivateComponent(ELevelComponentType Type);
@@ -73,4 +74,7 @@ private:
 
 	UPROPERTY()
 	UBaseLevelComponent* ActiveComponent;
+
+	UPROPERTY()
+	UTextureTransferManager* TextureTransferManager = nullptr;
 };

@@ -1,6 +1,7 @@
 #include "PC_MatchingLobby.h"
 
 #include "CineCameraActor.h"
+#include "FNetLogger.h"
 #include "OnlineSessionSettings.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
@@ -24,6 +25,12 @@ void APC_MatchingLobby::ServerSetReady_Implementation(bool pIsReady)
 bool APC_MatchingLobby::ServerSetReady_Validate(bool pIsReady)
 {
 	return true;
+}
+
+APC_MatchingLobby::APC_MatchingLobby()
+{
+	TextureTransferManager = CreateDefaultSubobject<UTextureTransferManager>(TEXT("TextureTransferManager"));
+	TextureTransferManager->OnDataTransferComplete.BindDynamic(TextureTransferManager, &UTextureTransferManager::OnTextureTransferComplete);
 }
 
 void APC_MatchingLobby::ToggleReadyState()

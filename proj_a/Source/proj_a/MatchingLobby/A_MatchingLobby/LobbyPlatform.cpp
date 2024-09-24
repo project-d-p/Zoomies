@@ -3,6 +3,7 @@
 #include "LobbyPlatform.h"
 
 #include "DPCharacter.h"
+#include "FNetLogger.h"
 #include "Engine/StaticMeshActor.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
@@ -45,7 +46,14 @@ void ALobbyPlatform::SpawnCharacter(APlayerController* PlayerController)
 		ADPCharacter::StaticClass(),
  		ArrowComponent->GetComponentTransform(),
  		SpawnParams);
- }
+
+	ADPCharacter* DPC = Cast<ADPCharacter>(CurrentCharacter);
+	DPC->SetOwner(PC);
+	if (PC->PlayerState)
+	{
+		DPC->SetPlayerState(PC->PlayerState);
+	}
+}
 
 void ALobbyPlatform::Clear_Platform()
 {

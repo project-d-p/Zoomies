@@ -1,5 +1,6 @@
 #include "GM_MatchingLobby.h"
 
+#include "CompileMode.h"
 #include "DPCharacter.h"
 #include "isteamfriends.h"
 #include "isteamuser.h"

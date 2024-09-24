@@ -96,6 +96,9 @@ void ADPGameModeBase::SpawnNewCharacter(APlayerController* NewPlayer)
 	
 	// As we set the default pawn class to ADPCharacter, we can use the following code to relocate an existing character.
 	NewPlayer->GetCharacter()->SetActorLocation(SpawnLocation);
+
+	// For Test ...//
+	// NewPlayer->GetCharacter()->SetOwner(NewPlayer);
 }
 
 void ADPGameModeBase::UpdateMonsterData(ABaseMonsterCharacter* InMonster)
@@ -324,7 +327,7 @@ void ADPGameModeBase::Tick(float delta_time)
 				}
 				Character->SetNameTag();
 			}
-			TimerManager->StartTimer<ADPInGameState>(300.f, &ADPGameModeBase::EndGame, this);
+			TimerManager->StartTimer<ADPInGameState>(PLAY_TIME, &ADPGameModeBase::EndGame, this);
 		}
 		this->ProcessData(delta_time);
 #if EDITOR_MODE != 1
