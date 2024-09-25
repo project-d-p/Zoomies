@@ -80,9 +80,9 @@ void UNetworkFailureManager::OnLevelLoaded(UWorld* LoadedWorld, FOnSessionDestro
 void UNetworkFailureManager::CreateNewSession(UWorld* World)
 {
 	// Online Mode : False
-	// SessionSettings.bIsLANMatch = false;
+	SessionSettings.bIsLANMatch = false;
 	// Lan Mode : True
-	SessionSettings.bIsLANMatch = true;
+	// SessionSettings.bIsLANMatch = true;
 	SessionSettings.NumPublicConnections = 4; // Number of players
 	SessionSettings.bShouldAdvertise = true; // Advertise the session to others
 	SessionSettings.bAllowJoinInProgress = true; // Allow joining in progress
@@ -124,9 +124,9 @@ void UNetworkFailureManager::JoinNewSession(UWorld* World)
 {
 	SessionSearch = MakeShareable(new FOnlineSessionSearch());
 	// Online Mode : False
-	// SessionSearch->bIsLanQuery = false;
+	SessionSearch->bIsLanQuery = false;
 	// Lan Mode : True
-	SessionSearch->bIsLanQuery = true;
+	// SessionSearch->bIsLanQuery = true;
 	SessionSearch->MaxSearchResults = 10;
 	SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 	SessionSearch->QuerySettings.Set(SETTING_MAPNAME, DesiredMapName.ToString(), EOnlineComparisonOp::Equals);
