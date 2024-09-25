@@ -7,12 +7,12 @@ bool UNetworkedDynamicTextureComponent::InitializeTexture(FNetworkedDynamicTextu
 {
 	DynamicMaterialInstance = Initializer.DynamicMaterialInstance;
 	SkeletalMeshComponent = Initializer.SkeletalMeshComponent;
+	PlayerState = Initializer.PlayerState;
+	TextureTransferManager = Initializer.TextureTransferManager;
 	if (!PlayerState || !TextureTransferManager)
 	{
 		return false;	
 	}
-	PlayerState = Initializer.PlayerState;
-	TextureTransferManager = Initializer.TextureTransferManager;
 
 	UDynamicTextureComponent::InitializeTexture();
 	return true;
@@ -73,7 +73,7 @@ FSerializedTextureData UNetworkedDynamicTextureComponent::SerializeTexture(UText
 
 void UNetworkedDynamicTextureComponent::LoadTexture()
 {
-	const FString FilePath = FPaths::ProjectContentDir() + TEXT("customCharacter/customImage.png");
+	const FString FilePath = FPaths::ProjectContentDir() + TEXT("customCharacter/customImage2.png");
 	LoadTextureFromFile(FilePath);
 	UTexture2D* CustomTexture = GetDynamicTexture();
 		
@@ -82,7 +82,7 @@ void UNetworkedDynamicTextureComponent::LoadTexture()
 		FNetLogger::LogError(TEXT("Failed to load texture in 'UNetworkedDynamicTextureComponent'."));
 		return ;
 	}
-		
+
 	if (GetOwner()->HasLocalNetOwner())
 	{
 		HandleLocalNetOwner(CustomTexture);
@@ -114,6 +114,7 @@ void UNetworkedDynamicTextureComponent::HandleRemoteNetOwner()
 {
 	if (!GetOwner()->HasAuthority())
 	{
+		FNetLogger::EditerLog(FColor::Yellow, TEXT("Request %d texture to server"), PlayerState->GetPlayerId());
 		TextureTransferManager->RequestTextureToServer(PlayerState->GetPlayerId());
 	}
 }

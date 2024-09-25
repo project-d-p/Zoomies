@@ -57,8 +57,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "References")
 	class AReturnTriggerVolume* ReturnTriggerVolume; 
 
-	// UFUNCTION()
-	// void OnTransferComplete(const TArray<uint8>& FullData);
 public:	// component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UDPHpActorComponent* hpComponent;
@@ -139,8 +137,7 @@ public:	// component
 	void RemoveSpringArm();
 
 	UNetworkedDynamicTextureComponent* GetDynamicTextureComponent() const { return DynamicTextureComponent; }
-	// bool TryGetPlayerStateAndTransferManager(APlayerState*& OutPS, UTextureTransferManager*& OutTTM);
-	// FSerializedTextureData SerializeTexture(UTexture2D* Texture);
+	
 protected:
 	void ClientNotifyAnimalReturn_Implementation(const FString& player_name);
 	
@@ -153,11 +150,6 @@ private:
 	void OnServerHit(const FHitResult& HitResult);
 
 	/* For Character Custom Texture */
-	// void LoadTexture();
-	// void HandleLocalNetOwner(UTexture2D* CustomTexture, APlayerState* PS, UTextureTransferManager* TTM);
-	// void HandleRemoteNetOwner(APlayerState* PS, UTextureTransferManager* TTM);
-	// UTexture2D* DeserializeTexture(FSerializedTextureData& InData);
-	// void UpdateTexture(UTexture2D* NewTexture);
 	void TryInItializeDynamicTexture();
 	UPROPERTY()
 	UNetworkedDynamicTextureComponent* DynamicTextureComponent;

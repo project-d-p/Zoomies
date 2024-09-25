@@ -16,6 +16,8 @@ void UDataTransferManager::ReceiveDataChunkForServer_Implementation(const FDataC
 
 void UDataTransferManager::SendLargeDataInChunks(FDataTransferParams Params)
 {
+	Params.TransferID = ++DataTransferID;
+	FNetLogger::EditerLog(FColor::Green, TEXT("Send %d Texture."), Params.PlayerId);
 	SendDataChunks(Params);
 }
 
@@ -27,7 +29,8 @@ void UDataTransferManager::SendDataChunks(FDataTransferParams Params)
 	const int32& ChunkSize = Params.ChunkSize;
 	const TArray<uint8>& Data = Params.Data;
 	const int32& PlayerId = Params.PlayerId;
-
+	const int32& TransferID = Params.TransferID;
+	
 	int32 ChunksSentThisTick = 0;
 	for (int32 ChunkIndex = StartChunk; ChunkIndex < TotalChunks; ++ChunkIndex)
 	{
@@ -37,7 +40,7 @@ void UDataTransferManager::SendDataChunks(FDataTransferParams Params)
 		TArray<uint8> DataChunk;
 		DataChunk.Append(&Data[StartIndex], EndIndex - StartIndex);
 
-		FDataChunkInfo ChunkInfo(ChunkIndex, TotalChunks, DataChunk, PlayerId);
+		FDataChunkInfo ChunkInfo(ChunkIndex, TotalChunks, DataChunk, PlayerId, TransferID);
 		UFunction* Function = nullptr;
 
 		if (GetOwner()->HasAuthority())
@@ -107,15 +110,22 @@ void UDataTransferManager::HandleReceivedData(const FDataChunkInfo& DataChunkInf
 	const int32& TotalChunks = DataChunkInfo.TotalChunks;
 	const TArray<uint8>& DataChunk = DataChunkInfo.DataChunk;
 	const int32& Key = DataChunkInfo.Key;
-
+	const int32& TransferID = DataChunkInfo.TransferID;
+	
 	FDataTransferInfo& Data = DataTransferMap.FindOrAdd(Key);
 	TArray<uint8>& ReceivedData = Data.ReceivedDataChunks;
+
+	// if the Next Transfer begin, then cancel the current transfer
+	if (Data.TransferID > TransferID)
+	{
+		return ;
+	}
 	
-	if (/*TotalChunks != ExpectedTotalChunks ||*/ ChunkIndex == 0)
+	if (Data.TransferID < TransferID)
 	{
 		Data.bDataTransferComplete = false;
+		Data.TransferID = TransferID;
 		ResetData(Key);
-		// ExpectedTotalChunks = TotalChunks;
 	}
 	
 	ReceivedData.Append(DataChunk);
@@ -133,5 +143,4 @@ void UDataTransferManager::HandleReceivedData(const FDataChunkInfo& DataChunkInf
 void UDataTransferManager::ResetData(int32 Key)
 {
 	DataTransferMap.Find(Key)->ReceivedDataChunks.Empty();
-	ExpectedTotalChunks = 0;
 }

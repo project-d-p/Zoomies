@@ -19,10 +19,12 @@ struct FDataChunkInfo
 	TArray<uint8> DataChunk = {};
 	UPROPERTY()
 	int32 Key = 0;
+	UPROPERTY()
+	int32 TransferID = 0;
 
 	FDataChunkInfo() = default;
-	FDataChunkInfo(int32 InChunkIndex, int32 InTotalChunks, const TArray<uint8>& InDataChunk, int32 InKey)
-		: ChunkIndex(InChunkIndex), TotalChunks(InTotalChunks), DataChunk(InDataChunk), Key(InKey) {}
+	FDataChunkInfo(int32 InChunkIndex, int32 InTotalChunks, const TArray<uint8>& InDataChunk, int32 InKey, int32 InTransferID)
+		: ChunkIndex(InChunkIndex), TotalChunks(InTotalChunks), DataChunk(InDataChunk), Key(InKey), TransferID(InTransferID) {}
 };
 
 USTRUCT()
@@ -33,6 +35,7 @@ struct FDataTransferInfo
 	// Array to store received data chunks
 	TArray<uint8> ReceivedDataChunks;
 	bool bDataTransferComplete = false;
+	int32 TransferID = 0;
 };
 
 USTRUCT()
@@ -46,6 +49,7 @@ struct FDataTransferParams
 	int32 TotalChunks;
 	int32 StartChunk;
 	int32 ChunksPerTick;
+	int32 TransferID = 0;
 
 	enum ETransferConstants
 	{
@@ -88,5 +92,5 @@ protected:
 	bool CanSendDataWithoutOverflow(const TArray<uint8>& Data, UFunction* Function, const FDataChunkInfo& ChunkInfo);
 	
 	TMap<int32, FDataTransferInfo> DataTransferMap;
-	int32 ExpectedTotalChunks = 0;
+	int32 DataTransferID = 0;
 };
