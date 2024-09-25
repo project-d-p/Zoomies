@@ -84,10 +84,13 @@ void ADPGameModeBase::SpawnNewCharacter(APlayerController* NewPlayer)
 		idx = 0;
 	FVector SpawnLocation = Location[idx++];
 
-	// ADPCharacter* NewCharacter = GetWorld()->SpawnActor<ADPCharacter>(DefaultPawnClass, SpawnLocation, FRotator::ZeroRotator);
-	
+	ADPCharacter* NewCharacter = GetWorld()->SpawnActor<ADPCharacter>(DefaultPawnClass, SpawnLocation, FRotator::ZeroRotator);
+	if (NewPlayer)
+	{
+		NewPlayer->Possess(NewCharacter);
+	}
 	// As we set the default pawn class to ADPCharacter, we can use the following code to relocate an existing character.
-	NewPlayer->GetCharacter()->SetActorLocation(SpawnLocation);
+	// NewPlayer->GetCharacter()->SetActorLocation(SpawnLocation);
 }
 
 void ADPGameModeBase::UpdateMonsterData(ABaseMonsterCharacter* InMonster)

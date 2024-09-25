@@ -267,12 +267,12 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 	if (CurrentSession)
 	{
 		/* For Debugging */
-		if (CurrentSession->RegisteredPlayers.Num() == 2)
-		{
-			bNextHost = false;
-			FNetLogger::EditerLog(FColor::Red, TEXT("You are the Last Player in the Session"));
-			return ;
-		}
+		// if (CurrentSession->RegisteredPlayers.Num() == 2)
+		// {
+		// 	bNextHost = false;
+		// 	FNetLogger::EditerLog(FColor::Red, TEXT("You are the Last Player in the Session"));
+		// 	return ;
+		// }
 		TArray<FUniqueNetIdRepl> RegisteredPlayers;
 		for (int32 i = 0; i < CurrentSession->RegisteredPlayers.Num(); i++)
 		{
