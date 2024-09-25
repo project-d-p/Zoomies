@@ -55,6 +55,15 @@ UIC_MatchLobby::UIC_MatchLobby()
 	{
 		UE_LOG(LogTemp, Error, TEXT("IC_MatchLobby::Failed to load InteractAction"));
 	}
+	
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_ESC
+	(TEXT("/Game/input/ia_ESC.ia_ESC"));
+	if (IA_ESC.Succeeded())
+		ESCAction = IA_ESC.Object;
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("IC_MatchLobby::Failed to load EscAction"));
+	}
 }
 
 void UIC_MatchLobby::Activate(bool bReset)
@@ -98,7 +107,8 @@ void UIC_MatchLobby::BindMatchLobbyActions()
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &UIC_MatchLobby::Move);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &UIC_MatchLobby::Jump);
 		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &UIC_MatchLobby::Rotate);
-		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &UIC_MatchLobby::Interact);
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &UIC_MatchLobby::Interact);
+		EnhancedInputComponent->BindAction(ESCAction, ETriggerEvent::Started, this, &UIC_MatchLobby::ESC);
 		if (!MoveAction || !JumpAction || !RotateAction)
 		{
 			UE_LOG(LogTemp, Error, TEXT("IC_MatchLobby::One or more InputActions are not valid"));
@@ -222,6 +232,18 @@ void UIC_MatchLobby::Interact(const FInputActionValue& value)
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("IC_MatchLobby::Interact function called but canInteract is false."));
+	}
+}
+
+void UIC_MatchLobby::ESC(const FInputActionValue& value)
+{
+	if (PC_MatchLobby != nullptr)
+	{
+		PC_MatchLobby->ShowUI_ESC();
+	}
+	else
+	{
+		UE_LOG( LogTemp, Warning, TEXT("IC_MatchLobby::PlayerController is nullptr."));
 	}
 }
 

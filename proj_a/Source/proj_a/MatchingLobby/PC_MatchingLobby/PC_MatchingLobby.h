@@ -37,6 +37,7 @@ public:
 	UUserWidget* MatchLobbyWidget;
 	
 	void UpdateUIVisibility() const;
+	void ShowUI_ESC() const;
 	void getMatchLobbyUI();
 	void RemoveMatchLobbyUI();
 	

@@ -31,6 +31,7 @@ private:
 	void Jump(const FInputActionValue& value);
 	void Rotate(const FInputActionValue& value);
 	void Interact(const FInputActionValue& value);
+	void ESC(const FInputActionValue& value);
 
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputMappingContext* InputMappingContext;
@@ -43,6 +44,8 @@ private:
 	class UInputAction* RotateAction;
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* InteractAction;
+	UPROPERTY(VisibleAnywhere, Category = Input)
+	class UInputAction* ESCAction;
 	
 protected:
 	APC_MatchingLobby* Get_PC() const;

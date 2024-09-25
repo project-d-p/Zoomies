@@ -260,6 +260,39 @@ void APC_MatchingLobby::UpdateUIVisibility() const
 	}
 }
 
+void APC_MatchingLobby::ShowUI_ESC() const
+{
+	if (MatchLobbyWidget)
+	{
+		APC_MatchingLobby* PC = Cast<APC_MatchingLobby>(GetWorld()->GetFirstPlayerController());
+		UUserWidget* Widget_ESC = Cast<UUserWidget>(PC->GetWidgetByName(MatchLobbyWidget, TEXT("WBP_Esc_Menu")));
+
+		if (Widget_ESC)
+		{
+			ESlateVisibility CurrentVisibility = Widget_ESC->GetVisibility();
+
+			if (CurrentVisibility == ESlateVisibility::Visible)
+			{
+				Widget_ESC->SetVisibility(ESlateVisibility::Hidden);
+				UE_LOG(LogTemp, Log, TEXT("UpdateUIVisibility: WBP_Esc_Menu visibility set to Hidden."));
+			}
+			else
+			{
+				Widget_ESC->SetVisibility(ESlateVisibility::Visible);
+				UE_LOG(LogTemp, Log, TEXT("UpdateUIVisibility: WBP_Esc_Menu visibility set to Visible."));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("UpdateUIVisibility: WBP_Esc_Menu not found."));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UpdateUIVisibility: MatchLobbyWidget is nullptr."));
+	}
+}
+
 void APC_MatchingLobby::RemoveMatchLobbyUI()
 {
 	if (MatchLobbyWidget != nullptr)
