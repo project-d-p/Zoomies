@@ -68,6 +68,11 @@ USteamSocketP2P::~USteamSocketP2P()
 	}
 }
 
+void USteamSocketP2P::BeginDestroy()
+{
+	Super::BeginDestroy();
+}
+
 CSteamID USteamSocketP2P::GetHostSteamID()
 {
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();

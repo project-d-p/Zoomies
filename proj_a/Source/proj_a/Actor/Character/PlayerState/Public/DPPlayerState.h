@@ -19,6 +19,7 @@ public:
 	UFUNCTION()
 	EPlayerJob GetPlayerJob() const;
 
+	void SetPlayerRandomJob();
 	void SetFinalScoreData(const FFinalScoreData& InFinalScoreData) { FinalScoreData = InFinalScoreData; }
 	const FFinalScoreData& GetFinalScoreData() const { return FinalScoreData; }
 
@@ -31,16 +32,18 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerSetRank(int InRank);
 
+	UPROPERTY(ReplicatedUsing = OnRep_Job, BlueprintReadWrite, Category = "PlayerJob")
+	EPlayerJob PlayerJob;
+
+	UFUNCTION()
+	void OnRep_Job();
 protected:
 	virtual void CopyProperties(APlayerState* PlayerState) override;
 	
 private:
 	UPROPERTY()
 	UPlayerScoreComp* PlayerScoreComp = nullptr;
-
-	UPROPERTY(Replicated)
-	EPlayerJob PlayerJob = EPlayerJob::JOB_ARCHAEOLOGIST;
-
+	
 	FFinalScoreData FinalScoreData;
 
 	virtual void BeginPlay() override;

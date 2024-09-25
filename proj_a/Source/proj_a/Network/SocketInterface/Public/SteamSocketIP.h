@@ -13,6 +13,10 @@ public:
 	virtual void ActivateServer() override;
 	virtual void ActivateClient() override;
 	virtual ~USteamSocketIP();
+
+protected:
+	virtual void BeginDestroy() override;
+	
 private:
 	enum
 	{

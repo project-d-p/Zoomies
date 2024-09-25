@@ -41,4 +41,9 @@ void UISocketInterface::SetGameStartCallback(int NumOfPlayers, const TFunction<v
 {
 }
 
+void UISocketInterface::BeginDestroy()
+{
+	Super::BeginDestroy();
+}
+
 

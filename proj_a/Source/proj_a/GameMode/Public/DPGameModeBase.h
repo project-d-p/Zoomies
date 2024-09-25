@@ -142,4 +142,5 @@ private:
 	/* For Monster Movement Manage (Interval & Process) */
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	TMap<ABaseMonsterCharacter*, FMonsterOptimizationData> MonsterOptimizationData;
+	bool bWallDisappear = false;
 };

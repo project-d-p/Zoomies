@@ -39,14 +39,6 @@ ADPGameModeBase::ADPGameModeBase()
 #else
 	NetworkManager = CreateDefaultSubobject<UServerNetworkManager>(TEXT("NetworkManager"));
 #endif	
-
-	monster_controllers_.resize(NUM_OF_MAX_MONSTERS, nullptr);
-	empty_monster_slots_.reserve(NUM_OF_MAX_MONSTERS);
-
-	for (int i = 0; i < NUM_OF_MAX_MONSTERS; i++)
-	{
-		empty_monster_slots_.push_back(i);
-	}
 }
 
 void ADPGameModeBase::OnGameStart()
@@ -203,6 +195,7 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 	ADPPlayerState* player_state = Cast<ADPPlayerState>(newPlayer->PlayerState);
 	check(player_state);
 
+#if LAN_MODE || EDITOR_MODE
 	FString name = player_state->GetPlayerName();
 	std::string key(TCHAR_TO_UTF8(*name));
 	
@@ -211,10 +204,21 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 		player_state->SetPlayerName(name + "1");
 		key = std::string(TCHAR_TO_UTF8(*player_state->GetPlayerName()));
 	}
+#else
+	// Online Mode : Steam ID
+	std::string key(TCHAR_TO_UTF8(*player_state->GetUniqueId()->ToString()));
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Player ID : %s"), *FString(key.c_str()));
+#endif
+	
 	player_controllers_[key] = Cast<ADPPlayerController>(newPlayer);
 	player_controllers_[key]->SwitchLevelComponent(ELevelComponentType::MAIN);
 
-	SpawnNewCharacter(newPlayer); 
+	// Spawn Character in New Place
+	SpawnNewCharacter(newPlayer);
+	
+	// Set Player Random Job
+	player_state->SetPlayerRandomJob();
+	
 	if (!newPlayer->IsLocalController())
 	{
 		player_controllers_[key]->ConnectToServer(ELevelComponentType::MAIN);
@@ -245,6 +249,14 @@ void ADPGameModeBase::CheckAllPlayersConnected()
 
 void ADPGameModeBase::StartGame()
 {
+	ADPInGameState* GS = GetGameState<ADPInGameState>();
+	if (GS)
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([GS]() {
+			GS->MulticastPlayerJob();
+		}), 5.0f, false); 
+	}
 }
 
 void ADPGameModeBase::Logout(AController* Exiting)
@@ -259,8 +271,13 @@ void ADPGameModeBase::Logout(AController* Exiting)
 	{
 		return ;
 	}
+	// 여기 고쳐야 함! 이름으로 되어 있음!! SteamID로 바뀌어야 함
+#if LAN_MODE || EDITOR_MODE
 	std::string key(TCHAR_TO_UTF8(*controller->PlayerState->GetPlayerName()));
-	if (player_controllers_.find(key) != player_controllers_.end())
+#else
+	std::string key(TCHAR_TO_UTF8(*controller->PlayerState->GetUniqueId()->ToString()));
+#endif
+	if (player_controllers_.contains(key))
 	{
 		player_controllers_.erase(key);
 	}
@@ -274,7 +291,28 @@ void ADPGameModeBase::Logout(AController* Exiting)
 void ADPGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+#if EDITOR_MODE
+	NetworkManager->Initialize(ENetworkTypeZoomies::NONE);
+#elif LAN_MODE
+	// NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
+	NetworkManager->Initialize(ENetworkTypeZoomies::ENGINE_SOCKET);
+#else
+	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
+#endif
 	
+	NetworkManager->SetGameStartCallback(NUM_OF_MAX_CLIENTS, [this]()
+	{
+		this->OnGameStart();
+	});
+
+	monster_controllers_.resize(NUM_OF_MAX_MONSTERS, nullptr);
+	empty_monster_slots_.reserve(NUM_OF_MAX_MONSTERS);
+
+	for (int i = 0; i < NUM_OF_MAX_MONSTERS; i++)
+	{
+		empty_monster_slots_.push_back(i);
+	}
 	BlockingVolume = GetWorld()->SpawnActor<ABlockingBoxVolume>(ABlockingBoxVolume::StaticClass(), FVector(0.0f, 0.0f, 0.0f), FRotator(0.0f, 0.0f, 0.0f));
 }
 
@@ -288,19 +326,6 @@ void ADPGameModeBase::EndGame()
 void ADPGameModeBase::StartPlay()
 {
 	Super::StartPlay();
-
-#if EDITOR_MODE
-	NetworkManager->Initialize(ENetworkTypeZoomies::NONE);
-#elif LAN_MODE
-	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
-#else
-	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
-#endif
-	
-	NetworkManager->SetGameStartCallback(NUM_OF_MAX_CLIENTS, [this]()
-	{
-		this->OnGameStart();
-	});
 }
 
 void ADPGameModeBase::Tick(float delta_time)
@@ -312,7 +337,7 @@ void ADPGameModeBase::Tick(float delta_time)
 #endif
 		if (bTimeSet == false)
 		{
-			BlockingVolume->DeactiveBlockingVolume();
+			BlockingVolume->DeactiveBlockingVolume(bWallDisappear);
 			bTimeSet = true;
 			for (auto& pair: player_controllers_)
 			{
@@ -324,7 +349,7 @@ void ADPGameModeBase::Tick(float delta_time)
 				}
 				Character->SetNameTag();
 			}
-			TimerManager->StartTimer<ADPInGameState>(300.f, &ADPGameModeBase::EndGame, this);
+			TimerManager->StartTimer<ADPInGameState>(PLAY_TIME, &ADPGameModeBase::EndGame, this);
 		}
 		this->ProcessData(delta_time);
 #if EDITOR_MODE != 1
@@ -344,14 +369,21 @@ void ADPGameModeBase::ProcessData(float delta_time)
 {
 	message_queue_ = NetworkManager->GetRecievedMessages();
 
-	this->SpawnMonsters(delta_time);
-	this->MonsterMoveSimulate(delta_time);
+	if (bWallDisappear)
+	{
+		this->SpawnMonsters(delta_time);
+		this->MonsterMoveSimulate(delta_time);
+	}
 	while (!this->message_queue_.empty())
 	{
 		Message message = this->message_queue_.front();
 		this->message_queue_.pop();
 		ADPPlayerController* controller = this->player_controllers_[message.player_id()];
-		message_handler_.HandleMessage(message)->ExecuteIfBound(controller, message, delta_time);
+		FServerMessageDelegate* delegate = this->message_handler_.HandleMessage(message);
+		if (delegate)
+		{
+			delegate->ExecuteIfBound(controller, message, delta_time);
+		}
 	}
 	this->SimulateAiming();
 	this->SimulateGunFire();

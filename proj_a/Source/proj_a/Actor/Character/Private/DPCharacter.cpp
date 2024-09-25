@@ -210,6 +210,14 @@ ADPCharacter::ADPCharacter()
 			LobbyInfoWidgetComponent->SetRelativeRotation(FRotator(-180, -90, 180));
 		}
 	}
+
+	// Crown
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> CrownMesh
+	(TEXT("/Game/model/objects/crown/crown1/crown_merged.crown_merged"));
+	if (CrownMesh.Succeeded())
+	{
+		Crown = CrownMesh.Object;
+	}
 }
 
 ADPCharacter::~ADPCharacter()
@@ -683,4 +691,19 @@ void ADPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ADPCharacter, bIsStunned);
+}
+
+void ADPCharacter::SetCrownMesh_Implementation()
+{
+	UStaticMeshComponent* CrownMeshComponent = NewObject<UStaticMeshComponent>(this);
+	
+	CrownMeshComponent->SetStaticMesh(Crown);
+	CrownMeshComponent->SetRelativeLocation(FVector(0, 0, 100));
+	CrownMeshComponent->SetRelativeRotation(FRotator(0, -90, -90));
+	CrownMeshComponent->SetWorldScale3D(FVector(0.5f, 0.5f, 0.5f));
+	// CrownMeshComponent->SetupAttachment(RootComponent);
+
+	CrownMeshComponent->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("MonsterSlot_0"));
+	CrownMeshComponent->RegisterComponent();
+	CrownMeshComponent->SetVisibility(true);
 }
