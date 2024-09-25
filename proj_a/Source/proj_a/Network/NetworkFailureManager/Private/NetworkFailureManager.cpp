@@ -35,6 +35,7 @@ void UNetworkFailureManager::DestroyPreviousSession(FOnSessionDestroyedCallback 
 {
 	if (SessionInterface.IsValid())
 	{
+		
 		OnDestroyCompleteDelegateHandle = SessionInterface->OnDestroySessionCompleteDelegates.AddLambda([this, OnSessionDestroyedCallback](FName SessionName, bool bWasSuccessful)
 		{
 			this->SessionInterface->OnDestroySessionCompleteDelegates.Remove(this->OnDestroyCompleteDelegateHandle);
@@ -43,6 +44,7 @@ void UNetworkFailureManager::DestroyPreviousSession(FOnSessionDestroyedCallback 
 				const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
 				if (GameMapsSettings)
 				{
+					
 					FName DefaultLevel = FName(*GameMapsSettings->GetGameDefaultMap());
 					FNetLogger::EditerLog(FColor::Green, TEXT("Default Level: %s"), *DefaultLevel.ToString());
 					FNetLogger::LogError(TEXT("Default Level: %s"), *DefaultLevel.ToString());
@@ -50,9 +52,18 @@ void UNetworkFailureManager::DestroyPreviousSession(FOnSessionDestroyedCallback 
 					FString DefaultLevelWithOption = DefaultLevel.ToString() + TEXT("?closed");
 					FName NewLevelName = FName(*DefaultLevelWithOption);
 				
-					FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnLevelLoaded, OnSessionDestroyedCallback);
-				
-					UGameplayStatics::OpenLevel(this, NewLevelName);
+					UWorld* World = this->GetWorld();
+					if (World)
+					{
+						FNetLogger::EditerLog(FColor::Cyan, TEXT("Destroy Session Complete CallBack"));
+						(this->*OnSessionDestroyedCallback)(World);
+					}
+					else
+					{
+						FNetLogger::EditerLog(FColor::Cyan, TEXT("Cannt Get World"));
+						FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnLevelLoaded, OnSessionDestroyedCallback);
+						UGameplayStatics::OpenLevel(this, NewLevelName, true);
+					}
 				}
 			}
 			else
