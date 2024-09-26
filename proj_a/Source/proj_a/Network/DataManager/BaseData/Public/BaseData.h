@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "BaseData.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDataChanged);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDataChanged, UBaseData*, Data);
 
 UCLASS()
 class UBaseData : public UObject

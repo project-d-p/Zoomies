@@ -6,7 +6,7 @@ void UBaseData::InitializeData_Implementation()
 	DataID = FGuid::NewGuid().ToString();
 	DataVersion = 1;
 	
-	OnDataChanged.Broadcast();
+	OnDataChanged.Broadcast(this);
 }
 
 bool UBaseData::ValidateData_Implementation()
@@ -19,7 +19,7 @@ void UBaseData::ResetData_Implementation()
 	DataID = TEXT("");
 	DataVersion = 1;
 
-	OnDataChanged.Broadcast();
+	OnDataChanged.Broadcast(this);
 }
 
 void UBaseData::SaveData_Implementation()
@@ -49,7 +49,7 @@ FName UBaseData::GetDataType() const
 
 void UBaseData::OnDataChangedBroadcast()
 {
-	OnDataChanged.Broadcast();
+	OnDataChanged.Broadcast(this);
 }
 
 void UBaseData::CloneData(UBaseData* NewData)
