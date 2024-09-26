@@ -17,12 +17,7 @@ void UGI_Zoomies::Init()
 {
 	Super::Init();
 	CheckSteamInit();
-	if (session_interface_.IsValid())
-	{
-		session_interface_->AddOnSessionUserInviteAcceptedDelegate_Handle(
-			FOnSessionUserInviteAcceptedDelegate::CreateUObject(this, &UGI_Zoomies::OnInviteAccepted)
-		);
-	}
+
 	#if EDITOR_MODE
 		bIsOnline = false;
 	#elif LAN_MODE
@@ -501,6 +496,9 @@ void UGI_Zoomies::InitOnlineSubsystemSteam()
 						Log,
 						TEXT("Online Subsystem steam SUCCESS || SubsystemName: %s"),
 						*online_subsystem_->GetSubsystemName().ToString());
+				session_interface_->AddOnSessionUserInviteAcceptedDelegate_Handle(
+					FOnSessionUserInviteAcceptedDelegate::CreateUObject(this, &UGI_Zoomies::OnInviteAccepted)
+				);
 			}
 		}
 	}
