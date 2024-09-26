@@ -47,6 +47,12 @@ void ADPInGameState::MulticastPlayerJob_Implementation() const
 void ADPInGameState::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ADPPlayerController* PlayerController = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (PlayerController)
+	{
+		PlayerController->SwitchLevelComponent(ELevelComponentType::MAIN);
+	}
 }
 
 void ADPInGameState::AddPlayerState(APlayerState* PlayerState)

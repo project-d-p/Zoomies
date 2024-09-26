@@ -10,18 +10,13 @@ class UBaseData : public UObject
 {
 	GENERATED_BODY()
 public:
-	UBaseData();
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	FString DataID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	int32 DataVersion;
 
-	UPROPERTY(Transient)
-	bool bIsDirty;
-
-	UPROPERTY(BlueprintAssignable, Category = "Data")
+	UPROPERTY(BlueprintAssignable, VisibleAnywhere, BlueprintCallable, Category = "Data")
 	FOnDataChanged OnDataChanged;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Data")
@@ -52,5 +47,6 @@ public:
 	virtual FName GetDataType() const;
 
 protected:
-	virtual void MarkDirty();
+	virtual void OnDataChangedBroadcast();
+	void CloneData(UBaseData* NewData);
 };

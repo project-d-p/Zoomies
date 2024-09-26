@@ -8,11 +8,11 @@
 //     1       |    0     : Editor
 
 #ifndef EDITOR_MODE
-	#define EDITOR_MODE 0
+	#define EDITOR_MODE 1
 #endif
 
 #ifndef LAN_MODE
-	#define LAN_MODE 1
+	#define LAN_MODE 0
 #endif
 
 namespace Zoomies

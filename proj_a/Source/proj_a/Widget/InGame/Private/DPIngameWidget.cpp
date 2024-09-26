@@ -45,3 +45,8 @@ void UDPIngameWidget::NativeConstruct()
 		ScoreUI_Private->InitScoreUiPrivate(PrivateScoreUiInitializer);
 	}
 }
+
+void UDPIngameWidget::OnScoreChanged()
+{
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("OnScoreChanged"));
+}

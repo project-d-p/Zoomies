@@ -1,9 +1,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-// #include "PlayerScoreComp.h"
+#include "PlayerScoreComp.h"
 #include "GameFramework/PlayerState.h"
 #include "proj_a/Component/InGame/Score/Types/ScoreTypes.h"
+#include "PlayerScoreData.h"
 #include "DPPlayerState.generated.h"
 
 UCLASS()
@@ -23,20 +24,14 @@ public:
 	void SetFinalScoreData(const FFinalScoreData& InFinalScoreData) { FinalScoreData = InFinalScoreData; }
 	const FFinalScoreData& GetFinalScoreData() const { return FinalScoreData; }
 
-	UPROPERTY(ReplicatedUsing = OnRep_Rank, BlueprintReadWrite, Category = "PlayerRank")
+	UPROPERTY(Replicated, BlueprintReadWrite, Category = "PlayerRank")
 	int Rank;
-
-	UFUNCTION()
-	void OnRep_Rank();
 
 	UFUNCTION(Server, Reliable)
 	void ServerSetRank(int InRank);
 
-	UPROPERTY(ReplicatedUsing = OnRep_Job, BlueprintReadWrite, Category = "PlayerJob")
+	UPROPERTY(Replicated, BlueprintReadWrite, Category = "PlayerJob")
 	EPlayerJob PlayerJob;
-
-	UFUNCTION()
-	void OnRep_Job();
 protected:
 	virtual void CopyProperties(APlayerState* PlayerState) override;
 	
@@ -45,6 +40,7 @@ private:
 	UPlayerScoreComp* PlayerScoreComp = nullptr;
 	
 	FFinalScoreData FinalScoreData;
+	UPlayerScoreData* PlayerScoreData = nullptr;
 
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

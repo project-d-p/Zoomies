@@ -22,7 +22,7 @@ ADPGameModeBase::ADPGameModeBase()
 	bReplicates = true;
 	PrimaryActorTick.bCanEverTick = true;
 	
-	DefaultPawnClass = ADPCharacter::StaticClass();
+	DefaultPawnClass = nullptr;
 	PlayerControllerClass = ADPPlayerController::StaticClass();
 	PlayerStateClass = ADPPlayerState::StaticClass();
 	GameStateClass = ADPInGameState::StaticClass();
@@ -84,7 +84,7 @@ void ADPGameModeBase::SpawnNewCharacter(APlayerController* NewPlayer)
 		idx = 0;
 	FVector SpawnLocation = Location[idx++];
 
-	ADPCharacter* NewCharacter = GetWorld()->SpawnActor<ADPCharacter>(DefaultPawnClass, SpawnLocation, FRotator::ZeroRotator);
+	ADPCharacter* NewCharacter = GetWorld()->SpawnActor<ADPCharacter>(ADPCharacter::StaticClass(), SpawnLocation, FRotator::ZeroRotator);
 	if (NewPlayer)
 	{
 		NewPlayer->Possess(NewCharacter);

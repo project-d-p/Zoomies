@@ -21,17 +21,41 @@ UMainLevelComponent::UMainLevelComponent()
 	SoundComponent = CreateDefaultSubobject<USoundComponent>(TEXT("MainSoundComponent"));
 	CatchRay = CreateDefaultSubobject<UHitScan>(TEXT("CatchRay"));
 
+	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetBPClass(TEXT("/Game/widget/widget_ingame.widget_ingame_C"));
+	if (WidgetBPClass.Succeeded())
+	{
+		WidgetClass = WidgetBPClass.Class;
+	}
+
 	InputComponent->SetLevelComponent(this);
 }
 
 void UMainLevelComponent::Activate(bool bReset)
 {
 	Super::Activate(bReset);
+
+	if (GetPlayerController()->IsLocalController())
+	{
+		if (!InGameWidget)
+		{
+			InGameWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+			if (InGameWidget)
+			{
+				InGameWidget->AddToViewport();
+			}
+		}
+	}
 }
 
 void UMainLevelComponent::Deactivate()
 {
 	Super::Deactivate();
+
+	if (InGameWidget)
+	{
+		InGameWidget->RemoveFromParent();
+		InGameWidget = nullptr;		
+	}
 }
 
 void UMainLevelComponent::BeginPlay()
@@ -382,4 +406,9 @@ void UMainLevelComponent::SimulateAim(UANetworkManager* NetworkManager)
 		}
 		NetworkManager->SendData(aimState);
 	}
+}
+
+UUserWidget* UMainLevelComponent::GetInGameWidget() const
+{
+	return InGameWidget;
 }

@@ -1,10 +1,13 @@
 #include "DPPlayerState.h"
 
 #include "DPInGameState.h"
+#include "DPIngameWidget.h"
+#include "DPPlayerController.h"
 #include "FNetLogger.h"
 #include "JudgePlayerState.h"
 #include "PlayerName.h"
 #include "PlayerScoreComp.h"
+#include "PlayerScoreData.h"
 #include "Net/UnrealNetwork.h"
 
 ADPPlayerState::ADPPlayerState()
@@ -12,6 +15,7 @@ ADPPlayerState::ADPPlayerState()
 	bReplicates = true;
 	
 	PlayerScoreComp = CreateDefaultSubobject<UPlayerScoreComp>(TEXT("PlayerScore"));
+	PlayerScoreData = NewObject<UPlayerScoreData>(this, TEXT("PlayerScoreData"));
 	FString PlayerName = FGuid::NewGuid().ToString();
 	APlayerState::SetPlayerName(PlayerName);
 }
@@ -24,34 +28,6 @@ UPlayerScoreComp* ADPPlayerState::GetPlayerScoreComp() const
 EPlayerJob ADPPlayerState::GetPlayerJob() const
 {
 	return PlayerJob;
-}
-
-void ADPPlayerState::OnRep_Rank()
-{
-}
-
-void ADPPlayerState::OnRep_Job()
-{
-	// switch (PlayerJob)
-	// {
-	// case EPlayerJob::JOB_ARCHAEOLOGIST:
-	// 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Job : JOB_ARCHAEOLOGIST"));
-	// 	break;
-	// case EPlayerJob::JOB_POACHER:
-	// 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Job : JOB_POACHER"));
-	// 	break;
-	// case EPlayerJob::JOB_RINGMASTER:
-	// 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Job : JOB_RINGMASTER"));
-	// 	break;
-	// case EPlayerJob::JOB_TERRORIST:
-	// 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Job : JOB_TERRORIST"));
-	// 	break;
-	// case EPlayerJob::JOB_ENVIRONMENTALIST:
-	// 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Job : JOB_ENVIRONMENTALIST"));
-	// 	break;
-	// default:
-	// 	break;
-	// }
 }
 
 void ADPPlayerState::CopyProperties(APlayerState* PlayerState)
@@ -68,13 +44,22 @@ void ADPPlayerState::CopyProperties(APlayerState* PlayerState)
 void ADPPlayerState::ServerSetRank_Implementation(int InRank)
 {
 	Rank = InRank;
-
-	OnRep_Rank();
 }
 
 void ADPPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ADPPlayerController* LocalPC = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (LocalPC)
+	{
+		UMainLevelComponent* MainLevelComponent = Cast<UMainLevelComponent>(LocalPC->GetLevelComponent());
+		if (MainLevelComponent)
+		{
+			UDPIngameWidget* InGameWidget = Cast<UDPIngameWidget>(MainLevelComponent->GetInGameWidget());
+			PlayerScoreData->OnDataChanged.AddDynamic(InGameWidget, &UDPIngameWidget::OnScoreChanged);
+		}
+	}
 }
 
 void ADPPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -88,24 +73,4 @@ void ADPPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 void ADPPlayerState::SetPlayerRandomJob()
 {
 	PlayerJob = static_cast<EPlayerJob>(FMath::RandRange(0, static_cast<int>(EPlayerJob::JOB_MAX) - 1));
-	// switch (PlayerJob)
-	// {
-	// case EPlayerJob::JOB_ARCHAEOLOGIST:
-	// 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Job : JOB_ARCHAEOLOGIST"));
-	// 	break;
-	// case EPlayerJob::JOB_POACHER:
-	// 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Job : JOB_POACHER"));
-	// 	break;
-	// case EPlayerJob::JOB_RINGMASTER:
-	// 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Job : JOB_RINGMASTER"));
-	// 	break;
-	// case EPlayerJob::JOB_TERRORIST:
-	// 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Job : JOB_TERRORIST"));
-	// 	break;
-	// case EPlayerJob::JOB_ENVIRONMENTALIST:
-	// 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Job : JOB_ENVIRONMENTALIST"));
-	// 	break;
-	// default:
-	// 	break;
-	// }
 }

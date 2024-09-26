@@ -1,17 +1,11 @@
 #include "BaseData.h"
 #include "UObject/ConstructorHelpers.h"
 
-UBaseData::UBaseData()
-	: DataID(TEXT("")), DataVersion(1), bIsDirty(false)
-{
-}
-
 void UBaseData::InitializeData_Implementation()
 {
 	DataID = FGuid::NewGuid().ToString();
 	DataVersion = 1;
-	bIsDirty = false;
-
+	
 	OnDataChanged.Broadcast();
 }
 
@@ -24,7 +18,6 @@ void UBaseData::ResetData_Implementation()
 {
 	DataID = TEXT("");
 	DataVersion = 1;
-	bIsDirty = false;
 
 	OnDataChanged.Broadcast();
 }
@@ -44,7 +37,6 @@ UBaseData* UBaseData::Clone_Implementation()
 	UBaseData* NewData = NewObject<UBaseData>(GetOuter(), GetClass());
 	NewData->DataID = DataID;
 	NewData->DataVersion = DataVersion;
-	NewData->bIsDirty = bIsDirty;
 
 	// Clone any additional data members on derived classes
 	return NewData;
@@ -55,8 +47,13 @@ FName UBaseData::GetDataType() const
 	return GetClass()->GetFName();
 }
 
-void UBaseData::MarkDirty()
+void UBaseData::OnDataChangedBroadcast()
 {
-	bIsDirty = true;
 	OnDataChanged.Broadcast();
+}
+
+void UBaseData::CloneData(UBaseData* NewData)
+{
+	NewData->DataID = DataID;
+	NewData->DataVersion = DataVersion;
 }
