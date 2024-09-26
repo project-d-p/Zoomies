@@ -21,7 +21,7 @@ UNetworkFailureManager::UNetworkFailureManager()
 
 void UNetworkFailureManager::Init()
 {
-	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
+	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(/*STEAM_SUBSYSTEM*/);
 	this->SessionInterface = OnlineSubsystem->GetSessionInterface();
 
 	if (GEngine)
@@ -35,7 +35,6 @@ void UNetworkFailureManager::DestroyPreviousSession(FOnSessionDestroyedCallback 
 {
 	if (SessionInterface.IsValid())
 	{
-		
 		OnDestroyCompleteDelegateHandle = SessionInterface->OnDestroySessionCompleteDelegates.AddLambda([this, OnSessionDestroyedCallback](FName SessionName, bool bWasSuccessful)
 		{
 			this->SessionInterface->OnDestroySessionCompleteDelegates.Remove(this->OnDestroyCompleteDelegateHandle);
@@ -52,7 +51,7 @@ void UNetworkFailureManager::DestroyPreviousSession(FOnSessionDestroyedCallback 
 					FString DefaultLevelWithOption = DefaultLevel.ToString() + TEXT("?closed");
 					FName NewLevelName = FName(*DefaultLevelWithOption);
 				
-					UWorld* World = this->GetWorld();
+					UWorld* World = this->GetOuter()->GetWorld();
 					if (World)
 					{
 						FNetLogger::EditerLog(FColor::Cyan, TEXT("Destroy Session Complete CallBack"));
@@ -110,7 +109,7 @@ void UNetworkFailureManager::CreateNewSession(UWorld* World)
 	
 	OnCreateCompleteDelegateHandle = SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UNetworkFailureManager::CreateSessionComplete, World);
 
-	const ULocalPlayer* LocalPlayer = World->GetFirstLocalPlayerFromController();
+	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 	SessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, SessionSettings);
 }
 
@@ -123,7 +122,7 @@ void UNetworkFailureManager::CreateSessionComplete(FName SessionName, bool bWasS
 
 		FString MapName = DesiredMapName.ToString();
 		FString TravelURL = FString::Printf(TEXT("%s?listen"), *MapName);
-		World->ServerTravel(TravelURL, true);
+		GetWorld()->ServerTravel(TravelURL, true);
 	}
 	else
 	{
@@ -149,7 +148,7 @@ void UNetworkFailureManager::JoinNewSession(UWorld* World)
 
 	OnFindCompleteDelegateHandle = SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UNetworkFailureManager::FindSessionComplete, World);
 
-	const ULocalPlayer* LocalPlayer = World->GetFirstLocalPlayerFromController();
+	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 	SessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), SessionSearch.ToSharedRef());
 }
 
@@ -183,7 +182,7 @@ void UNetworkFailureManager::JoinSession(const FOnlineSessionSearchResult& Searc
 {
 	FNetLogger::EditerLog(FColor::Green, TEXT("Joining Session..."));
 	OnJoinCompleteDelegateHandle = SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UNetworkFailureManager::JoinSessionComplete, World);
-	const ULocalPlayer* LocalPlayer = World->GetFirstLocalPlayerFromController();
+	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 	SessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, SearchResult);
 }
 
@@ -193,7 +192,7 @@ void UNetworkFailureManager::JoinSessionComplete(FName SessionName, EOnJoinSessi
 	if (Result == EOnJoinSessionCompleteResult::Success)
 	{
 		FNetLogger::EditerLog(FColor::Green, TEXT("Joined Session Successfully"));
-		APlayerController* PlayerController = World->GetFirstPlayerController();
+		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 		if (PlayerController)
 		{
 			FString ConnectString;
