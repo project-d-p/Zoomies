@@ -499,6 +499,7 @@ void UGI_Zoomies::InitOnlineSubsystemSteam()
 				session_interface_->AddOnSessionUserInviteAcceptedDelegate_Handle(
 					FOnSessionUserInviteAcceptedDelegate::CreateUObject(this, &UGI_Zoomies::OnInviteAccepted)
 				);
+				UE_LOG(LogTemp, Log, TEXT("Online Subsystem steam init success"));
 			}
 		}
 	}
