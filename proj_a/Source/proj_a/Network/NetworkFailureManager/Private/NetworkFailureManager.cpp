@@ -21,7 +21,7 @@ UNetworkFailureManager::UNetworkFailureManager()
 
 void UNetworkFailureManager::Init()
 {
-	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
+	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(/*STEAM_SUBSYSTEM*/);
 	this->SessionInterface = OnlineSubsystem->GetSessionInterface();
 
 	if (GEngine)
