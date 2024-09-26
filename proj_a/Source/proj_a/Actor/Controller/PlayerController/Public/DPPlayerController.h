@@ -19,6 +19,7 @@ class PROJ_A_API ADPPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
+	void InitializeLevelComponent();
 	ADPPlayerController();
 	virtual ~ADPPlayerController() override;
 	
@@ -35,6 +36,7 @@ public:
 	/* Get Level Component */
 	UFUNCTION(BlueprintCallable)
 	UBaseLevelComponent* GetLevelComponent() const;
+	UBaseLevelComponent* GetLevelComponent(ELevelComponentType Type) const;
 
 	UPlayerScoreComp* GetScoreManagerComponent() const;
 	UPrivateScoreManager* GetPrivateScoreManagerComponent() const;

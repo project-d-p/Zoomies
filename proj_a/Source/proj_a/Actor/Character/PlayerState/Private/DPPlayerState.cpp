@@ -30,6 +30,11 @@ EPlayerJob ADPPlayerState::GetPlayerJob() const
 	return PlayerJob;
 }
 
+void ADPPlayerState::IncreaseScore(const TArray<EAnimal>& InAnimals)
+{
+	PlayerScoreData->IncreaseScore(PlayerJob, InAnimals);
+}
+
 void ADPPlayerState::CopyProperties(APlayerState* PlayerState)
 {
 	Super::CopyProperties(PlayerState);
@@ -53,12 +58,21 @@ void ADPPlayerState::BeginPlay()
 	ADPPlayerController* LocalPC = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
 	if (LocalPC)
 	{
-		UMainLevelComponent* MainLevelComponent = Cast<UMainLevelComponent>(LocalPC->GetLevelComponent());
+		UMainLevelComponent* MainLevelComponent = Cast<UMainLevelComponent>(LocalPC->GetLevelComponent(ELevelComponentType::MAIN));
 		if (MainLevelComponent)
 		{
 			UDPIngameWidget* InGameWidget = Cast<UDPIngameWidget>(MainLevelComponent->GetInGameWidget());
 			PlayerScoreData->OnDataChanged.AddDynamic(InGameWidget, &UDPIngameWidget::OnScoreChanged);
+			PlayerScoreData->TestBroadcast();
 		}
+		else
+		{
+			FNetLogger::EditerLog(FColor::Cyan, TEXT("MainLevelComponent is nullptr"));
+		}
+	}
+	else
+	{
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("LocalPC is nullptr"));
 	}
 }
 

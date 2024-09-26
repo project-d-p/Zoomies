@@ -28,22 +28,23 @@ UMainLevelComponent::UMainLevelComponent()
 	}
 
 	InputComponent->SetLevelComponent(this);
+
 }
 
 void UMainLevelComponent::Activate(bool bReset)
 {
 	Super::Activate(bReset);
 
-	if (GetPlayerController()->IsLocalController())
+	if (Cast<APlayerController>(GetOwner())->IsLocalPlayerController())
 	{
 		if (!InGameWidget)
 		{
 			InGameWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
-			if (InGameWidget)
-			{
-				InGameWidget->AddToViewport();
-			}
 		}
+	}
+	if (InGameWidget)
+	{
+		InGameWidget->AddToViewport();
 	}
 }
 
@@ -61,6 +62,13 @@ void UMainLevelComponent::Deactivate()
 void UMainLevelComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	if (Cast<APlayerController>(GetOwner())->IsLocalPlayerController())
+	{
+		if (!InGameWidget)
+		{
+			InGameWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+		}
+	}
 }
 
 void UMainLevelComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -202,36 +210,28 @@ void UMainLevelComponent::ServerNotifyReturnAnimals_Implementation()
 	ADPPlayerController* PlayerController = GetPlayerController();
 	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
 	if (!Character) return;
-	// ���� ���� ����
+	
 	ADPPlayerState* PlayerState = Cast<ADPPlayerState>(PlayerController->PlayerState);
 	if (!PlayerState)
 	{
 		return ;
 	}
-	
-	// Ŭ���̾�Ʈ�� ���� ��ȯ ó���� ó���Ѵ�.
+
 	TArray<EAnimal> animals = Character->ReturnMonsters();
-
-	PlayerController->GetPrivateScoreManagerComponent()->IncreasePrivatePlayerScoreByServer(PlayerState->GetPlayerJob(), animals);
-
-	uint32 score = PlayerController->GetPrivateScoreManagerComponent()->GetPrivatePlayerScore();
-	FString playerName = PlayerState->GetPlayerName();
-	
-	ADPGameModeBase* GM = GetWorld()->GetAuthGameMode<ADPGameModeBase>();
-	if (GM)
+	if (animals.Num() != 0)
 	{
-		GM->ScoreManager->IncreasePlayerScore(PlayerController, animals);
-	}
-
-	if (Character->ReturnTriggerVolume)
-	{
-		Character->ReturnTriggerVolume->SpawnReturnEffect(animals);
+		PlayerState->IncreaseScore(animals);
+		FString playerName = PlayerState->GetPlayerName();
+		if (Character->ReturnTriggerVolume)
+		{
+			Character->ReturnTriggerVolume->SpawnReturnEffect(animals);
+		}
 	}
 	
 	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 	{
 		ADPPlayerController* PC = Cast<ADPPlayerController>(It->Get());
-		if (PC && PC != PlayerController) // �ڱ� �ڽ��� ������ ��� Ŭ���̾�Ʈ
+		if (PC && PC != PlayerController)
 		{
 			ADPCharacter* OtherCharacter = Cast<ADPCharacter>(PC->GetPawn());
 			OtherCharacter->ClientNotifyAnimalReturn(PlayerState->GetPlayerName());

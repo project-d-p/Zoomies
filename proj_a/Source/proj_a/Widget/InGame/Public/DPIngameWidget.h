@@ -20,7 +20,7 @@ public:
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()
-	void OnScoreChanged(const UBaseData* Data);
+	void OnScoreChanged(UBaseData* Data);
 protected:
 	UPROPERTY()
 	UTimerUI* TimerUI = nullptr;

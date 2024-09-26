@@ -214,7 +214,10 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 #endif
 	
 	player_controllers_[key] = Cast<ADPPlayerController>(newPlayer);
-	player_controllers_[key]->SwitchLevelComponent(ELevelComponentType::MAIN);
+	if (!player_controllers_[key]->HasAuthority())
+	{
+		player_controllers_[key]->SwitchLevelComponent(ELevelComponentType::MAIN);
+	}
 
 	// Spawn Character in New Place
 	SpawnNewCharacter(newPlayer);
@@ -375,7 +378,7 @@ void ADPGameModeBase::ProcessData(float delta_time)
 	if (bWallDisappear)
 	{
 		this->SpawnMonsters(delta_time);
-		this->MonsterMoveSimulate(delta_time);
+		// this->MonsterMoveSimulate(delta_time);
 	}
 	while (!this->message_queue_.empty())
 	{

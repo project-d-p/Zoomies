@@ -12,6 +12,7 @@
 #include "ResultLevelComponent.h"
 #include "CompileMode.h"
 #include "LobbyLevelComponent.h"
+#include "Chaos/ChaosPerfTest.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 DEFINE_LOG_CATEGORY(LogNetwork);
@@ -171,6 +172,10 @@ void ADPPlayerController::SetupInputComponent()
 
 void ADPPlayerController::SwitchLevelComponent(ELevelComponentType Type)
 {
+	if (ActiveComponent == LevelComponents[static_cast<uint32>(Type)])
+	{
+		return ;
+	}
 	if (ActiveComponent)
 	{
 		DeactiveCurrentComponent();
@@ -185,6 +190,11 @@ void ADPPlayerController::SwitchLevelComponent(ELevelComponentType Type)
 UBaseLevelComponent* ADPPlayerController::GetLevelComponent() const
 {
 	return ActiveComponent;
+}
+
+UBaseLevelComponent* ADPPlayerController::GetLevelComponent(ELevelComponentType Type) const
+{
+	return LevelComponents[static_cast<uint32>(Type)];
 }
 
 void ADPPlayerController::DeactiveCurrentComponent()

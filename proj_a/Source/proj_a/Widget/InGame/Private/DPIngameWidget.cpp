@@ -46,7 +46,7 @@ void UDPIngameWidget::NativeConstruct()
 	}
 }
 
-void UDPIngameWidget::OnScoreChanged(const UBaseData* Data)
+void UDPIngameWidget::OnScoreChanged(UBaseData* Data)
 {
 	FNetLogger::EditerLog(FColor::Cyan, TEXT("OnScoreChanged"));
 }

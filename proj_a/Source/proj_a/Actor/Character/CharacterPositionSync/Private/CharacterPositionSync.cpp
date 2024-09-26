@@ -154,6 +154,7 @@ void UCharacterPositionSync::SyncReturnAnimal(ADPCharacter* character)
 	if (*isReturn)
 	{
 		TArray<EAnimal> animals = character->ReturnMonsters();
+		Player_State->IncreaseScore(animals);
 		if (character->ReturnTriggerVolume)
 		{
 			character->ReturnTriggerVolume->SpawnReturnEffect(animals);
