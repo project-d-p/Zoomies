@@ -70,8 +70,6 @@ void AGS_MatchingLobby::UpdateLobbyInfo() const
 	}
 }
 
-
-
 void AGS_MatchingLobby::SetPlayerReady(int32 PlayerIndex, bool bIsReady)
 {
 	if (PlayerIndex >= 0 && PlayerIndex < ReadyPlayers.Num())
