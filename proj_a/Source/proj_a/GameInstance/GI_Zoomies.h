@@ -42,6 +42,8 @@ public:
 	TArray<TSharedRef<FOnlineFriend>> FriendsList;
 	UPROPERTY(BlueprintReadOnly, Category = "Friends")
 	TArray<FFriendInfo> FriendsArray;
+	void ShowLoadingScreen();
+	void HideLoadingScreen();
 	
 	int player_count = 0;
 private:
@@ -80,4 +82,7 @@ private:
 	void InitOnlineSubsystemSteam();
 	bool CheckValidation() const;
 	void OnInviteAccepted(const bool bWasSuccessful, const int32 LocalPlayerNum, TSharedPtr<const FUniqueNetId> UserId, const FOnlineSessionSearchResult& InviteResult);
+
+	UPROPERTY()
+	UUserWidget* LoadingWidget;
 };

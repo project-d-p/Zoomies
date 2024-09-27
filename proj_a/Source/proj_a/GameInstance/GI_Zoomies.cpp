@@ -237,6 +237,7 @@ void UGI_Zoomies::OnInviteAccepted(const bool bWasSuccessful, const int32 LocalP
 	if (bWasSuccessful && InviteResult.IsValid())
 	{
 		UE_LOG(LogTemp, Log, TEXT("OnInviteAccepted: Invite successfully accepted"));
+		ShowLoadingScreen();
 
 		dh_on_join_complete = session_interface_->AddOnJoinSessionCompleteDelegate_Handle(
 			FOnJoinSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onJoinComplete));
@@ -279,6 +280,7 @@ void UGI_Zoomies::onJoinComplete(FName session_name, EOnJoinSessionCompleteResul
                     
 					// ClientTravel to the map
 					player_controller->ClientTravel(travel_url, ETravelType::TRAVEL_Absolute);
+					HideLoadingScreen();
 				}
 				else
 				{
@@ -609,4 +611,45 @@ bool UGI_Zoomies::CheckValidation() const
 		return false;
 	}
 	return true;
+}
+
+void UGI_Zoomies::ShowLoadingScreen()
+{
+	UClass* WidgetClass = nullptr;
+	FString WidgetPath = TEXT("/Game/widget/widget_loading.widget_loading_C");
+
+	WidgetClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *WidgetPath));
+
+	if (WidgetClass != nullptr)
+	{
+		LoadingWidget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), WidgetClass);
+
+		if (LoadingWidget != nullptr)
+		{
+			LoadingWidget->AddToViewport();
+			UE_LOG(LogTemp, Log, TEXT("ShowLoadingScreen::Loading screen displayed"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("ShowLoadingScreen::Failed to create widget"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("ShowLoadingScreen::Failed to load widget class"));
+	}
+}
+
+void UGI_Zoomies::HideLoadingScreen()
+{
+	if (LoadingWidget != nullptr)
+	{
+		LoadingWidget->RemoveFromParent();
+		LoadingWidget = nullptr;
+		UE_LOG(LogTemp, Log, TEXT("HideLoadingScreen::Loading screen hidden"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HideLoadingScreen::No loading screen to hide"));
+	}
 }
