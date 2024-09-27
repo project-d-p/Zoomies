@@ -5,6 +5,7 @@
 #include "ClientScoreMananger.h"
 #include "ChatManager.h"
 #include "IChatGameState.h"
+#include "NetworkFailureManager.h"
 #include "DPInGameState.generated.h"
 
 UCLASS()
@@ -34,7 +35,9 @@ public:
 protected:
 	virtual void AddPlayerState(APlayerState* PlayerState) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	void OnHostMigration(UWorld* World, UDataManager* DataManager);
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	int32 ConnectedPlayers = 0;
 	const int32 ExpectedPlayers = 4;
 	
@@ -48,5 +51,6 @@ protected:
 	UClientTimerManager* TimerManager;
 	UPROPERTY()
 	UChatManager* ChatManager;
+	FDelegateHandle OnHostMigrationDelegate;
 };
 

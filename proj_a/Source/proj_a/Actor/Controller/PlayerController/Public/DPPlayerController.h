@@ -38,6 +38,13 @@ public:
 	UBaseLevelComponent* GetLevelComponent() const;
 	UBaseLevelComponent* GetLevelComponent(ELevelComponentType Type) const;
 
+	template <typename T>
+	T* GetLevelComponentAs(const ELevelComponentType E) const
+	{
+		UBaseLevelComponent* LevelComponent = GetLevelComponent(E);
+		return LevelComponent ? Cast<T>(LevelComponent) : nullptr;
+	}
+
 	UPlayerScoreComp* GetScoreManagerComponent() const;
 	UPrivateScoreManager* GetPrivateScoreManagerComponent() const;
 

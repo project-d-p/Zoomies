@@ -40,8 +40,8 @@ public:
 	virtual void LoadData_Implementation();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Data")
-	UBaseData* Clone();
-	virtual UBaseData* Clone_Implementation();
+	UBaseData* Clone(UObject* Outer);
+	virtual UBaseData* Clone_Implementation(UObject* Outer);
 
 	UFUNCTION(BlueprintCallable, Category = "Data")
 	virtual FName GetDataType() const;

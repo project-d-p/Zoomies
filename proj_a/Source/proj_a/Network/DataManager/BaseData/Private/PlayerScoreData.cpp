@@ -30,12 +30,14 @@ void UPlayerScoreData::ResetData_Implementation()
 	Score.bIsDetected = false;
 }
 
-UBaseData* UPlayerScoreData::Clone_Implementation()
+UBaseData* UPlayerScoreData::Clone_Implementation(UObject* Outer)
 {
-	UPlayerScoreData* NewData = NewObject<UPlayerScoreData>(GetOuter(), GetClass());
-	UBaseData::CloneData(NewData);	
-	NewData->Score = Score;
-	return NewData;
+	UPlayerScoreData* ClonedObject = Cast<UPlayerScoreData>(Super::Clone_Implementation(Outer));
+	if (ClonedObject)
+	{
+		ClonedObject->Score = Score;
+	}
+	return ClonedObject;
 }
 
 FName UPlayerScoreData::GetDataType() const

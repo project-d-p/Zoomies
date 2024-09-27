@@ -1,6 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DataManager.h"
+#include "NetworkFailureManager.h"
 #include "PlayerScoreComp.h"
 #include "GameFramework/PlayerState.h"
 #include "proj_a/Component/InGame/Score/Types/ScoreTypes.h"
@@ -38,15 +40,18 @@ protected:
 	virtual void CopyProperties(APlayerState* PlayerState) override;
 	
 private:
-	UPROPERTY()
-	UPlayerScoreData* PlayerScoreData = nullptr;
-
 	// Will Delete
 	UPROPERTY()
 	UPlayerScoreComp* PlayerScoreComp = nullptr;
 	FFinalScoreData FinalScoreData;
 	//
-	
+
+	void OnHostMigration(UWorld* World, UDataManager* DataManager);
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	UPROPERTY()
+	UPlayerScoreData* PlayerScoreData = nullptr;
+	FDelegateHandle OnHostMigrationDelegate;
 };

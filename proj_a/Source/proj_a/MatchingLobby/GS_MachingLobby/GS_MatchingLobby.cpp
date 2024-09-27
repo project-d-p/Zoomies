@@ -93,7 +93,6 @@ void AGS_MatchingLobby::BeginPlay()
 	{
 		if (GameInstance)
 		{
-			FNetLogger::EditerLog(FColor::Red, TEXT("GameInstance is not null"));
 			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &AGS_MatchingLobby::OnHostMigration);
 		}
 	}

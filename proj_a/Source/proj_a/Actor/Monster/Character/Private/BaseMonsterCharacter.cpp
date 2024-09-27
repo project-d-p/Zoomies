@@ -11,6 +11,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "proj_a/GameInstance/GI_Zoomies.h"
 
 ABaseMonsterCharacter::ABaseMonsterCharacter()
 {
@@ -73,6 +74,15 @@ void ABaseMonsterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UGI_Zoomies* GI = Cast<UGI_Zoomies>(GetGameInstance());
+	if (!HasAuthority())
+	{
+		if (GI)
+		{
+			OnHostMigrationDelegate = GI->network_failure_manager_->OnHostMigration().AddUObject(this, &ABaseMonsterCharacter::OnHostMigration);
+		}
+	}
+
 	UNiagaraComponent* sparkle = nullptr;
 	// special animals
 	if (sparkleEffect && arrowSparkle) {
@@ -95,6 +105,17 @@ void ABaseMonsterCharacter::BeginPlay()
 
 	GetCapsuleComponent()->SetCollisionObjectType(ECC_MonsterChannel);
 	GetMesh()->SetCollisionObjectType(ECC_MonsterChannel);
+}
+
+void ABaseMonsterCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	UGI_Zoomies* GI = Cast<UGI_Zoomies>(GetGameInstance());
+	if (GI)
+	{
+		GI->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
+	}
 }
 
 /** Static storage for loaded meshes and animations */
@@ -225,6 +246,16 @@ void ABaseMonsterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 void ABaseMonsterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+void ABaseMonsterCharacter::OnHostMigration(UWorld* World, UDataManager* DataManager)
+{
+	UGI_Zoomies* GI = Cast<UGI_Zoomies>(GetGameInstance());
+	if (GI)
+	{
+		GI->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
+	}
+	
 }
 
 void ABaseMonsterCharacter::TakeMonsterDamage(float Dmg)

@@ -3,6 +3,7 @@
 #include "DPCharacter.h"
 
 #include "BaseMonsterCharacter.h"
+#include "CharacterData.h"
 #include "ChasePlayerMonsterAIController.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -30,6 +31,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
+#include "proj_a/GameInstance/GI_Zoomies.h"
 #include "Serialization/BulkDataRegistry.h"
 
 // Sets default values
@@ -224,6 +226,24 @@ ADPCharacter::~ADPCharacter()
 {
 }
 
+void ADPCharacter::OnHostMigration(UWorld* World, UDataManager* DataManager)
+{
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (GameInstance)
+	{
+		GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
+	}
+	UCharacterData* CharacterData = NewObject<UCharacterData>(DataManager, UCharacterData::StaticClass());
+	if (CharacterData)
+	{
+		FString PlayerName = GetPlayerState()->GetPlayerName();
+		CharacterData->SetActorName(PlayerName);
+		CharacterData->SetActorLocation(GetActorLocation());
+		CharacterData->SetActorRotation(GetActorRotation());
+		DataManager->AddDataToArray(TEXT("CharacterData"), CharacterData);
+	}
+}
+
 void ADPCharacter::SetNameTag_Implementation()
 {
 	APlayerState* PS = GetPlayerState();
@@ -248,35 +268,19 @@ void ADPCharacter::SetNameTag_Implementation()
 	}
 }
 
-// void ADPCharacter::SetNameTag()
-// {
-// 	APlayerState* PS = GetPlayerState();
-// 	if (!PS)
-// 	{
-// 		FTimerHandle TimerHandle;
-// 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
-// 		{
-// 			SetNameTag();
-// 		}), 0.1f, false);
-// 		return ;
-// 	}
-//
-// 	FString Name = PS->GetPlayerName();
-// 	if (NameTag_Instance)
-// 	{
-// 		NameTag_Instance->SetName(Name);
-// 	}
-// 	if (NameTag_WidgetComponent && !IsLocallyControlled())
-// 	{
-// 		NameTag_WidgetComponent->SetVisibility(true);
-// 	}
-// }
-
 // Called when the game starts or when spawned
 void ADPCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (!HasAuthority())
+	{
+		if (GameInstance)
+		{
+			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &ADPCharacter::OnHostMigration);
+		}
+	}
 	if (!NameTag_BP)
 	{
 		check(false);
@@ -288,16 +292,6 @@ void ADPCharacter::BeginPlay()
 		NameTag_WidgetComponent->SetVisibility(false);
 	}
 	
-	//if (GetMesh()) {
-	//	UMaterialInterface* Material = GetMesh()->GetMaterial(0);
-	//	if (Material) {
-	//		dynamicMaterialInstance = UMaterialInstanceDynamic::Create(Material, this);
-	//		GetMesh()->SetMaterial(0, dynamicMaterialInstance);
-	//	}
-	//}
-	//if (dynamicMaterialInstance)
-	//	dynamicMaterialInstance->SetVectorParameterValue(FName("color"), FVector4(0.f, 0.f, 1.f, 1.f));
-
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AReturnTriggerVolume::StaticClass(), FoundActors);
 	if (FoundActors.Num() > 0)
@@ -311,7 +305,17 @@ void ADPCharacter::BeginPlay()
 	constructionComponent->placeWall = false;
 	constructionComponent->placeturret = false;
 	bUseControllerRotationYaw = false;
-	// SetNameTag();
+}
+
+void ADPCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (GameInstance)
+	{
+		GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
+	}
 }
 
 // Called every frame

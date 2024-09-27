@@ -9,6 +9,7 @@
 #include "PlayerScoreComp.h"
 #include "PlayerScoreData.h"
 #include "Net/UnrealNetwork.h"
+#include "proj_a/GameInstance/GI_Zoomies.h"
 
 ADPPlayerState::ADPPlayerState()
 {
@@ -51,28 +52,54 @@ void ADPPlayerState::ServerSetRank_Implementation(int InRank)
 	Rank = InRank;
 }
 
+void ADPPlayerState::OnHostMigration(UWorld* World, UDataManager* DataManager)
+{
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (GameInstance)
+	{
+		GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
+	}
+	UPlayerScoreData* ClonedPlayerScoreData = Cast<UPlayerScoreData>(PlayerScoreData->Clone(DataManager));
+	if (ClonedPlayerScoreData)
+	{
+		DataManager->AddDataToArray(TEXT("PlayerScore"), ClonedPlayerScoreData);
+	}
+}
+
 void ADPPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (!HasAuthority())
+	{
+		if (GameInstance)
+		{
+			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &ADPPlayerState::OnHostMigration);
+		}
+	}
+	
 	ADPPlayerController* LocalPC = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
 	if (LocalPC)
 	{
-		UMainLevelComponent* MainLevelComponent = Cast<UMainLevelComponent>(LocalPC->GetLevelComponent(ELevelComponentType::MAIN));
+		UMainLevelComponent* MainLevelComponent = LocalPC->GetLevelComponentAs<UMainLevelComponent>(ELevelComponentType::MAIN);
 		if (MainLevelComponent)
 		{
 			UDPIngameWidget* InGameWidget = Cast<UDPIngameWidget>(MainLevelComponent->GetInGameWidget());
 			PlayerScoreData->OnDataChanged.AddDynamic(InGameWidget, &UDPIngameWidget::OnScoreChanged);
 			PlayerScoreData->TestBroadcast();
 		}
-		else
-		{
-			FNetLogger::EditerLog(FColor::Cyan, TEXT("MainLevelComponent is nullptr"));
-		}
 	}
-	else
+}
+
+void ADPPlayerState::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (GameInstance)
 	{
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("LocalPC is nullptr"));
+		GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
 	}
 }
 

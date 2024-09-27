@@ -32,9 +32,9 @@ void UBaseData::LoadData_Implementation()
 	UE_LOG(LogTemp, Warning, TEXT("LoadData called on UBaseData. Override this method in a derived class."))
 }
 
-UBaseData* UBaseData::Clone_Implementation()
+UBaseData* UBaseData::Clone_Implementation(UObject* Outer)
 {
-	UBaseData* NewData = NewObject<UBaseData>(GetOuter(), GetClass());
+	UBaseData* NewData = NewObject<UBaseData>(Outer, GetClass());
 	NewData->DataID = DataID;
 	NewData->DataVersion = DataVersion;
 

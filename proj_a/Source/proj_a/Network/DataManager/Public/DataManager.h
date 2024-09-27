@@ -40,19 +40,43 @@
 // 그럼 이 데이터를 어떻게 사용할 것인지는 사용하는 자의 마음대로 아닌가..?
 // 그렇다면 나는 어떻게 데이터를 저장하고 불러올 수 있는지에 대해서 고민하면 된다.
 
+UCLASS()
+class UDataArray : public UObject
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY()
+	TArray<UBaseData*> DataArray;
+
+	// 배열에 데이터 추가
+	void AddData(UBaseData* Data)
+	{
+		if (Data && Data->ValidateData())
+		{
+			DataArray.Add(Data);
+		}
+	}
+};
+
 UCLASS(Blueprintable)
 class UDataManager : public UObject
 {
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintCallable, Category = "DataManager")
-	void AddData(const FString& Key, UBaseData* Data);
+	void AddDataToArray(const FString& Key, UBaseData* Data);
+
+	UFUNCTION(BlueprintCallable, Category = "DataManager")
+	void AddDataToSingle(const FString& Key, UBaseData* Data);
 	
 	UFUNCTION(BlueprintCallable, Category = "DataManager")
 	UBaseData* GetData(const FString& Key);
 
+	UFUNCTION(BlueprintCallable, Category = "DataManager")
+	UDataArray* GetDataArray(const FString& Key);
+
 	template <typename T>
-	T* GetDataAs(const FString& Key)
+	T* GetSingleDataAs(const FString& Key)
 	{
 		UBaseData* Data = GetData(Key);
 		return Data ? Cast<T>(Data) : nullptr;
@@ -60,5 +84,7 @@ public:
 	
 private:
 	UPROPERTY()
-	TMap<FString, UBaseData*> DataMap;
+	TMap<FString, UDataArray*> DataArrayMap;
+	UPROPERTY()
+	TMap<FString, UBaseData*> DataSingleMap;
 };
