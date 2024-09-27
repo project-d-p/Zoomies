@@ -28,26 +28,49 @@ void AGS_MatchingLobby::UpdateLobbyInfo() const
 {
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADPCharacter::StaticClass(), FoundActors);
+    
 	for (int32 j = 0; j < FoundActors.Num(); j++)
 	{
 		ADPCharacter* Character = Cast<ADPCharacter>(FoundActors[j]);
 		if (Character && Character->LobbyInfoWidgetComponent)
 		{
-			UUserWidget* Widget = Character->LobbyInfoWidgetComponent->GetUserWidgetObject();
-			UUserWidget* WidgetBack = Character->LobbyInfoWidgetComponentBack->GetUserWidgetObject();
-			if (Widget && WidgetBack)
+			APlayerController* CharPC = Cast<APlayerController>(Character->GetController());
+            
+			int32 LobbyIndex = -1;
+			for (int32 i = 0; i < LobbyInfos.Num(); i++)
 			{
-				FString Command = FString::Printf(TEXT("Update %d"), j);
-				Widget->CallFunctionByNameWithArguments(*Command, *GLog, nullptr, true);
-				WidgetBack->CallFunctionByNameWithArguments(*Command, *GLog, nullptr, true);
+				if (LobbyInfos[i].PC == CharPC)
+				{
+					LobbyIndex = i;
+					break;
+				}
+			}
+            
+			if (LobbyIndex != -1)
+			{
+				UUserWidget* Widget = Character->LobbyInfoWidgetComponent->GetUserWidgetObject();
+				UUserWidget* WidgetBack = Character->LobbyInfoWidgetComponentBack->GetUserWidgetObject();
+                
+				if (Widget && WidgetBack)
+				{
+					FString Command = FString::Printf(TEXT("Update %d"), LobbyIndex);  // j 대신 LobbyIndex 사용
+					Widget->CallFunctionByNameWithArguments(*Command, *GLog, nullptr, true);
+					WidgetBack->CallFunctionByNameWithArguments(*Command, *GLog, nullptr, true);
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("&*Widget is null for Character at index %d"), j);
+				}
 			}
 			else
 			{
-				UE_LOG(LogTemp, Warning, TEXT("&*Widget is null for Character at index %d"), j);
+				UE_LOG(LogTemp, Warning, TEXT("Could not find matching PlayerController for Character at index %d"), j);
 			}
 		}
 	}
 }
+
+
 
 void AGS_MatchingLobby::SetPlayerReady(int32 PlayerIndex, bool bIsReady)
 {
