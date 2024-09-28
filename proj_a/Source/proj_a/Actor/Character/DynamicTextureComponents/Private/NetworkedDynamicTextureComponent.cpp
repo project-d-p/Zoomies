@@ -139,6 +139,10 @@ UTexture2D* UNetworkedDynamicTextureComponent::DeserializeTexture(FSerializedTex
 	if (TextureDataPointer)
 	{
 		TArray64<uint8> dd = DecompressEXRToRawData(InData.CompressedTextureData, InData.Width, InData.Height);
+		// Udpate Texture data
+		delete TextureData;
+		TextureData = new uint8[dd.Num()];
+		FMemory::Memcpy(TextureData, dd.GetData(), dd.Num());
 		FMemory::Memcpy(TextureDataPointer, dd.GetData(), dd.Num());
 		Mip->BulkData.Unlock();
 	}
