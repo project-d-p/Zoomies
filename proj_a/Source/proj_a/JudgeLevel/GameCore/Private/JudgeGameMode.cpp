@@ -1,6 +1,7 @@
 ﻿#include "JudgeGameMode.h"
 
 #include "CompileMode.h"
+#include "EngineUtils.h"
 #include "FNetLogger.h"
 #include "JudgeGameState.h"
 #include "JudgeLevelComponent.h"
@@ -15,6 +16,7 @@ AJudgeGameMode::AJudgeGameMode()
     PlayerStateClass = AJudgePlayerState::StaticClass();
     PlayerControllerClass = AJudgePlayerController::StaticClass();
     // PlayerControllerClass = ADPPlayerController::StaticClass();
+    // DefaultPawnClass = ADynamicTexturedCharacter::StaticClass();
     GameStateClass = AJudgeGameState::StaticClass();
     
     TimerManager = CreateDefaultSubobject<UServerTimerManager>(TEXT("TimerManager"));
@@ -140,16 +142,16 @@ void AJudgeGameMode::HandleStartingNewPlayer_Implementation(APlayerController* N
 {
     Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 
-    UWorld* W = GetWorld();
-    check(W)
-
-    FActorSpawnParameters SpawnParams;
-    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-    const FVector Loc = FVector(0.069079f, 1673.736449f, 1410.153101f);
-    const FRotator Rot = FRotator(-30.0f, -90.0f, 0.0f);
-    ACameraActor* CamAct =
-        W->SpawnActor<ACameraActor>(ACameraActor::StaticClass(), Loc, Rot, SpawnParams);
-    check(CamAct)
-
-    NewPlayer->SetViewTarget(CamAct);
+    // UWorld* W = GetWorld();
+    // check(W)
+    //
+    // FActorSpawnParameters SpawnParams;
+    // SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+    // const FVector Loc = FVector(0.069079f, 1673.736449f, 1410.153101f);
+    // const FRotator Rot = FRotator(-30.0f, -90.0f, 0.0f);
+    // ACameraActor* CamAct =
+    //     W->SpawnActor<ACameraActor>(ACameraActor::StaticClass(), Loc, Rot, SpawnParams);
+    // check(CamAct)
+    //
+    // NewPlayer->SetViewTarget(CamAct);
 }

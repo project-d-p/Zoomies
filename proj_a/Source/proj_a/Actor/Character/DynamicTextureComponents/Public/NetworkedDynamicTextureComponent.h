@@ -5,7 +5,7 @@
 
 class UTextureTransferManager;
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FNetworkedDynamicTextureComponentInitializer
 {
 	GENERATED_BODY()
@@ -19,7 +19,7 @@ struct FNetworkedDynamicTextureComponentInitializer
 	UTextureTransferManager* TextureTransferManager = nullptr;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FSerializedTextureData
 {
 	GENERATED_BODY()
@@ -32,30 +32,33 @@ struct FSerializedTextureData
 	int32 Height = 0;
 };
 
-UCLASS()
+UCLASS(Blueprintable)
 class UNetworkedDynamicTextureComponent : public UDynamicTextureComponent
 {
 	GENERATED_BODY()
 public:
 	UNetworkedDynamicTextureComponent() = default;
 
+	UFUNCTION(BlueprintCallable, Category = "DynamicTexture")
 	bool InitializeTexture(FNetworkedDynamicTextureComponentInitializer& Initializer);
+	UFUNCTION(BlueprintCallable, Category = "DynamicTexture")
 	FSerializedTextureData SerializeTexture(UTexture2D* Texture);
-	void OnTransferComplete(const TArray<uint8>& FullData);
+	UFUNCTION(BlueprintCallable, Category = "DynamicTexture")
 	void LoadTexture();
 
+	void OnTransferComplete(const TArray<uint8>& FullData);
 private:
 	void HandleLocalNetOwner(UTexture2D* CustomTexture);
 	void HandleRemoteNetOwner();
 	UTexture2D* DeserializeTexture(FSerializedTextureData& InData);
 	void UpdateTexture(UTexture2D* NewTexture);
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category = "DynamicTexture")
 	UMaterialInstanceDynamic* DynamicMaterialInstance;
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category = "DynamicTexture")
 	USkeletalMeshComponent* SkeletalMeshComponent;
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category = "DynamicTexture")
 	APlayerState* PlayerState;
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category = "DynamicTexture")
 	UTextureTransferManager* TextureTransferManager;
 };

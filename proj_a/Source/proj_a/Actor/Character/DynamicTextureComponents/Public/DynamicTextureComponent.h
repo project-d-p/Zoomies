@@ -5,7 +5,7 @@
 #include "RHIFwd.h"
 #include "DynamicTextureComponent.generated.h"
 
-UCLASS()
+UCLASS(Blueprintable)
 class UDynamicTextureComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -16,9 +16,14 @@ private:
 	FUpdateTextureRegion2D* TextureRegion;
 
 public:
-	uint8* TextureData;
+	UDynamicTextureComponent() = default;
+	~UDynamicTextureComponent();
+
 	bool bCustomTextureUploaded = false;
 	UTexture2D* GetDynamicTexture() const { return DynamicTexture; }
+	
+protected:
+	uint8* TextureData;
 	void SetDynamicTexture(UTexture2D* inTexture) { DynamicTexture = inTexture; }
 	void InitializeTexture();
 	void FillTexture(FLinearColor Color);
@@ -26,7 +31,6 @@ public:
 	bool LoadTextureFromFile(const FString& FilePath);
 	TArray64<uint8> CompressTextureDataToEXR();
 	TArray64<uint8> DecompressEXRToRawData(const TArray<uint8>& CompressedData, int32& OutWidth, int32& OutHeight);
-	~UDynamicTextureComponent();
 
 	UPROPERTY(EditDefaultsOnly)
 	int32 TextureWidth = 1024;

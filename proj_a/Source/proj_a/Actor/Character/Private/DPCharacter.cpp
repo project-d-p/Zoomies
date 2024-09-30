@@ -65,15 +65,12 @@ ADPCharacter::ADPCharacter()
 	sceneCaptureSpringArm->SetupAttachment(RootComponent);
 	sceneCapture->SetupAttachment(sceneCaptureSpringArm);
 
+	/* If initialize before the parent constructor, it may be ignored by Unreal Engine. please check USkeletalMeshComponent::SetSkeletalMesh */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CHARACTER
 	(TEXT("/Game/model/steve/StickManForMixamo.StickManForMixamo"));
 	if (SK_CHARACTER.Succeeded())
 	{
-		DynamicTextureComponent = CreateDefaultSubobject<UNetworkedDynamicTextureComponent>(TEXT("UNetworkedDynamicTextureComponent"));
-		
 		GetMesh()->SetSkeletalMesh(SK_CHARACTER.Object);
-
-		dynamicMaterialInstance = UMaterialInstanceDynamic::Create(GetMesh()->GetMaterial(0), this, TEXT("DynamicMaterial"));
 	}
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -90.f), FRotator(0.f, 270.f, 0.f));
@@ -288,7 +285,7 @@ void ADPCharacter::BeginPlay()
 		NameTag_WidgetComponent->SetVisibility(false);
 	}
 	
-	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ADPCharacter::TryInItializeDynamicTexture);
+	// GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ADPCharacter::TryInItializeDynamicTexture);
 	
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AReturnTriggerVolume::StaticClass(), FoundActors);
@@ -306,20 +303,20 @@ void ADPCharacter::BeginPlay()
 	// SetNameTag();
 }
 
-void ADPCharacter::TryInItializeDynamicTexture()
-{
-	FNetworkedDynamicTextureComponentInitializer Initializer;
-	Initializer.DynamicMaterialInstance = dynamicMaterialInstance;
-	Initializer.SkeletalMeshComponent = GetMesh();
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
-	if (PC)
-	{
-		Initializer.PlayerState = GetPlayerState<APlayerState>();
-		Initializer.TextureTransferManager = PC->FindComponentByClass<UTextureTransferManager>();
-	}
-	if (DynamicTextureComponent->InitializeTexture(Initializer))
-		DynamicTextureComponent->LoadTexture();
-}
+// void ADPCharacter::TryInItializeDynamicTexture()
+// {
+// 	FNetworkedDynamicTextureComponentInitializer Initializer;
+// 	Initializer.DynamicMaterialInstance = dynamicMaterialInstance;
+// 	Initializer.SkeletalMeshComponent = GetMesh();
+// 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+// 	if (PC)
+// 	{
+// 		Initializer.PlayerState = GetPlayerState<APlayerState>();
+// 		Initializer.TextureTransferManager = PC->FindComponentByClass<UTextureTransferManager>();
+// 	}
+// 	if (DynamicTextureComponent->InitializeTexture(Initializer))
+// 		DynamicTextureComponent->LoadTexture();
+// }
 
 // Called every frame
 void ADPCharacter::Tick(float DeltaTime)
@@ -464,19 +461,19 @@ void ADPCharacter::ClientNotifyAnimalReturn_Implementation(const FString& player
 	FDataHub::PushReturnAnimalDA(player_name, true);
 }
 
-void ADPCharacter::OnRep_PlayerState()
-{
-	Super::OnRep_PlayerState();
-
-	TryInItializeDynamicTexture();
-}
-
-void ADPCharacter::OnRep_Controller()
-{
-	Super::OnRep_Controller();
-
-	TryInItializeDynamicTexture();
-}
+// void ADPCharacter::OnRep_PlayerState()
+// {
+// 	Super::OnRep_PlayerState();
+//
+// 	TryInItializeDynamicTexture();
+// }
+//
+// void ADPCharacter::OnRep_Controller()
+// {
+// 	Super::OnRep_Controller();
+//
+// 	TryInItializeDynamicTexture();
+// }
 
 void ADPCharacter::UpdateNameTagRotation()
 {

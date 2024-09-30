@@ -5,12 +5,19 @@
 
 bool UNetworkedDynamicTextureComponent::InitializeTexture(FNetworkedDynamicTextureComponentInitializer& Initializer)
 {
+	if (!IsValid(Initializer.DynamicMaterialInstance) || !IsValid(Initializer.SkeletalMeshComponent)
+		|| !IsValid(Initializer.PlayerState) || !IsValid(Initializer.TextureTransferManager))
+	{
+		return false;
+	}
+	
 	DynamicMaterialInstance = Initializer.DynamicMaterialInstance;
 	SkeletalMeshComponent = Initializer.SkeletalMeshComponent;
 	PlayerState = Initializer.PlayerState;
 	TextureTransferManager = Initializer.TextureTransferManager;
 	if (!PlayerState || !TextureTransferManager)
 	{
+		FNetLogger::LogError(TEXT("Failed to initialize texture in 'UNetworkedDynamicTextureComponent'."));
 		return false;	
 	}
 

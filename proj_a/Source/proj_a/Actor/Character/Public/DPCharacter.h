@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "CharacterPositionSync.h"
+#include "DynamicTexturedCharacter.h"
 #include "NameTag.h"
 #include "NetworkedDynamicTextureComponent.h"
 #include "Components/WidgetComponent.h"
@@ -15,21 +16,8 @@
 class ABaseMonsterCharacter;
 class UTextureTransferManager;
 
-// USTRUCT()
-// struct FSerializedTextureData
-// {
-// 	GENERATED_BODY()
-//
-// 	UPROPERTY()
-// 	TArray<uint8> CompressedTextureData;
-// 	UPROPERTY()
-// 	int32 Width = 0;
-// 	UPROPERTY()
-// 	int32 Height = 0;
-// };
-
 UCLASS()
-class PROJ_A_API ADPCharacter : public ACharacter
+class PROJ_A_API ADPCharacter : public ADynamicTexturedCharacter
 {
 	GENERATED_BODY()
 
@@ -73,9 +61,6 @@ public:	// component
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
 	UAnimMontage* characterMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
-	UMaterialInstanceDynamic* dynamicMaterialInstance;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MatchLobby", meta = (AllowPrivateAccess = "true"))
 	class UWidgetComponent* userInfoWidget;
@@ -129,31 +114,19 @@ public:	// component
 	void DyingAnimation();
 
 	bool CatchMonster(const FString& monster_type);
-
 	
 	void SetAtReturnPlace(bool isReturnPlace);
 	bool IsAtReturnPlace() const;
 
 	void RemoveSpringArm();
-
-	UNetworkedDynamicTextureComponent* GetDynamicTextureComponent() const { return DynamicTextureComponent; }
 	
 protected:
 	void ClientNotifyAnimalReturn_Implementation(const FString& player_name);
-	
-	virtual void OnRep_PlayerState() override;
-	virtual void OnRep_Controller() override;
 	
 private:
 	void UpdateNameTagRotation();
 	void CheckCollisionWithMonster();
 	void OnServerHit(const FHitResult& HitResult);
-
-	/* For Character Custom Texture */
-	void TryInItializeDynamicTexture();
-	UPROPERTY()
-	UNetworkedDynamicTextureComponent* DynamicTextureComponent;
-	//
 	
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* springArm;

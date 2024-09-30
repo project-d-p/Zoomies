@@ -5,7 +5,7 @@
 
 void UTextureTransferManager::RequestTextureToServer_Implementation(int32 PlayerId)
 {
-	ADPCharacter* Character = FindCharacterByPlayerId(PlayerId);
+	ADynamicTexturedCharacter* Character = FindCharacterByPlayerId(PlayerId);
 	if (!Character)
 	{
 		RetryRequestTexture(PlayerId);
@@ -45,7 +45,7 @@ void UTextureTransferManager::OnTextureTransferComplete(const int32 Key)
 	if (Data.bDataTransferComplete == false)
 		return ;
 
-	ADPCharacter* C = FindCharacterByPlayerId(Key);
+	ADynamicTexturedCharacter* C = FindCharacterByPlayerId(Key);
 	if (C)
 	{
 		UNetworkedDynamicTextureComponent* dynamicTextureComp = C->GetDynamicTextureComponent();
@@ -62,16 +62,16 @@ void UTextureTransferManager::OnTextureTransferComplete(const int32 Key)
 	}
 }
 
-ADPCharacter* UTextureTransferManager::FindCharacterByPlayerId(int32 PlayerId) const
+ADynamicTexturedCharacter* UTextureTransferManager::FindCharacterByPlayerId(int32 PlayerId) const
 {
-	for (TActorIterator<ADPCharacter> It(GetWorld()); It; ++It)
+	for (TActorIterator<ADynamicTexturedCharacter> It(GetWorld()); It; ++It)
 	{
-		ADPCharacter* C = *It;
+		ADynamicTexturedCharacter* C = *It;
 		if (C && C->GetPlayerState())
 		{
 			if (C->GetPlayerState()->GetPlayerId() == PlayerId)
 			{
-				return Cast<ADPCharacter>(C);
+				return Cast<ADynamicTexturedCharacter>(C);
 			}
 		}
 	}
