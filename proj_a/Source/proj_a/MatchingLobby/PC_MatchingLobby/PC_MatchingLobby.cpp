@@ -198,31 +198,31 @@ void APC_MatchingLobby::getMatchLobbyUI()
 
 	UClass* WidgetClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *WidgetPath));
 
-	if (WidgetClass != nullptr && MatchLobbyWidget == nullptr)
+	if (WidgetClass != nullptr)
 	{
 		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-		if (PlayerController)
+		if (PlayerController && Cast<APC_MatchingLobby>(PlayerController)->MatchLobbyWidget == nullptr)
 		{
 			MatchLobbyWidget = CreateWidget<UUserWidget>(PlayerController, WidgetClass);
 
 			if (MatchLobbyWidget != nullptr)
 			{
 				MatchLobbyWidget->AddToViewport();
-				UE_LOG(LogTemp, Log, TEXT("AGM_MatchingLobby::getMatchLobbyUI: Widget successfully created and added to viewport."));
+				UE_LOG(LogTemp, Log, TEXT("APC_MatchingLobby::getMatchLobbyUI: Widget successfully created and added to viewport."));
 			}
 			else
 			{
-				UE_LOG(LogTemp, Warning, TEXT("AGM_MatchingLobby::getMatchLobbyUI: MatchLobbyWidget is nullptr after creation."));
+				UE_LOG(LogTemp, Warning, TEXT("APC_MatchingLobby::getMatchLobbyUI: MatchLobbyWidget is nullptr after creation."));
 			}
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("AGM_MatchingLobby::getMatchLobbyUI: PlayerController is nullptr."));
+			UE_LOG(LogTemp, Warning, TEXT("APC_MatchingLobby::getMatchLobbyUI: PlayerController is nullptr."));
 		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AGM_MatchingLobby::getMatchLobbyUI: Unable to load widget class from path: %s"), *WidgetPath);
+		UE_LOG(LogTemp, Warning, TEXT("APC_MatchingLobby::getMatchLobbyUI: Unable to load widget class from path: %s"), *WidgetPath);
 	}
 }
 
