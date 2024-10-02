@@ -25,6 +25,9 @@ struct FLobbyInfo
 	
 	UPROPERTY(BlueprintReadWrite, Category = "LobbyInfo")
 	APlayerState *PS = nullptr;
+	
+	UPROPERTY(BlueprintReadWrite, Category = "LobbyInfo")
+	int32 PlayerId = -1;
 };
 
 USTRUCT(BlueprintType)

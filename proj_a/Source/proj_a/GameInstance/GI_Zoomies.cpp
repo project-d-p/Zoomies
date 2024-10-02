@@ -280,7 +280,6 @@ void UGI_Zoomies::onJoinComplete(FName session_name, EOnJoinSessionCompleteResul
                     
 					// ClientTravel to the map
 					player_controller->ClientTravel(travel_url, ETravelType::TRAVEL_Absolute);
-					HideLoadingScreen();
 				}
 				else
 				{

@@ -43,6 +43,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "MatchLobby")
 	bool AreAllPlayersReady();
+	
+	int32 FindIndexByPlayerId(const int32 &PlayerId) const;
 
 
 protected:

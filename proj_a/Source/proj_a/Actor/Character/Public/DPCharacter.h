@@ -104,6 +104,7 @@ public:	// component
 	void ApplyKockback(const FHitResult& HitResult);
 	UFUNCTION(NetMulticast, Reliable)
 	void SetNameTag();
+	void UpdateLobbyInfo();
 
 	UPROPERTY(ReplicatedUsing=OnRep_SyncInvincible)
 	bool bIsInvincible = false;

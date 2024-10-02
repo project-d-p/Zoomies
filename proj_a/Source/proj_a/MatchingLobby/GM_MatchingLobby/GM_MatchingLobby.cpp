@@ -156,6 +156,7 @@ void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 						GS->LobbyInfos[j].Name = steam_username;
 						GS->LobbyInfos[j].PC = Cast<APC_MatchingLobby>(PCs[i]);
 						GS->LobbyInfos[j].PS = Cast<APS_MatchingLobby>(PCs[i]->PlayerState);
+						GS->LobbyInfos[j].PlayerId = Cast<APS_MatchingLobby>(PCs[i]->PlayerState)->GetPlayerId();
 						GS->UpdateLobbyInfo();
 					}
 					break;

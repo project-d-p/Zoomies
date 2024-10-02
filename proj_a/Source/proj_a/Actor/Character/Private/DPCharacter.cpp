@@ -30,6 +30,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
+#include "proj_a/MatchingLobby/GS_MachingLobby/GS_MatchingLobby.h"
 #include "Serialization/BulkDataRegistry.h"
 
 // Sets default values
@@ -251,6 +252,36 @@ void ADPCharacter::SetNameTag_Implementation()
 	if (NameTag_WidgetComponent && !IsLocallyControlled())
 	{
 		NameTag_WidgetComponent->SetVisibility(true);
+	}
+}
+
+void ADPCharacter::UpdateLobbyInfo() 
+{
+	APlayerState* PS = GetPlayerState();
+	AGS_MatchingLobby* GS = Cast<AGS_MatchingLobby>(GetWorld()->GetGameState());
+	if (!PS || !GS)
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+		{
+			UpdateLobbyInfo();
+		}), 0.1f, false);
+		return ;
+	}
+	
+	FString Name = PS->GetPlayerName();
+	UUserWidget* Widget = LobbyInfoWidgetComponent->GetUserWidgetObject();
+	UUserWidget* WidgetBack = LobbyInfoWidgetComponentBack->GetUserWidgetObject();
+	if (Widget && WidgetBack)
+	{
+		int32 PlayerIndex = GS->FindIndexByPlayerId(PS->GetPlayerId());
+		FString Command = FString::Printf(TEXT("Update %d"), PlayerIndex);
+		Widget->CallFunctionByNameWithArguments(*Command, *GLog, nullptr, true);
+		WidgetBack->CallFunctionByNameWithArguments(*Command, *GLog, nullptr, true);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("&*Widget is null for Character"));
 	}
 }
 

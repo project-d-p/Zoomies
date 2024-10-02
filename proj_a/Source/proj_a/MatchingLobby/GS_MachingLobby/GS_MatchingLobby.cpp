@@ -28,25 +28,33 @@ void AGS_MatchingLobby::UpdateLobbyInfo() const
 {
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADPCharacter::StaticClass(), FoundActors);
+	
 	for (int32 j = 0; j < FoundActors.Num(); j++)
 	{
 		ADPCharacter* Character = Cast<ADPCharacter>(FoundActors[j]);
-		if (Character && Character->LobbyInfoWidgetComponent)
+		if (Character)
 		{
-			UUserWidget* Widget = Character->LobbyInfoWidgetComponent->GetUserWidgetObject();
-			UUserWidget* WidgetBack = Character->LobbyInfoWidgetComponentBack->GetUserWidgetObject();
-			if (Widget && WidgetBack)
-			{
-				FString Command = FString::Printf(TEXT("Update %d"), j);
-				Widget->CallFunctionByNameWithArguments(*Command, *GLog, nullptr, true);
-				WidgetBack->CallFunctionByNameWithArguments(*Command, *GLog, nullptr, true);
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("&*Widget is null for Character at index %d"), j);
-			}
+			Character->UpdateLobbyInfo();
 		}
 	}
+}
+
+int32 AGS_MatchingLobby::FindIndexByPlayerId(const int32 &PlayerId) const
+{
+	int32 returnIndex = -1;
+	for (int32 i = 0; i < LobbyInfos.Num(); i++)
+	{
+		if (LobbyInfos[i].PlayerId == PlayerId)
+		{
+			returnIndex = i;
+			break;
+		}
+	}
+	if (returnIndex == -1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PlayerId not found in LobbyInfos"));
+	}
+	return returnIndex;
 }
 
 void AGS_MatchingLobby::SetPlayerReady(int32 PlayerIndex, bool bIsReady)
