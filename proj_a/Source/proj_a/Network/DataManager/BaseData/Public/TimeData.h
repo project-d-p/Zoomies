@@ -15,6 +15,7 @@ public:
 	virtual UBaseData* Clone_Implementation(UObject* Outer) override;
 	virtual FName GetDataType() const override;
 	void SetTimeRemaining(float NewTime);
+	float GetTimeRemaining() const { return TimeRemaining; }
 	
 private:
 	float TimeRemaining;

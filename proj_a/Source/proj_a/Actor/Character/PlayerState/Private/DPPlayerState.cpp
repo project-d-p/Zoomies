@@ -17,6 +17,7 @@ ADPPlayerState::ADPPlayerState()
 	
 	PlayerScoreComp = CreateDefaultSubobject<UPlayerScoreComp>(TEXT("PlayerScore"));
 	PlayerScoreData = NewObject<UPlayerScoreData>(this, TEXT("PlayerScoreData"));
+	PlayerScoreData->InitializeData();
 	FString PlayerName = FGuid::NewGuid().ToString();
 	APlayerState::SetPlayerName(PlayerName);
 }
@@ -66,6 +67,26 @@ void ADPPlayerState::OnHostMigration(UWorld* World, UDataManager* DataManager)
 	}
 }
 
+void ADPPlayerState::InitializePlayerState()
+{
+ 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+ 	check(GameInstance);
+ 	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
+ 	check(DataManager);
+ 	UDataArray* PlayerScoreDataArray = DataManager->GetDataArray(TEXT("PlayerScore"));
+	if (PlayerScoreDataArray)
+	{
+		for (UBaseData* Data : PlayerScoreDataArray->DataArray)
+		{
+			UPlayerScoreData* SavedScoreData = Cast<UPlayerScoreData>(Data);
+			if (SavedScoreData && SavedScoreData->GetPlayerName() == GetPlayerName())
+			{
+				PlayerScoreData->SetScore(SavedScoreData->GetScore());
+			}
+		}
+	}
+}
+
 void ADPPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
@@ -87,9 +108,11 @@ void ADPPlayerState::BeginPlay()
 		{
 			UDPIngameWidget* InGameWidget = Cast<UDPIngameWidget>(MainLevelComponent->GetInGameWidget());
 			PlayerScoreData->OnDataChanged.AddDynamic(InGameWidget, &UDPIngameWidget::OnScoreChanged);
-			PlayerScoreData->TestBroadcast();
+			PlayerScoreData->SetPlayerName(GetPlayerName());
 		}
 	}
+	InitializePlayerState();
+	PlayerScoreData->TestBroadcast();
 }
 
 void ADPPlayerState::EndPlay(const EEndPlayReason::Type EndPlayReason)

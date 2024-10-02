@@ -236,10 +236,17 @@ void ADPCharacter::OnHostMigration(UWorld* World, UDataManager* DataManager)
 	UCharacterData* CharacterData = NewObject<UCharacterData>(DataManager, UCharacterData::StaticClass());
 	if (CharacterData)
 	{
+		CharacterData->InitializeData();
 		FString PlayerName = GetPlayerState()->GetPlayerName();
 		CharacterData->SetActorName(PlayerName);
 		CharacterData->SetActorLocation(GetActorLocation());
 		CharacterData->SetActorRotation(GetActorRotation());
+
+		TArray<EAnimal> CapturedAnimals = ReturnMonsters();
+		for (EAnimal Animal : CapturedAnimals)
+		{
+			CharacterData->AddCapturedAnimal(Animal);
+		}
 		DataManager->AddDataToArray(TEXT("CharacterData"), CharacterData);
 	}
 }
@@ -367,6 +374,50 @@ void ADPCharacter::Tick(float DeltaTime)
 	{
 		CheckCollisionWithMonster();
 	}
+}
+
+void ADPCharacter::OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerState* OldPlayerState)
+{
+	Super::OnPlayerStateChanged(NewPlayerState, OldPlayerState);
+	FNetLogger::EditerLog(FColor::Red, TEXT("OnPlayerStateChanged"));
+	if (NewPlayerState == nullptr)
+	{
+		return ;
+	}
+
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	check(GameInstance);
+	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
+	check(DataManager);
+
+	UDataArray* CharacterDataArray = DataManager->GetDataArray(TEXT("CharacterData"));
+	if (!CharacterDataArray)
+	{
+		return ;
+	}
+
+	FString PlayerName = NewPlayerState->GetPlayerName();
+	UCharacterData* MyCharacterData = nullptr;
+	for (UBaseData* Data : CharacterDataArray->DataArray)
+	{
+		UCharacterData* SavedCharacterData = Cast<UCharacterData>(Data);
+		if (SavedCharacterData && SavedCharacterData->GetActorName() == PlayerName)
+		{
+			MyCharacterData = SavedCharacterData;
+			break;
+		}
+	}
+	if (IsLocallyControlled())
+	{
+		this->SetActorLocation(MyCharacterData->GetActorLocation());
+		this->SetActorRotation(MyCharacterData->GetActorRotation());
+	}
+	TArray<EAnimal> CapturedAnimals = MyCharacterData->GetCapturedAnimals();
+	for (EAnimal Animal : CapturedAnimals)
+	{
+		monsterSlotComponent->AddMonsterToSlot(this, Animal);
+	}
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("%s"), *PlayerName);
 }
 
 // Called to bind functionality to input

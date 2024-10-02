@@ -47,6 +47,7 @@ private:
 	//
 
 	void OnHostMigration(UWorld* World, UDataManager* DataManager);
+	void InitializePlayerState();
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

@@ -16,6 +16,7 @@ void UClientNetworkManager::Initialize(ENetworkTypeZoomies SocketType)
 	Worker->Initialize(SocketInterface);
 	Worker->SetMessageReceivedCallback([this](const Message& Data)
 	{
+		// FNetLogger::EditerLog(FColor::Blue, TEXT("%s"), *FString(Data.DebugString().c_str()));
 		this->OnDataReceived(Data);
 	});
 	WorkerThread = FRunnableThread::Create(Worker, TEXT("NetworkWorker"));
@@ -23,8 +24,6 @@ void UClientNetworkManager::Initialize(ENetworkTypeZoomies SocketType)
 
 void UClientNetworkManager::OnDataReceived(const Message& Data)
 {
-	FMessageHandler MessageHandler;
-
 	MessageHandler.HandleMessage(Data);
 }
 

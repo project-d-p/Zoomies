@@ -81,6 +81,12 @@ public:
 		UBaseData* Data = GetData(Key);
 		return Data ? Cast<T>(Data) : nullptr;
 	}
+
+	UFUNCTION(BlueprintCallable, Category = "DataManager")
+	bool IsEmpty() const
+	{
+		return DataArrayMap.Num() == 0 && DataSingleMap.Num() == 0;
+	}
 	
 private:
 	UPROPERTY()

@@ -14,7 +14,11 @@
 #include "MessageMaker.h"
 #include "ServerNetworkManager.h"
 #include "CompileMode.h"
+#include "MonsterData.h"
+#include "TimeData.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
+
+class UTimeData;
 
 ADPGameModeBase::ADPGameModeBase()
 {
@@ -214,7 +218,7 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 #endif
 	
 	player_controllers_[key] = Cast<ADPPlayerController>(newPlayer);
-	if (!player_controllers_[key]->HasAuthority())
+	if (!player_controllers_[key]->IsLocalController())
 	{
 		player_controllers_[key]->SwitchLevelComponent(ELevelComponentType::MAIN);
 	}
@@ -294,6 +298,55 @@ void ADPGameModeBase::Logout(AController* Exiting)
 	}
 }
 
+void ADPGameModeBase::InitializeGame()
+{
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	check(GameInstance);
+	int NumMaxPlayers = GameInstance->network_failure_manager_->GetDesiredMaxPlayers();
+	if (NumMaxPlayers == 0)
+	{
+		BlockingVolume = GetWorld()->SpawnActor<ABlockingBoxVolume>(ABlockingBoxVolume::StaticClass(), FVector(13380.0f, -270.0f, 140.0f), FRotator(0.0f, 0.0f, 0.0f));
+	}
+	NumMaxPlayers = NumMaxPlayers > 0 ? NumMaxPlayers : NUM_OF_MAX_CLIENTS;
+	NetworkManager->SetGameStartCallback(NumMaxPlayers, [this]()
+	{
+		this->OnGameStart();
+	});
+
+	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
+	check(DataManager);
+
+	UTimeData* TimeData = DataManager->GetSingleDataAs<UTimeData>(TEXT("TimeData"));
+	if (TimeData)
+	{
+		PlayTime = TimeData->GetTimeRemaining();
+	}
+	else
+	{
+		PlayTime = Zoomies::GAME_TIME;
+	}
+
+	monster_controllers_.resize(NUM_OF_MAX_MONSTERS, nullptr);
+	empty_monster_slots_.reserve(NUM_OF_MAX_MONSTERS);
+	
+	for (int i = 0; i < NUM_OF_MAX_MONSTERS; i++)
+	{
+		empty_monster_slots_.push_back(i);
+	}
+	UDataArray* MonsterDataArray = DataManager->GetDataArray(TEXT("MonsterData"));
+	if (MonsterDataArray)
+	{
+		for (UBaseData* Data : MonsterDataArray->DataArray)
+		{
+			UMonsterData* MonsterData = Cast<UMonsterData>(Data);
+			if (MonsterData)
+			{
+				// Monster Stuff
+			}
+		}
+	}
+}
+
 void ADPGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -306,20 +359,8 @@ void ADPGameModeBase::BeginPlay()
 #else
 	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
 #endif
-	
-	NetworkManager->SetGameStartCallback(NUM_OF_MAX_CLIENTS, [this]()
-	{
-		this->OnGameStart();
-	});
 
-	monster_controllers_.resize(NUM_OF_MAX_MONSTERS, nullptr);
-	empty_monster_slots_.reserve(NUM_OF_MAX_MONSTERS);
-
-	for (int i = 0; i < NUM_OF_MAX_MONSTERS; i++)
-	{
-		empty_monster_slots_.push_back(i);
-	}
-	BlockingVolume = GetWorld()->SpawnActor<ABlockingBoxVolume>(ABlockingBoxVolume::StaticClass(), FVector(0.0f, 0.0f, 0.0f), FRotator(0.0f, 0.0f, 0.0f));
+	InitializeGame();
 }
 
 void ADPGameModeBase::EndGame()
@@ -343,7 +384,14 @@ void ADPGameModeBase::Tick(float delta_time)
 #endif
 		if (bTimeSet == false)
 		{
-			BlockingVolume->DeactiveBlockingVolume(bWallDisappear);
+			if (BlockingVolume)
+			{
+				BlockingVolume->DeactiveBlockingVolume(bWallDisappear);
+			}
+			else
+			{
+				bWallDisappear = true;
+			}
 			bTimeSet = true;
 			for (auto& pair: player_controllers_)
 			{
@@ -355,7 +403,7 @@ void ADPGameModeBase::Tick(float delta_time)
 				}
 				Character->SetNameTag();
 			}
-			TimerManager->StartTimer<ADPInGameState>(PLAY_TIME, &ADPGameModeBase::EndGame, this);
+			TimerManager->StartTimer<ADPInGameState>(PlayTime, &ADPGameModeBase::EndGame, this);
 		}
 		this->ProcessData(delta_time);
 #if EDITOR_MODE != 1
@@ -366,7 +414,6 @@ void ADPGameModeBase::Tick(float delta_time)
 void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-	UE_LOG(LogTemp, Warning, TEXT("Call end play."));
 
 	NetworkManager->Shutdown();
 }
@@ -385,6 +432,11 @@ void ADPGameModeBase::ProcessData(float delta_time)
 		Message message = this->message_queue_.front();
 		this->message_queue_.pop();
 		ADPPlayerController* controller = this->player_controllers_[message.player_id()];
+		if (!controller)
+		{
+			FNetLogger::LogError(TEXT("Failed to get PlayerController. (Method: ProcessData)"));
+			continue;
+		}
 		FServerMessageDelegate* delegate = this->message_handler_.HandleMessage(message);
 		if (delegate)
 		{

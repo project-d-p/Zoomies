@@ -55,6 +55,16 @@ void UCharacterData::SetActorRotation(const FRotator& NewRotation)
 	ActorRotation = NewRotation;
 }
 
+void UCharacterData::AddCapturedAnimal(EAnimal NewAnimal)
+{
+	CapturedAnimals.Add(NewAnimal);
+}
+
+TArray<EAnimal> UCharacterData::GetCapturedAnimals() const
+{
+	return CapturedAnimals;
+}
+
 FString UCharacterData::GetActorName() const
 {
 	return ActorName;

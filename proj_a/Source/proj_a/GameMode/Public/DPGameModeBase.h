@@ -102,6 +102,7 @@ public:
 	UServerTimerManager* GetTimerManager() const { return TimerManager; }
 
 private:
+	void InitializeGame();
 	// Implementations
 	void SyncMovement();
 	void SimulateGunFire();
@@ -137,7 +138,7 @@ private:
 	bool bStart = false;
 	bool bTimeSet = false;
 	/* Set Play Time */
-	const float PLAY_TIME = Zoomies::GAME_TIME;
+	float PlayTime = 999999.0f;
 
 	/* For Monster Movement Manage (Interval & Process) */
 	UPROPERTY(EditAnywhere, Category = "Debug")

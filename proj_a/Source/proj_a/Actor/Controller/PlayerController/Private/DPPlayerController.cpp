@@ -118,6 +118,9 @@ void ADPPlayerController::ClientDestroySession_Implementation()
 
 void ADPPlayerController::ConnectToServer_Implementation(ELevelComponentType Type)
 {
+	if (IsLocalController())
+	{
+		
 #if EDITOR_MODE
 	NetworkManager->Initialize(ENetworkTypeZoomies::NONE);
 #elif LAN_MODE
@@ -128,6 +131,7 @@ void ADPPlayerController::ConnectToServer_Implementation(ELevelComponentType Typ
 #endif
 	//
 	// SwitchLevelComponent(Type);
+	}
 }
 
 void ADPPlayerController::BeginPlay()

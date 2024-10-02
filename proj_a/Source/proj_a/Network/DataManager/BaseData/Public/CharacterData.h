@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "BaseData.h"
+#include "EnumTypes.h"
 #include "CharacterData.generated.h"
 
 UCLASS()
@@ -17,7 +18,9 @@ public:
 	void SetActorName(const FString& NewName);
 	void SetActorLocation(const FVector& NewLocation);
 	void SetActorRotation(const FRotator& NewRotation);
-	
+	void AddCapturedAnimal(EAnimal NewAnimal);
+
+	TArray<EAnimal> GetCapturedAnimals() const;
 	FString GetActorName() const;
 	FVector GetActorLocation() const;
 	FRotator GetActorRotation() const;
@@ -25,4 +28,5 @@ private:
 	FString ActorName;
 	FVector ActorLocation;
 	FRotator ActorRotation;
+	TArray<EAnimal> CapturedAnimals;
 };

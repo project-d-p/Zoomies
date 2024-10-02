@@ -22,11 +22,12 @@ struct FScoreData
 
 struct FFinalScoreData
 {
+	FString PlayerName;
 	TArray<TArray<EAnimal>> CapturedAnimals;
 	TArray<FScoreData> ScoreDatas;
 	float PrivateTotalScore = 0;
 	float PrivateTotalBaseScore = 0;
-	float PrivateTotalScale = 0;
+	float PrivateTotalScale = 1;
 	float PublicTotalScore = 0;
 	bool bIsDetected = false;
 

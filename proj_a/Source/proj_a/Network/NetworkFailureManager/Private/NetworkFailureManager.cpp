@@ -243,9 +243,10 @@ void UNetworkFailureManager::HandleNetworkFailure(UWorld* World, UNetDriver* Net
 	if (Arg == ENetworkFailure::ConnectionLost)
 	{
 		this->SaveSessionMetaData(World);
+		OnHostMigrationDelegate.Broadcast(World, DataManager);
 		if (bNextHost)
 		{
-			OnHostMigrationDelegate.Broadcast(World, DataManager);
+			// OnHostMigrationDelegate.Broadcast(World, DataManager);
 			DestroyPreviousSession(&UNetworkFailureManager::CreateNewSession);
 		}
 		else
@@ -284,15 +285,29 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 		// 	return ;
 		// }
 		TArray<FUniqueNetIdRepl> RegisteredPlayers;
+		TSet<FString> UniqueNicknames;  // 중복 확인을 위한 닉네임 저장소
+		
 		for (int32 i = 0; i < CurrentSession->RegisteredPlayers.Num(); i++)
 		{
 			IOnlineIdentityPtr IdentityInterface = Online::GetIdentityInterface(World);
-			if (IdentityInterface->GetPlayerNickname(*CurrentSession->RegisteredPlayers[i]) == CurrentSession->OwningUserId->ToString())
+			FString PlayerNickname = IdentityInterface->GetPlayerNickname(*CurrentSession->RegisteredPlayers[i]);
+
+			// 첫 번째 플레이어(Original Host)는 포함하지 않음
+			if (PlayerNickname == CurrentSession->OwningUserId->ToString())
 			{
 				continue;
 			}
+
+			// 중복된 닉네임이 있는지 확인
+			if (UniqueNicknames.Contains(PlayerNickname))
+			{
+				FNetLogger::EditerLog(FColor::Yellow, TEXT("Duplicate nickname: %s, skipping."), *PlayerNickname);
+				continue;  // 중복된 닉네임은 추가하지 않음
+			}
 			// Not Include the First Player(Original Host)
 			RegisteredPlayers.Add(CurrentSession->RegisteredPlayers[i]);
+			UniqueNicknames.Add(PlayerNickname);
+			DesiredMaxPlayers += 1;
 			FNetLogger::EditerLog(FColor::Blue, TEXT("Player %d: %s"), i, *(IdentityInterface->GetPlayerNickname(*CurrentSession->RegisteredPlayers[i])));
 		}
 		auto CompareByNickname = [&World](const FUniqueNetIdRepl& A, const FUniqueNetIdRepl& B) -> bool

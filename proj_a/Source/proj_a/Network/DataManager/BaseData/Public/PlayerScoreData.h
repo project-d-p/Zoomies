@@ -19,7 +19,12 @@ public:
 	virtual FName GetDataType() const override;
 	void IncreaseScore(const EPlayerJob& PlayerJob, const TArray<EAnimal>& Animals);
 	void TestBroadcast();
-	
+	void SetPlayerName(const FString& String);
+	FString GetPlayerName() const { return PlayerName; }
+	FFinalScoreData GetScore() const { return Score; }
+	void SetScore(const FFinalScoreData& InScore) { Score = InScore; }
+
 private:
+	FString PlayerName;
 	FFinalScoreData Score;
 };

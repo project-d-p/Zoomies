@@ -20,6 +20,7 @@ public:
 	UNetworkFailureManager();
 	FOnHostMigration& OnHostMigration() { return OnHostMigrationDelegate; }
 	UDataManager* GetDataManager() { return DataManager; }
+	int GetDesiredMaxPlayers() { return DesiredMaxPlayers; }
 	void Init();
 
 private:
@@ -49,4 +50,5 @@ private:
 	UDataManager* DataManager;
 	FName DesiredSessionName;
 	FName DesiredMapName;
+	int DesiredMaxPlayers = 0;
 };
