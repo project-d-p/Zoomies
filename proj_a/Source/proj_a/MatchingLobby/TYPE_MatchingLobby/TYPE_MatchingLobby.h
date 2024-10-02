@@ -18,7 +18,7 @@ struct FLobbyInfo
 	bool bIsReady = false;
 
 	UPROPERTY(BlueprintReadWrite, Category = "LobbyInfo")
-	FString Name = "test";
+	FString Name = "Wait...";
 	
 	UPROPERTY(BlueprintReadWrite, Category = "LobbyInfo")
 	APlayerController *PC = nullptr;
