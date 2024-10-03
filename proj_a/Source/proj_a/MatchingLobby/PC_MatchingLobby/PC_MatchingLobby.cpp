@@ -45,7 +45,7 @@ void APC_MatchingLobby::BeginPlay()
 	Super::BeginPlay();
 
 	bShowMouseCursor = true;
-	SetInputMode(FInputModeGameOnly());
+
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
 	if (IsValid(GameInstance) && GameInstance->FriendsArray.Num() == 0)
 	{
@@ -208,6 +208,10 @@ void APC_MatchingLobby::getMatchLobbyUI()
 			if (MatchLobbyWidget != nullptr)
 			{
 				MatchLobbyWidget->AddToViewport();
+				FInputModeGameAndUI InputMode;
+				InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+				InputMode.SetWidgetToFocus(MatchLobbyWidget->TakeWidget());
+				SetInputMode(InputMode);
 				UE_LOG(LogTemp, Log, TEXT("APC_MatchingLobby::getMatchLobbyUI: Widget successfully created and added to viewport."));
 			}
 			else

@@ -638,17 +638,3 @@ void UGI_Zoomies::ShowLoadingScreen()
 		UE_LOG(LogTemp, Error, TEXT("ShowLoadingScreen::Failed to load widget class"));
 	}
 }
-
-void UGI_Zoomies::HideLoadingScreen()
-{
-	if (LoadingWidget != nullptr)
-	{
-		LoadingWidget->RemoveFromParent();
-		LoadingWidget = nullptr;
-		UE_LOG(LogTemp, Log, TEXT("HideLoadingScreen::Loading screen hidden"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("HideLoadingScreen::No loading screen to hide"));
-	}
-}
