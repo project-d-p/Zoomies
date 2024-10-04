@@ -23,13 +23,15 @@ public:
 protected:
 	UPROPERTY()
 	UTimerUI* TimerUI = nullptr;
+	
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* Time_Text;
+	
+	/*
 	UPROPERTY()
 	UScoreUI* ScoreUI = nullptr;
 	UPROPERTY()
 	UScoreUiPrivate* ScoreUI_Private = nullptr;
-	
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* Time_Text;
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* score_Text;
@@ -54,4 +56,5 @@ protected:
 
 	void UpdateTextBlock(UTextBlock* TextBlock);
 	void FindAndUpdateTextBlocks(UWidget* ParentWidget);
+	*/
 };

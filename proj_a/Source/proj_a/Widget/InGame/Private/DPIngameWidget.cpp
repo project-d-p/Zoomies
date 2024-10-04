@@ -24,7 +24,7 @@ void UDPIngameWidget::NativeConstruct()
 		TimerUiInitializer.InWorld = GetWorld();
 		TimerUI->initTimerUI<ADPInGameState>(TimerUiInitializer);
 	}
-	
+	/*	
 	ScoreUI = NewObject<UScoreUI>(this);
 	if (ScoreUI)
 	{
@@ -51,8 +51,9 @@ void UDPIngameWidget::NativeConstruct()
 		PrivateScoreUiInitializer.ScoreTextPrivate_Total = scoreTotal;
 		ScoreUI_Private->InitScoreUiPrivate(PrivateScoreUiInitializer);
 	}
+	*/
 }
-
+/*
 void UDPIngameWidget::FindAndUpdateTextBlocks(UWidget* ParentWidget)
 {
 	if (!ParentWidget)
@@ -121,3 +122,4 @@ void UDPIngameWidget::UpdateTextBlock(UTextBlock* TextBlock)
 		TextBlock->SetText(FText::FromString("else"));
 	}
 }
+*/
