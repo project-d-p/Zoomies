@@ -203,6 +203,7 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 	check(player_state);
 
 #if LAN_MODE || EDITOR_MODE
+// #if EDITOR_MODE
 	FString name = player_state->GetPlayerName();
 	std::string key(TCHAR_TO_UTF8(*name));
 	
@@ -533,9 +534,14 @@ ADPGameModeBase::~ADPGameModeBase()
 
 void ADPGameModeBase::SyncMovement()
 {
+	static int count = 0;
 	for (auto& pair: player_controllers_)
 	{
 		Message msg = MessageMaker::MakePositionMessage(pair.second);
+		if (pair.second->IsLocalController())
+		{
+			// FNetLogger::EditerLog(FColor::Cyan, TEXT("Local Player Position : %d"), count++);
+		}
 		NetworkManager->SendData(msg);
 	}
 }

@@ -49,4 +49,12 @@ void UDPIngameWidget::NativeConstruct()
 void UDPIngameWidget::OnScoreChanged(UBaseData* Data)
 {
 	FNetLogger::EditerLog(FColor::Cyan, TEXT("OnScoreChanged"));
+
+	
+	
+	// 본인이 잡을 경우 호출됨
+	// 상대가 잡을 경우에도 호출됨
+	// 서버든 클라이언트든 모두 호출됨
+
+	PlayerState = 
 }
