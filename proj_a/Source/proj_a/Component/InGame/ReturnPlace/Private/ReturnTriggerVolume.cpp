@@ -156,13 +156,13 @@ void AReturnTriggerVolume::SpawnReturnEffect(TArray<EAnimal> Array)
         
 		TWeakObjectPtr<AReturnTriggerVolume> WeakThis(this);
         
-		SpawnTimerDelegate.BindLambda([WeakThis, Animal, Index, &SpawnTimerHandle]()
+		SpawnTimerDelegate.BindLambda([WeakThis, Animal, Index, SpawnTimerHandle]()
 		{
 			if (WeakThis.IsValid())
 			{
 				WeakThis->SpawnSingleMonster(Animal, Index);
-				WeakThis->SpawnTimerHandles.Remove(SpawnTimerHandle);
 				delete SpawnTimerHandle;
+				WeakThis->SpawnTimerHandles.Remove(SpawnTimerHandle);
 			}
 		});
 		float SpawnDelay = Index * 0.5f;

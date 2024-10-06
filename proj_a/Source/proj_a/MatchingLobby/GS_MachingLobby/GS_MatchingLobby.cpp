@@ -2,11 +2,14 @@
 
 #include "CompileMode.h"
 #include "DPCharacter.h"
+#include "FNetLogger.h"
+#include "TestData.h"
 #include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
+#include "proj_a/GameInstance/GI_Zoomies.h"
 #include "proj_a/MatchingLobby/GM_MatchingLobby/GM_MatchingLobby.h"
 #include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
 
@@ -83,6 +86,41 @@ void AGS_MatchingLobby::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(AGS_MatchingLobby, LobbyInfos);
 	DOREPLIFETIME(AGS_MatchingLobby, LowestAveragePing);
 	DOREPLIFETIME(AGS_MatchingLobby, BestHostPlayer);
+}
+
+void AGS_MatchingLobby::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// Delegate for handling network failure On This Level
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (!HasAuthority())
+	{
+		if (GameInstance)
+		{
+			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &AGS_MatchingLobby::OnHostMigration);
+		}
+	}
+}
+
+void AGS_MatchingLobby::OnHostMigration(UWorld* World, UDataManager* DataManager)
+{
+}
+
+void AGS_MatchingLobby::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	// Delegate for handling network failure On This Level
+	if (!HasAuthority())
+	{
+		UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+		if (GameInstance)
+		{
+			FNetLogger::EditerLog(FColor::Red, TEXT("GameInstance is not null"));
+			GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
+		}
+	}
 }
 
 bool AGS_MatchingLobby::AreAllPlayersReady()

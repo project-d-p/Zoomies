@@ -12,6 +12,7 @@
 #include "ResultLevelComponent.h"
 #include "CompileMode.h"
 #include "LobbyLevelComponent.h"
+#include "Chaos/ChaosPerfTest.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 DEFINE_LOG_CATEGORY(LogNetwork);
@@ -117,14 +118,20 @@ void ADPPlayerController::ClientDestroySession_Implementation()
 
 void ADPPlayerController::ConnectToServer_Implementation(ELevelComponentType Type)
 {
+	if (IsLocalController())
+	{
+		
 #if EDITOR_MODE
 	NetworkManager->Initialize(ENetworkTypeZoomies::NONE);
 #elif LAN_MODE
-	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
+	// NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
+	NetworkManager->Initialize(ENetworkTypeZoomies::ENGINE_SOCKET);
 #else
 	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
 #endif
-	SwitchLevelComponent(Type);
+	//
+	// SwitchLevelComponent(Type);
+	}
 }
 
 void ADPPlayerController::BeginPlay()
@@ -169,6 +176,10 @@ void ADPPlayerController::SetupInputComponent()
 
 void ADPPlayerController::SwitchLevelComponent(ELevelComponentType Type)
 {
+	if (ActiveComponent == LevelComponents[static_cast<uint32>(Type)])
+	{
+		return ;
+	}
 	if (ActiveComponent)
 	{
 		DeactiveCurrentComponent();
@@ -183,6 +194,11 @@ void ADPPlayerController::SwitchLevelComponent(ELevelComponentType Type)
 UBaseLevelComponent* ADPPlayerController::GetLevelComponent() const
 {
 	return ActiveComponent;
+}
+
+UBaseLevelComponent* ADPPlayerController::GetLevelComponent(ELevelComponentType Type) const
+{
+	return LevelComponents[static_cast<uint32>(Type)];
 }
 
 void ADPPlayerController::DeactiveCurrentComponent()

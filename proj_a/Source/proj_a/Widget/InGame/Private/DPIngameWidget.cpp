@@ -123,3 +123,9 @@ void UDPIngameWidget::UpdateTextBlock(UTextBlock* TextBlock)
 	}
 }
 */
+
+
+void UDPIngameWidget::OnScoreChanged(UBaseData* Data)
+{
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("OnScoreChanged"));
+}

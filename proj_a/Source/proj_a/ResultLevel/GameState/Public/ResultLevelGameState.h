@@ -66,6 +66,9 @@ public:
 	UFUNCTION(Client, Reliable)
 	void NotifyPlayersAllTraveled();
 
+	UFUNCTION(BlueprintCallable)
+	void SetWinner();
+
 	// index displays as player index
 	UPROPERTY(Replicated, BlueprintReadWrite, Category = "PlayerScores")
 	TArray<FPlayerScore> PlayerScores;

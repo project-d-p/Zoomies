@@ -17,6 +17,7 @@ public:
 	UMonsterSlotComponent();
 	bool AddMonsterToSlot(ADPCharacter* character, USkeletalMesh* monster, const FString& monster_type);
 	bool AddMonsterToSlot(ADPCharacter* character, const FString& monster_type);
+	bool AddMonsterToSlot(ADPCharacter* character, EAnimal monster_type);
 	TArray<EAnimal> RemoveMonstersFromSlot();
 
 private:

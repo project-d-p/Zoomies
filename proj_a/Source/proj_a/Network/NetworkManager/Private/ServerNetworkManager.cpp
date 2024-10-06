@@ -1,5 +1,6 @@
 #include "ServerNetworkManager.h"
 
+#include "FNetLogger.h"
 #include "ISocketFactory.h"
 #include "ISocketInterface.h"
 #include "NetworkWorker.h"
@@ -8,7 +9,6 @@ void UServerNetworkManager::Initialize(ENetworkTypeZoomies SocketType)
 {
 	UISocketInterface* SocketInterface = SocketFactory->CreateSocketInterface(SocketType);
 	check(SocketInterface);
-	SocketInterface->SetAsServer();
 	SocketInterface->ActivateServer();
 
 	Worker = NewObject<UNetworkWorker>();

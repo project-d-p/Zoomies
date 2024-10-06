@@ -8,6 +8,7 @@
 #include "FNetLogger.h"
 #include "ReturnTriggerVolume.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "CompileMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Serialization/BulkDataRegistry.h"
@@ -27,7 +28,11 @@ void UCharacterPositionSync::PlayAimAnimation(ADPCharacter* character)
 	{
 		return;
 	}
+#if EDITOR_MODE || LAN_MODE
 	const FString PlayerId = Player_State->GetPlayerName();
+#else
+	const FString PlayerId = Player_State->GetUniqueId()->ToString();
+#endif
 	AimState* aim_state = FDataHub::aimStateData.Find(PlayerId);
 	if (aim_state == nullptr)
 	{
@@ -55,7 +60,11 @@ void UCharacterPositionSync::SyncWithServer(ADPCharacter* character)
 		return;
 	}
 	
+#if EDITOR_MODE || LAN_MODE
 	const FString PlayerId = Player_State->GetPlayerName();
+#else
+	const FString PlayerId = Player_State->GetUniqueId()->ToString();
+#endif
 
 	ActorPosition* actor_position = FDataHub::actorPosition.Find(PlayerId);
 	if (actor_position == nullptr)
@@ -80,7 +89,11 @@ void UCharacterPositionSync::SyncGunFire(ADPCharacter* character)
 	{
 		return;
 	}
+#if EDITOR_MODE || LAN_MODE
 	const FString PlayerId = Player_State->GetPlayerName();
+#else
+	const FString PlayerId = Player_State->GetUniqueId()->ToString();
+#endif
 	Gunfire* gunfire = FDataHub::gunfireData.Find(PlayerId);
 	if (gunfire == nullptr)
 	{
@@ -105,7 +118,11 @@ void UCharacterPositionSync::SyncCatch(ADPCharacter* character)
 	{
 		return;
 	}
+#if EDITOR_MODE || LAN_MODE
 	const FString PlayerId = Player_State->GetPlayerName();
+#else
+	const FString PlayerId = Player_State->GetUniqueId()->ToString();
+#endif
 	Catch* catch_ = FDataHub::catchData.Find(PlayerId);
 	if (catch_ == nullptr)
 	{
@@ -124,7 +141,11 @@ void UCharacterPositionSync::SyncReturnAnimal(ADPCharacter* character)
 	{
 		return;
 	}
+#if EDITOR_MODE || LAN_MODE
 	const FString PlayerId = Player_State->GetPlayerName();
+#else
+	const FString PlayerId = Player_State->GetUniqueId()->ToString();
+#endif
 	bool* isReturn = FDataHub::returnAnimalData.Find(PlayerId);
 	if (isReturn == nullptr)
 	{
@@ -133,6 +154,7 @@ void UCharacterPositionSync::SyncReturnAnimal(ADPCharacter* character)
 	if (*isReturn)
 	{
 		TArray<EAnimal> animals = character->ReturnMonsters();
+		Player_State->IncreaseScore(animals);
 		if (character->ReturnTriggerVolume)
 		{
 			character->ReturnTriggerVolume->SpawnReturnEffect(animals);

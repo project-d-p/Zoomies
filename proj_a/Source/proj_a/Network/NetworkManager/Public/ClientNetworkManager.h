@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "ANetworkManager.h"
+#include "MessageHandler.h"
 #include "NetworkWorker.h"
 #include "ClientNetworkManager.generated.h"
 
@@ -20,4 +21,5 @@ private:
 	UPROPERTY()
 	UNetworkWorker* Worker = nullptr;
 	FRunnableThread* WorkerThread = nullptr;
+	FMessageHandler MessageHandler;
 };

@@ -3,6 +3,7 @@
 #include "DPCharacter.h"
 
 #include "BaseMonsterCharacter.h"
+#include "CharacterData.h"
 #include "ChasePlayerMonsterAIController.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -30,6 +31,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
+#include "proj_a/GameInstance/GI_Zoomies.h"
 #include "proj_a/MatchingLobby/GS_MachingLobby/GS_MatchingLobby.h"
 #include "Serialization/BulkDataRegistry.h"
 
@@ -195,7 +197,7 @@ ADPCharacter::ADPCharacter()
 				LobbyInfoWidgetComponent->DestroyComponent();
 				LobbyInfoWidgetComponent = nullptr;
 			}
-
+	
 			LobbyInfoWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("LobbyInfoWidgetComponent"));
 			static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClass(TEXT("/Game/widget/WBP_MatchLobby/widget_LobbyInfo.widget_LobbyInfo_C"));
 			if (WidgetClass.Succeeded())
@@ -225,10 +227,43 @@ ADPCharacter::ADPCharacter()
 
 		}
 	}
+
+	// Crown
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> CrownMesh
+	(TEXT("/Game/model/objects/crown/crown1/crown_merged.crown_merged"));
+	if (CrownMesh.Succeeded())
+	{
+		Crown = CrownMesh.Object;
+	}
 }
 
 ADPCharacter::~ADPCharacter()
 {
+}
+
+void ADPCharacter::OnHostMigration(UWorld* World, UDataManager* DataManager)
+{
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (GameInstance)
+	{
+		GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
+	}
+	UCharacterData* CharacterData = NewObject<UCharacterData>(DataManager, UCharacterData::StaticClass());
+	if (CharacterData)
+	{
+		CharacterData->InitializeData();
+		FString PlayerName = GetPlayerState()->GetPlayerName();
+		CharacterData->SetActorName(PlayerName);
+		CharacterData->SetActorLocation(GetActorLocation());
+		CharacterData->SetActorRotation(GetActorRotation());
+
+		TArray<EAnimal> CapturedAnimals = ReturnMonsters();
+		for (EAnimal Animal : CapturedAnimals)
+		{
+			CharacterData->AddCapturedAnimal(Animal);
+		}
+		DataManager->AddDataToArray(TEXT("CharacterData"), CharacterData);
+	}
 }
 
 void ADPCharacter::SetNameTag_Implementation()
@@ -314,6 +349,14 @@ void ADPCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (!HasAuthority())
+	{
+		if (GameInstance)
+		{
+			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &ADPCharacter::OnHostMigration);
+		}
+	}
 	if (!NameTag_BP)
 	{
 		check(false);
@@ -325,16 +368,6 @@ void ADPCharacter::BeginPlay()
 		NameTag_WidgetComponent->SetVisibility(false);
 	}
 	
-	//if (GetMesh()) {
-	//	UMaterialInterface* Material = GetMesh()->GetMaterial(0);
-	//	if (Material) {
-	//		dynamicMaterialInstance = UMaterialInstanceDynamic::Create(Material, this);
-	//		GetMesh()->SetMaterial(0, dynamicMaterialInstance);
-	//	}
-	//}
-	//if (dynamicMaterialInstance)
-	//	dynamicMaterialInstance->SetVectorParameterValue(FName("color"), FVector4(0.f, 0.f, 1.f, 1.f));
-
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AReturnTriggerVolume::StaticClass(), FoundActors);
 	if (FoundActors.Num() > 0)
@@ -348,14 +381,16 @@ void ADPCharacter::BeginPlay()
 	constructionComponent->placeWall = false;
 	constructionComponent->placeturret = false;
 	bUseControllerRotationYaw = false;
-	if (UWorld* World = GetWorld())
+}
+
+void ADPCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (GameInstance)
 	{
-		FString CurrentLevelName = UGameplayStatics::GetCurrentLevelName(World);
-		
-		if (CurrentLevelName != "matchLobby")
-		{
-			SetNameTag();
-		}
+		GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
 	}
 }
 
@@ -408,6 +443,50 @@ void ADPCharacter::Tick(float DeltaTime)
 	{
 		CheckCollisionWithMonster();
 	}
+}
+
+void ADPCharacter::OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerState* OldPlayerState)
+{
+	Super::OnPlayerStateChanged(NewPlayerState, OldPlayerState);
+	FNetLogger::EditerLog(FColor::Red, TEXT("OnPlayerStateChanged"));
+	if (NewPlayerState == nullptr)
+	{
+		return ;
+	}
+
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	check(GameInstance);
+	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
+	check(DataManager);
+
+	UDataArray* CharacterDataArray = DataManager->GetDataArray(TEXT("CharacterData"));
+	if (!CharacterDataArray)
+	{
+		return ;
+	}
+
+	FString PlayerName = NewPlayerState->GetPlayerName();
+	UCharacterData* MyCharacterData = nullptr;
+	for (UBaseData* Data : CharacterDataArray->DataArray)
+	{
+		UCharacterData* SavedCharacterData = Cast<UCharacterData>(Data);
+		if (SavedCharacterData && SavedCharacterData->GetActorName() == PlayerName)
+		{
+			MyCharacterData = SavedCharacterData;
+			break;
+		}
+	}
+	if (IsLocallyControlled())
+	{
+		this->SetActorLocation(MyCharacterData->GetActorLocation());
+		this->SetActorRotation(MyCharacterData->GetActorRotation());
+	}
+	TArray<EAnimal> CapturedAnimals = MyCharacterData->GetCapturedAnimals();
+	for (EAnimal Animal : CapturedAnimals)
+	{
+		monsterSlotComponent->AddMonsterToSlot(this, Animal);
+	}
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("%s"), *PlayerName);
 }
 
 // Called to bind functionality to input
@@ -499,6 +578,7 @@ bool ADPCharacter::IsStunned() const
 
 void ADPCharacter::ClientNotifyAnimalReturn_Implementation(const FString& player_name)
 {
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("ClientNotifyAnimalReturn_Implementation"));
 	FDataHub::PushReturnAnimalDA(player_name, true);
 }
 
@@ -621,6 +701,7 @@ void ADPCharacter::RemoveStunEffect()
 
 void ADPCharacter::ApplyKockback_Implementation(const FHitResult& HitResult)
 {
+	// �浹 �������� ĳ���� ��ġ���� ������ ���
 	FVector KnockbackDirection = GetActorLocation() - HitResult.ImpactPoint;
 	// FVector KnockbackDirection = -HitResult.ImpactNormal;
 	KnockbackDirection.Z = 20.0f;
@@ -634,9 +715,10 @@ void ADPCharacter::ApplyKockback_Implementation(const FHitResult& HitResult)
 		KnockbackDirection = GetActorForwardVector() * -1;
 	}
 
+	// �˹� �ӵ� ����
 	float KnockbackSpeed = 2000.0f;
 
-	// Character Movement Component
+	// Character Movement Component ��������
 	UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
 	if (MovementComponent)
 	{
@@ -734,4 +816,19 @@ void ADPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ADPCharacter, bIsStunned);
+}
+
+void ADPCharacter::SetCrownMesh_Implementation()
+{
+	UStaticMeshComponent* CrownMeshComponent = NewObject<UStaticMeshComponent>(this);
+	
+	CrownMeshComponent->SetStaticMesh(Crown);
+	CrownMeshComponent->SetRelativeLocation(FVector(0, 0, 100));
+	CrownMeshComponent->SetRelativeRotation(FRotator(0, -90, -90));
+	CrownMeshComponent->SetWorldScale3D(FVector(0.5f, 0.5f, 0.5f));
+	// CrownMeshComponent->SetupAttachment(RootComponent);
+
+	CrownMeshComponent->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("MonsterSlot_0"));
+	CrownMeshComponent->RegisterComponent();
+	CrownMeshComponent->SetVisibility(true);
 }

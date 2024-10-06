@@ -17,14 +17,17 @@ void UGI_Zoomies::Init()
 {
 	Super::Init();
 	CheckSteamInit();
-
-	#if EDITOR_MODE
-		bIsOnline = false;
-	#elif LAN_MODE
-		bIsOnline = false;
-	#else
-		bIsOnline = true;
-	#endif
+	
+	network_failure_manager_ = NewObject<UNetworkFailureManager>(this, UNetworkFailureManager::StaticClass());
+	network_failure_manager_->Init();
+	
+#if EDITOR_MODE
+	bIsOnline = false;
+#elif LAN_MODE
+	bIsOnline = false;
+#else
+	bIsOnline = true;
+#endif
 }
 
 // matching session Functions
@@ -490,6 +493,7 @@ void UGI_Zoomies::InitOnlineSubsystemSteam()
 		{
 			session_interface_ = online_subsystem_->GetSessionInterface();
 			is_online_session_steam_init = true;
+			// network_failure_manager_->Init(session_interface_);
 			if (session_interface_.IsValid())
 			{
 				UE_LOG(

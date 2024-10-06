@@ -12,9 +12,13 @@ class ABlockingBoxVolume : public AActor
 public:
 	ABlockingBoxVolume();
 
-	void DeactiveBlockingVolume();
+	void DeactiveBlockingVolume(bool& bWallDisappear);
 
+protected:
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastDestroyComponent();
+	
 private:
 	UPROPERTY()
-	UBoxComponent* BlockingBox;
+	UStaticMeshComponent* BlockingBox;
 };

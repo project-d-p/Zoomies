@@ -22,9 +22,15 @@ struct FScoreData
 
 struct FFinalScoreData
 {
+	FString PlayerName;
 	TArray<TArray<EAnimal>> CapturedAnimals;
 	TArray<FScoreData> ScoreDatas;
+	float PrivateTotalScore = 0;
+	float PrivateTotalBaseScore = 0;
+	float PrivateTotalScale = 1;
+	float PublicTotalScore = 0;
 	bool bIsDetected = false;
+
 	FFinalScoreData& operator=(const FFinalScoreData& InFinalScoreData)
 	{
 		if (this != &InFinalScoreData)
@@ -36,6 +42,10 @@ struct FFinalScoreData
 			for (const auto& ScoreData : InFinalScoreData.ScoreDatas)
 				ScoreDatas.Add(ScoreData);
 			bIsDetected = InFinalScoreData.bIsDetected;
+			PrivateTotalScore = InFinalScoreData.PrivateTotalScore;
+			PrivateTotalBaseScore = InFinalScoreData.PrivateTotalBaseScore;
+			PrivateTotalScale = InFinalScoreData.PrivateTotalScale;
+			PublicTotalScore = InFinalScoreData.PublicTotalScore;
 		}
 		return *this;
 	}

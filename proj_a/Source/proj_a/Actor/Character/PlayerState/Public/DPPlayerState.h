@@ -1,9 +1,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-// #include "PlayerScoreComp.h"
+#include "DataManager.h"
+#include "NetworkFailureManager.h"
+#include "PlayerScoreComp.h"
 #include "GameFramework/PlayerState.h"
 #include "proj_a/Component/InGame/Score/Types/ScoreTypes.h"
+#include "PlayerScoreData.h"
 #include "DPPlayerState.generated.h"
 
 UCLASS()
@@ -19,30 +22,37 @@ public:
 	UFUNCTION()
 	EPlayerJob GetPlayerJob() const;
 
+	void SetPlayerRandomJob();
 	void SetFinalScoreData(const FFinalScoreData& InFinalScoreData) { FinalScoreData = InFinalScoreData; }
 	const FFinalScoreData& GetFinalScoreData() const { return FinalScoreData; }
 
-	UPROPERTY(ReplicatedUsing = OnRep_Rank, BlueprintReadWrite, Category = "PlayerRank")
+	UPROPERTY(Replicated, BlueprintReadWrite, Category = "PlayerRank")
 	int Rank;
-
-	UFUNCTION()
-	void OnRep_Rank();
 
 	UFUNCTION(Server, Reliable)
 	void ServerSetRank(int InRank);
 
+	UPROPERTY(Replicated, BlueprintReadWrite, Category = "PlayerJob")
+	EPlayerJob PlayerJob;
+
+	void IncreaseScore(const TArray<EAnimal>& InAnimals);
 protected:
 	virtual void CopyProperties(APlayerState* PlayerState) override;
 	
 private:
+	// Will Delete
 	UPROPERTY()
 	UPlayerScoreComp* PlayerScoreComp = nullptr;
-
-	UPROPERTY(Replicated)
-	EPlayerJob PlayerJob = EPlayerJob::JOB_ARCHAEOLOGIST;
-
 	FFinalScoreData FinalScoreData;
+	//
 
+	void OnHostMigration(UWorld* World, UDataManager* DataManager);
+	void InitializePlayerState();
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	UPROPERTY()
+	UPlayerScoreData* PlayerScoreData = nullptr;
+	FDelegateHandle OnHostMigrationDelegate;
 };

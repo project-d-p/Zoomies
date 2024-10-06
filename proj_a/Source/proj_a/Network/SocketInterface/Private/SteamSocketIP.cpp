@@ -62,3 +62,8 @@ USteamSocketIP::~USteamSocketIP()
 		SteamNetworkingSockets()->CloseConnection(m_Connection, 0, nullptr, false);
 	}
 }
+
+void USteamSocketIP::BeginDestroy()
+{
+	Super::BeginDestroy();
+}

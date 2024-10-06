@@ -15,6 +15,9 @@ public:
 	virtual void ActivateClient() override;
 	virtual ~USteamSocketP2P();
 
+protected:
+	virtual void BeginDestroy() override;
+
 private:
 	CSteamID GetHostSteamID();
 	void CheckRelayNetworkStatus();

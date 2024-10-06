@@ -19,6 +19,9 @@ class PROJ_A_API UDPIngameWidget : public UUserWidget
 	GENERATED_BODY()
 public:
 	virtual void NativeConstruct() override;
+
+	UFUNCTION()
+	void OnScoreChanged(UBaseData* Data);
 	
 protected:
 	UPROPERTY()

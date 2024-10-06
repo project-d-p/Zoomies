@@ -19,13 +19,20 @@ ADPWeaponGun::ADPWeaponGun()
 	hitScan = CreateDefaultSubobject<UHitScan>(TEXT("HitScan"));
 
 	gunMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GunMesh"));
-	// RootComponent = gunMesh;
+	RootComponent = gunMesh;
 
+	// SoundComponent = CreateDefaultSubobject<USoundComponent>(TEXT("SoundComponent"));
+	// Base Property : SoundComponent
+	SoundComponent->SetupAttachment(RootComponent);
+	
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> GUN
 	(TEXT("/Game/model/weapon/simpleGun.simpleGun"));
 	if (GUN.Succeeded()) {
 		gunMesh->SetStaticMesh(GUN.Object);
-		gunMesh->SetupAttachment(RootComponent);
+		
+		// 충돌 비활성화
+		gunMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		gunMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 	}
 
 	muzzle = CreateDefaultSubobject<UArrowComponent>(TEXT("MuzzleComp"));
