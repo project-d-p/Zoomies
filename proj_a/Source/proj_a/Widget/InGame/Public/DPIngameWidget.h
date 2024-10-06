@@ -30,23 +30,8 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* Time_Text;
 	
-	/*
-	UPROPERTY()
-	UScoreUI* ScoreUI = nullptr;
 	UPROPERTY()
 	UScoreUiPrivate* ScoreUI_Private = nullptr;
-
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* score_Text;
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* score_Text_Private;
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* player1Score_Text;
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* player2Score_Text;
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* player3Score_Text;
-
 	//ScoreBox
 	UPROPERTY()
 	UTextBlock* scoreFront = nullptr;
@@ -59,5 +44,4 @@ protected:
 
 	void UpdateTextBlock(UTextBlock* TextBlock);
 	void FindAndUpdateTextBlocks(UWidget* ParentWidget);
-	*/
 };

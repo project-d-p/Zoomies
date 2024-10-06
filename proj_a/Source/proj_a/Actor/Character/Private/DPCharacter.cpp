@@ -448,7 +448,7 @@ void ADPCharacter::Tick(float DeltaTime)
 void ADPCharacter::OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerState* OldPlayerState)
 {
 	Super::OnPlayerStateChanged(NewPlayerState, OldPlayerState);
-	FNetLogger::EditerLog(FColor::Red, TEXT("OnPlayerStateChanged"));
+	//FNetLogger::EditerLog(FColor::Red, TEXT("OnPlayerStateChanged"));
 	if (NewPlayerState == nullptr)
 	{
 		return ;

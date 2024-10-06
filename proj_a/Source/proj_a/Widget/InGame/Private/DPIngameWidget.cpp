@@ -24,18 +24,6 @@ void UDPIngameWidget::NativeConstruct()
 		TimerUiInitializer.InWorld = GetWorld();
 		TimerUI->initTimerUI<ADPInGameState>(TimerUiInitializer);
 	}
-	/*	
-	ScoreUI = NewObject<UScoreUI>(this);
-	if (ScoreUI)
-	{
-		FScoreUiInitializer ScoreUiInitializer;
-		ScoreUiInitializer.InWorld = GetWorld();
-		ScoreUiInitializer.ScoreText = score_Text;
-		ScoreUiInitializer.Player1ScoreText = player1Score_Text;
-		ScoreUiInitializer.Player2ScoreText = player2Score_Text;
-		ScoreUiInitializer.Player3ScoreText = player3Score_Text;
-		ScoreUI->InitScoreUi(ScoreUiInitializer);
-	}
 	
 	FindAndUpdateTextBlocks(this);
 
@@ -44,16 +32,14 @@ void UDPIngameWidget::NativeConstruct()
 	{
 		FPrivateScoreUiInitializer PrivateScoreUiInitializer;
 		PrivateScoreUiInitializer.InWorld = GetWorld();
-		PrivateScoreUiInitializer.ScoreTextPrivate = score_Text_Private;
+		//PrivateScoreUiInitializer.ScoreTextPrivate = score_Text_Private;
 		PrivateScoreUiInitializer.ScoreTextPrivate_Front = scoreFront;
 		PrivateScoreUiInitializer.ScoreTextPrivate_Back = scoreBack;
 		PrivateScoreUiInitializer.ScoreTextPrivate_Job = scoreJob;
 		PrivateScoreUiInitializer.ScoreTextPrivate_Total = scoreTotal;
 		ScoreUI_Private->InitScoreUiPrivate(PrivateScoreUiInitializer);
 	}
-	*/
 }
-/*
 void UDPIngameWidget::FindAndUpdateTextBlocks(UWidget* ParentWidget)
 {
 	if (!ParentWidget)
@@ -104,17 +90,14 @@ void UDPIngameWidget::UpdateTextBlock(UTextBlock* TextBlock)
 	}
 	else if (OuterName.Contains("WBP_InGame_ScoreBox_Back"))
 	{
-		// TextBlock->SetText(FText::FromString("34"));
 		scoreBack = TextBlock;
 	}
 	else if (OuterName.Contains("WBP_InGame_ScoreBox_Job"))
 	{
-		// TextBlock->SetText(FText::FromString("jobbb"));
 		scoreJob = TextBlock;
 	}
 	else if (OuterName.Contains("WBP_InGame_ScoreBox_Total"))
 	{
-		// TextBlock->SetText(FText::FromString("totallll"));
 		scoreTotal = TextBlock;
 	}
 	else
@@ -122,10 +105,22 @@ void UDPIngameWidget::UpdateTextBlock(UTextBlock* TextBlock)
 		TextBlock->SetText(FText::FromString("else"));
 	}
 }
-*/
-
 
 void UDPIngameWidget::OnScoreChanged(UBaseData* Data)
 {
+	//BaseData to PlayerScoreData
+	UPlayerScoreData* PlayerScoreData = Cast<UPlayerScoreData>(Data);
+	if (!PlayerScoreData)
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("OnScoreChanged: PlayerScoreData is nullptr"));
+		return;
+	}
+	else
+	{
+		FFinalScoreData ScoreData = PlayerScoreData->GetScore();
+		scoreFront->SetText(FText::FromString(FString::FromInt(ScoreData.PrivateTotalBaseScore)));
+		scoreBack->SetText(FText::FromString(FString::FromInt(ScoreData.PrivateTotalScale)));
+		scoreTotal->SetText(FText::FromString(FString::FromInt(ScoreData.PrivateTotalScore)));
+	}
 	FNetLogger::EditerLog(FColor::Cyan, TEXT("OnScoreChanged"));
 }
