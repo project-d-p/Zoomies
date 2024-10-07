@@ -73,4 +73,5 @@ void UPlayerScoreData::TestBroadcast()
 void UPlayerScoreData::SetPlayerName(const FString& String)
 {
 	this->PlayerName = String;
+	Score.PlayerName = String;
 }

@@ -23,6 +23,7 @@ public:
 	FString GetPlayerName() const { return PlayerName; }
 	FFinalScoreData GetScore() const { return Score; }
 	void SetScore(const FFinalScoreData& InScore) { Score = InScore; }
+	void SetIsDetected(bool bIsDetected) { Score.bIsDetected = bIsDetected; }
 
 private:
 	FString PlayerName;

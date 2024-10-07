@@ -20,8 +20,11 @@ struct FScoreData
 
 };
 
+USTRUCT(BlueprintType)
 struct FFinalScoreData
 {
+	GENERATED_BODY()
+	
 	FString PlayerName;
 	TArray<TArray<EAnimal>> CapturedAnimals;
 	TArray<FScoreData> ScoreDatas;
@@ -41,6 +44,7 @@ struct FFinalScoreData
 			ScoreDatas.Empty();
 			for (const auto& ScoreData : InFinalScoreData.ScoreDatas)
 				ScoreDatas.Add(ScoreData);
+			PlayerName = InFinalScoreData.PlayerName;
 			bIsDetected = InFinalScoreData.bIsDetected;
 			PrivateTotalScore = InFinalScoreData.PrivateTotalScore;
 			PrivateTotalBaseScore = InFinalScoreData.PrivateTotalBaseScore;

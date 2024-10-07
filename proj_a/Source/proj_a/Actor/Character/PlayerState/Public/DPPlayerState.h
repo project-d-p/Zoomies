@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "DataManager.h"
+#include "FNetLogger.h"
 #include "NetworkFailureManager.h"
 #include "PlayerScoreComp.h"
 #include "GameFramework/PlayerState.h"
@@ -18,6 +19,7 @@ public:
 	
 	UFUNCTION()
 	UPlayerScoreComp* GetPlayerScoreComp() const;
+	UPlayerScoreData* GetPlayerScoreData() const { return PlayerScoreData; }
 
 	UFUNCTION()
 	EPlayerJob GetPlayerJob() const;
@@ -25,6 +27,11 @@ public:
 	void SetPlayerRandomJob();
 	void SetFinalScoreData(const FFinalScoreData& InFinalScoreData) { FinalScoreData = InFinalScoreData; }
 	const FFinalScoreData& GetFinalScoreData() const { return FinalScoreData; }
+	void SetPlayerScoreData(UPlayerScoreData* InPlayerScoreData)
+	{
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("SetPlayerScoreData"));
+		PlayerScoreData = Cast<UPlayerScoreData>(InPlayerScoreData->Clone(this));
+	}
 
 	UPROPERTY(Replicated, BlueprintReadWrite, Category = "PlayerRank")
 	int Rank;
