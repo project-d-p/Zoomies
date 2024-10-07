@@ -4,6 +4,7 @@
 #include "ClientTimerManager.h"
 #include "ClientScoreMananger.h"
 #include "ChatManager.h"
+#include "CompileMode.h"
 #include "IChatGameState.h"
 #include "NetworkFailureManager.h"
 #include "DPInGameState.generated.h"
@@ -39,7 +40,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	int32 ConnectedPlayers = 0;
-	const int32 ExpectedPlayers = 4;
+	const int32 ExpectedPlayers = Zoomies::MAX_PLAYERS;
 	
 	/*
 	 * TEST: COMMENT
