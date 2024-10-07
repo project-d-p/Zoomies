@@ -10,8 +10,11 @@
 #include "Engine/World.h"
 #include "Engine/GameInstance.h"
 // #include "Engine/GameMapsSettings.h"
+#include "CapturedImageWidget.h"
 #include "Engine/GameViewportClient.h"
 #include "Algo/Sort.h"
+#include "Engine/TextureRenderTarget2D.h"
+#include "Kismet/KismetRenderingLibrary.h"
 
 UNetworkFailureManager::UNetworkFailureManager()
 {
@@ -28,6 +31,48 @@ void UNetworkFailureManager::Init()
 	{
 		FNetLogger::EditerLog(FColor::Green, TEXT("NetworkFailureManager::Init"));
 		GEngine->OnNetworkFailure().AddUObject(this, &UNetworkFailureManager::HandleNetworkFailure);
+	}
+}
+
+void UNetworkFailureManager::ShowCapturedTextureToPlayer(UTextureRenderTarget2D* CapturedTexture,
+	const TArray<FColor>& Bitmap)
+{
+	if (!CapturedTexture)
+	{
+		return;
+	}
+
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+
+	// Texture2D로 변환
+	UTexture2D* CapturedTexture2D = UTexture2D::CreateTransient(CapturedTexture->SizeX, CapturedTexture->SizeY, PF_B8G8R8A8);
+	if (!CapturedTexture2D)
+	{
+		return;
+	}
+
+	void* TextureData = CapturedTexture2D->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+	FMemory::Memcpy(TextureData, Bitmap.GetData(), Bitmap.Num() * sizeof(FColor));
+	CapturedTexture2D->GetPlatformData()->Mips[0].BulkData.Unlock();
+
+	// 플레이어 컨트롤러를 통해 위젯 생성
+	APlayerController* PlayerController = World->GetFirstPlayerController();
+	if (PlayerController && PlayerController->IsLocalController())
+	{
+		// UMG 위젯 생성
+		CapturedImageWidget = CreateWidget<UCapturedImageWidget>(PlayerController, UCapturedImageWidget::StaticClass());
+		if (CapturedImageWidget)
+		{
+			// 캡처된 텍스처 설정
+			CapturedImageWidget->SetCapturedTexture(CapturedTexture2D);
+
+			// 위젯을 화면에 추가
+			CapturedImageWidget->AddToViewport();
+		}
 	}
 }
 
@@ -122,6 +167,7 @@ void UNetworkFailureManager::CreateSessionComplete(FName SessionName, bool bWasS
 
 		FString MapName = DesiredMapName.ToString();
 		FString TravelURL = FString::Printf(TEXT("%s?listen"), *MapName);
+		FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
 		GetWorld()->ServerTravel(TravelURL, true);
 	}
 	else
@@ -177,6 +223,13 @@ void UNetworkFailureManager::FindSessionComplete(bool bWasSuccessful, UWorld* Wo
 	}
 }
 
+void UNetworkFailureManager::OnNewLevelLoaded(UWorld* World)
+{
+	if (CapturedImageWidget)
+	{
+		CapturedImageWidget->RemoveFromParent();
+	}
+}
 
 void UNetworkFailureManager::JoinSession(const FOnlineSessionSearchResult& SearchResult, UWorld* World)
 {
@@ -210,7 +263,7 @@ void UNetworkFailureManager::JoinSessionComplete(FName SessionName, EOnJoinSessi
 				{
 					FString URL = FString::Printf(TEXT("%s/%s"), *ConnectString, *MapName);
 					FNetLogger::EditerLog(FColor::Green, TEXT("ClientTravel URL: %s"), *URL);
-					
+					FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
 					PlayerController->ClientTravel(URL, ETravelType::TRAVEL_Absolute);
 				}
 				else
@@ -272,18 +325,44 @@ void UNetworkFailureManager::CreateNewSessionMetaData(UWorld* World, const FUniq
 	}
 }
 
+void UNetworkFailureManager::CaptureViewport()
+{
+	// 1. Viewport 캡처
+	if (GEngine && GEngine->GameViewport)
+	{
+		FViewport* Viewport = GEngine->GameViewport->Viewport;
+
+		if (Viewport)
+		{
+			// Render Target 생성
+			UTextureRenderTarget2D* RenderTarget = NewObject<UTextureRenderTarget2D>();
+			RenderTarget->InitAutoFormat(1920, 1080);
+
+			// 캡처된 화면을 저장하기 위해 버퍼를 생성
+			TArray<FColor> Bitmap;
+
+			// 렌더 타겟의 크기 설정
+			FIntRect Rect(0, 0, Viewport->GetSizeXY().X, Viewport->GetSizeXY().Y);
+
+			// Viewport에서 픽셀 읽기
+			if (Viewport->ReadPixels(Bitmap, FReadSurfaceDataFlags(), Rect))
+			{
+				// 비동기로 렌더링 리소스를 처리하여 텍스처로 변환
+				AsyncTask(ENamedThreads::GameThread, [this, Bitmap, RenderTarget]()
+				{
+					// Bitmap 데이터를 사용해 텍스처를 업데이트하고, 플레이어에게 보여줄 수 있도록 설정
+					ShowCapturedTextureToPlayer(RenderTarget, Bitmap);
+				});
+			}
+		}
+	}
+}
+
 void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 {
 	FNamedOnlineSession* CurrentSession = SessionInterface->GetNamedSession(NAME_GameSession);
 	if (CurrentSession)
 	{
-		/* For Debugging */
-		// if (CurrentSession->RegisteredPlayers.Num() == 2)
-		// {
-		// 	bNextHost = false;
-		// 	FNetLogger::EditerLog(FColor::Red, TEXT("You are the Last Player in the Session"));
-		// 	return ;
-		// }
 		TArray<FUniqueNetIdRepl> RegisteredPlayers;
 		TSet<FString> UniqueNicknames;  // 중복 확인을 위한 닉네임 저장소
 		
@@ -324,7 +403,7 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 
 			return NicknameA < NicknameB;  // 문자열을 기준으로 사전순 정렬
 		};
-		// Algo::Sort(RegisteredPlayers, CompareByNickname);
+		
 		RegisteredPlayers.Sort(CompareByNickname);
 		for (int32 i = 0; i < RegisteredPlayers.Num(); i++) {
 			IOnlineIdentityPtr IdentityInterface = Online::GetIdentityInterface(World);
@@ -341,6 +420,7 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 			bNextHost = false;
 		}
 		CreateNewSessionMetaData(World, NextHostID);
+		CaptureViewport();
 	}
 	else
 	{

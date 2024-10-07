@@ -240,7 +240,11 @@ void ADPCharacter::OnHostMigration(UWorld* World, UDataManager* DataManager)
 	if (CharacterData)
 	{
 		CharacterData->InitializeData();
-		FString PlayerName = GetPlayerState()->GetPlayerName();
+		FString PlayerName = TEXT("");
+		if (GetPlayerState())
+		{
+			PlayerName = GetPlayerState()->GetPlayerName();
+		}
 		CharacterData->SetActorName(PlayerName);
 		CharacterData->SetActorLocation(GetActorLocation());
 		CharacterData->SetActorRotation(GetActorRotation());
