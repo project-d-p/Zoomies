@@ -1,5 +1,6 @@
 #include "DPInGameState.h"
 
+#include "DPJobAssign.h"
 #include "DPPlayerController.h"
 #include "FNetLogger.h"
 #include "TimeData.h"
@@ -15,6 +16,12 @@ ADPInGameState::ADPInGameState()
 	TimerManager = CreateDefaultSubobject<UClientTimerManager>(TEXT("TimerManager"));
 	ScoreManager = CreateDefaultSubobject<UClientScoreMananger>(TEXT("ScoreManager"));
 	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetBPClass(TEXT("/Game/widget/widget_jobAssign.widget_jobAssign_C"));
+	if (WidgetBPClass.Succeeded())
+	{
+		WidgetClass = WidgetBPClass.Class;
+	}
 }
 
 void ADPInGameState::MulticastPlayerJob_Implementation() const
@@ -46,6 +53,13 @@ void ADPInGameState::MulticastPlayerJob_Implementation() const
 				break;
 			}
 		}
+		if (JobWidgetInstance)
+		{
+			UDPJobAssign* JobWidget = Cast<UDPJobAssign>(JobWidgetInstance);
+			check(JobWidget)
+			JobWidget->AddToViewport();
+			JobWidget->OnJobAssigned(PlayerState->GetPlayerJob());
+		}
 	}
 }
 
@@ -66,7 +80,10 @@ void ADPInGameState::BeginPlay()
 	{
 		PlayerController->SwitchLevelComponent(ELevelComponentType::MAIN);
 	}
-
+	if (!JobWidgetInstance)
+	{
+		JobWidgetInstance = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+	}
 }
 
 void ADPInGameState::EndPlay(const EEndPlayReason::Type EndPlayReason)

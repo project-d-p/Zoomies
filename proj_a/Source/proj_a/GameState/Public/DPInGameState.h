@@ -52,5 +52,9 @@ protected:
 	UPROPERTY()
 	UChatManager* ChatManager;
 	FDelegateHandle OnHostMigrationDelegate;
+
+	TSubclassOf<UUserWidget> WidgetClass;
+	UPROPERTY()
+	UUserWidget* JobWidgetInstance;
 };
 

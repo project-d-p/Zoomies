@@ -3,3 +3,7 @@
 
 #include "DPJobAssign.h"
 
+void UDPJobAssign::NativeConstruct()
+{
+	Super::NativeConstruct();
+}
