@@ -36,6 +36,8 @@ void AResultLevelGameState::NotifyPlayersAllTraveled()
 {
 	this->SetPlayerScores();
 	this->SetMyRank();
+
+	NotifyAllScoresCalculated(FinalScoreDataArray);
 }
 
 void AResultLevelGameState::NotifyAllScoresCalculated_Implementation(
