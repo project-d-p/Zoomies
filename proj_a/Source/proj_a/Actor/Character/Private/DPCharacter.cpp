@@ -220,6 +220,9 @@ ADPCharacter::ADPCharacter()
 	{
 		Crown = CrownMesh.Object;
 	}
+
+	GetCharacterMovement()->SetWalkableFloorAngle(80.f);
+	GetCharacterMovement()->MaxStepHeight = 50.f;
 }
 
 ADPCharacter::~ADPCharacter()
