@@ -167,10 +167,6 @@ void UIC_MatchLobby::Move(const FInputActionValue& value)
 	}
 	const FVector2D actionValue = value.Get<FVector2D>();
 	const FRotator controlRotation = PlayerController->FixedCamera ? PlayerController->FixedCamera->GetActorRotation() : PlayerController->GetControlRotation();
-	if (!PlayerController->FixedCamera)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("FixedCamera is nullptr"));
-	}
 
 	const FVector forwardVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::X);
 	const FVector rightVector = FRotationMatrix(controlRotation).GetUnitAxis(EAxis::Y);

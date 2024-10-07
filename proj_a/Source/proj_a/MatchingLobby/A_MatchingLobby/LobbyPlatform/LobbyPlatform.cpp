@@ -53,6 +53,7 @@ void ALobbyPlatform::SpawnCharacter(APlayerController* PlayerController)
 	{
 		PC_MatchingLobby->Possess(CurrentCharacter);
 		PC_MatchingLobby->SetCineCameraView();
+		PC_MatchingLobby->bAutoManageActiveCameraTarget = false;
 	}
 	else
 	{

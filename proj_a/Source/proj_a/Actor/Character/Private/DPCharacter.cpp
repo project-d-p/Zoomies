@@ -31,6 +31,7 @@
 #include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
 #include "proj_a/MatchingLobby/GS_MachingLobby/GS_MatchingLobby.h"
+#include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
 #include "Serialization/BulkDataRegistry.h"
 
 // Sets default values
@@ -190,6 +191,7 @@ ADPCharacter::ADPCharacter()
 		
 		if (CurrentLevelName == "matchLobby")
 		{
+			RemoveSpringArm();
 			if (LobbyInfoWidgetComponent && LobbyInfoWidgetComponent->IsValidLowLevel())
 			{
 				LobbyInfoWidgetComponent->DestroyComponent();

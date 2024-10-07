@@ -51,8 +51,9 @@ void APC_MatchingLobby::BeginPlay()
 	{
 		GameInstance->LoadFriendsList();
 	}
+	SetCineCameraView();
+	this->bAutoManageActiveCameraTarget = false;
 	getMatchLobbyUI();
-	FindCineCamera();
 }
 
 void APC_MatchingLobby::EndPlay( const EEndPlayReason::Type EndPlayReason)
@@ -65,8 +66,13 @@ void APC_MatchingLobby::EndPlay( const EEndPlayReason::Type EndPlayReason)
 void APC_MatchingLobby::SetCineCameraView()
 {
 	if (FixedCamera == nullptr)
+	{
 		FindCineCamera();
-	this->SetViewTargetWithBlend(FixedCamera);
+	}
+	if (FixedCamera != nullptr)
+	{
+		this->SetViewTarget(FixedCamera);
+	}
 }
 
 void APC_MatchingLobby::FindCineCamera()
@@ -122,6 +128,7 @@ void APC_MatchingLobby::ActivateCurrentComponent(APC_MatchingLobby* LocalPlayerC
 		}
 	}
 }
+
 
 void APC_MatchingLobby::DeactiveCurrentComponent()
 {
