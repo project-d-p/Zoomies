@@ -112,6 +112,7 @@ void AResultLevelGameMode::CheckPlayersAllTraveled()
 
 		StartTimerDelegate.BindLambda([this, GS]()
 		{
+			FNetLogger::EditerLog(FColor::Green, "All players have traveled to the result level.");
 			GS->NotifyPlayersAllTraveled();
 
 			for (auto it = GetWorld()->GetPlayerControllerIterator(); it; ++it)

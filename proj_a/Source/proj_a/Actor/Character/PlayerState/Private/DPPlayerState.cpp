@@ -44,6 +44,7 @@ void ADPPlayerState::SeamlessTravelTo(APlayerState* NewPlayerState)
 	AJudgePlayerState* JPS = Cast<AJudgePlayerState>(NewPlayerState);
 	if (JPS)
 	{
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("SeamlessTravelTo in PlayerState"));
 		JPS->SetPlayerJob(PlayerJob);
 		JPS->SetPlayerScoreData(PlayerScoreData);
 	}
