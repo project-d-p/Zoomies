@@ -69,6 +69,11 @@ UMainInputComponent::UMainInputComponent()
 	(TEXT("/Game/input/ia_run.ia_run"));
 	if (IA_RUN.Succeeded())
 		RunAction = IA_RUN.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_ESC
+	(TEXT("/Game/input/ia_esc.ia_esc"));
+	if (IA_ESC.Succeeded())
+		EscAction = IA_ESC.Object;
 }
 
 void UMainInputComponent::Activate(bool bReset)
@@ -444,4 +449,10 @@ void UMainInputComponent::RunReleased(const FInputActionValue& value)
 	if (!Character) return ;
 
 	Character->GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+}
+
+void UMainInputComponent::Esc(const FInputActionValue& value)
+{
+	ADPPlayerController* PlayerController = GetPlayerController();
+	if (!PlayerController) return ;
 }
