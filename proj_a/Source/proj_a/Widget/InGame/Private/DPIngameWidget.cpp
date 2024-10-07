@@ -95,6 +95,17 @@ void UDPIngameWidget::UpdateTextBlock(UTextBlock* TextBlock)
 	else if (OuterName.Contains("WBP_InGame_ScoreBox_Job"))
 	{
 		scoreJob = TextBlock;
+		FText JobText = scoreJob->GetText();
+		FText DefaultJob = FText::FromString("Job");
+		if (JobText.EqualTo(DefaultJob))
+		{
+			ADPPlayerState* P = Cast<ADPPlayerState>(GetOwningPlayerState());
+			EPlayerJob Job = P->GetPlayerJob();
+			FString JobString = UEnum::GetValueAsString<EPlayerJob>(Job);
+			JobString = JobString.Replace(TEXT("EPlayerJob::JOB_"), TEXT(""));
+			
+			scoreJob->SetText(FText::FromString(JobString));
+		}
 	}
 	else if (OuterName.Contains("WBP_InGame_ScoreBox_Total"))
 	{
