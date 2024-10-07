@@ -37,6 +37,18 @@ void ADPPlayerState::IncreaseScore(const TArray<EAnimal>& InAnimals)
 	PlayerScoreData->IncreaseScore(PlayerJob, InAnimals);
 }
 
+void ADPPlayerState::SeamlessTravelTo(APlayerState* NewPlayerState)
+{
+	Super::SeamlessTravelTo(NewPlayerState);
+
+	AJudgePlayerState* JPS = Cast<AJudgePlayerState>(NewPlayerState);
+	if (JPS)
+	{
+		JPS->SetPlayerJob(PlayerJob);
+		JPS->SetPlayerScoreData(PlayerScoreData);
+	}
+}
+
 void ADPPlayerState::CopyProperties(APlayerState* PlayerState)
 {
 	Super::CopyProperties(PlayerState);

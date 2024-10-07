@@ -103,8 +103,6 @@ void ADPGameModeBase::UpdateMonsterData(ABaseMonsterCharacter* InMonster)
 	if (ClosestPlayer)
 	{
 		float MoveInterval = CalculateMoveInterval(MinDistance);
-		// FNetLogger::EditerLog(FColor::Green, TEXT("Monster: %s, ClosestPlayer: %s, Distance: %f, Interval: %f"),
-		// 	*InMonster->GetName(), *ClosestPlayer->GetName(), MinDistance, MoveInterval);
 		
 		FMonsterOptimizationData MOD;
 		MOD.ClosestPlayer = ClosestPlayer;
@@ -313,7 +311,6 @@ void ADPGameModeBase::InitializeGame()
 	{
 		this->OnGameStart();
 	});
-
 	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
 	check(DataManager);
 

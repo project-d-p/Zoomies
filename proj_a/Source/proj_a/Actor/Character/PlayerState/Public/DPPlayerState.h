@@ -43,6 +43,8 @@ public:
 	EPlayerJob PlayerJob;
 
 	void IncreaseScore(const TArray<EAnimal>& InAnimals);
+
+	virtual void SeamlessTravelTo(APlayerState* NewPlayerState) override;
 protected:
 	virtual void CopyProperties(APlayerState* PlayerState) override;
 	

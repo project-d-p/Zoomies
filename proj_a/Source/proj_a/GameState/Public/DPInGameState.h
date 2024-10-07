@@ -39,6 +39,7 @@ protected:
 	void OnHostMigration(UWorld* World, UDataManager* DataManager);
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	
 	int32 ConnectedPlayers = 0;
 	const int32 ExpectedPlayers = Zoomies::MAX_PLAYERS;
 	

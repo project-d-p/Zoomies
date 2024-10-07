@@ -29,6 +29,7 @@ void ADPInGameState::MulticastPlayerJob_Implementation() const
 	ADPPlayerController* PlayerController = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
 	if (PlayerController)
 	{
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("MulticastPlayerJob_Implementation"));
 		ADPPlayerState* PlayerState = Cast<ADPPlayerState>(PlayerController->PlayerState);
 		if (PlayerState)
 		{
