@@ -195,7 +195,6 @@ UUserWidget* APC_MatchingLobby::GetWidgetByName(UUserWidget* ParentWidget, const
 void APC_MatchingLobby::getMatchLobbyUI()
 {
 	FString WidgetPath = TEXT("/Game/widget/WBP_MatchLobby/widget_match_ready.widget_match_ready_C");
-
 	UClass* WidgetClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *WidgetPath));
 
 	if (WidgetClass != nullptr)
@@ -278,12 +277,10 @@ void APC_MatchingLobby::ShowUI_ESC() const
 			if (CurrentVisibility == ESlateVisibility::Visible)
 			{
 				Widget_ESC->SetVisibility(ESlateVisibility::Hidden);
-				UE_LOG(LogTemp, Log, TEXT("UpdateUIVisibility: WBP_Esc_Menu visibility set to Hidden."));
 			}
 			else
 			{
 				Widget_ESC->SetVisibility(ESlateVisibility::Visible);
-				UE_LOG(LogTemp, Log, TEXT("UpdateUIVisibility: WBP_Esc_Menu visibility set to Visible."));
 			}
 		}
 		else

@@ -58,6 +58,12 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ConnectToServer(ELevelComponentType Type);
 	
+	UPROPERTY(BlueprintReadOnly, Category= "UI")
+	UUserWidget* UIWidget = nullptr;
+	void getUIWidget();
+	void RemoveUIWidget();
+	void ShowUI_ESC();
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -67,6 +73,7 @@ protected:
 private:
 	void DeactiveCurrentComponent();
 	void ActivateComponent(ELevelComponentType Type);
+	
 
 	// Move To PlayerState
 	UPROPERTY(VisibleAnywhere)

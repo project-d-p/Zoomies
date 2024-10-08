@@ -13,6 +13,7 @@
 #include "CompileMode.h"
 #include "LobbyLevelComponent.h"
 #include "Chaos/ChaosPerfTest.h"
+#include "Kismet/GameplayStatics.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 DEFINE_LOG_CATEGORY(LogNetwork);
@@ -254,4 +255,64 @@ void ADPPlayerController::GetSeamlessTravelActorList(bool bToTransitionMap, TArr
 		NetworkManager->Shutdown();
 	}
 	this->SwitchLevelComponent(ELevelComponentType::NONE);
+}
+
+void ADPPlayerController::getUIWidget()
+{
+	UMainLevelComponent* ML = Cast<UMainLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::MAIN)]);
+	UIWidget = ML->GetInGameWidget();
+	if (UIWidget == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DPPlayerController::getUIWidget: Widget is nullptr"));
+	}
+}
+
+void ADPPlayerController::RemoveUIWidget()
+{
+	if (UIWidget != nullptr)
+	{
+		UIWidget->RemoveFromParent();
+		UIWidget = nullptr;
+		UE_LOG(LogTemp, Log, TEXT("DPPlayerController::RemoveMatchLobbyUI: Widget successfully removed from viewport and cleared."));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DPPlayerController::RemoveMatchLobbyUI: MatchLobbyWidget is nullptr, nothing to remove."));
+	}
+}
+
+void ADPPlayerController::ShowUI_ESC()
+{
+	if (UIWidget == nullptr)
+	{
+		getUIWidget();
+	}
+	if (UIWidget)
+	{
+		UUserWidget* WidgetESC = Cast<UUserWidget>(UIWidget->GetWidgetFromName("WBP_Esc_Menu"));
+		if (WidgetESC)
+		{
+			ESlateVisibility CurrentVisibility = WidgetESC->GetVisibility();
+			if (CurrentVisibility == ESlateVisibility::Visible)
+			{
+				WidgetESC->SetVisibility(ESlateVisibility::Hidden);
+				bShowMouseCursor = false;
+				SetInputMode(FInputModeGameOnly());
+			}
+			else
+			{
+				WidgetESC->SetVisibility(ESlateVisibility::Visible);
+				bShowMouseCursor = true;
+				SetInputMode(FInputModeGameAndUI());
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("DPPlayerController:: UIWidget->GetWidgetFromName(ESC) is nullptr"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DPPlayerController:: UIWidget is nullptr"));
+	}
 }
