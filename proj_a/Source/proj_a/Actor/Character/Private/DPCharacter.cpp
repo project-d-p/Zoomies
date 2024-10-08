@@ -260,6 +260,17 @@ void ADPCharacter::SetNameTag_Implementation()
 void ADPCharacter::UpdateLobbyInfo() 
 {
 	APlayerState* PS = GetPlayerState();
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+		{
+			UpdateLobbyInfo();
+		}), 0.1f, false);
+		return;
+	}
+	
 	AGS_MatchingLobby* GS = Cast<AGS_MatchingLobby>(GetWorld()->GetGameState());
 	if (!PS || !GS)
 	{

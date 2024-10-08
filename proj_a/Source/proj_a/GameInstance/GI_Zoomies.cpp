@@ -163,6 +163,7 @@ void UGI_Zoomies::CreateSession()
 	   FOnCreateSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onCreateComplete));
 	// set SessionName to Unique
 	SessionName = FName(*FString::Printf(TEXT("Zoomies_%s"), *FGuid::NewGuid().ToString()));
+	session_settings_->Set(FName("SessionName"), SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
 	
 	// Create session
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
@@ -218,8 +219,16 @@ bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& se
 	
 	dh_on_join_complete = session_interface_->AddOnJoinSessionCompleteDelegate_Handle(
 		FOnJoinSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onJoinComplete));
-	SessionName = FName(*search_result.Session.GetSessionIdStr());
-
+	FString RetrievedSessionName;
+	if (search_result.Session.SessionSettings.Get(FName("SessionName"), RetrievedSessionName))
+	{
+		SessionName = FName(*RetrievedSessionName);
+	}
+	else
+	{
+		SessionName = FName(*search_result.Session.GetSessionIdStr());
+	}
+	
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
 	session_interface_->JoinSession(*local_player->GetPreferredUniqueNetId(), SessionName, search_result);
 	return true;
