@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "CineCameraActor.h"
+#include "TextureTransferManager.h"
 #include "GameFramework/PlayerController.h"
 #include "proj_a/MatchingLobby/TYPE_MatchingLobby/TYPE_MatchingLobby.h"
 #include "PC_MatchingLobby.generated.h"
@@ -45,6 +46,14 @@ public:
 	ACineCameraActor* FixedCamera = nullptr;
 	void FindCineCamera();
 	
+	bool GetIsReady();
+	
+	UTextureTransferManager* GetTextureTransferManager() const { return TextureTransferManager; }
+private:
+	UPROPERTY()
+	USteamInvite* SteamInvite = nullptr;
+	UPROPERTY()
+	UTextureTransferManager* TextureTransferManager = nullptr;
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;

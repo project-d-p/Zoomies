@@ -1,6 +1,7 @@
 ﻿#include "JudgePlayerController.h"
 
 #include "DPPlayerController.h"
+#include "EngineUtils.h"
 #include "FNetLogger.h"
 #include "IChatGameMode.h"
 #include "JudgeGameMode.h"
@@ -21,6 +22,8 @@ AJudgePlayerController::AJudgePlayerController()
 	{
 		JudgeLevelUI_BP = WidgetClassFinder.Class;
 	}
+	TextureTransferManager = CreateDefaultSubobject<UTextureTransferManager>(TEXT("TextureTransferManager"));
+	TextureTransferManager->OnDataTransferComplete.BindDynamic(TextureTransferManager, &UTextureTransferManager::OnTextureTransferComplete);
 }
 
 void AJudgePlayerController::SetOccupationeName_Implementation(int index, const FString& Name)
@@ -134,4 +137,18 @@ void AJudgePlayerController::SeamlessTravelTo(APlayerController* NewPC)
 	AJudgePlayerState* GS = GetPlayerState<AJudgePlayerState>();
 	check(GS)
 	NGS->SetFinalScoreData(GS->GetFinalScoreData());
+}
+
+void AJudgePlayerController::PostSeamlessTravel()
+{
+	Super::PostSeamlessTravel();
+
+	for (TActorIterator<ADynamicTexturedCharacter> It(GetWorld()); It; ++It)
+	{
+		if (It->bPlayerAssigned)
+			continue;
+		It->SetOwner(this);
+		It->bPlayerAssigned = true;
+		break;
+	}
 }

@@ -11,6 +11,8 @@
 #include "MainLevelComponent.h"
 #include "ResultLevelComponent.h"
 #include "CompileMode.h"
+#include "EngineUtils.h"
+#include "JudgeLevelComponent.h"
 #include "LobbyLevelComponent.h"
 #include "Chaos/ChaosPerfTest.h"
 #include "Kismet/GameplayStatics.h"
@@ -26,17 +28,22 @@ ADPPlayerController::ADPPlayerController()
 	NetworkManager = CreateDefaultSubobject<UClientNetworkManager>(TEXT("NetworkManager"));
 #endif
 	
+	TextureTransferManager = CreateDefaultSubobject<UTextureTransferManager>(TEXT("DataTransferManager"));
+	TextureTransferManager->OnDataTransferComplete.BindDynamic(TextureTransferManager, &UTextureTransferManager::OnTextureTransferComplete);
 	PrivateScoreManager = CreateDefaultSubobject<UPrivateScoreManager>(TEXT("PrivateScoreManager"));
 	
 	UBaseLevelComponent* MainLevelComponet = CreateDefaultSubobject<UMainLevelComponent>(TEXT("MainLevelComponent"));
+	// UBaseLevelComponent* JudgeLevelComponent = CreateDefaultSubobject<UJudgeLevelComponent>(TEXT("JudgeLevelComponent"));
 	UBaseLevelComponent* ResultLevelComponet = CreateDefaultSubobject<UResultLevelComponent>(TEXT("ResultLevelComponent"));
 	UBaseLevelComponent* LobbyLevelComponent = CreateDefaultSubobject<ULobbyLevelComponent>(TEXT("LobbyLevelComponent"));
 
 	MainLevelComponet->InitializeController(this);
 	ResultLevelComponet->InitializeController(this);
 	LobbyLevelComponent->InitializeController(this);
+	// JudgeLevelComponent->InitializeController(this);
 	
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::MAIN), MainLevelComponet);
+	// LevelComponents.Add(static_cast<uint32>(ELevelComponentType::JUDGE), JudgeLevelComponent);
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::RESULT), ResultLevelComponet);
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::LOBBY), LobbyLevelComponent);
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::NONE), nullptr);

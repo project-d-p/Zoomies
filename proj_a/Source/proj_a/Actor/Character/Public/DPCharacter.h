@@ -5,16 +5,19 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "CharacterPositionSync.h"
+#include "DynamicTexturedCharacter.h"
 #include "NameTag.h"
+#include "NetworkedDynamicTextureComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "proj_a/Component/InGame/Score/Types/ScoreTypes.h"
 #include "DPCharacter.generated.h"
 
 class ABaseMonsterCharacter;
+class UTextureTransferManager;
 
 UCLASS()
-class PROJ_A_API ADPCharacter : public ACharacter
+class PROJ_A_API ADPCharacter : public ADynamicTexturedCharacter
 {
 	GENERATED_BODY()
 
@@ -29,7 +32,6 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -59,15 +61,11 @@ public:	// component
 	class UDPStateActorComponent* stateComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UMonsterSlotComponent* monsterSlotComponent;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PostProcess")
 	class UPostProcessComponent* postProcessComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
 	UAnimMontage* characterMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
-	UMaterialInstanceDynamic* dynamicMaterialInstance;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MatchLobby", meta = (AllowPrivateAccess = "true"))
 	class UWidgetComponent* userInfoWidget;
@@ -77,9 +75,6 @@ public:	// component
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MatchLobby")
 	UWidgetComponent* LobbyInfoWidgetComponentBack = nullptr;
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
-	//UMaterialInstanceDynamic* dynamicMaterialInstance;
 
 	UPROPERTY()
 	TSubclassOf<UNameTag> NameTag_BP;
@@ -133,7 +128,6 @@ public:	// component
 	void DyingAnimation();
 
 	bool CatchMonster(const FString& monster_type);
-
 	
 	void SetAtReturnPlace(bool isReturnPlace);
 	bool IsAtReturnPlace() const;
@@ -148,7 +142,7 @@ private:
 	void UpdateNameTagRotation();
 	void CheckCollisionWithMonster();
 	void OnServerHit(const FHitResult& HitResult);
-
+	
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* springArm;
 	UPROPERTY(VisibleAnywhere, Category = Camera)

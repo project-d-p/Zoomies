@@ -13,6 +13,7 @@
 #include "DPWeaponActorComponent.h"
 #include "DPStateActorComponent.h"
 #include "DPWeaponGun.h"
+#include "DynamicTextureComponent.h"
 #include "FDataHub.h"
 #include "FNetLogger.h"
 #include "MonsterSlotComponent.h"
@@ -29,8 +30,10 @@
 #include "Materials/MaterialInstanceConstant.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/GameSession.h"
 #include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
+#include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 #include "proj_a/MatchingLobby/GS_MachingLobby/GS_MatchingLobby.h"
 #include "Serialization/BulkDataRegistry.h"
@@ -67,7 +70,8 @@ ADPCharacter::ADPCharacter()
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CHARACTER
 	(TEXT("/Game/model/steve/StickManForMixamo.StickManForMixamo"));
-	if (SK_CHARACTER.Succeeded()) {
+	if (SK_CHARACTER.Succeeded())
+	{
 		GetMesh()->SetSkeletalMesh(SK_CHARACTER.Object);
 	}
 

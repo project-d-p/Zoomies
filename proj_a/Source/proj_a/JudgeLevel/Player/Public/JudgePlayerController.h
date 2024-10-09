@@ -5,6 +5,7 @@
 #include "JudgeLevelUI.h"
 #include "JudgeGameMode.h"
 #include "EnumTypes.h"
+#include "TextureTransferManager.h"
 #include "JudgePlayerController.generated.h"
 
 // Enum for player jobs
@@ -61,15 +62,16 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SeamlessTravelFrom(APlayerController* OldPC) override;
 	virtual void SeamlessTravelTo(APlayerController* NewPC) override;
-	
+	virtual void PostSeamlessTravel() override;
 private:
 	bool IsBeginPlay = false;
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UJudgeLevelUI> JudgeLevelUI_BP;
-
 	UPROPERTY()
 	UJudgeLevelUI* JudgeLevelUI;
+	UPROPERTY()
+	UTextureTransferManager* TextureTransferManager;
 
 	FTimerHandle TH;
 };

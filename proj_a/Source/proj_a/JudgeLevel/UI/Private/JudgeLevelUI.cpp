@@ -27,7 +27,6 @@ void UJudgeLevelUI::InitTextBlocksFromContainer(UPanelWidget* Container, TArray<
 void UJudgeLevelUI::NativeConstruct()
 {
 	Super::NativeConstruct();
-
 	
 	TimerUI = NewObject<UTimerUI>(Time_Text);
 	if (TimerUI)

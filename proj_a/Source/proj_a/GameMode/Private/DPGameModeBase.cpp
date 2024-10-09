@@ -281,7 +281,6 @@ void ADPGameModeBase::Logout(AController* Exiting)
 	{
 		return ;
 	}
-	// 여기 고쳐야 함! 이름으로 되어 있음!! SteamID로 바뀌어야 함
 #if LAN_MODE || EDITOR_MODE
 	std::string key(TCHAR_TO_UTF8(*controller->PlayerState->GetPlayerName()));
 #else
