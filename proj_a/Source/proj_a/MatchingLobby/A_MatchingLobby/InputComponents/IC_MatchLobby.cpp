@@ -81,7 +81,7 @@ void UIC_MatchLobby::Deactivate()
 void UIC_MatchLobby::BindMatchLobbyActions()
 {
 	APC_MatchingLobby* PlayerController = Get_PC();
-	if (!PlayerController)
+	if (PlayerController == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("IC_MatchLobby::Can't found PlayerController to Bind Input."));
 		return ;
@@ -112,6 +112,10 @@ void UIC_MatchLobby::BindMatchLobbyActions()
 		if (!MoveAction || !JumpAction || !RotateAction)
 		{
 			UE_LOG(LogTemp, Error, TEXT("IC_MatchLobby::One or more InputActions are not valid"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("IC_MatchLobby::InputActions are valid"));
 		}
 	}
 	else
