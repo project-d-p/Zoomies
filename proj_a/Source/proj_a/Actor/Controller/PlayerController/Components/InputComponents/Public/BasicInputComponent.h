@@ -15,6 +15,7 @@ public:
 
 	virtual void Activate(bool bReset=false) override;
 	virtual void Deactivate() override;
+	void Set_PC(ADPPlayerController* PlayerController);
 	
 private:
 	void BindBasicLevelActions();
@@ -24,6 +25,7 @@ private:
 	void Jump(const FInputActionValue& value);
 	void Rotate(const FInputActionValue& value);
 	void Run(const FInputActionValue& value);
+	void ESC(const FInputActionValue& value);
 
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputMappingContext* BasicLevelContext;
@@ -36,4 +38,9 @@ private:
 	class UInputAction* RotateAction;
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* RunAction;
+	UPROPERTY(VisibleAnywhere, Category = Input)
+	class UInputAction* ESCAction;
+
+protected:
+	ADPPlayerController* PC = nullptr;
 };

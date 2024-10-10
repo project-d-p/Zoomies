@@ -274,6 +274,10 @@ void ADPPlayerController::getUIWidget()
 			UMainLevelComponent* ML = Cast<UMainLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::MAIN)]);
 			UIWidget = ML->GetInGameWidget();
 		}
+		if (CurrentLevelName.Contains("result"))
+		{
+			UResultLevelComponent* RL = Cast<UResultLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::RESULT)]);
+		}
 	}
 	if (UIWidget == nullptr)
 	{
