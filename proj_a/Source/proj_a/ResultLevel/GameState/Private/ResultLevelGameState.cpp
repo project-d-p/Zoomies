@@ -64,8 +64,8 @@ void AResultLevelGameState::AddPlayerState(APlayerState* PlayerState)
 void AResultLevelGameState::SetMyRank()
 {
 	FinalScoreDataArray.Sort([](const FFinalScoreData& A, const FFinalScoreData& B) {
-		float ScoreA = A.bIsDetected ? A.PublicTotalScore : A.PrivateTotalScale;
-		float ScoreB = B.bIsDetected ? B.PublicTotalScore : B.PrivateTotalScale;
+		float ScoreA = A.bIsDetected ? A.PublicTotalScore : A.PrivateTotalScore;
+		float ScoreB = B.bIsDetected ? B.PublicTotalScore : B.PrivateTotalScore;
 		return ScoreA > ScoreB;
 	});
 }
