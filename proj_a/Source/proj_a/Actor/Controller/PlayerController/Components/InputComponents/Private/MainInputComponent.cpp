@@ -116,7 +116,7 @@ void UMainInputComponent::BindMainLevelActions()
 		// (right mouse button) : Aim
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &UMainInputComponent::Aim);	// 	key down
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &UMainInputComponent::AimReleased);
-		// (esc) : Cancel
+		// (esc) : EseMenu
 		EnhancedInputComponent->BindAction(EscAction, ETriggerEvent::Started, this, &UMainInputComponent::Esc);
 		// (f) : Catch
 		EnhancedInputComponent->BindAction(CatchAction, ETriggerEvent::Started, this, &UMainInputComponent::CatchAnimals);

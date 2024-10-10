@@ -2,15 +2,15 @@
 
 #include "DPPlayerController.h"
 #include "EngineUtils.h"
-#include "FNetLogger.h"
 #include "IChatGameMode.h"
 #include "JudgeGameMode.h"
-#include "JudgeGameState.h"
 #include "JudgeLevelUI.h"
 #include "JudgePlayerState.h"
 #include "PathManager.h"
 #include "ServerChatManager.h"
 #include "Blueprint/UserWidget.h"
+#include "JudgeLevelComponent.h"
+#include "JudgeInputComponent.h"
 #include "GameFramework/GameStateBase.h"
 
 AJudgePlayerController::AJudgePlayerController()
@@ -24,6 +24,8 @@ AJudgePlayerController::AJudgePlayerController()
 	}
 	TextureTransferManager = CreateDefaultSubobject<UTextureTransferManager>(TEXT("TextureTransferManager"));
 	TextureTransferManager->OnDataTransferComplete.BindDynamic(TextureTransferManager, &UTextureTransferManager::OnTextureTransferComplete);
+
+	LevelComponent = CreateDefaultSubobject<UJudgeLevelComponent>(TEXT("ULC_JudgeLevel"));
 }
 
 void AJudgePlayerController::SetOccupationeName_Implementation(int index, const FString& Name)
@@ -109,6 +111,7 @@ void AJudgePlayerController::BeginPlay()
 		
 		GetWorldTimerManager().SetTimer(TH, this, &AJudgePlayerController::RequestUIData, 1.f, true);
 	}
+	SetInputMode(FInputModeGameAndUI());
 }
 
 void AJudgePlayerController::SeamlessTravelFrom(APlayerController* OldPC)
@@ -149,6 +152,68 @@ void AJudgePlayerController::PostSeamlessTravel()
 			continue;
 		It->SetOwner(this);
 		It->bPlayerAssigned = true;
+		ActivateCurrentComponent(this);
 		break;
+	}
+}
+
+void AJudgePlayerController::ShowUI_ESC()
+{
+	if (JudgeLevelUI == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("JudgeLevelUI is nullptr"));
+		return;
+	}
+	UUserWidget* WidgetESC = Cast<UUserWidget>(JudgeLevelUI->GetWidgetFromName("WBP_Esc_Menu"));
+	if (WidgetESC)
+	{
+		ESlateVisibility CurrentVisibility = WidgetESC->GetVisibility();
+		if (CurrentVisibility == ESlateVisibility::Visible)
+		{
+			WidgetESC->SetVisibility(ESlateVisibility::Hidden);
+		}
+		else
+		{
+			WidgetESC->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DPPlayerController:: UIWidget->GetWidgetFromName(ESC) is nullptr"));
+	}
+}
+
+void AJudgePlayerController::ActivateCurrentComponent(AJudgePlayerController* LocalPlayerController)
+{
+	
+	if (LevelComponent)
+	{
+		LevelComponent->PrimaryComponentTick.bCanEverTick = true;
+		LevelComponent->Activate(true);
+		LevelComponent->SetComponentTickEnabled(true);
+		LevelComponent->RegisterComponent();
+		if (LocalPlayerController)
+		{
+			LevelComponent->Set_PC(LocalPlayerController);
+			if (!LocalPlayerController->IsLocalController())
+			{
+				UE_LOG(LogTemp, Warning, TEXT("PC_MatchingLobby::LocalPlayerController is not local controller"));
+				return ;
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("PC_MatchingLobby::LocalPlayerController is nullptr"));
+			return ;
+		}
+
+		if (UJudgeInputComponent* IC_Local = LevelComponent->GetInputComponent())
+		{
+			IC_Local->Activate(true);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("PC_MatchingLobby::InputComponent is nullptr"));
+		}
 	}
 }

@@ -46,12 +46,9 @@ public:
 	ACineCameraActor* FixedCamera = nullptr;
 	void FindCineCamera();
 	
-	bool GetIsReady();
 	
 	UTextureTransferManager* GetTextureTransferManager() const { return TextureTransferManager; }
 private:
-	UPROPERTY()
-	USteamInvite* SteamInvite = nullptr;
 	UPROPERTY()
 	UTextureTransferManager* TextureTransferManager = nullptr;
 protected:

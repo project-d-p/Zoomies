@@ -266,8 +266,15 @@ void ADPPlayerController::GetSeamlessTravelActorList(bool bToTransitionMap, TArr
 
 void ADPPlayerController::getUIWidget()
 {
-	UMainLevelComponent* ML = Cast<UMainLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::MAIN)]);
-	UIWidget = ML->GetInGameWidget();
+	if (UWorld* World = GetWorld())
+	{
+		FString CurrentLevelName = World->GetMapName();
+		if (CurrentLevelName.Contains("main"))
+		{
+			UMainLevelComponent* ML = Cast<UMainLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::MAIN)]);
+			UIWidget = ML->GetInGameWidget();
+		}
+	}
 	if (UIWidget == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("DPPlayerController::getUIWidget: Widget is nullptr"));
