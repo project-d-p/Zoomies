@@ -383,47 +383,47 @@ void UGI_Zoomies::CheckSteamInit()
 
 void UGI_Zoomies::InitSteamAPI()
 {
-	// if (!is_steamAPI_init && SteamAPI_Init())
-	// {
-	// 	is_steamAPI_init = true;
-	// 	CSteamID steam_id = SteamUser()->GetSteamID();
-	// 	FString steam_username = UTF8_TO_TCHAR(SteamFriends()->GetPersonaName());
-	// 	if (steam_id.IsValid() && !steam_username.IsEmpty())
-	// 	{
-	// 		UE_LOG(LogTemp, Log, TEXT("SteamAPI INIT SUCCESS || ID: %llu, Username: %s"), steam_id.ConvertToUint64(), *steam_username);
-	// 		SteamNetworkingUtils()->InitRelayNetworkAccess();
-	// 	}
-	// }
-	//
-	// if (!is_steamAPI_init)
-	// {
-	// 	UE_LOG(LogTemp, Log, TEXT("SteamAPI init failed"));
-	// 	//logging on Screen if GEngine is available
-	// 	if (GEngine)
-	// 	{
-	// 		GEngine->AddOnScreenDebugMessage(
-	// 			-1,
-	// 			30.f,
-	// 			FColor::Red,
-	// 			FString::Printf(TEXT("SteamAPI init failed")));
-	// 	}
-	// }
-	// else
-	// {
-	// 	FTimerHandle TimerHandle;
-	// 	GetWorld()->GetTimerManager().SetTimer(
-	// 		TimerHandle,
-	// 		this, &UGI_Zoomies::InitOnlineSubsystemSteam,
-	// 		0.5f, false);
+	if (!is_steamAPI_init && SteamAPI_Init())
+	{
+		is_steamAPI_init = true;
+		CSteamID steam_id = SteamUser()->GetSteamID();
+		FString steam_username = UTF8_TO_TCHAR(SteamFriends()->GetPersonaName());
+		if (steam_id.IsValid() && !steam_username.IsEmpty())
+		{
+			UE_LOG(LogTemp, Log, TEXT("SteamAPI INIT SUCCESS || ID: %llu, Username: %s"), steam_id.ConvertToUint64(), *steam_username);
+			SteamNetworkingUtils()->InitRelayNetworkAccess();
+		}
+	}
+	
+	if (!is_steamAPI_init)
+	{
+		UE_LOG(LogTemp, Log, TEXT("SteamAPI init failed"));
+		//logging on Screen if GEngine is available
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				30.f,
+				FColor::Red,
+				FString::Printf(TEXT("SteamAPI init failed")));
+		}
+	}
+	else
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(
+			TimerHandle,
+			this, &UGI_Zoomies::InitOnlineSubsystemSteam,
+			0.5f, false);
 		InitOnlineSubsystemSteam();
-	// }
+	}
 }
 
 void UGI_Zoomies::InitOnlineSubsystemSteam()
 {
 	if (!is_online_session_steam_init)
 	{
-		online_subsystem_ = IOnlineSubsystem::Get(/*STEAM_SUBSYSTEM*/);
+		online_subsystem_ = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
 		if (online_subsystem_)
 		{
 			session_interface_ = online_subsystem_->GetSessionInterface();
