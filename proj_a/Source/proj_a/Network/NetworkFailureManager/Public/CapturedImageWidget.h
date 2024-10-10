@@ -14,6 +14,7 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	UImage* CapturedImage;
 
+	// virtual void OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld) override;
 	void SetCapturedTexture(UTexture2D* Texture);
 };
 

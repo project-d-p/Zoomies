@@ -56,4 +56,7 @@ private:
 	int DesiredMaxPlayers = 0;
 	UPROPERTY()
 	UCapturedImageWidget* CapturedImageWidget;
+	UPROPERTY()
+	UTexture2D* CapturedTexture2D;
+	TSubclassOf<UCapturedImageWidget> CapturedImageWidgetClass;
 };
