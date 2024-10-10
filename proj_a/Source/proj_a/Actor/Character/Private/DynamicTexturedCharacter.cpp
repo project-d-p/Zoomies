@@ -20,7 +20,7 @@ void ADynamicTexturedCharacter::BeginPlay()
 
 	// TryInItializeDynamicTexture();
 	dynamicMaterialInstance = UMaterialInstanceDynamic::Create(GetMesh()->GetMaterial(0), this, TEXT("DynamicMaterial"));
-	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ADynamicTexturedCharacter::TryInItializeDynamicTexture);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_InitializeDynamicTexture, this, &ADynamicTexturedCharacter::TryInItializeDynamicTexture, 0.1f, true);
 }
 
 void ADynamicTexturedCharacter::OnRep_PlayerState()
@@ -46,6 +46,10 @@ void ADynamicTexturedCharacter::OnRep_Owner()
 
 void ADynamicTexturedCharacter::TryInItializeDynamicTexture()
 {
+	if (bInitialized || !dynamicMaterialInstance || !NetworkedDynamicTexture)
+	{
+		return;
+	}
 	FNetworkedDynamicTextureComponentInitializer Initializer;
 	Initializer.DynamicMaterialInstance = dynamicMaterialInstance;
 	Initializer.SkeletalMeshComponent = GetMesh();
@@ -56,5 +60,9 @@ void ADynamicTexturedCharacter::TryInItializeDynamicTexture()
 		Initializer.TextureTransferManager = PC->FindComponentByClass<UTextureTransferManager>();
 	}
 	if (NetworkedDynamicTexture->InitializeTexture(Initializer))
+	{
 		NetworkedDynamicTexture->LoadTexture();
+		bInitialized = true;
+		GetWorld()->GetTimerManager().ClearTimer(TimerHandle_InitializeDynamicTexture);
+	}
 }

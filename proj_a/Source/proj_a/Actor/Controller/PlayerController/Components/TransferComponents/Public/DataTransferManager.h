@@ -54,10 +54,10 @@ struct FDataTransferParams
 	enum ETransferConstants
 	{
 		CHUNK_SIZE = 1024,
-		CHUNK_PER_TICK = 10
+		CHUNK_PER_TICK = 8
 	};
 	
-	FDataTransferParams() 
+	FDataTransferParams()
 		: PlayerId(0), ChunkSize(CHUNK_SIZE), TotalChunks(0), StartChunk(0), ChunksPerTick(CHUNK_PER_TICK)
 	{}
 	FDataTransferParams(const TArray<uint8>& InData, int32 InPlayerId)

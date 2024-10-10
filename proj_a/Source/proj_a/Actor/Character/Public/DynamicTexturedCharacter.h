@@ -23,6 +23,9 @@ protected:
 	virtual void OnRep_Controller() override;
 	virtual void OnRep_Owner() override;
 private:
+	bool bInitialized = false;
+	FTimerHandle TimerHandle_InitializeDynamicTexture;
+	
 	void TryInItializeDynamicTexture();
 	UPROPERTY(VisibleAnywhere, Category = "DynamicTexture")
 	UNetworkedDynamicTextureComponent* NetworkedDynamicTexture;
