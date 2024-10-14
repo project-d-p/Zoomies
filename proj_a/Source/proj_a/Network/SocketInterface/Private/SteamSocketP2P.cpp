@@ -71,17 +71,20 @@ USteamSocketP2P::~USteamSocketP2P()
 
 CSteamID USteamSocketP2P::GetHostSteamID()
 {
-	UGI_Zoomies* GameInstance = nullptr;
-	if (UWorld* World = GetWorld())
+	UWorld* World = GetWorld();
+	if (World == nullptr)
 	{
-		GameInstance = Cast<UGI_Zoomies>(World->GetGameInstance());
-		if (GameInstance)
+		
+	}
+	else
+	{
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(World->GetGameInstance());
+	if (GameInstance)
+	{
+		IOnlineSessionPtr SessionInt = GameInstance->GetOnlineSessionInterface();
+		if (SessionInt.IsValid())
 		{
-			IOnlineSessionPtr SessionInt = GameInstance->GetOnlineSessionInterface();
-			if (SessionInt.IsValid())
-			{
-				SessionInt->DestroySession(GameInstance->SessionName);
-			}
+			SessionInt->DestroySession(GameInstance->SessionName);
 		}
 	}
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
@@ -106,6 +109,8 @@ CSteamID USteamSocketP2P::GetHostSteamID()
 	CSteamID hostSteamID = CSteamID(HostSteamID64);
 
 	return hostSteamID;
+		
+	}
 }
 
 void USteamSocketP2P::CheckRelayNetworkStatus()
