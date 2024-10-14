@@ -14,9 +14,6 @@ class PROJ_A_API AGS_MatchingLobby : public AGameStateBase
 public:
 	AGS_MatchingLobby();
 
-	UPROPERTY(Replicated)
-	TArray<bool> ReadyPlayers;
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_LobbyInfo)
 	TArray<FLobbyInfo> LobbyInfos;
 	int32 HostPlayerIndex;

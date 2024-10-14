@@ -261,7 +261,7 @@ void ADPCharacter::UpdateLobbyInfo()
 {
 	APlayerState* PS = GetPlayerState();
 	UWorld* World = GetWorld();
-	if (!World)
+	if (World == nullptr)
 	{
 		FTimerHandle TimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
@@ -283,6 +283,17 @@ void ADPCharacter::UpdateLobbyInfo()
 	}
 	
 	FString Name = PS->GetPlayerName();
+
+	if (LobbyInfoWidgetComponent == nullptr || LobbyInfoWidgetComponentBack == nullptr)
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+		{
+			UpdateLobbyInfo();
+		}), 0.1f, false);
+		return ;
+	}
+	
 	UUserWidget* Widget = LobbyInfoWidgetComponent->GetUserWidgetObject();
 	UUserWidget* WidgetBack = LobbyInfoWidgetComponentBack->GetUserWidgetObject();
 	if (Widget && WidgetBack)

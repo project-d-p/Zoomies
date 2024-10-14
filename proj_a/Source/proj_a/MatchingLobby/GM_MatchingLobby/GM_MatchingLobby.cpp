@@ -175,9 +175,8 @@ void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 				if (AGS_MatchingLobby* GS = GetGameState<AGS_MatchingLobby>())
 				{
 					int32 playerIndex = i;
-					if (playerIndex >= 0 && playerIndex < GS->ReadyPlayers.Num())
+					if (playerIndex >= 0 && playerIndex < GS->LobbyInfos.Num())
 					{
-						GS->ReadyPlayers[i] = false;
 						GS->LobbyInfos[i].bIsReady = false;
 					}
 					else

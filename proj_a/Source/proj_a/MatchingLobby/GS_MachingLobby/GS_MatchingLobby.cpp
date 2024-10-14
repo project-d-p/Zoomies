@@ -12,7 +12,6 @@
 
 AGS_MatchingLobby::AGS_MatchingLobby() {
 	// Set Players Num. need to be Set
-	ReadyPlayers.SetNum(MAX_USERS, false);
 	LobbyInfos.SetNum(MAX_USERS, false);
 	BestHostPlayer = nullptr;
 	LowestAveragePing = 202406071806.0f;
@@ -59,9 +58,8 @@ int32 AGS_MatchingLobby::FindIndexByPlayerId(const int32 &PlayerId) const
 
 void AGS_MatchingLobby::SetPlayerReady(int32 PlayerIndex, bool bIsReady)
 {
-	if (PlayerIndex >= 0 && PlayerIndex < ReadyPlayers.Num())
+	if (PlayerIndex >= 0 && PlayerIndex < LobbyInfos.Num())
 	{
-		ReadyPlayers[PlayerIndex] = bIsReady;
 		LobbyInfos[PlayerIndex].bIsReady = bIsReady;
 		UpdateLobbyInfo();
 	}
@@ -79,7 +77,6 @@ void AGS_MatchingLobby::SetPlayerReady(int32 PlayerIndex, bool bIsReady)
 void AGS_MatchingLobby::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(AGS_MatchingLobby, ReadyPlayers);
 	DOREPLIFETIME(AGS_MatchingLobby, LobbyInfos);
 	DOREPLIFETIME(AGS_MatchingLobby, LowestAveragePing);
 	DOREPLIFETIME(AGS_MatchingLobby, BestHostPlayer);
@@ -87,9 +84,9 @@ void AGS_MatchingLobby::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 bool AGS_MatchingLobby::AreAllPlayersReady()
 {
-	for (int32 i = 0; i < ReadyPlayers.Num(); ++i)
+	for (int32 i = 0; i < LobbyInfos.Num(); ++i)
 	{
-		if (!ReadyPlayers[i])
+		if (!LobbyInfos[i].bIsReady)
 		{
 			return false;
 		}
