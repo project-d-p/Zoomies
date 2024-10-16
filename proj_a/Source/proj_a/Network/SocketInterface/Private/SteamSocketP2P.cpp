@@ -72,18 +72,12 @@ USteamSocketP2P::~USteamSocketP2P()
 CSteamID USteamSocketP2P::GetHostSteamID()
 {
 	UGI_Zoomies* GameInstance = nullptr;
+	
 	if (UWorld* World = GetWorld())
 	{
 		GameInstance = Cast<UGI_Zoomies>(World->GetGameInstance());
-		if (GameInstance)
-		{
-			IOnlineSessionPtr SessionInt = GameInstance->GetOnlineSessionInterface();
-			if (SessionInt.IsValid())
-			{
-				SessionInt->DestroySession(GameInstance->SessionName);
-			}
-		}
 	}
+	
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
 	check(OnlineSub);
 
