@@ -178,6 +178,10 @@ void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 					if (playerIndex >= 0 && playerIndex < GS->LobbyInfos.Num())
 					{
 						GS->LobbyInfos[i].bIsReady = false;
+						GS->LobbyInfos[i].Name = "";
+						GS->LobbyInfos[i].PC = nullptr;
+						GS->LobbyInfos[i].PS = nullptr;
+						GS->LobbyInfos[i].PlayerId = -1;
 					}
 					else
 					{
