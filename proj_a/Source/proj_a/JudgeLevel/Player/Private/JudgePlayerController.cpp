@@ -33,24 +33,10 @@ void AJudgePlayerController::SetOccupationeName_Implementation(int index, const 
 	// XXX: If the client experiences slow loading times, issues may arise with the code below.
 	if (JudgeLevelUI)
 		return ;
-	// check(JudgeLevelUI)
-	JudgeLevelUI->SetBlockContent(ETextBlockType::Occupation, index, Name);
 }
 
 void AJudgePlayerController::InitializeUI_Implementation(const FUIInitData UIData)
 {
-	if (JudgeLevelUI)
-	{
-		for (int32 i = 0; i < UIData.PlayerData.Num(); i++)
-		{
-			const FPlayerInitData& PlayerData = UIData.PlayerData[i];
-    
-			JudgeLevelUI->SetBlockContent(ETextBlockType::Id, i, PlayerData.PlayerName);
-			JudgeLevelUI->SetBlockContent(ETextBlockType::Score, i, FString::FromInt(PlayerData.Score));
-			JudgeLevelUI->SetBlockContent(ETextBlockType::Occupation, i, PlayerData.Occupation);
-		}
-		JudgeLevelUI->SetVoterName(UIData.VoterName);
-	}
 	GetWorldTimerManager().ClearTimer(TH);
 }
 

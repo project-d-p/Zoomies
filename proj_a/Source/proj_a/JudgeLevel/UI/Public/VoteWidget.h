@@ -9,6 +9,7 @@
 #include "Components/UniformGridPanel.h"
 #include "ScoreTypes.h"
 #include "Components/TextBlock.h"
+#include "Components/VerticalBox.h"
 #include "VoteWidget.generated.h"
 
 // refer ScoreTypes.h
@@ -47,7 +48,12 @@ protected:
     UPROPERTY(meta = (BindWidget))
     UCanvasPanel* VotableListPannel;
     UPROPERTY(meta = (BindWidget))
-    UUniformGridPanel* VoteButtonsGrid;
+    UVerticalBox* VoteButtonsGrid;
+    UPROPERTY(meta = (BindWidget))
+    UTextBlock* TargetUserName;
+    UPROPERTY(meta = (BindWidget))
+    UTextBlock* TargetUserJob;
+    
     
     virtual void NativeConstruct() override;
 

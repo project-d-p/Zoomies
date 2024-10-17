@@ -10,11 +10,11 @@ public:
 	{
 		switch (OType)
 		{
-		case EPlayerJob::JOB_ARCHAEOLOGIST: return TEXT("/Game/image/character/pickaxe");
-		case EPlayerJob::JOB_POACHER: return TEXT("/Game/image/character/gun");
-		case EPlayerJob::JOB_ENVIRONMENTALIST: return TEXT("/Game/image/character/earth");
-		case EPlayerJob::JOB_RINGMASTER: return TEXT("/Game/image/character/circus");
-		case EPlayerJob::JOB_TERRORIST: return TEXT("/Game/image/character/bomb");
+		case EPlayerJob::JOB_ARCHAEOLOGIST: return TEXT("/Game/image/character/JobText/archa");
+		case EPlayerJob::JOB_POACHER: return TEXT("/Game/image/character/JobText/Poacher");
+		case EPlayerJob::JOB_ENVIRONMENTALIST: return TEXT("/Game/image/character/JobText/environmentalist");
+		case EPlayerJob::JOB_RINGMASTER: return TEXT("/Game/image/character/JobText/RingMaster");
+		case EPlayerJob::JOB_TERRORIST: return TEXT("/Game/image/character/JobText/Terrorist");
 		case EPlayerJob::JOB_CHECK: return TEXT("/Game/image/ui/check");
 		case EPlayerJob::JOB_CROSS: return TEXT("/Game/image/ui/cross");
 			default: check(false) return nullptr;;
@@ -25,7 +25,7 @@ public:
 	{
 		switch(WType)
 		{
-		case EWidget::JUDGE_LEVEL: return TEXT("/Game/widget/widget_judge.widget_judge_C");
+		case EWidget::JUDGE_LEVEL: return TEXT("/Game/widget/WBP_JudgeLevel/widget_judge.widget_judge_C");
 		case EWidget::CALCULATE_WIDGET: return TEXT("/Game/widget/widget_calculate.widget_calculate_C");
 		case EWidget::RESULT_WIDGET: return TEXT("/Game/widget/widget_result.widget_result_C");
 		case EWidget::BOARD_ACTOR: return TEXT("/Game/widget/resultWidgetActor.resultWidgetActor_C");

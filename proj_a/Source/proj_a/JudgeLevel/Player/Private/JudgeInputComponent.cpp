@@ -60,7 +60,6 @@ void UJudgeInputComponent::BindJudgeLevelActions()
 	// Enhanced Input Component
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 	{
-		// (left mouse button) : Active
 		EnhancedInputComponent->BindAction(ActiveAction, ETriggerEvent::Triggered, this, &UJudgeInputComponent::Active);
 		EnhancedInputComponent->BindAction(EscAction, ETriggerEvent::Started, this, &UJudgeInputComponent::Esc);
 	}
@@ -94,7 +93,6 @@ void UJudgeInputComponent::Active(const FInputActionValue& value)
 
 void UJudgeInputComponent::Esc(const FInputActionValue& value)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("UJudgeInputComponent::Esc"));
 	AJudgePlayerController* PlayerController = Cast<AJudgePlayerController>(PC_JudgeLevel);
 	if (PlayerController != nullptr)
 	{

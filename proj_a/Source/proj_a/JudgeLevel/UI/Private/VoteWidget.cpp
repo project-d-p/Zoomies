@@ -23,23 +23,29 @@ void UVoteWidget::InitializEPlayerJobs()
         EPlayerJob::JOB_RINGMASTER,
         EPlayerJob::JOB_ENVIRONMENTALIST,
         EPlayerJob::JOB_TERRORIST,
-        EPlayerJob::JOB_CHECK,
-        EPlayerJob::JOB_CROSS };
+        };
     
     checkf(VoteButtonsGrid, TEXT("VoteButtonsGrid is nullptr"))
     for (int32 i = 0; i < OccupationTypes.Num(); ++i)
     {
-        UOccupationButton* BT = Cast<UOccupationButton>(VoteButtonsGrid->GetChildAt(i));
-        UImage* BtImg = Cast<UImage>(BT->GetChildAt(0));
-        check(BtImg)
-        BtImg->SetBrushFromTexture(LoadObject<UTexture2D>(nullptr, PathManager::GetOccupationImagePath(OccupationTypes[i])));
-        BT->SetOccupation(OccupationTypes[i]);
-        BT->SetLambda([this](EPlayerJob EOcc)
+        UUserWidget* BT = Cast<UUserWidget>(VoteButtonsGrid->GetChildAt(i));
+        if (BT)
         {
-            this->CurrentVoterOcc = EOcc;
-            UTexture2D* Texture = LoadObject<UTexture2D>(nullptr, PathManager::GetOccupationImagePath(EOcc));
-            this->VoterImg->SetBrushFromTexture(Texture);
-        });
+            UButton* Button = Cast<UButton>(BT->GetWidgetFromName(TEXT("introduce_Button")));
+            if (Button)
+            {
+                UOccupationButton* OccupationButton = Cast<UOccupationButton>(Button);
+                if (OccupationButton)
+                {
+                    OccupationButton->SetOccupation(OccupationTypes[i]);
+                    OccupationButton->SetLambda([this](EPlayerJob EOcc)
+                    {
+                        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("UJudgeInputComponent::Esc"));
+                        this->CurrentVoterOcc = EOcc;
+                    });
+                }
+            }
+        }
     }
 }
 
