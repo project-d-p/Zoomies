@@ -32,7 +32,8 @@ UNetworkFailureManager::UNetworkFailureManager()
 
 void UNetworkFailureManager::Init()
 {
-	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(/*STEAM_SUBSYSTEM*/);
+	// IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(/*STEAM_SUBSYSTEM*/);
+	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
 	this->SessionInterface = OnlineSubsystem->GetSessionInterface();
 
 	if (GEngine)
@@ -42,8 +43,7 @@ void UNetworkFailureManager::Init()
 	}
 }
 
-void UNetworkFailureManager::ShowCapturedTextureToPlayer(UTextureRenderTarget2D* CapturedTexture,
-	const TArray<FColor>& Bitmap)
+void UNetworkFailureManager::ShowCapturedTextureToPlayer(UTextureRenderTarget2D* CapturedTexture, const TArray<FColor>& Bitmap)
 {
 	if (!CapturedTexture)
 	{

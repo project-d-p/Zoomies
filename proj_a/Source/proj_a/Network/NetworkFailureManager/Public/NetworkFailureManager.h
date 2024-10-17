@@ -5,7 +5,6 @@
 #include "DataManager.h"
 #include "OnlineSessionSettings.h"
 #include "Interfaces/OnlineSessionInterface.h"
-#include <tiffio.h>
 #include "NetworkFailureManager.generated.h"
 
 DECLARE_EVENT_TwoParams(UNetworkFailureManager, FOnHostMigration, UWorld*, UDataManager*);
