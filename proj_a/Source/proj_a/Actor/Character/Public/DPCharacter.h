@@ -168,6 +168,7 @@ public:
 	FVector currentVelocity{ 0.f, 0.f, 0.f };
 	UPROPERTY(BlueprintReadWrite)
 	float speed{ 0.f };
+	UPROPERTY(BlueprintReadWrite)
 	bool isAim{ false };
 	bool mIsAtReturnPlace{ true };
 	UPROPERTY(BlueprintReadWrite)
