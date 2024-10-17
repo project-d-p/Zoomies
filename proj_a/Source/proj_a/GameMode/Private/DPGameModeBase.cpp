@@ -423,7 +423,7 @@ void ADPGameModeBase::ProcessData(float delta_time)
 	if (bWallDisappear)
 	{
 		this->SpawnMonsters(delta_time);
-		// this->MonsterMoveSimulate(delta_time);
+		this->MonsterMoveSimulate(delta_time);
 	}
 	while (!this->message_queue_.empty())
 	{
