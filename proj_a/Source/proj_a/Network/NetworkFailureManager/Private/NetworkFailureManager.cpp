@@ -163,10 +163,11 @@ void UNetworkFailureManager::OnLevelLoaded(UWorld* LoadedWorld, FOnSessionDestro
 
 void UNetworkFailureManager::CreateNewSession(UWorld* World)
 {
+	FNetLogger::EditerLog(FColor::Green, TEXT("Creating Session..."));
 	// Online Mode : False
-	// SessionSettings.bIsLANMatch = false;
+	SessionSettings.bIsLANMatch = false;
 	// Lan Mode : True
-	SessionSettings.bIsLANMatch = true;
+	// SessionSettings.bIsLANMatch = true;
 	SessionSettings.NumPublicConnections = 4; // Number of players
 	SessionSettings.bShouldAdvertise = true; // Advertise the session to others
 	SessionSettings.bAllowJoinInProgress = true; // Allow joining in progress
@@ -209,9 +210,9 @@ void UNetworkFailureManager::JoinNewSession(UWorld* World)
 {
 	SessionSearch = MakeShareable(new FOnlineSessionSearch());
 	// Online Mode : False
-	// SessionSearch->bIsLanQuery = false;
+	SessionSearch->bIsLanQuery = false;
 	// Lan Mode : True
-	SessionSearch->bIsLanQuery = true;
+	// SessionSearch->bIsLanQuery = true;
 	SessionSearch->MaxSearchResults = 10;
 	SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 	SessionSearch->QuerySettings.Set(SETTING_MAPNAME, DesiredMapName.ToString(), EOnlineComparisonOp::Equals);
@@ -355,11 +356,13 @@ void UNetworkFailureManager::HandleNetworkFailure(UWorld* World, UNetDriver* Net
 		OnHostMigrationDelegate.Broadcast(World, DataManager);
 		if (bNextHost)
 		{
+			FNetLogger::EditerLog(FColor::Green, TEXT("Next Host"));
 			// OnHostMigrationDelegate.Broadcast(World, DataManager);
 			DestroyPreviousSession(&UNetworkFailureManager::CreateNewSession);
 		}
 		else
 		{
+			FNetLogger::EditerLog(FColor::Green, TEXT("Not Host"));
 			DestroyPreviousSession(&UNetworkFailureManager::JoinNewSession);
 		}
 	}
@@ -461,8 +464,12 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 			FNetLogger::EditerLog(FColor::Cyan, TEXT("Player %d: %s"), i, *(IdentityInterface->GetPlayerNickname(*RegisteredPlayers[i])));
 		}
 		const FUniqueNetIdRepl LocalPlayerID = World->GetFirstLocalPlayerFromController()->GetPreferredUniqueNetId();
+		const FString LocalPlayerNickname = Online::GetIdentityInterface(World)->GetPlayerNickname(*LocalPlayerID);
 		const FUniqueNetIdRepl NextHostID = RegisteredPlayers[0];
-		if (NextHostID.IsValid() && NextHostID == LocalPlayerID)
+		const FString NextHostNickname = Online::GetIdentityInterface(World)->GetPlayerNickname(*NextHostID);
+
+		FNetLogger::EditerLog(FColor::Green, TEXT("Local Player: %s & Next Host Player: %s"), *LocalPlayerNickname, *NextHostNickname);
+		if (NextHostID.IsValid() && NextHostNickname == LocalPlayerNickname)
 		{
 			bNextHost = true;
 		}
@@ -471,7 +478,7 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 			bNextHost = false;
 		}
 		CreateNewSessionMetaData(World, NextHostID);
-		CaptureViewport();
+		// CaptureViewport();
 	}
 	else
 	{
