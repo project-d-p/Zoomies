@@ -72,13 +72,29 @@ USteamSocketP2P::~USteamSocketP2P()
 CSteamID USteamSocketP2P::GetHostSteamID()
 {
 	UGI_Zoomies* GameInstance = nullptr;
-	
-	if (UWorld* World = GetWorld())
+
+	if (GEngine)
 	{
-		GameInstance = Cast<UGI_Zoomies>(World->GetGameInstance());
+		for (const FWorldContext& Context : GEngine->GetWorldContexts())
+		{
+			if (Context.World())
+			{
+				GameInstance = Cast<UGI_Zoomies>(Context.World()->GetGameInstance());
+				if (GameInstance)
+				{
+					break;
+				}
+			}
+		}
 	}
-	
-	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
+
+	if (!GameInstance)
+	{
+		UE_LOG(LogTemp, Error, TEXT("GameInstance is null"));
+		return k_steamIDNil; // Return an invalid SteamID or handle the error appropriately
+	}
+
+	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
 	check(OnlineSub);
 
 	IOnlineSessionPtr SessionPtr = OnlineSub->GetSessionInterface();
@@ -92,6 +108,7 @@ CSteamID USteamSocketP2P::GetHostSteamID()
 
 	// Change UniqueNetId to FString
 	FString HostSteamIDString = hostNetID->ToString();
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, HostSteamIDString);
                     
 	// Change FString to uint64
 	uint64 HostSteamID64 = FCString::Atoi64(*HostSteamIDString);

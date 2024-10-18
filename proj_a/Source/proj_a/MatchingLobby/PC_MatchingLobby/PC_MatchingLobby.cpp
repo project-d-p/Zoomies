@@ -3,6 +3,7 @@
 #include "CineCameraActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "OnlineSessionSettings.h"
+#include "SteamSocketP2P.h"
 #include "Components/BackgroundBlur.h"
 #include "GameFramework/PlayerState.h"
 #include "proj_a/MatchingLobby/GM_MatchingLobby/GM_MatchingLobby.h"

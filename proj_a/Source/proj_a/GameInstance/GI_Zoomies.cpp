@@ -35,7 +35,12 @@ void UGI_Zoomies::StartMatchMaking()
 
 IOnlineSessionPtr UGI_Zoomies::GetOnlineSessionInterface() const
 {
-	return session_interface_;
+	if (session_interface_.IsValid())
+	{
+		return session_interface_;
+	}
+	UE_LOG(LogTemp, Error, TEXT("Session interface is not valid"));
+	return nullptr;
 }
 
 IOnlineSubsystem* UGI_Zoomies::GetOnlineSubsystemInterface() const
