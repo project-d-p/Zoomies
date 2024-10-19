@@ -21,7 +21,7 @@ UMainLevelComponent::UMainLevelComponent()
 	SoundComponent = CreateDefaultSubobject<USoundComponent>(TEXT("MainSoundComponent"));
 	CatchRay = CreateDefaultSubobject<UHitScan>(TEXT("CatchRay"));
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetBPClass(TEXT("/Game/widget/widget_ingame.widget_ingame_C"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetBPClass(TEXT("/Gamewidget/WBP_MainLevel/widget_ingame.widget_ingame_C"));
 	if (WidgetBPClass.Succeeded())
 	{
 		WidgetClass = WidgetBPClass.Class;
