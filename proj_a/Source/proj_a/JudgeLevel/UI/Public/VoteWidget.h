@@ -51,8 +51,6 @@ protected:
     UVerticalBox* VoteButtonsGrid;
     UPROPERTY(meta = (BindWidget))
     UTextBlock* TargetUserName;
-    UPROPERTY(meta = (BindWidget))
-    UTextBlock* TargetUserJob;
     
     
     virtual void NativeConstruct() override;
