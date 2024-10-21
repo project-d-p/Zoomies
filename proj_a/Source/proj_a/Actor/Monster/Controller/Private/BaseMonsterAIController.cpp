@@ -21,22 +21,48 @@ ABaseMonsterAIController::ABaseMonsterAIController(const FObjectInitializer& Obj
 
 void ABaseMonsterAIController::RemovePawnAndController()
 {
-	StopMovement();
+	if (GetPathFollowingComponent())
+	{
+		StopMovement();
+	}
+	else
+	{
+		FNetLogger::LogError(TEXT("PathFollowingComponent is nullptr"));
+		return;
+	}
 
 	ADPGameModeBase* GM = GetWorld()->GetAuthGameMode<ADPGameModeBase>();
-	check(GM)
-	
+	if (GM == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Failed to get GameMode"));
+		return;
+	}
+
 	ABaseMonsterCharacter* ControlledCharacter = Cast<ABaseMonsterCharacter>(GetCharacter());
 	if (ControlledCharacter)
 	{
 		GM->RemoveMonsterData(ControlledCharacter);
-		int32 id = Cast<ABaseMonsterCharacter>(GetCharacter())->MonsterId;
-		FNetLogger::LogInfo(TEXT("Monster destroyed. - Character exsist, in Controller id: %d"), id);
+		int32 id = ControlledCharacter->MonsterId;
+		FNetLogger::LogInfo(TEXT("Monster destroyed. - Character exists, in Controller id: %d"), id);
 		ControlledCharacter->Destroy();
 	}
-	
+	else
+	{
+		FNetLogger::LogInfo(TEXT("Monster destroyed. - Character does not exist, in Controller id: %d"), GetUniqueID());
+		return;
+	}
+
+	if (index < 0 || index >= GM->empty_monster_slots_.size())
+	{
+		FNetLogger::LogError(TEXT("Index out of bounds: %d"), index);
+		return;
+	}
+
 	GM->empty_monster_slots_.push_back(index);
-	GM->monster_controllers_[index] = nullptr;
+	if (GM->monster_controllers_.size() > index)
+	{
+		GM->monster_controllers_[index] = nullptr;
+	}
 	Destroy();
 }
 
