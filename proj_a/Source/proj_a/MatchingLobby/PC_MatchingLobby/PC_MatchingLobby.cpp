@@ -4,6 +4,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "FNetLogger.h"
 #include "OnlineSessionSettings.h"
+#include "SteamSocketP2P.h"
 #include "Components/BackgroundBlur.h"
 #include "GameFramework/PlayerState.h"
 #include "proj_a/MatchingLobby/GM_MatchingLobby/GM_MatchingLobby.h"
@@ -54,8 +55,9 @@ void APC_MatchingLobby::BeginPlay()
 	{
 		GameInstance->LoadFriendsList();
 	}
+	SetCineCameraView();
+	this->bAutoManageActiveCameraTarget = false;
 	getMatchLobbyUI();
-	FindCineCamera();
 }
 
 void APC_MatchingLobby::EndPlay( const EEndPlayReason::Type EndPlayReason)
@@ -68,8 +70,13 @@ void APC_MatchingLobby::EndPlay( const EEndPlayReason::Type EndPlayReason)
 void APC_MatchingLobby::SetCineCameraView()
 {
 	if (FixedCamera == nullptr)
+	{
 		FindCineCamera();
-	this->SetViewTargetWithBlend(FixedCamera);
+	}
+	if (FixedCamera != nullptr)
+	{
+		this->SetViewTarget(FixedCamera);
+	}
 }
 
 void APC_MatchingLobby::FindCineCamera()
@@ -125,6 +132,7 @@ void APC_MatchingLobby::ActivateCurrentComponent(APC_MatchingLobby* LocalPlayerC
 		}
 	}
 }
+
 
 void APC_MatchingLobby::DeactiveCurrentComponent()
 {

@@ -36,6 +36,7 @@
 #include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 #include "proj_a/MatchingLobby/GS_MachingLobby/GS_MatchingLobby.h"
+#include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
 #include "Serialization/BulkDataRegistry.h"
 
 // Sets default values
@@ -196,6 +197,7 @@ ADPCharacter::ADPCharacter()
 		
 		if (CurrentLevelName == "matchLobby")
 		{
+			RemoveSpringArm();
 			if (LobbyInfoWidgetComponent && LobbyInfoWidgetComponent->IsValidLowLevel())
 			{
 				LobbyInfoWidgetComponent->DestroyComponent();
@@ -297,6 +299,17 @@ void ADPCharacter::SetNameTag_Implementation()
 void ADPCharacter::UpdateLobbyInfo() 
 {
 	APlayerState* PS = GetPlayerState();
+	UWorld* World = GetWorld();
+	if (World == nullptr)
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+		{
+			UpdateLobbyInfo();
+		}), 0.1f, false);
+		return;
+	}
+	
 	AGS_MatchingLobby* GS = Cast<AGS_MatchingLobby>(GetWorld()->GetGameState());
 	if (!PS || !GS)
 	{
@@ -309,6 +322,17 @@ void ADPCharacter::UpdateLobbyInfo()
 	}
 	
 	FString Name = PS->GetPlayerName();
+
+	if (LobbyInfoWidgetComponent == nullptr || LobbyInfoWidgetComponentBack == nullptr)
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+		{
+			UpdateLobbyInfo();
+		}), 0.1f, false);
+		return ;
+	}
+	
 	UUserWidget* Widget = LobbyInfoWidgetComponent->GetUserWidgetObject();
 	UUserWidget* WidgetBack = LobbyInfoWidgetComponentBack->GetUserWidgetObject();
 	if (Widget && WidgetBack)

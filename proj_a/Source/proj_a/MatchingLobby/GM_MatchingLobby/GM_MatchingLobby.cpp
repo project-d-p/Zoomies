@@ -175,10 +175,13 @@ void AGM_MatchingLobby::UpdatePlayerOnPlatform()
 				if (AGS_MatchingLobby* GS = GetGameState<AGS_MatchingLobby>())
 				{
 					int32 playerIndex = i;
-					if (playerIndex >= 0 && playerIndex < GS->ReadyPlayers.Num())
+					if (playerIndex >= 0 && playerIndex < GS->LobbyInfos.Num())
 					{
-						GS->ReadyPlayers[i] = false;
 						GS->LobbyInfos[i].bIsReady = false;
+						GS->LobbyInfos[i].Name = "";
+						GS->LobbyInfos[i].PC = nullptr;
+						GS->LobbyInfos[i].PS = nullptr;
+						GS->LobbyInfos[i].PlayerId = -1;
 					}
 					else
 					{

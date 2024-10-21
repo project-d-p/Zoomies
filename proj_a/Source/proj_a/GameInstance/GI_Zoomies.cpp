@@ -38,7 +38,12 @@ void UGI_Zoomies::StartMatchMaking()
 
 IOnlineSessionPtr UGI_Zoomies::GetOnlineSessionInterface() const
 {
-	return session_interface_;
+	if (session_interface_.IsValid())
+	{
+		return session_interface_;
+	}
+	UE_LOG(LogTemp, Error, TEXT("Session interface is not valid"));
+	return nullptr;
 }
 
 IOnlineSubsystem* UGI_Zoomies::GetOnlineSubsystemInterface() const
@@ -166,6 +171,7 @@ void UGI_Zoomies::CreateSession()
 	   FOnCreateSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onCreateComplete));
 	// set SessionName to Unique
 	SessionName = FName(*FString::Printf(TEXT("Zoomies_%s"), *FGuid::NewGuid().ToString()));
+	session_settings_->Set(FName("SessionName"), SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
 	
 	// Create session
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
@@ -221,8 +227,16 @@ bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& se
 	
 	dh_on_join_complete = session_interface_->AddOnJoinSessionCompleteDelegate_Handle(
 		FOnJoinSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onJoinComplete));
-	SessionName = FName(*search_result.Session.GetSessionIdStr());
-
+	FString RetrievedSessionName;
+	if (search_result.Session.SessionSettings.Get(FName("SessionName"), RetrievedSessionName))
+	{
+		SessionName = FName(*RetrievedSessionName);
+	}
+	else
+	{
+		SessionName = FName(*search_result.Session.GetSessionIdStr());
+	}
+	
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
 	session_interface_->JoinSession(*local_player->GetPreferredUniqueNetId(), SessionName, search_result);
 	return true;
@@ -640,5 +654,19 @@ void UGI_Zoomies::ShowLoadingScreen()
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("ShowLoadingScreen::Failed to load widget class"));
+	}
+}
+
+void UGI_Zoomies::HideLoadingScreen()
+{
+	if (LoadingWidget != nullptr)
+	{
+		LoadingWidget->RemoveFromParent();
+		LoadingWidget = nullptr;
+		UE_LOG(LogTemp, Log, TEXT("HideLoadingScreen::Loading screen hidden"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HideLoadingScreen::No loading screen to hide"));
 	}
 }

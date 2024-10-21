@@ -44,7 +44,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Friends")
 	TArray<FFriendInfo> FriendsArray;
 	void ShowLoadingScreen();
-	
+	void HideLoadingScreen();
 	int player_count = 0;
 	UPROPERTY()
 	UNetworkFailureManager* network_failure_manager_;
