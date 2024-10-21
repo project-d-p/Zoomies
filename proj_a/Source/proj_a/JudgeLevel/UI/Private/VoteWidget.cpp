@@ -5,6 +5,7 @@
 #include "PathManager.h"
 #include "ScoreTypes.h"
 #include "TimerUI.h"
+#include "Components/SizeBox.h"
 #include "Delegates/DelegateSignatureImpl.inl"
 
 void UVoteWidget::NativeConstruct()
@@ -28,19 +29,16 @@ void UVoteWidget::InitializEPlayerJobs()
     checkf(VoteButtonsGrid, TEXT("VoteButtonsGrid is nullptr"))
     for (int32 i = 0; i < OccupationTypes.Num(); ++i)
     {
-        UUserWidget* BT = Cast<UUserWidget>(VoteButtonsGrid->GetChildAt(i));
-        if (BT)
+        UWidget* ChildWidget = VoteButtonsGrid->GetChildAt(i);
+        if (USizeBox* SizeBox = Cast<USizeBox>(ChildWidget))
         {
-            UButton* Button = Cast<UButton>(BT->GetWidgetFromName(TEXT("introduce_Button")));
-            if (Button)
+            if (UButton* Button = Cast<UButton>(SizeBox->GetChildAt(0)))
             {
-                UOccupationButton* OccupationButton = Cast<UOccupationButton>(Button);
-                if (OccupationButton)
+                if (UOccupationButton* OccupationButton = Cast<UOccupationButton>(Button))
                 {
                     OccupationButton->SetOccupation(OccupationTypes[i]);
                     OccupationButton->SetLambda([this](EPlayerJob EOcc)
                     {
-                        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("UJudgeInputComponent::Esc"));
                         this->CurrentVoterOcc = EOcc;
                     });
                 }
