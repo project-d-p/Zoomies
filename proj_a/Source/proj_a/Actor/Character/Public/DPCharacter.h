@@ -150,10 +150,10 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class UCameraComponent* camera;
 
-	UPROPERTY(VisibleAnywhere, Category = Camera)
-	class USpringArmComponent* sceneCaptureSpringArm;
-	UPROPERTY(VisibleAnywhere, Category = Camera)
-	class  USceneCaptureComponent2D* sceneCapture;
+	//UPROPERTY(VisibleAnywhere, Category = Camera)
+	//class USpringArmComponent* sceneCaptureSpringArm;
+	//UPROPERTY(VisibleAnywhere, Category = Camera)
+	//class  USceneCaptureComponent2D* sceneCapture;
 
 	UPROPERTY()
 	UCharacterPositionSync* syncer = nullptr;

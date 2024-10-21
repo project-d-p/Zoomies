@@ -21,8 +21,8 @@ ABlockingBoxVolume::ABlockingBoxVolume()
 	BlockingBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECR_Block);
 	RootComponent = BlockingBox;
 
-	BlockingBox->SetRelativeLocation(FVector(-620.000000, -30.000000, 140.000000));
-	BlockingBox->SetRelativeScale3D(FVector(0.250000,13.250000,7.500000));
+	//BlockingBox->SetRelativeLocation(FVector(-620.000000, -30.000000, 140.000000));
+	BlockingBox->SetRelativeScale3D(FVector(0.001f, 5.25f, 1.25f));
 
 	// 머티리얼 적용
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> BlockingWallMaterial(TEXT("/Game/material/m_blockingWall.m_blockingWall"));
