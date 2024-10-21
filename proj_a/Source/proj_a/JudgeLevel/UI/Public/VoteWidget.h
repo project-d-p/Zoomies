@@ -36,7 +36,12 @@ class PROJ_A_API UVoteWidget : public UUserWidget
 
 public:
     EPlayerJob GetVote() const { return CurrentVoterOcc; }
-    void SetVoterName(const FString& Name) { VoterName->SetText(FText::FromString(Name)); }
+    void SetVoterName(const FString& Name)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("SetVoterName: %s"), *Name));
+        VoterName->SetText(FText::FromString(Name));
+        TargetUserName->SetText(FText::FromString(Name));
+    }
     
 protected:
     UPROPERTY(meta = (BindWidget))
