@@ -31,6 +31,12 @@ void ABaseMonsterAIController::RemovePawnAndController()
 		return;
 	}
 
+	UWorld* World = GetWorld();
+	if (World == nullptr)
+	{
+		FNetLogger::LogError(TEXT("World is nullptr"));
+		return;
+	}
 	ADPGameModeBase* GM = GetWorld()->GetAuthGameMode<ADPGameModeBase>();
 	if (GM == nullptr)
 	{
