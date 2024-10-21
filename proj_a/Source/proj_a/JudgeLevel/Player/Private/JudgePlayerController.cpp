@@ -37,8 +37,14 @@ void AJudgePlayerController::SetOccupationeName_Implementation(int index, const 
 
 void AJudgePlayerController::InitializeUI_Implementation(const FUIInitData UIData)
 {
+	if (JudgeLevelUI)
+	{
+		JudgeLevelUI->SetVoterName(UIData.VoterName);
+	}
 	GetWorldTimerManager().ClearTimer(TH);
 }
+
+
 
 void AJudgePlayerController::SetVoterName_Implementation(const FString& Name)
 {
