@@ -12,7 +12,7 @@ void UVoteWidget::NativeConstruct()
     Super::NativeConstruct();
     
     InitializEPlayerJobs();
-    if (OpenVoteListButton) OpenVoteListButton->OnClicked.AddDynamic(this, &UVoteWidget::OnOpenVoteListButtonClicked);
+    //if (OpenVoteListButton) OpenVoteListButton->OnClicked.AddDynamic(this, &UVoteWidget::OnOpenVoteListButtonClicked);
 }
 
 void UVoteWidget::InitializEPlayerJobs()
