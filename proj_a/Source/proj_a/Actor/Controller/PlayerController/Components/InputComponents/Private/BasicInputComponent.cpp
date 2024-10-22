@@ -30,14 +30,6 @@ UBasicInputComponent::UBasicInputComponent()
 	(TEXT("/Game/input/ia_run.ia_run"));
 	if (IA_RUN.Succeeded())
 		RunAction = IA_RUN.Object;
-	static ConstructorHelpers::FObjectFinder<UInputAction>IA_ESC
-(TEXT("/Game/input/ia_ESC.ia_ESC"));
-	if (IA_ESC.Succeeded())
-		ESCAction = IA_ESC.Object;
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("IC_MatchLobby::Failed to load EscAction"));
-	}
 }
 
 void UBasicInputComponent::Activate(bool bReset)
@@ -75,7 +67,6 @@ void UBasicInputComponent::BindBasicLevelActions()
 		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &UBasicInputComponent::Rotate);
 		// 달리기 ( shift )
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Triggered, this, &UBasicInputComponent::Run);
-		EnhancedInputComponent->BindAction(ESCAction, ETriggerEvent::Started, this, &UBasicInputComponent::ESC);
 	}
 }
 
@@ -149,18 +140,6 @@ void UBasicInputComponent::Run(const FInputActionValue& value)
 	if (!Character) return ;
 
 	Character->GetCharacterMovement()->MaxWalkSpeed = 1000.0f;
-}
-
-void UBasicInputComponent::ESC(const FInputActionValue& value)
-{
-	if (PC != nullptr)
-	{
-		PC->ShowUI_ESC();
-	}
-	else
-	{
-		UE_LOG( LogTemp, Warning, TEXT("IC_MatchLobby::PlayerController is nullptr."));
-	}
 }
 
 void UBasicInputComponent::Set_PC(ADPPlayerController* PlayerController)

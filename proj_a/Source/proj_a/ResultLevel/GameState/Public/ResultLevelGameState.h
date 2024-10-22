@@ -78,8 +78,8 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	int MyRank = 0;
 	
-
 	UChatManager* GetChatManager() const { return ChatManager; }
+	
 protected:
 	virtual void AddPlayerState(APlayerState* PlayerState) override;
 	virtual void BeginPlay() override;
