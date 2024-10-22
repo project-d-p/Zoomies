@@ -252,7 +252,7 @@ void ADPGameModeBase::CheckAllPlayersConnected()
 	check(GS)
 	if (GS && GS->AreAllPlayersConnected())
 	{
-		StartGame();
+		// StartGame();
 	}
 }
 
@@ -382,6 +382,14 @@ void ADPGameModeBase::Tick(float delta_time)
 #endif
 		if (bTimeSet == false)
 		{
+			ADPInGameState* GS = GetGameState<ADPInGameState>();
+			if (GS)
+			{
+				FTimerHandle TimerHandle;
+				GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([GS]() {
+					GS->MulticastPlayerJob();
+				}), 0.5f, false); 
+			}
 			if (BlockingVolume)
 			{
 				BlockingVolume->DeactiveBlockingVolume(bWallDisappear);
