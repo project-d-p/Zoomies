@@ -31,22 +31,7 @@ void ABaseMonsterAIController::RemovePawnAndController()
 		return;
 	}
 
-	
-	ADPGameModeBase* GM = nullptr;
-	if (GEngine)
-	{
-		for (const FWorldContext& Context : GEngine->GetWorldContexts())
-		{
-			if (Context.World())
-			{
-				GM = Cast<ADPGameModeBase>(Context.World()->GetAuthGameMode());
-				if (GM)
-				{
-					break;
-				}
-			}
-		}
-	}
+	ADPGameModeBase* GM = GetWorld() ? Cast<ADPGameModeBase>(GetWorld()->GetAuthGameMode()) : nullptr;
 	if (GM == nullptr)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Failed to get GameMode"));
