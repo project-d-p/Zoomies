@@ -8,7 +8,7 @@
 //     1       |    0     : Editor
 
 #ifndef EDITOR_MODE
-	#define EDITOR_MODE 1
+	#define EDITOR_MODE 0
 #endif
 
 #ifndef LAN_MODE
@@ -17,8 +17,8 @@
 
 namespace Zoomies	
 {
-	constexpr int MAX_MONSTERS = 1;
-	constexpr int MAX_PLAYERS = 1;
-	constexpr float GAME_TIME = 15.f;
-	constexpr float JUDGE_TIME = 200.f;
+	constexpr int MAX_MONSTERS = 4;
+	constexpr int MAX_PLAYERS = 4;
+	constexpr float GAME_TIME = 30.f;
+	constexpr float JUDGE_TIME = 30.f;
 }
