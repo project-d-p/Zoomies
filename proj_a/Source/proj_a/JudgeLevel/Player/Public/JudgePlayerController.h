@@ -80,6 +80,7 @@ private:
 	UPROPERTY()
 	UTextureTransferManager* TextureTransferManager;
 
+	USoundBase *TurnStartSound;
 	UJudgeLevelComponent* LevelComponent = nullptr;
 
 	FTimerHandle TH;

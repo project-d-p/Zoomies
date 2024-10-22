@@ -12,6 +12,7 @@
 #include "JudgeLevelComponent.h"
 #include "JudgeInputComponent.h"
 #include "GameFramework/GameStateBase.h"
+#include "Kismet/GameplayStatics.h"
 
 AJudgePlayerController::AJudgePlayerController()
 {
@@ -24,7 +25,12 @@ AJudgePlayerController::AJudgePlayerController()
 	}
 	TextureTransferManager = CreateDefaultSubobject<UTextureTransferManager>(TEXT("TextureTransferManager"));
 	TextureTransferManager->OnDataTransferComplete.BindDynamic(TextureTransferManager, &UTextureTransferManager::OnTextureTransferComplete);
-
+	static ConstructorHelpers::FObjectFinder<USoundWave> SoundAsset(TEXT("/Game/sounds/effect/Turn/Chin.Chin"));
+	if (SoundAsset.Succeeded())
+	{
+		TurnStartSound = SoundAsset.Object;
+	}
+	
 	LevelComponent = CreateDefaultSubobject<UJudgeLevelComponent>(TEXT("ULC_JudgeLevel"));
 }
 
@@ -40,6 +46,12 @@ void AJudgePlayerController::InitializeUI_Implementation(const FUIInitData UIDat
 	if (JudgeLevelUI)
 	{
 		JudgeLevelUI->SetVoterName(UIData.VoterName);
+		if (TurnStartSound)
+		{
+			float VolumeMultiplier = 0.2f;
+
+			UGameplayStatics::PlaySound2D(this, TurnStartSound, VolumeMultiplier);
+		}
 	}
 	GetWorldTimerManager().ClearTimer(TH);
 }
@@ -51,6 +63,17 @@ void AJudgePlayerController::SetVoterName_Implementation(const FString& Name)
 	if (JudgeLevelUI)
 	{
 		JudgeLevelUI->SetVoterName(Name);
+		if (TurnStartSound)  // 사운드가 유효한지 확인
+		{
+			// 2D 사운드를 재생 (UI에서 사용)
+			UGameplayStatics::PlaySound2D(this, TurnStartSound);
+			//log on screen
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("TurnStartSound"));
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("TurnStartSound is not valid"));
+		}
 	}
 }
 

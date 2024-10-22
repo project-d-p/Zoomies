@@ -38,7 +38,6 @@ public:
     EPlayerJob GetVote() const { return CurrentVoterOcc; }
     void SetVoterName(const FString& Name)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("SetVoterName: %s"), *Name));
         VoterName->SetText(FText::FromString(Name));
         TargetUserName->SetText(FText::FromString(Name));
     }

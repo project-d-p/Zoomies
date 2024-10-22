@@ -21,7 +21,6 @@ AJudgeGameMode::AJudgeGameMode()
     
     TimerManager = CreateDefaultSubobject<UServerTimerManager>(TEXT("TimerManager"));
     ChatManager = CreateDefaultSubobject<UServerChatManager>(TEXT("ChatManager"));
-    
     bUseSeamlessTravel = true;
 }
 
