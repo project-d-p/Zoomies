@@ -8,6 +8,7 @@
 #include "NetworkFailureManager.generated.h"
 
 DECLARE_EVENT_TwoParams(UNetworkFailureManager, FOnHostMigration, UWorld*, UDataManager*);
+DECLARE_EVENT_OneParam(UNetworkFailureManager, FOnSessionDestroyedDelegate, UWorld*);
 typedef void (UNetworkFailureManager::*FOnSessionDestroyedCallback)(UWorld*);
 
 UCLASS()
@@ -41,6 +42,7 @@ private:
 	
 	IOnlineSessionPtr SessionInterface;
 	FOnHostMigration OnHostMigrationDelegate;
+	FOnSessionDestroyedDelegate OnSessionDestroyedDelegate;
 	FOnlineSessionSettings SessionSettings;
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 	FDelegateHandle OnDestroyCompleteDelegateHandle;

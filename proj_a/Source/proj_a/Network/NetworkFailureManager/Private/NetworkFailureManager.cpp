@@ -111,37 +111,41 @@ void UNetworkFailureManager::DestroyPreviousSession(FOnSessionDestroyedCallback 
 {
 	if (SessionInterface.IsValid())
 	{
-		OnDestroyCompleteDelegateHandle = SessionInterface->OnDestroySessionCompleteDelegates.AddLambda([this, OnSessionDestroyedCallback](FName SessionName, bool bWasSuccessful)
+		TWeakObjectPtr<UNetworkFailureManager> WeakThis = this;
+		OnDestroyCompleteDelegateHandle = SessionInterface->OnDestroySessionCompleteDelegates.AddLambda([WeakThis, OnSessionDestroyedCallback](FName SessionName, bool bWasSuccessful)
 		{
-			this->SessionInterface->OnDestroySessionCompleteDelegates.Remove(this->OnDestroyCompleteDelegateHandle);
-			if (bWasSuccessful)
+			if (WeakThis.IsValid())
 			{
-				const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
-				if (GameMapsSettings)
+				UNetworkFailureManager* StrongThis = WeakThis.Get();
+				StrongThis->SessionInterface->OnDestroySessionCompleteDelegates.Remove(StrongThis->OnDestroyCompleteDelegateHandle);
+				if (bWasSuccessful)
 				{
-					
-					FName DefaultLevel = FName(*GameMapsSettings->GetGameDefaultMap());
-				
-					FString DefaultLevelWithOption = DefaultLevel.ToString() + TEXT("?closed");
-					FName NewLevelName = FName(*DefaultLevelWithOption);
-				
-					UWorld* World = this->GetOuter()->GetWorld();
-					if (World)
+					const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
+					if (GameMapsSettings)
 					{
-						FNetLogger::EditerLog(FColor::Cyan, TEXT("Destroy Session Complete CallBack"));
-						(this->*OnSessionDestroyedCallback)(World);
-					}
-					else
-					{
-						FNetLogger::EditerLog(FColor::Cyan, TEXT("Cannt Get World"));
-						FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnLevelLoaded, OnSessionDestroyedCallback);
-						UGameplayStatics::OpenLevel(this, NewLevelName, true);
+						FName DefaultLevel = FName(*GameMapsSettings->GetGameDefaultMap());
+						FString DefaultLevelWithOption = DefaultLevel.ToString() + TEXT("?closed");
+						FName NewLevelName = FName(*DefaultLevelWithOption);
+
+						UWorld* World = StrongThis->GetWorld();
+						if (World)
+						{
+							FNetLogger::EditerLog(FColor::Cyan, TEXT("Destroy Session Complete CallBack"));
+							// (StrongThis->*OnSessionDestroyedCallback)(World);
+							StrongThis->OnSessionDestroyedDelegate.Broadcast(World);
+						}
+						else
+						{
+							FNetLogger::EditerLog(FColor::Cyan, TEXT("Cannot Get World"));
+							FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(StrongThis, &UNetworkFailureManager::OnLevelLoaded, OnSessionDestroyedCallback);
+							UGameplayStatics::OpenLevel(StrongThis, NewLevelName, true);
+						}
 					}
 				}
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Failed to destroy session: %s"), *SessionName.ToString());
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Failed to destroy session: %s"), *SessionName.ToString());
+				}
 			}
 		});
 
@@ -163,6 +167,7 @@ void UNetworkFailureManager::OnLevelLoaded(UWorld* LoadedWorld, FOnSessionDestro
 
 void UNetworkFailureManager::CreateNewSession(UWorld* World)
 {
+	this->OnSessionDestroyedDelegate.Clear();
 	FNetLogger::EditerLog(FColor::Green, TEXT("Creating Session..."));
 	// Online Mode : False
 	SessionSettings.bIsLANMatch = false;
@@ -208,6 +213,7 @@ void UNetworkFailureManager::CreateSessionComplete(FName SessionName, bool bWasS
 
 void UNetworkFailureManager::JoinNewSession(UWorld* World)
 {
+	this->OnSessionDestroyedDelegate.Clear();
 	SessionSearch = MakeShareable(new FOnlineSessionSearch());
 	// Online Mode : False
 	SessionSearch->bIsLanQuery = false;
@@ -358,11 +364,13 @@ void UNetworkFailureManager::HandleNetworkFailure(UWorld* World, UNetDriver* Net
 		{
 			FNetLogger::EditerLog(FColor::Green, TEXT("Next Host"));
 			// OnHostMigrationDelegate.Broadcast(World, DataManager);
+			OnSessionDestroyedDelegate.AddUObject(this, &UNetworkFailureManager::CreateNewSession);
 			DestroyPreviousSession(&UNetworkFailureManager::CreateNewSession);
 		}
 		else
 		{
 			FNetLogger::EditerLog(FColor::Green, TEXT("Not Host"));
+			OnSessionDestroyedDelegate.AddUObject(this, &UNetworkFailureManager::JoinNewSession);
 			DestroyPreviousSession(&UNetworkFailureManager::JoinNewSession);
 		}
 	}

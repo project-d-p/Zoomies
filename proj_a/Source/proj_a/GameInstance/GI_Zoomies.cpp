@@ -342,20 +342,20 @@ void UGI_Zoomies::OnDestroyComplete(FName session_name, bool bWasSuccessful)
 
 bool UGI_Zoomies::ResetSession()
 {
-	if (session_interface_.IsValid())
-	{
-		if (session_interface_->GetNamedSession(NAME_GameSession) != nullptr)
-		{
-			// Register OnDestroySessionComplete delegate
-			dh_on_destroy_complete = session_interface_->AddOnDestroySessionCompleteDelegate_Handle(
-				FOnDestroySessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::OnDestroyComplete)
-			);
-			// Destroy the current session
-			session_interface_->DestroySession(NAME_GameSession);
-			return true;
-		}
-	}
-	UE_LOG(LogTemp, Log, TEXT("no existing session to reset"));
+	// if (session_interface_.IsValid())
+	// {
+	// 	if (session_interface_->GetNamedSession(NAME_GameSession) != nullptr)
+	// 	{
+	// 		// Register OnDestroySessionComplete delegate
+	// 		dh_on_destroy_complete = session_interface_->AddOnDestroySessionCompleteDelegate_Handle(
+	// 			FOnDestroySessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::OnDestroyComplete)
+	// 		);
+	// 		// Destroy the current session
+	// 		session_interface_->DestroySession(NAME_GameSession);
+	// 		return true;
+	// 	}
+	// }
+	// UE_LOG(LogTemp, Log, TEXT("no existing session to reset"));
 	return false;
 }
 
