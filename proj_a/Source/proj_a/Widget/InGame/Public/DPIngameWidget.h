@@ -44,4 +44,5 @@ protected:
 
 	void UpdateTextBlock(UTextBlock* TextBlock);
 	void FindAndUpdateTextBlocks(UWidget* ParentWidget);
+	void CheckAndUpdatePlayerJob();
 };

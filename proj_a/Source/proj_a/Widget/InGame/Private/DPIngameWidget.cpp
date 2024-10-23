@@ -99,12 +99,10 @@ void UDPIngameWidget::UpdateTextBlock(UTextBlock* TextBlock)
 		FText DefaultJob = FText::FromString("Job");
 		if (JobText.EqualTo(DefaultJob))
 		{
-			ADPPlayerState* P = Cast<ADPPlayerState>(GetOwningPlayerState());
-			EPlayerJob Job = P->GetPlayerJob();
-			FString JobString = UEnum::GetValueAsString<EPlayerJob>(Job);
-			JobString = JobString.Replace(TEXT("EPlayerJob::JOB_"), TEXT(""));
-			
-			scoreJob->SetText(FText::FromString(JobString));
+			GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
+			{
+				CheckAndUpdatePlayerJob();
+			});
 		}
 	}
 	else if (OuterName.Contains("WBP_InGame_ScoreBox_Total"))
@@ -114,6 +112,25 @@ void UDPIngameWidget::UpdateTextBlock(UTextBlock* TextBlock)
 	else
 	{
 		TextBlock->SetText(FText::FromString("else"));
+	}
+}
+
+void UDPIngameWidget::CheckAndUpdatePlayerJob()
+{
+	ADPPlayerState* P = Cast<ADPPlayerState>(GetOwningPlayerState());
+	if (P)
+	{
+		EPlayerJob Job = P->GetPlayerJob();
+		FString JobString = UEnum::GetValueAsString<EPlayerJob>(Job);
+		JobString = JobString.Replace(TEXT("EPlayerJob::JOB_"), TEXT(""));
+		scoreJob->SetText(FText::FromString(JobString));
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
+		{
+			CheckAndUpdatePlayerJob();
+		});
 	}
 }
 
