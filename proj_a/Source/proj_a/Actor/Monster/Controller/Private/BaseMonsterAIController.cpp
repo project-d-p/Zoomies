@@ -21,6 +21,8 @@ ABaseMonsterAIController::ABaseMonsterAIController(const FObjectInitializer& Obj
 
 void ABaseMonsterAIController::RemovePawnAndController()
 {
+	if (GetCharacter() == nullptr)
+		return ;
 	StopMovement();
 
 	ADPGameModeBase* GM = GetWorld()->GetAuthGameMode<ADPGameModeBase>();

@@ -114,7 +114,6 @@ void AGS_MatchingLobby::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
 		if (GameInstance)
 		{
-			FNetLogger::EditerLog(FColor::Red, TEXT("GameInstance is not null"));
 			GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
 		}
 	}
