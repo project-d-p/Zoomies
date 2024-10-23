@@ -17,7 +17,7 @@
 
 namespace Zoomies
 {
-	constexpr int MAX_MONSTERS = 10;
+	constexpr int MAX_MONSTERS = 30;
 	constexpr int MAX_PLAYERS = 1;
 	constexpr float GAME_TIME = 60.f;
 }
