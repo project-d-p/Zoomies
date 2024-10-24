@@ -36,7 +36,10 @@ void UClientNetworkManager::SendData(const Message& Data)
 void UClientNetworkManager::Shutdown()
 {
 	if (Worker)
+	{
 		Worker->Stop();
+		Worker = nullptr;
+	}
 }
 
 UClientNetworkManager::~UClientNetworkManager()
@@ -44,9 +47,6 @@ UClientNetworkManager::~UClientNetworkManager()
 	UClientNetworkManager::Shutdown();
 	if (WorkerThread)
 	{
-		WorkerThread->Kill();
-		WorkerThread->WaitForCompletion();
-		delete WorkerThread;
 		WorkerThread = nullptr;
 	}
 }

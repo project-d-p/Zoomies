@@ -10,18 +10,33 @@
 #include "Engine/World.h"
 #include "Engine/GameInstance.h"
 // #include "Engine/GameMapsSettings.h"
+#include "CapturedImageWidget.h"
 #include "Engine/GameViewportClient.h"
 #include "Algo/Sort.h"
+#include "Engine/TextureRenderTarget2D.h"
+#include "Kismet/KismetRenderingLibrary.h"
+#include "proj_a/GameInstance/GI_Zoomies.h"
 
 UNetworkFailureManager::UNetworkFailureManager()
 {
 	bNextHost = false;
 	DataManager = NewObject<UDataManager>();
+
+	static ConstructorHelpers::FClassFinder<UCapturedImageWidget> CaptureImage
+	(TEXT("/Game/widget/CapturedImage.CapturedImage_C"));
+	if (CaptureImage.Succeeded())
+	{
+		CapturedImageWidgetClass = CaptureImage.Class;
+	}
 }
 
 void UNetworkFailureManager::Init()
 {
+#if EDITOR_MODE || LAN_MODE
+	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(/*STEAM_SUBSYSTEM*/);
+#else
 	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
+#endif
 	this->SessionInterface = OnlineSubsystem->GetSessionInterface();
 
 	if (GEngine)
@@ -31,43 +46,109 @@ void UNetworkFailureManager::Init()
 	}
 }
 
+void UNetworkFailureManager::ShowCapturedTextureToPlayer(UTextureRenderTarget2D* CapturedTexture, const TArray<FColor>& Bitmap)
+{
+	if (!CapturedTexture)
+	{
+		return;
+	}
+
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+
+	// Texture2D로 변환
+	if (CapturedTexture2D)
+	{
+		CapturedTexture2D->DestroyNonNativeProperties();
+		CapturedTexture2D = nullptr;
+	}
+	CapturedTexture2D = UTexture2D::CreateTransient(CapturedTexture->SizeX, CapturedTexture->SizeY, PF_B8G8R8A8);
+	if (!CapturedTexture2D)
+	{
+		return;
+	}
+
+	/* TEST */
+	// 검은색으로 초기화된 Bitmap 데이터 생성
+	// TArray<FColor> BlackBitmap;
+	// BlackBitmap.SetNum(CapturedTexture->SizeX * CapturedTexture->SizeY);
+	// for (FColor& Pixel : BlackBitmap)
+	// {
+	// 	Pixel = FColor::Black;  // 검은색으로 모든 픽셀 설정
+	// }
+	//
+	// // 텍스처 데이터 복사
+	// void* TextureData = CapturedTexture2D->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+	// FMemory::Memcpy(TextureData, BlackBitmap.GetData(), BlackBitmap.Num() * sizeof(FColor));
+	// CapturedTexture2D->GetPlatformData()->Mips[0].BulkData.Unlock();
+	
+	void* TextureData = CapturedTexture2D->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+	FMemory::Memcpy(TextureData, Bitmap.GetData(), Bitmap.Num() * sizeof(FColor));
+	CapturedTexture2D->GetPlatformData()->Mips[0].BulkData.Unlock();
+	CapturedTexture2D->UpdateResource();
+
+	// 플레이어 컨트롤러를 통해 위젯 생성
+	APlayerController* PlayerController = World->GetFirstPlayerController();
+	if (PlayerController && PlayerController->IsLocalController())
+	{
+		// UMG 위젯 생성
+		CapturedImageWidget = CreateWidget<UCapturedImageWidget>(GetWorld(), CapturedImageWidgetClass);
+		if (CapturedImageWidget)
+		{
+			// 캡처된 텍스처 설정
+			CapturedImageWidget->SetCapturedTexture(CapturedTexture2D);
+
+			FNetLogger::EditerLog(FColor::Blue, TEXT("ShowCapturedTextureToPlayer"));
+
+			// 위젯을 화면에 추가
+			CapturedImageWidget->AddToViewport();
+		}
+	}
+	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
+}
+
 void UNetworkFailureManager::DestroyPreviousSession(FOnSessionDestroyedCallback OnSessionDestroyedCallback)
 {
 	if (SessionInterface.IsValid())
 	{
-		OnDestroyCompleteDelegateHandle = SessionInterface->OnDestroySessionCompleteDelegates.AddLambda([this, OnSessionDestroyedCallback](FName SessionName, bool bWasSuccessful)
+		TWeakObjectPtr<UNetworkFailureManager> WeakThis = this;
+		OnDestroyCompleteDelegateHandle = SessionInterface->OnDestroySessionCompleteDelegates.AddLambda([WeakThis, OnSessionDestroyedCallback](FName SessionName, bool bWasSuccessful)
 		{
-			this->SessionInterface->OnDestroySessionCompleteDelegates.Remove(this->OnDestroyCompleteDelegateHandle);
-			if (bWasSuccessful)
+			if (WeakThis.IsValid())
 			{
-				const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
-				if (GameMapsSettings)
+				UNetworkFailureManager* StrongThis = WeakThis.Get();
+				StrongThis->SessionInterface->OnDestroySessionCompleteDelegates.Remove(StrongThis->OnDestroyCompleteDelegateHandle);
+				if (bWasSuccessful)
 				{
-					
-					FName DefaultLevel = FName(*GameMapsSettings->GetGameDefaultMap());
-					FNetLogger::EditerLog(FColor::Green, TEXT("Default Level: %s"), *DefaultLevel.ToString());
-					FNetLogger::LogError(TEXT("Default Level: %s"), *DefaultLevel.ToString());
-				
-					FString DefaultLevelWithOption = DefaultLevel.ToString() + TEXT("?closed");
-					FName NewLevelName = FName(*DefaultLevelWithOption);
-				
-					UWorld* World = this->GetOuter()->GetWorld();
-					if (World)
+					const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
+					if (GameMapsSettings)
 					{
-						FNetLogger::EditerLog(FColor::Cyan, TEXT("Destroy Session Complete CallBack"));
-						(this->*OnSessionDestroyedCallback)(World);
-					}
-					else
-					{
-						FNetLogger::EditerLog(FColor::Cyan, TEXT("Cannt Get World"));
-						FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnLevelLoaded, OnSessionDestroyedCallback);
-						UGameplayStatics::OpenLevel(this, NewLevelName, true);
+						FName DefaultLevel = FName(*GameMapsSettings->GetGameDefaultMap());
+						FString DefaultLevelWithOption = DefaultLevel.ToString() + TEXT("?closed");
+						FName NewLevelName = FName(*DefaultLevelWithOption);
+
+						UWorld* World = StrongThis->GetWorld();
+						if (World)
+						{
+							FNetLogger::EditerLog(FColor::Cyan, TEXT("Destroy Session Complete CallBack"));
+							// (StrongThis->*OnSessionDestroyedCallback)(World);
+							StrongThis->OnSessionDestroyedDelegate.Broadcast(World);
+						}
+						else
+						{
+							FNetLogger::EditerLog(FColor::Cyan, TEXT("Cannot Get World"));
+							FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(StrongThis, &UNetworkFailureManager::OnLevelLoaded, OnSessionDestroyedCallback);
+							UGameplayStatics::OpenLevel(StrongThis, NewLevelName, true);
+						}
 					}
 				}
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Failed to destroy session: %s"), *SessionName.ToString());
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Failed to destroy session: %s"), *SessionName.ToString());
+				}
 			}
 		});
 
@@ -89,6 +170,8 @@ void UNetworkFailureManager::OnLevelLoaded(UWorld* LoadedWorld, FOnSessionDestro
 
 void UNetworkFailureManager::CreateNewSession(UWorld* World)
 {
+	this->OnSessionDestroyedDelegate.Clear();
+	FNetLogger::EditerLog(FColor::Green, TEXT("Creating Session..."));
 	// Online Mode : False
 	SessionSettings.bIsLANMatch = false;
 	// Lan Mode : True
@@ -122,6 +205,7 @@ void UNetworkFailureManager::CreateSessionComplete(FName SessionName, bool bWasS
 
 		FString MapName = DesiredMapName.ToString();
 		FString TravelURL = FString::Printf(TEXT("%s?listen"), *MapName);
+		// FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
 		GetWorld()->ServerTravel(TravelURL, true);
 	}
 	else
@@ -132,6 +216,7 @@ void UNetworkFailureManager::CreateSessionComplete(FName SessionName, bool bWasS
 
 void UNetworkFailureManager::JoinNewSession(UWorld* World)
 {
+	this->OnSessionDestroyedDelegate.Clear();
 	SessionSearch = MakeShareable(new FOnlineSessionSearch());
 	// Online Mode : False
 	SessionSearch->bIsLanQuery = false;
@@ -177,6 +262,41 @@ void UNetworkFailureManager::FindSessionComplete(bool bWasSuccessful, UWorld* Wo
 	}
 }
 
+void UNetworkFailureManager::OnNewLevelLoaded(UWorld* World)
+{
+	// FCoreUObjectDelegates::PostLoadMapWithWorld.RemoveAll(this);
+	//
+	const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
+	if (!GameMapsSettings)
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("GameMapsSettings is null"));
+		return;
+	}
+	FString DefaultLevel = GameMapsSettings->GetGameDefaultMap();
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Default Level: %s"), *DefaultLevel);
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Current Level: %s"), *World->GetMapName());
+	if (CapturedImageWidget && !DefaultLevel.Contains(World->GetMapName()))
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("OnNewLevelLoaded"));
+		FCoreUObjectDelegates::PostLoadMapWithWorld.RemoveAll(this);
+		CapturedImageWidget->RemoveFromParent();
+	}
+	else if (DefaultLevel.Contains(World->GetMapName()))
+	{
+		// UMG 위젯 생성
+		CapturedImageWidget = CreateWidget<UCapturedImageWidget>(World, CapturedImageWidgetClass);
+		if (CapturedImageWidget)
+		{
+			// 캡처된 텍스처 설정
+			if (CapturedTexture2D)
+			{
+				CapturedImageWidget->SetCapturedTexture(CapturedTexture2D);
+				FNetLogger::EditerLog(FColor::Red, TEXT("OnNewLevelLoaded Default Level"));
+				CapturedImageWidget->AddToViewport(9);
+			}
+		}
+	}
+}
 
 void UNetworkFailureManager::JoinSession(const FOnlineSessionSearchResult& SearchResult, UWorld* World)
 {
@@ -210,7 +330,6 @@ void UNetworkFailureManager::JoinSessionComplete(FName SessionName, EOnJoinSessi
 				{
 					FString URL = FString::Printf(TEXT("%s/%s"), *ConnectString, *MapName);
 					FNetLogger::EditerLog(FColor::Green, TEXT("ClientTravel URL: %s"), *URL);
-					
 					PlayerController->ClientTravel(URL, ETravelType::TRAVEL_Absolute);
 				}
 				else
@@ -246,11 +365,15 @@ void UNetworkFailureManager::HandleNetworkFailure(UWorld* World, UNetDriver* Net
 		OnHostMigrationDelegate.Broadcast(World, DataManager);
 		if (bNextHost)
 		{
+			FNetLogger::EditerLog(FColor::Green, TEXT("Next Host"));
 			// OnHostMigrationDelegate.Broadcast(World, DataManager);
+			OnSessionDestroyedDelegate.AddUObject(this, &UNetworkFailureManager::CreateNewSession);
 			DestroyPreviousSession(&UNetworkFailureManager::CreateNewSession);
 		}
 		else
 		{
+			FNetLogger::EditerLog(FColor::Green, TEXT("Not Host"));
+			OnSessionDestroyedDelegate.AddUObject(this, &UNetworkFailureManager::JoinNewSession);
 			DestroyPreviousSession(&UNetworkFailureManager::JoinNewSession);
 		}
 	}
@@ -272,18 +395,39 @@ void UNetworkFailureManager::CreateNewSessionMetaData(UWorld* World, const FUniq
 	}
 }
 
+void UNetworkFailureManager::CaptureViewport()
+{
+	// 1. Viewport 캡처
+	if (GEngine && GEngine->GameViewport)
+	{
+		FViewport* Viewport = GEngine->GameViewport->Viewport;
+
+		if (Viewport)
+		{
+			UTextureRenderTarget2D* RenderTarget = NewObject<UTextureRenderTarget2D>();
+			RenderTarget->InitAutoFormat(1920, 1080);
+
+			TArray<FColor> Bitmap;
+			Bitmap.SetNum(Viewport->GetSizeXY().X * Viewport->GetSizeXY().Y);
+
+			// FIntRect Rect(0, 0, Viewport->GetSizeXY().X, Viewport->GetSizeXY().Y);
+
+			if (Viewport->ReadPixels(Bitmap))
+			{
+				AsyncTask(ENamedThreads::GameThread, [this, Bitmap, RenderTarget]()
+				{
+					ShowCapturedTextureToPlayer(RenderTarget, Bitmap);
+				});
+			}
+		}
+	}
+}
+
 void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 {
 	FNamedOnlineSession* CurrentSession = SessionInterface->GetNamedSession(NAME_GameSession);
 	if (CurrentSession)
 	{
-		/* For Debugging */
-		// if (CurrentSession->RegisteredPlayers.Num() == 2)
-		// {
-		// 	bNextHost = false;
-		// 	FNetLogger::EditerLog(FColor::Red, TEXT("You are the Last Player in the Session"));
-		// 	return ;
-		// }
 		TArray<FUniqueNetIdRepl> RegisteredPlayers;
 		TSet<FString> UniqueNicknames;  // 중복 확인을 위한 닉네임 저장소
 		
@@ -324,15 +468,19 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 
 			return NicknameA < NicknameB;  // 문자열을 기준으로 사전순 정렬
 		};
-		// Algo::Sort(RegisteredPlayers, CompareByNickname);
+		
 		RegisteredPlayers.Sort(CompareByNickname);
 		for (int32 i = 0; i < RegisteredPlayers.Num(); i++) {
 			IOnlineIdentityPtr IdentityInterface = Online::GetIdentityInterface(World);
 			FNetLogger::EditerLog(FColor::Cyan, TEXT("Player %d: %s"), i, *(IdentityInterface->GetPlayerNickname(*RegisteredPlayers[i])));
 		}
 		const FUniqueNetIdRepl LocalPlayerID = World->GetFirstLocalPlayerFromController()->GetPreferredUniqueNetId();
+		const FString LocalPlayerNickname = Online::GetIdentityInterface(World)->GetPlayerNickname(*LocalPlayerID);
 		const FUniqueNetIdRepl NextHostID = RegisteredPlayers[0];
-		if (NextHostID.IsValid() && NextHostID == LocalPlayerID)
+		const FString NextHostNickname = Online::GetIdentityInterface(World)->GetPlayerNickname(*NextHostID);
+
+		FNetLogger::EditerLog(FColor::Green, TEXT("Local Player: %s & Next Host Player: %s"), *LocalPlayerNickname, *NextHostNickname);
+		if (NextHostID.IsValid() && NextHostNickname == LocalPlayerNickname)
 		{
 			bNextHost = true;
 		}
@@ -341,6 +489,7 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 			bNextHost = false;
 		}
 		CreateNewSessionMetaData(World, NextHostID);
+		// CaptureViewport();
 	}
 	else
 	{

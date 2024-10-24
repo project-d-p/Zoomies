@@ -58,7 +58,7 @@ void ADPInGameState::MulticastPlayerJob_Implementation() const
 		{
 			UDPJobAssign* JobWidget = Cast<UDPJobAssign>(JobWidgetInstance);
 			check(JobWidget)
-			JobWidget->AddToViewport();
+			// JobWidget->AddToViewport();
 			JobWidget->OnJobAssigned(PlayerState->GetPlayerJob());
 		}
 	}

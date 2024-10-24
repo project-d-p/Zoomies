@@ -13,7 +13,7 @@ class PROJ_A_API AJudgePlayerState : public APlayerState
 public:
 	void SetCapturedAnimals(const TArray<TArray<EAnimal>>& CapturedAnimals) { FinalScoreData.CapturedAnimals = CapturedAnimals; }
 	void SetScoreDatas(const TArray<FScoreData>& ScoreDatas) { FinalScoreData.ScoreDatas = ScoreDatas; }
-	void SetIsDetected(bool bIsDetected) { PlayerScoreData->SetIsDetected(bIsDetected); }
+	void SetIsDetected(bool bIsDetected) { if(PlayerScoreData) {PlayerScoreData->SetIsDetected(bIsDetected);} }
 	FFinalScoreData GetFinalScoreData() const { return FinalScoreData; }
 	UPlayerScoreData* GetPlayerScoreData() const { return PlayerScoreData; }
 
