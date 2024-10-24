@@ -2,6 +2,7 @@
 
 #include "DPCharacter.h"
 #include "DPPlayerController.h"
+#include "CompileMode.h"
 #include "FNetLogger.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/PlayerState.h"
@@ -17,8 +18,14 @@ Message MessageMaker::MakeMovementMessage(const ADPPlayerController* Controller,
 	{
 		return msg;
 	}
-	
+
+#if EDITOR_MODE
 	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetPlayerName()));
+#elif LAN_MODE
+	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetPlayerName()));
+#else
+	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetUniqueId()->ToString()));
+#endif
 	Movement movement;
 	Vec3 velocity;
 	velocity.set_x(Velocity.X);
@@ -51,7 +58,14 @@ Message MessageMaker::MakePositionMessage(const ADPPlayerController* Controller)
 	{
 		return msg;
 	}
+
+#if EDITOR_MODE
 	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetPlayerName()));
+#elif LAN_MODE
+	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetPlayerName()));
+#else
+	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetUniqueId()->ToString()));
+#endif
 	ActorPosition actor_position;
 	if (Controller->GetPawn() == nullptr || !IsValid(Controller->GetPawn()))
 	{
@@ -105,8 +119,13 @@ Message MessageMaker::MakeJumpMessage(ADPPlayerController* Controller)
 	{
 		return msg;
 	}
-
+#if EDITOR_MODE
 	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetPlayerName()));
+#elif LAN_MODE
+	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetPlayerName()));
+#else
+	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetUniqueId()->ToString()));
+#endif
 	Jump jump;
 	jump.set_jump_event(1);
 	*msg.mutable_jump() = jump;
@@ -125,7 +144,13 @@ Message MessageMaker::MakeFireMessage(ADPPlayerController* Controller, const FVe
 		return msg;
 	}
 
+#if EDITOR_MODE
 	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetPlayerName()));
+#elif LAN_MODE
+	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetPlayerName()));
+#else
+	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetUniqueId()->ToString()));
+#endif
 	Gunfire gunfire;
 	Vec3 position;
 	position.set_x(Position.X);
@@ -152,7 +177,13 @@ Message MessageMaker::MakeAimMessage(ADPPlayerController* controller, bool bAim)
 	{
 		return msg;
 	}
+#if EDITOR_MODE
 	msg.set_player_id(TCHAR_TO_UTF8(*controller->PlayerState->GetPlayerName()));
+#elif LAN_MODE
+	msg.set_player_id(TCHAR_TO_UTF8(*controller->PlayerState->GetPlayerName()));
+#else
+	msg.set_player_id(TCHAR_TO_UTF8(*controller->PlayerState->GetUniqueId()->ToString()));
+#endif
 	AimState aim_state;
 	aim_state.set_aim_state(bAim ? AimState::AIM_STATE_ACTIVE : AimState::AIM_STATE_RELEASE);
 	*msg.mutable_aim_state() = aim_state;
@@ -201,7 +232,13 @@ Message MessageMaker::MakeCatchMessage(ADPPlayerController* Controller, const FV
 	{
 		return msg;
 	}
+#if EDITOR_MODE
 	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetPlayerName()));
+#elif LAN_MODE
+	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetPlayerName()));
+#else
+	msg.set_player_id(TCHAR_TO_UTF8(*Controller->PlayerState->GetUniqueId()->ToString()));
+#endif
 	Catch catch_;
 	Vec3 position;
 	position.set_x(Position.X);

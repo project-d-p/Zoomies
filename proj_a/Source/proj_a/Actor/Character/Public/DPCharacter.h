@@ -27,13 +27,18 @@ public:
 	virtual ~ADPCharacter() override;
 
 protected:
+	void OnHostMigration(UWorld* World, UDataManager* DataManager);
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// virtual void NotifyControllerChanged() override;
+	virtual void OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerState* OldPlayerState) override;
+	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -74,6 +79,9 @@ public:	// component
 	UNameTag* NameTag_Instance;
 	UPROPERTY()
 	UWidgetComponent* NameTag_WidgetComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	UStaticMesh* Crown;
 	
 	// stun effect
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "effects")
@@ -96,6 +104,8 @@ public:	// component
 	void ApplyKockback(const FHitResult& HitResult);
 	UFUNCTION(NetMulticast, Reliable)
 	void SetNameTag();
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void SetCrownMesh();
 
 	UPROPERTY(ReplicatedUsing=OnRep_SyncInvincible)
 	bool bIsInvincible = false;
@@ -122,6 +132,7 @@ public:	// component
 	
 protected:
 	void ClientNotifyAnimalReturn_Implementation(const FString& player_name);
+	void SetCrownMesh_Implementation();
 	
 private:
 	void UpdateNameTagRotation();
@@ -145,6 +156,7 @@ private:
 
 	// Collision with monster
 	FTimerHandle timerCollisionHandle;
+	FDelegateHandle OnHostMigrationDelegate;
 	
 public:
 	FVector currentVelocity{ 0.f, 0.f, 0.f };

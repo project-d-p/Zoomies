@@ -1,17 +1,23 @@
 #include "DPPlayerState.h"
 
 #include "DPInGameState.h"
+#include "DPIngameWidget.h"
+#include "DPPlayerController.h"
 #include "FNetLogger.h"
 #include "JudgePlayerState.h"
 #include "PlayerName.h"
 #include "PlayerScoreComp.h"
+#include "PlayerScoreData.h"
 #include "Net/UnrealNetwork.h"
+#include "proj_a/GameInstance/GI_Zoomies.h"
 
 ADPPlayerState::ADPPlayerState()
 {
 	bReplicates = true;
 	
 	PlayerScoreComp = CreateDefaultSubobject<UPlayerScoreComp>(TEXT("PlayerScore"));
+	PlayerScoreData = NewObject<UPlayerScoreData>(this, TEXT("PlayerScoreData"));
+	PlayerScoreData->InitializeData();
 	FString PlayerName = FGuid::NewGuid().ToString();
 	APlayerState::SetPlayerName(PlayerName);
 }
@@ -26,8 +32,22 @@ EPlayerJob ADPPlayerState::GetPlayerJob() const
 	return PlayerJob;
 }
 
-void ADPPlayerState::OnRep_Rank()
+void ADPPlayerState::IncreaseScore(const TArray<EAnimal>& InAnimals)
 {
+	PlayerScoreData->IncreaseScore(PlayerJob, InAnimals);
+}
+
+void ADPPlayerState::SeamlessTravelTo(APlayerState* NewPlayerState)
+{
+	Super::SeamlessTravelTo(NewPlayerState);
+
+	AJudgePlayerState* JPS = Cast<AJudgePlayerState>(NewPlayerState);
+	if (JPS)
+	{
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("SeamlessTravelTo in PlayerState"));
+		JPS->SetPlayerJob(PlayerJob);
+		JPS->SetPlayerScoreData(PlayerScoreData);
+	}
 }
 
 void ADPPlayerState::CopyProperties(APlayerState* PlayerState)
@@ -44,13 +64,79 @@ void ADPPlayerState::CopyProperties(APlayerState* PlayerState)
 void ADPPlayerState::ServerSetRank_Implementation(int InRank)
 {
 	Rank = InRank;
+}
 
-	OnRep_Rank();
+void ADPPlayerState::OnHostMigration(UWorld* World, UDataManager* DataManager)
+{
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (GameInstance)
+	{
+		GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
+	}
+	UPlayerScoreData* ClonedPlayerScoreData = Cast<UPlayerScoreData>(PlayerScoreData->Clone(DataManager));
+	if (ClonedPlayerScoreData)
+	{
+		DataManager->AddDataToArray(TEXT("PlayerScore"), ClonedPlayerScoreData);
+	}
+}
+
+void ADPPlayerState::InitializePlayerState()
+{
+ 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+ 	check(GameInstance);
+ 	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
+ 	check(DataManager);
+ 	UDataArray* PlayerScoreDataArray = DataManager->GetDataArray(TEXT("PlayerScore"));
+	if (PlayerScoreDataArray)
+	{
+		for (UBaseData* Data : PlayerScoreDataArray->DataArray)
+		{
+			UPlayerScoreData* SavedScoreData = Cast<UPlayerScoreData>(Data);
+			if (SavedScoreData && SavedScoreData->GetPlayerName() == GetPlayerName())
+			{
+				PlayerScoreData->SetScore(SavedScoreData->GetScore());
+			}
+		}
+	}
 }
 
 void ADPPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (!HasAuthority())
+	{
+		if (GameInstance)
+		{
+			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &ADPPlayerState::OnHostMigration);
+		}
+	}
+	
+	ADPPlayerController* LocalPC = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (LocalPC)
+	{
+		UMainLevelComponent* MainLevelComponent = LocalPC->GetLevelComponentAs<UMainLevelComponent>(ELevelComponentType::MAIN);
+		if (MainLevelComponent)
+		{
+			UDPIngameWidget* InGameWidget = Cast<UDPIngameWidget>(MainLevelComponent->GetInGameWidget());
+			PlayerScoreData->OnDataChanged.AddDynamic(InGameWidget, &UDPIngameWidget::OnScoreChanged);
+			PlayerScoreData->SetPlayerName(GetPlayerName());
+		}
+	}
+	InitializePlayerState();
+	PlayerScoreData->TestBroadcast();
+}
+
+void ADPPlayerState::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (GameInstance)
+	{
+		GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
+	}
 }
 
 void ADPPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -59,4 +145,9 @@ void ADPPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	DOREPLIFETIME(ADPPlayerState, PlayerJob);
 	DOREPLIFETIME(ADPPlayerState, Rank);
+}
+
+void ADPPlayerState::SetPlayerRandomJob()
+{
+	PlayerJob = static_cast<EPlayerJob>(FMath::RandRange(0, static_cast<int>(EPlayerJob::JOB_MAX) - 1));
 }

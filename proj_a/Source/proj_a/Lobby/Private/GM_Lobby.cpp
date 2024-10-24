@@ -33,18 +33,18 @@ void AGM_Lobby::BeginPlay()
 					if (UUserWidget* WarningWidget = CreateWidget<UUserWidget>(World, WidgetClass))
 					{
 						WarningWidget->AddToViewport();
-
+			
 						// Set widget to center of the screen
 						WarningWidget->SetAnchorsInViewport(FAnchors(0.5f, 0.5f));
 						WarningWidget->SetAlignmentInViewport(FVector2D(0.5f, 0.5f));
-
+			
 						// Get viewport size and widget size
 						FVector2D ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
 						FVector2D WidgetSize = WarningWidget->GetDesiredSize();
-
+			
 						// Set position to center
 						WarningWidget->SetPositionInViewport((ViewportSize - WidgetSize) / 2, true);
-
+			
 						FTimerHandle TimerHandle;
 						GetWorld()->GetTimerManager().SetTimer(
 							TimerHandle,

@@ -20,11 +20,35 @@ struct FScoreData
 
 };
 
+USTRUCT(BlueprintType)
 struct FFinalScoreData
 {
+	GENERATED_BODY()
+	
+	UPROPERTY(BlueprintReadWrite, Category = "Score Data")
+	FString PlayerName;
+
+	//UPROPERTY(BlueprintReadWrite, Category = "Score Data")
 	TArray<TArray<EAnimal>> CapturedAnimals;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Score Data")
 	TArray<FScoreData> ScoreDatas;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Score Data")
+	float PrivateTotalScore = 0;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Score Data")
+	float PrivateTotalBaseScore = 0;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Score Data")
+	float PrivateTotalScale = 1;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Score Data")
+	float PublicTotalScore = 0;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Score Data")
 	bool bIsDetected = false;
+
 	FFinalScoreData& operator=(const FFinalScoreData& InFinalScoreData)
 	{
 		if (this != &InFinalScoreData)
@@ -35,7 +59,12 @@ struct FFinalScoreData
 			ScoreDatas.Empty();
 			for (const auto& ScoreData : InFinalScoreData.ScoreDatas)
 				ScoreDatas.Add(ScoreData);
+			PlayerName = InFinalScoreData.PlayerName;
 			bIsDetected = InFinalScoreData.bIsDetected;
+			PrivateTotalScore = InFinalScoreData.PrivateTotalScore;
+			PrivateTotalBaseScore = InFinalScoreData.PrivateTotalBaseScore;
+			PrivateTotalScale = InFinalScoreData.PrivateTotalScale;
+			PublicTotalScore = InFinalScoreData.PublicTotalScore;
 		}
 		return *this;
 	}

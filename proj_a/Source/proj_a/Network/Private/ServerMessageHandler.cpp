@@ -1,5 +1,6 @@
 #include "ServerMessageHandler.h"
 #include "DPPlayerController.h"
+#include "FNetLogger.h"
 
 ServerMessageHandler::ServerMessageHandler()
 {
@@ -16,6 +17,11 @@ ServerMessageHandler::ServerMessageHandler()
 	message_handlers_[Message::kGunfire] = FServerMessageDelegate::CreateLambda([](ADPPlayerController* player_controller, const Message& msg, const float& /*delta*/)
 	{
 		UMainLevelComponent* MainLevelComponent = Cast<UMainLevelComponent>(player_controller->GetLevelComponent());
+		if (MainLevelComponent == nullptr)
+		{
+			FNetLogger::LogError(TEXT("No MainLevelComponent found"));
+			return ;
+		}
 		MainLevelComponent->AddGunMessage(msg);
 	});
 
@@ -24,6 +30,7 @@ ServerMessageHandler::ServerMessageHandler()
 		UMainLevelComponent* MainLevelComponent = Cast<UMainLevelComponent>(player_controller->GetLevelComponent());
 		if (MainLevelComponent == nullptr)
 		{
+			FNetLogger::LogError(TEXT("No MainLevelComponent found"));
 			return ;
 		}
 		MainLevelComponent->AddAimMessage(msg);
@@ -34,6 +41,7 @@ ServerMessageHandler::ServerMessageHandler()
 		UMainLevelComponent* MainLevelComponent = Cast<UMainLevelComponent>(player_controller->GetLevelComponent());
 		if (MainLevelComponent == nullptr)
 		{
+			FNetLogger::LogError(TEXT("No MainLevelComponent found"));
 			return ;
 		}
 		MainLevelComponent->HandlePosition(msg.actor_position());
@@ -44,6 +52,7 @@ ServerMessageHandler::ServerMessageHandler()
 		UMainLevelComponent* MainLevelComponent = Cast<UMainLevelComponent>(player_controller->GetLevelComponent());
 		if (MainLevelComponent == nullptr)
 		{
+			FNetLogger::LogError(TEXT("No MainLevelComponent found"));
 			return ;
 		}
 		MainLevelComponent->AddCatchMessage(msg);

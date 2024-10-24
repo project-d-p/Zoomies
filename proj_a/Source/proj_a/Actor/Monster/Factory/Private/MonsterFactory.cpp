@@ -47,7 +47,8 @@ ABaseMonsterAIController* UMonsterFactory::RandomMonsterSpawn(int32 idx)
 
 	// XXX: For now, hardcoding the Location.
 	float RandomY = FMath::FRandRange(-3000.f, 3000.f);
-	FVector Location = FVector(-5000.f, RandomY, 300.f);
+	// FVector Location = FVector(-5000.f, RandomY, 300.f);
+	FVector Location = FVector(14166.601644,-469.843764, 300.f);
 	
 	std::vector MonsterClasses = {
 		ACrabCharacter::StaticClass(),

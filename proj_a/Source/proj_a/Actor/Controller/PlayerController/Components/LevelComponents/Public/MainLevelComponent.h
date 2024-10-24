@@ -48,19 +48,15 @@ public:
 
 	/* Handle Message From Client Only Execute in Server */
 	void HandlePosition(const ActorPosition& ActorPosition);
-
-	/*
-	 * TEST : COMMENT
-	 */
+	
 	/* Simulate Gun Fire */
-	// void SimulateGunFire(SteamNetworkingSocket* SteamSocket);
-	void SimulateGunFire(UANetworkManager* NetworkManager); // TEST
+	void SimulateGunFire(UANetworkManager* NetworkManager);
 	/* Simulate Catch */
-	// void SimulateCatch(SteamNetworkingSocket* SteamSocket);
-	void SimulateCatch(UANetworkManager* NetworkManager); // TEST
+	void SimulateCatch(UANetworkManager* NetworkManager);
 	/* Simulate Aim */
-	// void SimulateAim(SteamNetworkingSocket* SteamSocket);
-	void SimulateAim(UANetworkManager* NetworkManager); // TEST
+	void SimulateAim(UANetworkManager* NetworkManager);
+
+	UUserWidget* GetInGameWidget() const;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -95,4 +91,7 @@ private:
 	std::queue<Message> GunQueue;
 	std::queue<Message> CatchQueue;
 	std::queue<Message> AimQueue;
+	TSubclassOf<UUserWidget> WidgetClass;
+	UPROPERTY()
+	UUserWidget* InGameWidget;
 };
