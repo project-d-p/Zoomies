@@ -306,6 +306,10 @@ void ADPGameModeBase::InitializeGame()
 	{
 		BlockingVolume = GetWorld()->SpawnActor<ABlockingBoxVolume>(ABlockingBoxVolume::StaticClass(), FVector(13380.0f, -253.279822f, 60.0f), FRotator(0.0f, 0.0f, 0.0f));
 	}
+	else
+	{
+		bRestarted = true;
+	}
 	NumMaxPlayers = NumMaxPlayers > 0 ? NumMaxPlayers : NUM_OF_MAX_CLIENTS;
 	NetworkManager->SetGameStartCallback(NumMaxPlayers, [this]()
 	{
@@ -382,13 +386,16 @@ void ADPGameModeBase::Tick(float delta_time)
 #endif
 		if (bTimeSet == false)
 		{
-			ADPInGameState* GS = GetGameState<ADPInGameState>();
-			if (GS)
+			if (bRestarted == false)
 			{
-				FTimerHandle TimerHandle;
-				GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([GS]() {
-					GS->MulticastPlayerJob();
-				}), 0.5f, false); 
+				ADPInGameState* GS = GetGameState<ADPInGameState>();
+				if (GS)
+				{
+					FTimerHandle TimerHandle;
+					GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([GS]() {
+						GS->MulticastPlayerJob();
+					}), 0.5f, false); 
+				}
 			}
 			if (BlockingVolume)
 			{

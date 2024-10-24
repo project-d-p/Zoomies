@@ -44,7 +44,8 @@ void UNetworkFailureManager::Init()
 	{
 		FNetLogger::EditerLog(FColor::Green, TEXT("NetworkFailureManager::Init"));
 		GEngine->OnNetworkFailure().AddUObject(this, &UNetworkFailureManager::HandleNetworkFailure);
-		FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
+		// FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
+		FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
 	}
 }
 
@@ -109,7 +110,7 @@ void UNetworkFailureManager::ShowCapturedTextureToPlayer(UTextureRenderTarget2D*
 			CapturedImageWidget->AddToViewport();
 		}
 	}
-	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
+	// FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
 }
 
 void UNetworkFailureManager::DestroyPreviousSession(FOnSessionDestroyedCallback OnSessionDestroyedCallback)
@@ -264,18 +265,18 @@ void UNetworkFailureManager::FindSessionComplete(bool bWasSuccessful, UWorld* Wo
 	}
 }
 
-void UNetworkFailureManager::OnNewLevelLoaded(UWorld* World)
+void UNetworkFailureManager::OnNewLevelLoaded(const FString& LevelName)
 {
 	const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
 	FString DefaultLevel = GameMapsSettings->GetGameDefaultMap();
-	FString CurrentLevel = World->GetMapName();
+	// FString CurrentLevel = World->GetMapName();
 	if (bMigrating)
 	{
-		if (DefaultLevel.Contains(CurrentLevel))
+		if (DefaultLevel.Contains(LevelName))
 		{
 			return ;
 		}
-		if (CurrentLevel.Contains(DesiredMapName.ToString()))
+		if (LevelName.Contains(DesiredMapName.ToString()))
 		{
 			bMigrating = false;
 		}

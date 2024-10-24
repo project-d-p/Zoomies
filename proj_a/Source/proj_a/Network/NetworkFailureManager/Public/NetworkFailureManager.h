@@ -33,7 +33,7 @@ private:
 	void CreateSessionComplete(FName SessionName, bool bWasSuccessful, UWorld* World);
 	void JoinNewSession(UWorld* World);
 	void FindSessionComplete(bool bWasSuccessful, UWorld* World);
-	void OnNewLevelLoaded(UWorld* World);
+	void OnNewLevelLoaded(const FString& LevelName);
 	void JoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result, UWorld* World);
 	void JoinSession(const FOnlineSessionSearchResult& SearchResult, UWorld* World);
 	void HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type Arg, const FString& String);
