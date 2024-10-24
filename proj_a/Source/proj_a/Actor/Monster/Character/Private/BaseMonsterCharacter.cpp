@@ -69,8 +69,8 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
 
 	this->MonsterId = -1;
 
-	GetCharacterMovement()->SetWalkableFloorAngle(80.f);
-	GetCharacterMovement()->MaxStepHeight = 50.f;
+	GetCharacterMovement()->SetWalkableFloorAngle(85.f);
+	GetCharacterMovement()->MaxStepHeight = 200.f;
 }
 
 void ABaseMonsterCharacter::BeginPlay()
@@ -109,9 +109,9 @@ void ABaseMonsterCharacter::BeginPlay()
 	GetCapsuleComponent()->SetCollisionObjectType(ECC_MonsterChannel);
 	GetMesh()->SetCollisionObjectType(ECC_MonsterChannel);
 
-	// monster collision object type
-	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Monster"));
-	GetMesh()->SetCollisionProfileName(TEXT("Monster"));
+	//// monster collision object type
+	//GetCapsuleComponent()->SetCollisionProfileName(TEXT("Monster"));
+	//GetMesh()->SetCollisionProfileName(TEXT("Monster"));
 }
 
 void ABaseMonsterCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
