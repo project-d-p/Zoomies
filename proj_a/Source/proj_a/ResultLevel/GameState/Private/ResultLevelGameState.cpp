@@ -114,6 +114,23 @@ void AResultLevelGameState::BeginPlay()
 	{
 		Character->SetReplicatingMovement(true);
 	}
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (!HasAuthority())
+	{
+		if (GameInstance)
+		{
+			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &AResultLevelGameState::OnHostMigration);
+		}
+	}
+}
+
+void AResultLevelGameState::OnHostMigration(UWorld* World, UDataManager* DataManager)
+{
+	// TODO: Result Level에서 저장되어야 할 것
+	// 1. 플레이어들의 최종 점수 : PlayerState에서 어차피 저장되지 않나?
+	// 2. 플레이어들의 위치
+	// 3. 어떤 점수가 보여지고 있는가.. 정확히는 어떤 Widget이 보여지고 있는가?
+	//    ㄴ 만약 처음부터 다시 시작되면 굉장히 불쾌한 경험이 될 수 있음.
 }
 
 void AResultLevelGameState::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -129,6 +146,7 @@ void AResultLevelGameState::EndPlay(const EEndPlayReason::Type EndPlayReason)
     	{
     		SessionInt->DestroySession(NAME_GameSession);
     	}
+		GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
     }
 }
 
