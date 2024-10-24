@@ -20,28 +20,28 @@ void ADynamicTexturedCharacter::BeginPlay()
 
 	// TryInItializeDynamicTexture();
 	dynamicMaterialInstance = UMaterialInstanceDynamic::Create(GetMesh()->GetMaterial(0), this, TEXT("DynamicMaterial"));
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle_InitializeDynamicTexture, this, &ADynamicTexturedCharacter::TryInItializeDynamicTexture, 0.1f, true);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_InitializeDynamicTexture, this, &ADynamicTexturedCharacter::TryInItializeDynamicTexture, 0.5f, true);
 }
 
 void ADynamicTexturedCharacter::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
 
-	TryInItializeDynamicTexture();
+	// TryInItializeDynamicTexture();
 }
 
 void ADynamicTexturedCharacter::OnRep_Controller()
 {
 	Super::OnRep_Controller();
 
-	TryInItializeDynamicTexture();
+	// TryInItializeDynamicTexture();
 }
 
 void ADynamicTexturedCharacter::OnRep_Owner()
 {
 	Super::OnRep_Owner();
 
-	TryInItializeDynamicTexture();
+	// TryInItializeDynamicTexture();
 }
 
 void ADynamicTexturedCharacter::TryInItializeDynamicTexture()
@@ -62,7 +62,5 @@ void ADynamicTexturedCharacter::TryInItializeDynamicTexture()
 	if (NetworkedDynamicTexture->InitializeTexture(Initializer))
 	{
 		NetworkedDynamicTexture->LoadTexture();
-		bInitialized = true;
-		GetWorld()->GetTimerManager().ClearTimer(TimerHandle_InitializeDynamicTexture);
 	}
 }

@@ -29,6 +29,11 @@ void UNetworkedDynamicTextureComponent::OnTransferComplete(const TArray<uint8>& 
 {
 	if (FullData.Num() > 0)
 	{
+		ADPCharacter* C = Cast<ADPCharacter>(GetOwner());
+		if (!C)
+			return;
+		GetWorld()->GetTimerManager().ClearTimer(C->TimerHandle_InitializeDynamicTexture);
+		
 		FSerializedTextureData STD;
 		STD.CompressedTextureData = FullData;
 		STD.Width = 1024;
@@ -102,6 +107,10 @@ void UNetworkedDynamicTextureComponent::LoadTexture()
 
 void UNetworkedDynamicTextureComponent::HandleLocalNetOwner(UTexture2D* CustomTexture)
 {
+	ADPCharacter* C = Cast<ADPCharacter>(GetOwner());
+	if (!C)
+		return;
+	GetWorld()->GetTimerManager().ClearTimer(C->TimerHandle_InitializeDynamicTexture);
 	if (GetWorld()->GetNetMode() != NM_Standalone)
 	{
 		if (GetOwner()->HasAuthority())
