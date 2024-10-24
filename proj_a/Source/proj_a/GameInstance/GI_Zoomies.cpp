@@ -383,6 +383,7 @@ void UGI_Zoomies::CheckSteamInit()
 
 void UGI_Zoomies::InitSteamAPI()
 {
+#if not EDITOR_MODE || LAN_MODE
 	if (!is_steamAPI_init && SteamAPI_Init())
 	{
 		is_steamAPI_init = true;
@@ -415,16 +416,22 @@ void UGI_Zoomies::InitSteamAPI()
 			TimerHandle,
 			this, &UGI_Zoomies::InitOnlineSubsystemSteam,
 			0.5f, false);
+#endif
 		InitOnlineSubsystemSteam();
+#if not EDITOR_MODE || LAN_MODE
 	}
+#endif
 }
 
 void UGI_Zoomies::InitOnlineSubsystemSteam()
 {
 	if (!is_online_session_steam_init)
 	{
-		// online_subsystem_ = IOnlineSubsystem::Get(/*STEAM_SUBSYSTEM*/);
+#if EDITOR_MODE || LAN_MODE
+		online_subsystem_ = IOnlineSubsystem::Get(/*STEAM_SUBSYSTEM*/);
+#else
 		online_subsystem_ = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
+#endif
 		if (online_subsystem_)
 		{
 			session_interface_ = online_subsystem_->GetSessionInterface();

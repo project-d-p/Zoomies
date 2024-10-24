@@ -32,8 +32,11 @@ UNetworkFailureManager::UNetworkFailureManager()
 
 void UNetworkFailureManager::Init()
 {
-	// IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(/*STEAM_SUBSYSTEM*/);
+#if EDITOR_MODE || LAN_MODE
+	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(/*STEAM_SUBSYSTEM*/);
+#else
 	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
+#endif
 	this->SessionInterface = OnlineSubsystem->GetSessionInterface();
 
 	if (GEngine)
