@@ -38,6 +38,8 @@ protected:
 	
 	void AddConnection(HSteamNetConnection Connection);
 	void CloseConnection(HSteamNetConnection Connection);
+
+	virtual void BeginDestroy() override;
 	
 	HSteamNetPollGroup PollGroup;
 	TArray<HSteamNetConnection> Connections;

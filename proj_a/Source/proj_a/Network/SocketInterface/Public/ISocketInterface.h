@@ -24,4 +24,7 @@ public:
 	virtual void SetAsServer();
 	virtual void SetAsClient();
 	virtual void SetGameStartCallback(int NumOfPlayers, const TFunction<void()>& Function);
+
+protected:
+	virtual void BeginDestroy() override;
 };

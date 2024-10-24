@@ -418,36 +418,12 @@ void UMainInputComponent::ReturningAnimals(const FInputActionValue& value)
 	{
 		return ;
 	}
-	// ���� ���� ����
 	ADPPlayerState* PlayerState = Cast<ADPPlayerState>(PlayerController->PlayerState);
 	if (PlayerState)
 	{
-		PlayerController->GetPrivateScoreManagerComponent()->IncreasePrivatePlayerScore(PlayerState->GetPlayerJob(), animals);
-		uint32 score = PlayerController->GetPrivateScoreManagerComponent()->GetPrivatePlayerScore();
-		FString playerName = PlayerState->GetPlayerName();
+		PlayerState->IncreaseScore(animals);
 	}
-	if (PlayerController->HasAuthority())
-	{
-		ADPGameModeBase* GM = GetWorld()->GetAuthGameMode<ADPGameModeBase>();
-		if (GM)
-		{
-			GM->ScoreManager->IncreasePlayerScore(PlayerController, animals);
-		}
-
-		for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-		{
-			ADPPlayerController* PC = Cast<ADPPlayerController>(It->Get());
-			if (PC && PC != PlayerController) // �ڱ� �ڽ��� ������ ��� Ŭ���̾�Ʈ
-			{
-				ADPCharacter* OtherCharacter = Cast<ADPCharacter>(PC->GetPawn());
-				OtherCharacter->ClientNotifyAnimalReturn(PlayerState->GetPlayerName());
-			}
-		}
-	}
-	else
-	{
-		MainLevelComponent->ServerNotifyReturnAnimals();
-	}
+	MainLevelComponent->ServerNotifyReturnAnimals();
 	if (Character->ReturnTriggerVolume)
 	{
 		Character->ReturnTriggerVolume->SpawnReturnEffect(animals);
