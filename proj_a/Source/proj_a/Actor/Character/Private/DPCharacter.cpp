@@ -278,7 +278,7 @@ void ADPCharacter::LoadTexture()
 		UTextureTransferManager* TTM = nullptr;
 		if (!CustomTexture || !TryGetPlayerStateAndTransferManager(PS, TTM))
 		{
-			GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ADPCharacter::LoadTexture);
+			// GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ADPCharacter::LoadTexture);
 			return ;
 		}
 		
@@ -295,6 +295,7 @@ void ADPCharacter::LoadTexture()
 
 void ADPCharacter::HandleLocalNetOwner(UTexture2D* CustomTexture, APlayerState* PS, UTextureTransferManager* TTM)
 {
+	GetWorld()->GetTimerManager().ClearTimer(TextureTimerHandle);
 	if (GetWorld()->GetNetMode() != NM_Standalone)
 	{
 		if (HasAuthority())
@@ -323,6 +324,8 @@ void ADPCharacter::OnTransferComplete(const TArray<uint8>& FullData)
 {
 	if (FullData.Num() > 0)
 	{
+		GetWorld()->GetTimerManager().ClearTimer(TextureTimerHandle);
+		
 		FSerializedTextureData TextureData;
 		TextureData.CompressedTextureData = FullData;
 		TextureData.Width = 1024;
@@ -505,6 +508,8 @@ void ADPCharacter::BeginPlay()
 	constructionComponent->placeWall = false;
 	constructionComponent->placeturret = false;
 	bUseControllerRotationYaw = false;
+
+	GetWorld()->GetTimerManager().SetTimer(TextureTimerHandle, this, &ADPCharacter::LoadTexture, 1.f, true);
 }
 
 void ADPCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)

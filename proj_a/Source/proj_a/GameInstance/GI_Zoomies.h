@@ -43,6 +43,7 @@ private:
 	TSharedPtr<FOnlineSessionSearch> session_search_;
 	TSharedPtr<FOnlineSessionSettings> session_settings_;
 	
+	
 	// Matchmaking functions & callbacks & handlers
 	void FindSession();
 	void OnFindComplete(bool bWasSuccessful);

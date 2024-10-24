@@ -188,7 +188,8 @@ private:
 	// Collision with monster
 	FTimerHandle timerCollisionHandle;
 	FDelegateHandle OnHostMigrationDelegate;
-	
+
+	FTimerHandle TextureTimerHandle;
 public:
 	FVector currentVelocity{ 0.f, 0.f, 0.f };
 	UPROPERTY(BlueprintReadWrite)
