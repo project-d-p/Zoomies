@@ -148,8 +148,11 @@ void UDPIngameWidget::OnScoreChanged(UBaseData* Data)
 		//FNetLogger::EditerLog(FColor::Red, TEXT("OnScoreChanged: scoreFront or scoreBack or scoreTotal is nullptr"));
 		return;
 	}
-	FFinalScoreData ScoreData = PlayerScoreData->GetScore();
-	scoreFront->SetText(FText::FromString(FString::FromInt(ScoreData.PrivateTotalBaseScore)));
-	scoreBack->SetText(FText::FromString(FString::FromInt(ScoreData.PrivateTotalScale)));
-	scoreTotal->SetText(FText::FromString(FString::FromInt(ScoreData.PrivateTotalScore)));
+	if (PlayerScoreData->GetPlayerName() == GetOwningPlayerState()->GetPlayerName())
+	{
+		FFinalScoreData ScoreData = PlayerScoreData->GetScore();
+		scoreFront->SetText(FText::FromString(FString::FromInt(ScoreData.PrivateTotalBaseScore)));
+		scoreBack->SetText(FText::FromString(FString::FromInt(ScoreData.PrivateTotalScale)));
+		scoreTotal->SetText(FText::FromString(FString::FromInt(ScoreData.PrivateTotalScore)));
+	}
 }
