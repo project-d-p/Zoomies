@@ -87,6 +87,22 @@ public:
 	{
 		return DataArrayMap.Num() == 0 && DataSingleMap.Num() == 0;
 	}
+
+	void Clear()
+	{
+		DataArrayMap.Empty();
+		DataSingleMap.Empty();
+	}
+
+	void RemoveData(const FString& Key)
+	{
+		DataSingleMap.Remove(Key);
+	}
+
+	void RemoveDataArray(const FString& Key)
+	{
+		DataArrayMap.Remove(Key);
+	}
 	
 private:
 	UPROPERTY()

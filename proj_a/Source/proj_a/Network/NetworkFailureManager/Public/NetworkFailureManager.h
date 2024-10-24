@@ -21,6 +21,8 @@ public:
 	FOnHostMigration& OnHostMigration() { return OnHostMigrationDelegate; }
 	UDataManager* GetDataManager() { return DataManager; }
 	int GetDesiredMaxPlayers() { return DesiredMaxPlayers; }
+	void ResetInstance();
+	void TryReset();
 	void Init();
 
 private:
@@ -60,4 +62,5 @@ private:
 	UPROPERTY()
 	UTexture2D* CapturedTexture2D;
 	TSubclassOf<UCapturedImageWidget> CapturedImageWidgetClass;
+	bool bMigrating;
 };

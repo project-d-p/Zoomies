@@ -14,6 +14,7 @@
 #include "Engine/GameViewportClient.h"
 #include "Algo/Sort.h"
 #include "Engine/TextureRenderTarget2D.h"
+#include "CompileMode.h"
 #include "Kismet/KismetRenderingLibrary.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
@@ -43,6 +44,7 @@ void UNetworkFailureManager::Init()
 	{
 		FNetLogger::EditerLog(FColor::Green, TEXT("NetworkFailureManager::Init"));
 		GEngine->OnNetworkFailure().AddUObject(this, &UNetworkFailureManager::HandleNetworkFailure);
+		FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
 	}
 }
 
@@ -264,38 +266,54 @@ void UNetworkFailureManager::FindSessionComplete(bool bWasSuccessful, UWorld* Wo
 
 void UNetworkFailureManager::OnNewLevelLoaded(UWorld* World)
 {
-	// FCoreUObjectDelegates::PostLoadMapWithWorld.RemoveAll(this);
-	//
 	const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
-	if (!GameMapsSettings)
-	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("GameMapsSettings is null"));
-		return;
-	}
 	FString DefaultLevel = GameMapsSettings->GetGameDefaultMap();
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Default Level: %s"), *DefaultLevel);
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Current Level: %s"), *World->GetMapName());
-	if (CapturedImageWidget && !DefaultLevel.Contains(World->GetMapName()))
+	FString CurrentLevel = World->GetMapName();
+	if (bMigrating)
 	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("OnNewLevelLoaded"));
-		FCoreUObjectDelegates::PostLoadMapWithWorld.RemoveAll(this);
-		CapturedImageWidget->RemoveFromParent();
-	}
-	else if (DefaultLevel.Contains(World->GetMapName()))
-	{
-		// UMG 困连 积己
-		CapturedImageWidget = CreateWidget<UCapturedImageWidget>(World, CapturedImageWidgetClass);
-		if (CapturedImageWidget)
+		if (DefaultLevel.Contains(CurrentLevel))
 		{
-			// 母贸等 咆胶贸 汲沥
-			if (CapturedTexture2D)
-			{
-				CapturedImageWidget->SetCapturedTexture(CapturedTexture2D);
-				FNetLogger::EditerLog(FColor::Red, TEXT("OnNewLevelLoaded Default Level"));
-				CapturedImageWidget->AddToViewport(9);
-			}
+			return ;
+		}
+		if (CurrentLevel.Contains(DesiredMapName.ToString()))
+		{
+			bMigrating = false;
 		}
 	}
+	else
+	{
+		ResetInstance();
+	}
+	// const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
+	// if (!GameMapsSettings)
+	// {
+	// 	FNetLogger::EditerLog(FColor::Red, TEXT("GameMapsSettings is null"));
+	// 	return;
+	// }
+	// FString DefaultLevel = GameMapsSettings->GetGameDefaultMap();
+	// FNetLogger::EditerLog(FColor::Cyan, TEXT("Default Level: %s"), *DefaultLevel);
+	// FNetLogger::EditerLog(FColor::Cyan, TEXT("Current Level: %s"), *World->GetMapName());
+	// if (CapturedImageWidget && !DefaultLevel.Contains(World->GetMapName()))
+	// {
+	// 	FNetLogger::EditerLog(FColor::Red, TEXT("OnNewLevelLoaded"));
+	// 	FCoreUObjectDelegates::PostLoadMapWithWorld.RemoveAll(this);
+	// 	CapturedImageWidget->RemoveFromParent();
+	// }
+	// else if (DefaultLevel.Contains(World->GetMapName()))
+	// {
+	// 	// UMG 困连 积己
+	// 	CapturedImageWidget = CreateWidget<UCapturedImageWidget>(World, CapturedImageWidgetClass);
+	// 	if (CapturedImageWidget)
+	// 	{
+	// 		// 母贸等 咆胶贸 汲沥
+	// 		if (CapturedTexture2D)
+	// 		{
+	// 			CapturedImageWidget->SetCapturedTexture(CapturedTexture2D);
+	// 			FNetLogger::EditerLog(FColor::Red, TEXT("OnNewLevelLoaded Default Level"));
+	// 			CapturedImageWidget->AddToViewport(9);
+	// 		}
+	// 	}
+	// }
 }
 
 void UNetworkFailureManager::JoinSession(const FOnlineSessionSearchResult& SearchResult, UWorld* World)
@@ -304,6 +322,30 @@ void UNetworkFailureManager::JoinSession(const FOnlineSessionSearchResult& Searc
 	OnJoinCompleteDelegateHandle = SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UNetworkFailureManager::JoinSessionComplete, World);
 	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 	SessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, SearchResult);
+}
+
+void UNetworkFailureManager::ResetInstance()
+{
+	DataManager->Clear();
+	DesiredMaxPlayers = 0;
+	bNextHost = false;
+	DesiredSessionName = NAME_None;
+	DesiredMapName = NAME_None;
+	if (SessionInterface.IsValid())
+	{
+		SessionInterface->OnDestroySessionCompleteDelegates.Remove(OnDestroyCompleteDelegateHandle);
+		SessionInterface->OnCreateSessionCompleteDelegates.Remove(OnCreateCompleteDelegateHandle);
+		SessionInterface->OnFindSessionsCompleteDelegates.Remove(OnFindCompleteDelegateHandle);
+		SessionInterface->OnJoinSessionCompleteDelegates.Remove(OnJoinCompleteDelegateHandle);
+	}
+}
+
+void UNetworkFailureManager::TryReset()
+{
+	if (DataManager->IsEmpty())
+	{
+		ResetInstance();
+	}
 }
 
 void UNetworkFailureManager::JoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result, UWorld* World)
@@ -356,6 +398,8 @@ void UNetworkFailureManager::JoinSessionComplete(FName SessionName, EOnJoinSessi
 void UNetworkFailureManager::HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type Arg,
                                                   const FString& String)
 {
+	this->ResetInstance();
+	this->bMigrating = true;
 	UE_LOG(LogTemp, Warning, TEXT("Network Failure: %s"), *String);
 	FNetLogger::EditerLog(FColor::Red, TEXT("Network Failure: %s"), *String);
 
