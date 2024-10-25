@@ -114,6 +114,7 @@ void ADPPlayerState::BeginPlay()
 			}
 			PlayerScoreData->OnDataChanged.AddDynamic(InGameWidget, &UDPIngameWidget::OnScoreChanged);
 			PlayerScoreData->SetPlayerName(this->GetPlayerName());
+			PlayerScoreData->SetPlayerId(this->GetPlayerId());
 		}
 	}
 	InitializePlayerState();

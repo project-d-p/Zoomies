@@ -138,21 +138,38 @@ void UDPIngameWidget::OnScoreChanged(UBaseData* Data)
 {
 	//BaseData to PlayerScoreData
 	UPlayerScoreData* PlayerScoreData = Cast<UPlayerScoreData>(Data);
-	if (!PlayerScoreData)
+	
+	APlayerController* PlayerController = GetOwningPlayer<APlayerController>();
+	if (PlayerController)
 	{
-		//FNetLogger::EditerLog(FColor::Red, TEXT("OnScoreChanged: PlayerScoreData is nullptr"));
-		return;
-	}
-	if (scoreFront == nullptr || scoreBack == nullptr || scoreTotal == nullptr)
-	{
-		//FNetLogger::EditerLog(FColor::Red, TEXT("OnScoreChanged: scoreFront or scoreBack or scoreTotal is nullptr"));
-		return;
-	}
-	if (PlayerScoreData->GetPlayerName() == GetOwningPlayerState()->GetPlayerName())
-	{
-		FFinalScoreData ScoreData = PlayerScoreData->GetScore();
-		scoreFront->SetText(FText::FromString(FString::FromInt(ScoreData.PrivateTotalBaseScore)));
-		scoreBack->SetText(FText::FromString(FString::FromInt(ScoreData.PrivateTotalScale)));
-		scoreTotal->SetText(FText::FromString(FString::FromInt(ScoreData.PrivateTotalScore)));
+		ADPPlayerState* PlayerState = Cast<ADPPlayerState>(PlayerController->PlayerState);
+		if (!PlayerState)
+		{
+			GetWorld()->GetTimerManager().SetTimerForNextTick([this, Data]()
+			{
+				OnScoreChanged(Data);
+			});
+		}
+		else
+		{
+			if (PlayerState->GetPlayerId() == PlayerScoreData->GetPlayerId())
+			{
+				if (!PlayerScoreData)
+				{
+					//FNetLogger::EditerLog(FColor::Red, TEXT("OnScoreChanged: PlayerScoreData is nullptr"));
+					return;
+				}
+				if (scoreFront == nullptr || scoreBack == nullptr || scoreTotal == nullptr)
+				{
+					//FNetLogger::EditerLog(FColor::Red, TEXT("OnScoreChanged: scoreFront or scoreBack or scoreTotal is nullptr"));
+					return;
+				}
+					
+				FFinalScoreData ScoreData = PlayerScoreData->GetScore();
+				scoreFront->SetText(FText::FromString(FString::FromInt(ScoreData.PrivateTotalBaseScore)));
+				scoreBack->SetText(FText::FromString(FString::FromInt(ScoreData.PrivateTotalScale)));
+				scoreTotal->SetText(FText::FromString(FString::FromInt(ScoreData.PrivateTotalScore)));
+			}
+		}
 	}
 }
