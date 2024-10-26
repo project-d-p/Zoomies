@@ -76,11 +76,11 @@ void ADPInGameState::BeginPlay()
 			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &ADPInGameState::OnHostMigration);
 		}
 	}
-	ADPPlayerController* PlayerController = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
-	if (PlayerController)
-	{
-		PlayerController->SwitchLevelComponent(ELevelComponentType::MAIN);
-	}
+	// ADPPlayerController* PlayerController = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
+	// if (PlayerController)
+	// {
+	// 	PlayerController->SwitchLevelComponent(ELevelComponentType::MAIN);
+	// }
 	if (!JobWidgetInstance)
 	{
 		JobWidgetInstance = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);

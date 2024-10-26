@@ -39,6 +39,10 @@ ADPPlayerController::ADPPlayerController()
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::RESULT), ResultLevelComponet);
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::LOBBY), LobbyLevelComponent);
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::NONE), nullptr);
+
+	LevelEnumMap.Add(TEXT("mainLevel"), static_cast<uint32>(ELevelComponentType::MAIN));
+	LevelEnumMap.Add(TEXT("lobbyLevel"), static_cast<uint32>(ELevelComponentType::LOBBY));
+	LevelEnumMap.Add(TEXT("calculateLevel"), static_cast<uint32>(ELevelComponentType::RESULT));
 }
 
 ADPPlayerController::~ADPPlayerController()
@@ -139,6 +143,7 @@ void ADPPlayerController::BeginPlay()
 	Super::BeginPlay();
 
 	Cast<UMainLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::MAIN)])->SetStateComponent();
+	SetLevelComponent();
 }
 
 void ADPPlayerController::Tick(float DeltaSeconds)
@@ -167,6 +172,16 @@ void ADPPlayerController::OnPossess(APawn* InPawn)
 		}
 	}
 	Cast<UMainLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::MAIN)])->SetStateComponent();
+}
+
+void ADPPlayerController::SetLevelComponent()
+{
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		ELevelComponentType LevelType = LevelEnumMap.FindRef(World->GetMapName()) ? static_cast<ELevelComponentType>(LevelEnumMap.FindRef(World->GetMapName())) : ELevelComponentType::NONE;
+		SwitchLevelComponent(LevelType);
+	}
 }
 
 void ADPPlayerController::SetupInputComponent()

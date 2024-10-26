@@ -67,6 +67,7 @@ protected:
 	virtual void OnPossess(APawn* InPawn) override;
 	
 private:
+	void SetLevelComponent();
 	void DeactiveCurrentComponent();
 	void ActivateComponent(ELevelComponentType Type);
 
@@ -79,6 +80,8 @@ private:
 
 	UPROPERTY()
 	TMap<uint32, UBaseLevelComponent*> LevelComponents;
+	UPROPERTY()
+	TMap<FString, uint32> LevelEnumMap;
 
 	UPROPERTY()
 	UBaseLevelComponent* ActiveComponent;
