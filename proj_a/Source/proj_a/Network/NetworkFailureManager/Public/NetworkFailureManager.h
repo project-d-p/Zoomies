@@ -37,7 +37,7 @@ private:
 	void JoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result, UWorld* World);
 	void JoinSession(const FOnlineSessionSearchResult& SearchResult, UWorld* World);
 	void HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type Arg, const FString& String);
-	void CreateNewSessionMetaData(UWorld* World, const FUniqueNetIdRepl& NewHostPlayerID);
+	void CreateNewSessionMetaData(::UWorld* World, const FUniqueNetIdRef& NewHostPlayerID);
 	void CaptureViewport();
 	void SaveSessionMetaData(UWorld* World);
 	bool ValidateAddr(FString& Addr);

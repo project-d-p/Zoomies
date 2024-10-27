@@ -15,6 +15,8 @@
 #include "Algo/Sort.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "CompileMode.h"
+#include "Chaos/AABB.h"
+#include "Chaos/AABB.h"
 #include "Kismet/KismetRenderingLibrary.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
@@ -424,20 +426,16 @@ void UNetworkFailureManager::HandleNetworkFailure(UWorld* World, UNetDriver* Net
 	}
 }
 
-void UNetworkFailureManager::CreateNewSessionMetaData(UWorld* World, const FUniqueNetIdRepl& NewHostPlayerID)
+void UNetworkFailureManager::CreateNewSessionMetaData(UWorld* World, const FUniqueNetIdRef& NewHostPlayerID)
 {
-	IOnlineIdentityPtr IdentityInterface = Online::GetIdentityInterface(World);
-	if (IdentityInterface.IsValid())
-	{
-		FString PlayerName = IdentityInterface->GetPlayerNickname(*NewHostPlayerID);
+	FString PlayerName = NewHostPlayerID->ToString();
 
-		// Create a new session name based on the player's name
-		DesiredSessionName = FName(*FString::Printf(TEXT("Session_%s"), *PlayerName));
-		FNetLogger::EditerLog(FColor::Red, TEXT("New Session Name: %s"), *DesiredSessionName.ToString());
+	// Create a new session name based on the player's name
+	DesiredSessionName = FName(*FString::Printf(TEXT("Session_%s"), *PlayerName));
+	FNetLogger::EditerLog(FColor::Red, TEXT("New Session Name: %s"), *DesiredSessionName.ToString());
 
-		DesiredMapName = FName(*FString::Printf(TEXT("%s"), *World->GetMapName()));
-		FNetLogger::EditerLog(FColor::Red, TEXT("New Map Name: %s"), *DesiredMapName.ToString());
-	}
+	DesiredMapName = FName(*FString::Printf(TEXT("%s"), *World->GetMapName()));
+	FNetLogger::EditerLog(FColor::Red, TEXT("New Map Name: %s"), *DesiredMapName.ToString());
 }
 
 void UNetworkFailureManager::CaptureViewport()
@@ -478,87 +476,64 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 		
 		for (int32 i = 0; i < CurrentSession->RegisteredPlayers.Num(); i++)
 		{
-			IOnlineIdentityPtr IdentityInterface = Online::GetIdentityInterface(World, STEAM_SUBSYSTEM);
 			FUniqueNetIdRef PlayerID = CurrentSession->RegisteredPlayers[i];
-			/* OnlineIdentityInterfaceSteam.cpp 에서 코드를 확인해보면 애초에 넘겨준 Parameter로 검색을 하지 않는 것을 볼 수 있다. 즉, 제공된 함수 자체가 잘못됨 */
-			// FString PlayerNickname = IdentityInterface->GetPlayerNickname(*PlayerID);
-			// 그래서 NickName으로 하지 말고 ID로 세션의 주인을 정하면 될듯 ! ㅎㅎ
-			//  ㄴ 근데 이게 서로 같나..? 테스트 필요!
-			FString PlayerNickname = IdentityInterface->GetPlayerNickname(*PlayerID);
-			FString PlayerIDCheck = PlayerID->ToString();
-			// FUniqueNetId PlayerIDOrigin = *PlayerID
-			FNetLogger::EditerLog(FColor::Green, TEXT("Player ID[%d]: %s"), i, *PlayerIDCheck);
-			// FNetLogger::EditerLog(FColor::Green, TEXT("Player Nickname[%d]: %s"), i, *((*PlayerID)->ToString()));
-			
+			/* NOTE: Steam의 IdentityInterface를 사용할 경우 GetPlayerNickName을 사용할 수 없다.
+			* OnlineIdentityInterfaceSteam.cpp 에서 코드를 확인해보면 애초에 넘겨준 Parameter로 검색을 하지 않는 것을 볼 수 있다. 즉, 제공된 함수 자체가 잘못됨
+			* FString PlayerNickname = IdentityInterface->GetPlayerNickname(*PlayerID);
+			* 즉, 자기 자신의 이름만 가져오게 될 뿐이다.
+			*/
 
 			// 첫 번째 플레이어(Original Host)는 포함하지 않음
-			FString HostNickname = CurrentSession->OwningUserName;
 			FUniqueNetIdPtr HostID = CurrentSession->OwningUserId;
-			FUniqueNetIdRef HostIDRef = HostID.ToSharedRef();
-			FString HostIDCheck = HostID->ToString();
-			if (PlayerNickname == HostNickname)
+			if (HostID->ToString().Contains(PlayerID->ToString()))
 			{
 				continue;
 			}
-			else
-			{
-				FNetLogger::EditerLog(FColor::Blue, TEXT("Host Player: %s"), *HostNickname);
-				FNetLogger::EditerLog(FColor::Blue, TEXT("Host ID: %s"), *HostIDCheck);
-				FNetLogger::EditerLog(FColor::Blue, TEXT("Host ID Ref: %s"), *HostIDRef->ToString());
-				if (HostIDRef == PlayerID)
-				{
-					FNetLogger::EditerLog(FColor::Green, TEXT("Host Player REF Found"));
-				}
-				if (HostID == PlayerID)
-				{
-					FNetLogger::EditerLog(FColor::Green, TEXT("Host Player ID Found"));
-				}
-				else
-				{
-					FNetLogger::EditerLog(FColor::Green, TEXT("Host Player Not Found"));
-				}
-			}
 
 			// 중복된 닉네임이 있는지 확인
-			if (UniqueNicknames.Contains(PlayerNickname))
+			if (UniqueNicknames.Contains(PlayerID->ToString()))
 			{
-				FNetLogger::EditerLog(FColor::Yellow, TEXT("Duplicate nickname: %s, skipping."), *PlayerNickname);
+				FNetLogger::EditerLog(FColor::Yellow, TEXT("Duplicate nickname, skipping."));
 				continue;  // 중복된 닉네임은 추가하지 않음
 			}
 			// Not Include the First Player(Original Host)
 			RegisteredPlayers.Add(CurrentSession->RegisteredPlayers[i]);
-			UniqueNicknames.Add(PlayerNickname);
+			UniqueNicknames.Add(PlayerID->ToString());
 			DesiredMaxPlayers += 1;
-			FNetLogger::EditerLog(FColor::Blue, TEXT("Player %d: %s"), i, *(IdentityInterface->GetPlayerNickname(*CurrentSession->RegisteredPlayers[i])));
 		}
-		auto CompareByNickname = [&World](const FUniqueNetIdRepl& A, const FUniqueNetIdRepl& B) -> bool
+		auto CompareByNickname = [&World](const FUniqueNetIdRef& A, const FUniqueNetIdRef& B) -> bool
 		{
 			IOnlineIdentityPtr IdentityInterface = Online::GetIdentityInterface(World);
     
-			if (!A.IsValid() || !B.IsValid() || !IdentityInterface.IsValid())
+			if (!A->IsValid() || !B->IsValid() || !IdentityInterface.IsValid())
 			{
 				return false;
 			}
     
-			FString NicknameA = IdentityInterface->GetPlayerNickname(*A.GetUniqueNetId());
-			FString NicknameB = IdentityInterface->GetPlayerNickname(*B.GetUniqueNetId());
+			FString NicknameA = A->ToString();
+			FString NicknameB = B->ToString();
 
 			return NicknameA < NicknameB;  // 문자열을 기준으로 사전순 정렬
 		};
 		
 		RegisteredPlayers.Sort(CompareByNickname);
-		for (int32 i = 0; i < RegisteredPlayers.Num(); i++) {
-			IOnlineIdentityPtr IdentityInterface = Online::GetIdentityInterface(World);
-			FNetLogger::EditerLog(FColor::Cyan, TEXT("Player %d: %s"), i, *(IdentityInterface->GetPlayerNickname(*RegisteredPlayers[i])));
-		}
-		const FUniqueNetIdRepl LocalPlayerID = World->GetFirstLocalPlayerFromController()->GetPreferredUniqueNetId();
-		const FString LocalPlayerNickname = Online::GetIdentityInterface(World)->GetPlayerNickname(*LocalPlayerID);
-		const FUniqueNetIdRepl NextHostID = RegisteredPlayers[0];
-		const FString NextHostNickname = Online::GetIdentityInterface(World)->GetPlayerNickname(*NextHostID);
-
-		FNetLogger::EditerLog(FColor::Green, TEXT("Local Player: %s & Next Host Player: %s"), *LocalPlayerNickname, *NextHostNickname);
-		if (NextHostID.IsValid() && NextHostNickname == LocalPlayerNickname)
+		
+		for (int32 i = 0; i < RegisteredPlayers.Num(); i++)
 		{
+			FUniqueNetIdRef PlayerID = RegisteredPlayers[i];
+			FString PlayerNickname = PlayerID->ToString();
+			FNetLogger::EditerLog(FColor::Green, TEXT("Player %d: %s"), i, *PlayerNickname);
+		}
+		
+		const FUniqueNetIdPtr LocalPlayerID = CurrentSession->LocalOwnerId;
+		const FString LocalPlayerNickname = LocalPlayerID->ToString();
+		const FUniqueNetIdRef NextHostID = RegisteredPlayers[0];
+		const FString NextHostNickname = NextHostID->ToString();
+		
+		FNetLogger::EditerLog(FColor::Green, TEXT("Local Player: %s & Next Host Player: %s"), *LocalPlayerNickname, *NextHostNickname);
+		if (NextHostID->IsValid() && NextHostNickname.Contains(LocalPlayerNickname))
+		{
+			FNetLogger::EditerLog(FColor::Green, TEXT("Being a Next Host"));
 			bNextHost = true;
 		}
 		else
