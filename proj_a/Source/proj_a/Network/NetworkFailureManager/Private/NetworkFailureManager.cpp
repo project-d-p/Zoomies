@@ -473,18 +473,34 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 	FNamedOnlineSession* CurrentSession = SessionInterface->GetNamedSession(NAME_GameSession);
 	if (CurrentSession)
 	{
-		TArray<FUniqueNetIdRepl> RegisteredPlayers;
+		TArray<FUniqueNetIdRef> RegisteredPlayers;
 		TSet<FString> UniqueNicknames;  // 중복 확인을 위한 닉네임 저장소
 		
 		for (int32 i = 0; i < CurrentSession->RegisteredPlayers.Num(); i++)
 		{
-			IOnlineIdentityPtr IdentityInterface = Online::GetIdentityInterface(World);
-			FString PlayerNickname = IdentityInterface->GetPlayerNickname(*CurrentSession->RegisteredPlayers[i]);
+			IOnlineIdentityPtr IdentityInterface = Online::GetIdentityInterface(World, STEAM_SUBSYSTEM);
+			FUniqueNetIdRef PlayerID = CurrentSession->RegisteredPlayers[i];
+			/* OnlineIdentityInterfaceSteam.cpp 에서 코드를 확인해보면 애초에 넘겨준 Parameter로 검색을 하지 않는 것을 볼 수 있다. 즉, 제공된 함수 자체가 잘못됨 */
+			// FString PlayerNickname = IdentityInterface->GetPlayerNickname(*PlayerID);
+			// 그래서 NickName으로 하지 말고 ID로 세션의 주인을 정하면 될듯 ! ㅎㅎ
+			//  ㄴ 근데 이게 서로 같나..? 테스트 필요!
+			FString PlayerNickname = IdentityInterface->GetPlayerNickname(*PlayerID);
+			FString PlayerIDCheck = PlayerID->ToString();
+			FNetLogger::EditerLog(FColor::Green, TEXT("Player ID[%d]: %s"), i, *PlayerIDCheck);
+			
 
 			// 첫 번째 플레이어(Original Host)는 포함하지 않음
-			if (PlayerNickname == CurrentSession->OwningUserId->ToString())
+			FString HostNickname = CurrentSession->OwningUserName;
+			FUniqueNetIdPtr HostID = CurrentSession->OwningUserId;
+			FString HostIDCheck = HostID->ToString();
+			if (PlayerNickname == HostNickname)
 			{
 				continue;
+			}
+			else
+			{
+				FNetLogger::EditerLog(FColor::Blue, TEXT("Host Player: %s"), *HostNickname);
+				FNetLogger::EditerLog(FColor::Blue, TEXT("Host ID: %s"), *HostIDCheck);
 			}
 
 			// 중복된 닉네임이 있는지 확인
