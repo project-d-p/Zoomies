@@ -486,12 +486,15 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 			//  ㄴ 근데 이게 서로 같나..? 테스트 필요!
 			FString PlayerNickname = IdentityInterface->GetPlayerNickname(*PlayerID);
 			FString PlayerIDCheck = PlayerID->ToString();
+			// FUniqueNetId PlayerIDOrigin = *PlayerID
 			FNetLogger::EditerLog(FColor::Green, TEXT("Player ID[%d]: %s"), i, *PlayerIDCheck);
+			// FNetLogger::EditerLog(FColor::Green, TEXT("Player Nickname[%d]: %s"), i, *((*PlayerID)->ToString()));
 			
 
 			// 첫 번째 플레이어(Original Host)는 포함하지 않음
 			FString HostNickname = CurrentSession->OwningUserName;
 			FUniqueNetIdPtr HostID = CurrentSession->OwningUserId;
+			FUniqueNetIdRef HostIDRef = HostID.ToSharedRef();
 			FString HostIDCheck = HostID->ToString();
 			if (PlayerNickname == HostNickname)
 			{
@@ -501,6 +504,19 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 			{
 				FNetLogger::EditerLog(FColor::Blue, TEXT("Host Player: %s"), *HostNickname);
 				FNetLogger::EditerLog(FColor::Blue, TEXT("Host ID: %s"), *HostIDCheck);
+				FNetLogger::EditerLog(FColor::Blue, TEXT("Host ID Ref: %s"), *HostIDRef->ToString());
+				if (HostIDRef == PlayerID)
+				{
+					FNetLogger::EditerLog(FColor::Green, TEXT("Host Player REF Found"));
+				}
+				if (HostID == PlayerID)
+				{
+					FNetLogger::EditerLog(FColor::Green, TEXT("Host Player ID Found"));
+				}
+				else
+				{
+					FNetLogger::EditerLog(FColor::Green, TEXT("Host Player Not Found"));
+				}
 			}
 
 			// 중복된 닉네임이 있는지 확인
