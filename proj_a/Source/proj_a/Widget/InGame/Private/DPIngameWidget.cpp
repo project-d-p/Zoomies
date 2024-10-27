@@ -145,13 +145,18 @@ void UDPIngameWidget::OnScoreChanged(UBaseData* Data)
 		ADPPlayerState* PlayerState = Cast<ADPPlayerState>(PlayerController->PlayerState);
 		if (!PlayerState)
 		{
-			GetWorld()->GetTimerManager().SetTimerForNextTick([this, Data]()
+			if (reCallCnt < 10)
 			{
-				OnScoreChanged(Data);
-			});
+				GetWorld()->GetTimerManager().SetTimerForNextTick([this, Data]()
+				{
+					reCallCnt++;
+					OnScoreChanged(Data);
+				});
+			}
 		}
 		else
 		{
+			reCallCnt = 0;
 			if (PlayerState->GetPlayerId() == PlayerScoreData->GetPlayerId())
 			{
 				if (!PlayerScoreData)
