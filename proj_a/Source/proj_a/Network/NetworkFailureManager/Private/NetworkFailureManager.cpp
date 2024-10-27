@@ -15,8 +15,6 @@
 #include "Algo/Sort.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "CompileMode.h"
-#include "Chaos/AABB.h"
-#include "Chaos/AABB.h"
 #include "Kismet/KismetRenderingLibrary.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
@@ -525,7 +523,7 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 			FNetLogger::EditerLog(FColor::Green, TEXT("Player %d: %s"), i, *PlayerNickname);
 		}
 		
-		const FUniqueNetIdPtr LocalPlayerID = CurrentSession->LocalOwnerId;
+		const FUniqueNetIdRepl LocalPlayerID = World->GetFirstLocalPlayerFromController()->GetUniqueNetIdFromCachedControllerId();
 		const FString LocalPlayerNickname = LocalPlayerID->ToString();
 		const FUniqueNetIdRef NextHostID = RegisteredPlayers[0];
 		const FString NextHostNickname = NextHostID->ToString();
