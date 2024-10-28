@@ -43,16 +43,24 @@ void AResultLevelGameState::NotifyPlayersAllTraveled()
 void AResultLevelGameState::NotifyAllScoresCalculated_Implementation(
 	const TArray<FFinalScoreData>& InFinalScoreDataArray)
 {
-	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AResultWidgetActor::StaticClass(), FoundActors);
+	// TArray<AActor*> FoundActors;
+	// UGameplayStatics::GetAllActorsOfClass(GetWorld(), AResultWidgetActor::StaticClass(), FoundActors);
+	//
+	// if (FoundActors.Num() > 0)
+	// {
+	// 	AResultWidgetActor* ResultActor = Cast<AResultWidgetActor>(FoundActors[0]);
+	// 	if (ResultActor)
+	// 	{
+	// 		ResultActor->StartWidget(InFinalScoreDataArray);
+	// 	}
+	// }
 
-	if (FoundActors.Num() > 0)
+	/* Create Widget */
+	CalculateWidgetInstance = CreateWidget<UDPCalculateWidget>(GetWorld(), ResultWidget);
+	if (CalculateWidgetInstance)
 	{
-		AResultWidgetActor* ResultActor = Cast<AResultWidgetActor>(FoundActors[0]);
-		if (ResultActor)
-		{
-			ResultActor->StartWidget(InFinalScoreDataArray);
-		}
+		CalculateWidgetInstance->AddToViewport();
+		CalculateWidgetInstance->OnScoresUpdated(InFinalScoreDataArray);
 	}
 }
 
