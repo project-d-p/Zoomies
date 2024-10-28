@@ -13,6 +13,7 @@
 #include "ServerChatManager.h"
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/GameStateBase.h"
+#include "Kismet/GameplayStatics.h"
 
 AJudgePlayerController::AJudgePlayerController()
 {
@@ -95,6 +96,27 @@ void AJudgePlayerController::RequestUIData_Implementation()
 	}
 }
 
+void AJudgePlayerController::RequestCharacter_Implementation()
+{
+	if (this->GetCharacter() != nullptr)
+		return;
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADynamicTexturedCharacter::StaticClass(), FoundActors);
+	for (AActor* Actor : FoundActors)
+	{
+		ADynamicTexturedCharacter* FoundCharacter = Cast<ADynamicTexturedCharacter>(Actor);
+		if (FoundCharacter)
+		{
+			if (FoundCharacter->bPlayerAssigned == false)
+			{
+				FoundCharacter->SetOwner(this);
+				FoundCharacter->bPlayerAssigned = true;
+				break;
+			}
+		}
+	}
+}
+
 void AJudgePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -109,6 +131,7 @@ void AJudgePlayerController::BeginPlay()
 		bShowMouseCursor = true;
 		
 		GetWorldTimerManager().SetTimer(TH, this, &AJudgePlayerController::RequestUIData, 1.f, true);
+		GetWorldTimerManager().SetTimer(CTH, this, &AJudgePlayerController::RequestCharacter, 1.f, true);
 	}
 }
 
@@ -140,12 +163,12 @@ void AJudgePlayerController::PostSeamlessTravel()
 {
 	Super::PostSeamlessTravel();
 
-	for (TActorIterator<ADynamicTexturedCharacter> It(GetWorld()); It; ++It)
-	{
-		if (It->bPlayerAssigned)
-			continue;
-		It->SetOwner(this);
-		It->bPlayerAssigned = true;
-		break;
-	}
+	// for (TActorIterator<ADynamicTexturedCharacter> It(GetWorld()); It; ++It)
+	// {
+	// 	if (It->bPlayerAssigned)
+	// 		continue;
+	// 	It->SetOwner(this);
+	// 	It->bPlayerAssigned = true;
+	// 	break;
+	// }
 }

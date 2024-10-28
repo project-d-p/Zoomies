@@ -46,7 +46,7 @@ void ADynamicTexturedCharacter::OnRep_Owner()
 
 void ADynamicTexturedCharacter::TryInItializeDynamicTexture()
 {
-	if (bInitialized || !dynamicMaterialInstance || !NetworkedDynamicTexture)
+	if (bInitialized || !dynamicMaterialInstance || !NetworkedDynamicTexture || !bPlayerAssigned)
 	{
 		return;
 	}
@@ -61,6 +61,11 @@ void ADynamicTexturedCharacter::TryInItializeDynamicTexture()
 	}
 	if (NetworkedDynamicTexture->InitializeTexture(Initializer))
 	{
+		FNetLogger::EditerLog(FColor::Green, TEXT("TryInItializeDynamicTexture Success"));
 		NetworkedDynamicTexture->LoadTexture();
+	}
+	else
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("TryInItializeDynamicTexture failed"));
 	}
 }

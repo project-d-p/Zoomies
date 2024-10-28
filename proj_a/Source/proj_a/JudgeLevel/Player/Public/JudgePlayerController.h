@@ -57,6 +57,9 @@ public:
 	UFUNCTION(Server, Reliable)
 	void RequestUIData();
 
+	UFUNCTION(Server, Reliable)
+	void RequestCharacter();
+
 	UJudgeLevelUI* GetJudgeLevelUI() const { return JudgeLevelUI; }
 protected:
 	virtual void BeginPlay() override;
@@ -74,4 +77,5 @@ private:
 	UTextureTransferManager* TextureTransferManager;
 
 	FTimerHandle TH;
+	FTimerHandle CTH;
 };
