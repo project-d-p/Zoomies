@@ -394,7 +394,7 @@ void ADPGameModeBase::Tick(float delta_time)
 					FTimerHandle TimerHandle;
 					GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([GS]() {
 						GS->MulticastPlayerJob();
-					}), 0.5f, false); 
+					}), 1.0f, false); 
 				}
 			}
 			if (BlockingVolume)
