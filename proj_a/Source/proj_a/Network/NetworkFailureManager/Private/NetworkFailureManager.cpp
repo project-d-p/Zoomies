@@ -220,6 +220,7 @@ void UNetworkFailureManager::CreateSessionComplete(FName SessionName, bool bWasS
 void UNetworkFailureManager::JoinNewSession(UWorld* World)
 {
 	this->OnSessionDestroyedDelegate.Clear();
+	FNetLogger::EditerLog(FColor::Green, TEXT("Finding Session...!!!!!!!!!!!!!"));
 	SessionSearch = MakeShareable(new FOnlineSessionSearch());
 	// Online Mode : False
 	SessionSearch->bIsLanQuery = false;
@@ -250,11 +251,16 @@ void UNetworkFailureManager::FindSessionComplete(bool bWasSuccessful, UWorld* Wo
 			FString SessionName;
 			SearchResult.Session.SessionSettings.Get(FName("SESSION_NAME"), SessionName);
 			// 세션 이름 확인
+			/* TODO: 로그 출력해서 확인해보기 */
 			if (SessionName == DesiredSessionName) // 원하는 세션 이름과 비교
 			{
 				// 원하는 세션을 찾았으면 그 세션에 접속
 				JoinSession(SearchResult, World);
 				break;
+			}
+			else
+			{
+				FNetLogger::EditerLog(FColor::Green, TEXT("Session Name Mismatch: %s, %s"), *SessionName, *DesiredSessionName.ToString());
 			}
 		}
 	}
@@ -431,6 +437,7 @@ void UNetworkFailureManager::CreateNewSessionMetaData(UWorld* World, const FUniq
 	// Create a new session name based on the player's name
 	DesiredSessionName = FName(*FString::Printf(TEXT("Session_%s"), *PlayerName));
 	FNetLogger::EditerLog(FColor::Red, TEXT("New Session Name: %s"), *DesiredSessionName.ToString());
+	FNetLogger::LogError(TEXT("New Session Name: %s"), *DesiredSessionName.ToString());
 
 	DesiredMapName = FName(*FString::Printf(TEXT("%s"), *World->GetMapName()));
 	FNetLogger::EditerLog(FColor::Red, TEXT("New Map Name: %s"), *DesiredMapName.ToString());
