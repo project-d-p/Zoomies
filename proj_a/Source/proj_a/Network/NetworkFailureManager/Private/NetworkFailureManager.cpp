@@ -235,8 +235,9 @@ void UNetworkFailureManager::JoinNewSession(UWorld* World)
 		SessionSearch->QuerySettings.Set(SEARCH_LOBBIES, true, EOnlineComparisonOp::Equals);
 	}
 
-	OnFindCompleteDelegateHandle = SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UNetworkFailureManager::FindSessionComplete, World);
-
+	// UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(World->GetGameInstance());
+	OnFindCompleteDelegateHandle = SessionInterface->AddOnFindSessionsCompleteDelegate_Handle(
+	   FOnFindSessionsCompleteDelegate::CreateUObject(this, &UNetworkFailureManager::FindSessionComplete, GetWorld()));
 	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 	SessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), SessionSearch.ToSharedRef());
 }
