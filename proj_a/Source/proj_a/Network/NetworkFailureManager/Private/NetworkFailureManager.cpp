@@ -247,22 +247,32 @@ void UNetworkFailureManager::FindSessionComplete(bool bWasSuccessful, UWorld* Wo
 	SessionInterface->OnFindSessionsCompleteDelegates.Remove(OnFindCompleteDelegateHandle);
 	if (bWasSuccessful)
 	{
+		bool bFoundDesiredSession = false;
+		FNetLogger::LogError(TEXT("Number of Sessions Found: %d"), SessionSearch->SearchResults.Num());
 		for (const FOnlineSessionSearchResult& SearchResult : SessionSearch->SearchResults)
 		{
 			FString SessionName;
 			SearchResult.Session.SessionSettings.Get(FName("SESSION_NAME"), SessionName);
 			// 세션 이름 확인
 			/* TODO: 로그 출력해서 확인해보기 */
-			if (SessionName == DesiredSessionName) // 원하는 세션 이름과 비교
+			FNetLogger::LogError(TEXT("Session Name[JOIN]: %s"), *SessionName);
+			FNetLogger::LogError(TEXT("Desired Session Name[JOIN]: %s"), *DesiredSessionName.ToString());
+			if (SessionName.Contains(DesiredSessionName.ToString())) // 원하는 세션 이름과 비교
 			{
 				// 원하는 세션을 찾았으면 그 세션에 접속
 				JoinSession(SearchResult, World);
+				bFoundDesiredSession = true;
 				break;
 			}
 			else
 			{
 				FNetLogger::EditerLog(FColor::Green, TEXT("Session Name Mismatch: %s, %s"), *SessionName, *DesiredSessionName.ToString());
 			}
+		}
+		if (!bFoundDesiredSession)
+		{
+			FNetLogger::EditerLog(FColor::Green, TEXT("Failed to find session: Retrying...[true]"));
+			JoinNewSession(World);
 		}
 	}
 	else
@@ -400,6 +410,7 @@ void UNetworkFailureManager::JoinSessionComplete(FName SessionName, EOnJoinSessi
 	else
 	{
 		FNetLogger::EditerLog(FColor::Red, TEXT("Failed to join session"));
+		JoinNewSession(GetWorld());
 	}
 }
 
@@ -420,6 +431,7 @@ void UNetworkFailureManager::HandleNetworkFailure(UWorld* World, UNetDriver* Net
 			FNetLogger::EditerLog(FColor::Green, TEXT("Next Host"));
 			// OnHostMigrationDelegate.Broadcast(World, DataManager);
 			OnSessionDestroyedDelegate.AddUObject(this, &UNetworkFailureManager::CreateNewSession);
+			// OnSessionDestroyedDelegate.AddUObject(this, &UNetworkFailureManager::JoinNewSession);
 			DestroyPreviousSession(&UNetworkFailureManager::CreateNewSession);
 		}
 		else
