@@ -120,8 +120,11 @@ void ADPPlayerState::BeginPlay()
 		if (MainLevelComponent)
 		{
 			UDPIngameWidget* InGameWidget = Cast<UDPIngameWidget>(MainLevelComponent->GetInGameWidget());
-			PlayerScoreData->OnDataChanged.AddDynamic(InGameWidget, &UDPIngameWidget::OnScoreChanged);
-			PlayerScoreData->SetPlayerName(GetPlayerName());
+			if (InGameWidget)
+			{
+				PlayerScoreData->OnDataChanged.AddDynamic(InGameWidget, &UDPIngameWidget::OnScoreChanged);
+				PlayerScoreData->SetPlayerName(GetPlayerName());
+			}
 		}
 	}
 	InitializePlayerState();

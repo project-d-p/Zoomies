@@ -38,6 +38,17 @@ AReturnTriggerVolume::AReturnTriggerVolume()
 
 AReturnTriggerVolume::~AReturnTriggerVolume()
 {
+}
+
+void AReturnTriggerVolume::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void AReturnTriggerVolume::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
 	UWorld* World = GetWorld();
 	if (World)
 	{
@@ -55,11 +66,6 @@ AReturnTriggerVolume::~AReturnTriggerVolume()
 	}
 	MeshAnimationMap.clear();
 	SpawnTimerHandles.Empty();
-}
-
-void AReturnTriggerVolume::BeginPlay()
-{
-	Super::BeginPlay();
 }
 
 void AReturnTriggerVolume::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
