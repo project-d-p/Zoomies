@@ -20,5 +20,5 @@ public:
     TArray<int32> UpdateScores(const TArray<int32>& scores);
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnScoresUpdated();
+	void OnScoresUpdated(const TArray<FFinalScoreData>& InFinalScoreDataArray);
 };

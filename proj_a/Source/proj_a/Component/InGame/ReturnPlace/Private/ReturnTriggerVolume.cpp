@@ -38,6 +38,17 @@ AReturnTriggerVolume::AReturnTriggerVolume()
 
 AReturnTriggerVolume::~AReturnTriggerVolume()
 {
+}
+
+void AReturnTriggerVolume::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void AReturnTriggerVolume::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
 	UWorld* World = GetWorld();
 	if (World)
 	{
@@ -55,11 +66,6 @@ AReturnTriggerVolume::~AReturnTriggerVolume()
 	}
 	MeshAnimationMap.clear();
 	SpawnTimerHandles.Empty();
-}
-
-void AReturnTriggerVolume::BeginPlay()
-{
-	Super::BeginPlay();
 }
 
 void AReturnTriggerVolume::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
@@ -156,13 +162,13 @@ void AReturnTriggerVolume::SpawnReturnEffect(TArray<EAnimal> Array)
         
 		TWeakObjectPtr<AReturnTriggerVolume> WeakThis(this);
         
-		SpawnTimerDelegate.BindLambda([WeakThis, Animal, Index, &SpawnTimerHandle]()
+		SpawnTimerDelegate.BindLambda([WeakThis, Animal, Index, SpawnTimerHandle]()
 		{
 			if (WeakThis.IsValid())
 			{
 				WeakThis->SpawnSingleMonster(Animal, Index);
-				WeakThis->SpawnTimerHandles.Remove(SpawnTimerHandle);
 				delete SpawnTimerHandle;
+				WeakThis->SpawnTimerHandles.Remove(SpawnTimerHandle);
 			}
 		});
 		float SpawnDelay = Index * 0.5f;

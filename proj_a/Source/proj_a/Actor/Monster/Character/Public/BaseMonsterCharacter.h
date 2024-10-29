@@ -3,6 +3,7 @@
 #include <map>
 
 #include "CoreMinimal.h"
+#include "NetworkFailureManager.h"
 #include "GameFramework/Character.h"
 #include "PathManager.h"
 #include "BaseMonsterCharacter.generated.h"
@@ -49,7 +50,9 @@ public:
 	
 	FCapsuleProperties DefaultCP;
 	FCapsuleProperties FaintCP;
+
 private:
+	FDelegateHandle OnHostMigrationDelegate;
 	const float MaxHp = 100.f;
 	float CurrentHp = 100.f;
 
@@ -60,7 +63,9 @@ private:
 	
 protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	void OnHostMigration(UWorld* World, UDataManager* DataManager);
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	void InitMonsterMeshData(EAnimal AT);
 	virtual void Tick(float DeltaTime) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

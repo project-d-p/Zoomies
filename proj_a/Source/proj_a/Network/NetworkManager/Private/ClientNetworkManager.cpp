@@ -9,7 +9,6 @@ void UClientNetworkManager::Initialize(ENetworkTypeZoomies SocketType)
 {
 	UISocketInterface* SocketInterface = SocketFactory->CreateSocketInterface(SocketType);
 	check(SocketInterface);
-	SocketInterface->SetAsClient();
 	SocketInterface->ActivateClient();
 
 	Worker = NewObject<UNetworkWorker>();
@@ -17,6 +16,7 @@ void UClientNetworkManager::Initialize(ENetworkTypeZoomies SocketType)
 	Worker->Initialize(SocketInterface);
 	Worker->SetMessageReceivedCallback([this](const Message& Data)
 	{
+		// FNetLogger::EditerLog(FColor::Blue, TEXT("%s"), *FString(Data.DebugString().c_str()));
 		this->OnDataReceived(Data);
 	});
 	WorkerThread = FRunnableThread::Create(Worker, TEXT("NetworkWorker"));
@@ -24,8 +24,6 @@ void UClientNetworkManager::Initialize(ENetworkTypeZoomies SocketType)
 
 void UClientNetworkManager::OnDataReceived(const Message& Data)
 {
-	FMessageHandler MessageHandler;
-
 	MessageHandler.HandleMessage(Data);
 }
 
@@ -38,7 +36,10 @@ void UClientNetworkManager::SendData(const Message& Data)
 void UClientNetworkManager::Shutdown()
 {
 	if (Worker)
+	{
 		Worker->Stop();
+		Worker = nullptr;
+	}
 }
 
 UClientNetworkManager::~UClientNetworkManager()
@@ -46,9 +47,6 @@ UClientNetworkManager::~UClientNetworkManager()
 	UClientNetworkManager::Shutdown();
 	if (WorkerThread)
 	{
-		WorkerThread->Kill();
-		WorkerThread->WaitForCompletion();
-		delete WorkerThread;
 		WorkerThread = nullptr;
 	}
 }

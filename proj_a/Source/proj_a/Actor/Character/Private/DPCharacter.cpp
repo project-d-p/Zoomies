@@ -3,6 +3,7 @@
 #include "DPCharacter.h"
 
 #include "BaseMonsterCharacter.h"
+#include "CharacterData.h"
 #include "ChasePlayerMonsterAIController.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -30,6 +31,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
+#include "proj_a/GameInstance/GI_Zoomies.h"
 #include "Serialization/BulkDataRegistry.h"
 
 // Sets default values
@@ -50,8 +52,8 @@ ADPCharacter::ADPCharacter()
 	springArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SPRINGARM"));
 	camera = CreateDefaultSubobject<UCameraComponent>(TEXT("CAMERA"));
 
-	sceneCaptureSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SCENECAPTURESPRINGARM"));
-	sceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SCENECAPTURE"));
+	//sceneCaptureSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SCENECAPTURESPRINGARM"));
+	//sceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SCENECAPTURE"));
 
 	// tag
 	Tags.Add(FName("player"));
@@ -59,8 +61,8 @@ ADPCharacter::ADPCharacter()
 	springArm->SetupAttachment(RootComponent);
 	camera->SetupAttachment(springArm);
 
-	sceneCaptureSpringArm->SetupAttachment(RootComponent);
-	sceneCapture->SetupAttachment(sceneCaptureSpringArm);
+	//sceneCaptureSpringArm->SetupAttachment(RootComponent);
+	//sceneCapture->SetupAttachment(sceneCaptureSpringArm);
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CHARACTER
 	(TEXT("/Game/model/steve/StickManForMixamo.StickManForMixamo"));
@@ -75,21 +77,24 @@ ADPCharacter::ADPCharacter()
 	springArm->bUsePawnControlRotation = true;
 	camera->SetRelativeLocation(FVector(0.f, 50.f, 150.f));
 
-	// minimap
-	static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D> RENDERTARGET
-	(TEXT("/Game/widget/minimap/rt_minimap.rt_minimap"));
-	if (RENDERTARGET.Succeeded()){
-		sceneCapture->TextureTarget = RENDERTARGET.Object;
-	}
+	// player collision object type
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Player"));
 
-	sceneCaptureSpringArm->TargetArmLength = 700.0f;
-	sceneCaptureSpringArm->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
-	sceneCaptureSpringArm->bInheritPitch = false;
-	sceneCaptureSpringArm->bInheritYaw = false;
-	sceneCaptureSpringArm->bInheritRoll = false;
-	sceneCaptureSpringArm->bDoCollisionTest = false;
-	sceneCapture->ProjectionType = ECameraProjectionMode::Type::Orthographic;
-	sceneCapture->OrthoWidth = 1024.0f;
+	// minimap
+	//static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D> RENDERTARGET
+	//(TEXT("/Game/widget/minimap/rt_minimap.rt_minimap"));
+	//if (RENDERTARGET.Succeeded()){
+	//	sceneCapture->TextureTarget = RENDERTARGET.Object;
+	//}
+
+	//sceneCaptureSpringArm->TargetArmLength = 700.0f;
+	//sceneCaptureSpringArm->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
+	//sceneCaptureSpringArm->bInheritPitch = false;
+	//sceneCaptureSpringArm->bInheritYaw = false;
+	//sceneCaptureSpringArm->bInheritRoll = false;
+	//sceneCaptureSpringArm->bDoCollisionTest = false;
+	//sceneCapture->ProjectionType = ECameraProjectionMode::Type::Orthographic;
+	//sceneCapture->OrthoWidth = 1024.0f;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
@@ -210,10 +215,50 @@ ADPCharacter::ADPCharacter()
 			LobbyInfoWidgetComponent->SetRelativeRotation(FRotator(-180, -90, 180));
 		}
 	}
+
+	// Crown
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> CrownMesh
+	(TEXT("/Game/model/objects/crown/crown1/crown_merged.crown_merged"));
+	if (CrownMesh.Succeeded())
+	{
+		Crown = CrownMesh.Object;
+	}
+
+	GetCharacterMovement()->SetWalkableFloorAngle(80.f);
+	GetCharacterMovement()->MaxStepHeight = 50.f;
 }
 
 ADPCharacter::~ADPCharacter()
 {
+}
+
+void ADPCharacter::OnHostMigration(UWorld* World, UDataManager* DataManager)
+{
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (GameInstance)
+	{
+		GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
+	}
+	UCharacterData* CharacterData = NewObject<UCharacterData>(DataManager, UCharacterData::StaticClass());
+	if (CharacterData)
+	{
+		CharacterData->InitializeData();
+		FString PlayerName = TEXT("");
+		if (GetPlayerState())
+		{
+			PlayerName = GetPlayerState()->GetPlayerName();
+		}
+		CharacterData->SetActorName(PlayerName);
+		CharacterData->SetActorLocation(GetActorLocation());
+		CharacterData->SetActorRotation(GetActorRotation());
+
+		TArray<EAnimal> CapturedAnimals = ReturnMonsters();
+		for (EAnimal Animal : CapturedAnimals)
+		{
+			CharacterData->AddCapturedAnimal(Animal);
+		}
+		DataManager->AddDataToArray(TEXT("CharacterData"), CharacterData);
+	}
 }
 
 void ADPCharacter::SetNameTag_Implementation()
@@ -240,35 +285,19 @@ void ADPCharacter::SetNameTag_Implementation()
 	}
 }
 
-// void ADPCharacter::SetNameTag()
-// {
-// 	APlayerState* PS = GetPlayerState();
-// 	if (!PS)
-// 	{
-// 		FTimerHandle TimerHandle;
-// 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
-// 		{
-// 			SetNameTag();
-// 		}), 0.1f, false);
-// 		return ;
-// 	}
-//
-// 	FString Name = PS->GetPlayerName();
-// 	if (NameTag_Instance)
-// 	{
-// 		NameTag_Instance->SetName(Name);
-// 	}
-// 	if (NameTag_WidgetComponent && !IsLocallyControlled())
-// 	{
-// 		NameTag_WidgetComponent->SetVisibility(true);
-// 	}
-// }
-
 // Called when the game starts or when spawned
 void ADPCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (!HasAuthority())
+	{
+		if (GameInstance)
+		{
+			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &ADPCharacter::OnHostMigration);
+		}
+	}
 	if (!NameTag_BP)
 	{
 		check(false);
@@ -280,16 +309,6 @@ void ADPCharacter::BeginPlay()
 		NameTag_WidgetComponent->SetVisibility(false);
 	}
 	
-	//if (GetMesh()) {
-	//	UMaterialInterface* Material = GetMesh()->GetMaterial(0);
-	//	if (Material) {
-	//		dynamicMaterialInstance = UMaterialInstanceDynamic::Create(Material, this);
-	//		GetMesh()->SetMaterial(0, dynamicMaterialInstance);
-	//	}
-	//}
-	//if (dynamicMaterialInstance)
-	//	dynamicMaterialInstance->SetVectorParameterValue(FName("color"), FVector4(0.f, 0.f, 1.f, 1.f));
-
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AReturnTriggerVolume::StaticClass(), FoundActors);
 	if (FoundActors.Num() > 0)
@@ -303,7 +322,17 @@ void ADPCharacter::BeginPlay()
 	constructionComponent->placeWall = false;
 	constructionComponent->placeturret = false;
 	bUseControllerRotationYaw = false;
-	// SetNameTag();
+}
+
+void ADPCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (GameInstance)
+	{
+		GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
+	}
 }
 
 // Called every frame
@@ -355,6 +384,50 @@ void ADPCharacter::Tick(float DeltaTime)
 	{
 		CheckCollisionWithMonster();
 	}
+}
+
+void ADPCharacter::OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerState* OldPlayerState)
+{
+	Super::OnPlayerStateChanged(NewPlayerState, OldPlayerState);
+	FNetLogger::EditerLog(FColor::Red, TEXT("OnPlayerStateChanged"));
+	if (NewPlayerState == nullptr)
+	{
+		return ;
+	}
+
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	check(GameInstance);
+	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
+	check(DataManager);
+
+	UDataArray* CharacterDataArray = DataManager->GetDataArray(TEXT("CharacterData"));
+	if (!CharacterDataArray)
+	{
+		return ;
+	}
+
+	FString PlayerName = NewPlayerState->GetPlayerName();
+	UCharacterData* MyCharacterData = nullptr;
+	for (UBaseData* Data : CharacterDataArray->DataArray)
+	{
+		UCharacterData* SavedCharacterData = Cast<UCharacterData>(Data);
+		if (SavedCharacterData && SavedCharacterData->GetActorName() == PlayerName)
+		{
+			MyCharacterData = SavedCharacterData;
+			break;
+		}
+	}
+	if (IsLocallyControlled())
+	{
+		this->SetActorLocation(MyCharacterData->GetActorLocation());
+		this->SetActorRotation(MyCharacterData->GetActorRotation());
+	}
+	TArray<EAnimal> CapturedAnimals = MyCharacterData->GetCapturedAnimals();
+	for (EAnimal Animal : CapturedAnimals)
+	{
+		monsterSlotComponent->AddMonsterToSlot(this, Animal);
+	}
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("%s"), *PlayerName);
 }
 
 // Called to bind functionality to input
@@ -446,6 +519,7 @@ bool ADPCharacter::IsStunned() const
 
 void ADPCharacter::ClientNotifyAnimalReturn_Implementation(const FString& player_name)
 {
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("ClientNotifyAnimalReturn_Implementation"));
 	FDataHub::PushReturnAnimalDA(player_name, true);
 }
 
@@ -683,4 +757,19 @@ void ADPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ADPCharacter, bIsStunned);
+}
+
+void ADPCharacter::SetCrownMesh_Implementation()
+{
+	UStaticMeshComponent* CrownMeshComponent = NewObject<UStaticMeshComponent>(this);
+	
+	CrownMeshComponent->SetStaticMesh(Crown);
+	CrownMeshComponent->SetRelativeLocation(FVector(0, 0, 100));
+	CrownMeshComponent->SetRelativeRotation(FRotator(0, -90, -90));
+	CrownMeshComponent->SetWorldScale3D(FVector(0.5f, 0.5f, 0.5f));
+	// CrownMeshComponent->SetupAttachment(RootComponent);
+
+	CrownMeshComponent->AttachToComponent(this->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("MonsterSlot_0"));
+	CrownMeshComponent->RegisterComponent();
+	CrownMeshComponent->SetVisibility(true);
 }

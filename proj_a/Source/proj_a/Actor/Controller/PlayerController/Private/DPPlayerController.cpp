@@ -12,6 +12,7 @@
 #include "ResultLevelComponent.h"
 #include "CompileMode.h"
 #include "LobbyLevelComponent.h"
+#include "Chaos/ChaosPerfTest.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 DEFINE_LOG_CATEGORY(LogNetwork);
@@ -38,6 +39,10 @@ ADPPlayerController::ADPPlayerController()
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::RESULT), ResultLevelComponet);
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::LOBBY), LobbyLevelComponent);
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::NONE), nullptr);
+
+	LevelEnumMap.Add(TEXT("mainLevel"), static_cast<uint32>(ELevelComponentType::MAIN));
+	LevelEnumMap.Add(TEXT("lobbyLevel"), static_cast<uint32>(ELevelComponentType::LOBBY));
+	LevelEnumMap.Add(TEXT("calculateLevel"), static_cast<uint32>(ELevelComponentType::RESULT));
 }
 
 ADPPlayerController::~ADPPlayerController()
@@ -117,15 +122,20 @@ void ADPPlayerController::ClientDestroySession_Implementation()
 
 void ADPPlayerController::ConnectToServer_Implementation(ELevelComponentType Type)
 {
+	if (IsLocalController())
+	{
+		
 #if EDITOR_MODE
 	NetworkManager->Initialize(ENetworkTypeZoomies::NONE);
 #elif LAN_MODE
-	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
+	// NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
+	NetworkManager->Initialize(ENetworkTypeZoomies::ENGINE_SOCKET);
 #else
 	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
 #endif
-	
-	SwitchLevelComponent(Type);
+	//
+	// SwitchLevelComponent(Type);
+	}
 }
 
 void ADPPlayerController::BeginPlay()
@@ -133,6 +143,7 @@ void ADPPlayerController::BeginPlay()
 	Super::BeginPlay();
 
 	Cast<UMainLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::MAIN)])->SetStateComponent();
+	SetLevelComponent();
 }
 
 void ADPPlayerController::Tick(float DeltaSeconds)
@@ -163,6 +174,18 @@ void ADPPlayerController::OnPossess(APawn* InPawn)
 	Cast<UMainLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::MAIN)])->SetStateComponent();
 }
 
+void ADPPlayerController::SetLevelComponent()
+{
+	UWorld* World = GetWorld();
+	FNetLogger::EditerLog(FColor::Red, TEXT("SetLevelComponent"));
+	if (World)
+	{
+		FNetLogger::EditerLog(FColor::Red, TEXT("SetLevelComponent: %s"), *World->GetMapName());
+		ELevelComponentType LevelType = LevelEnumMap.Find(World->GetMapName()) ? static_cast<ELevelComponentType>(*(LevelEnumMap.Find(World->GetMapName()))) : ELevelComponentType::NONE;
+		SwitchLevelComponent(LevelType);
+	}
+}
+
 void ADPPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
@@ -170,6 +193,10 @@ void ADPPlayerController::SetupInputComponent()
 
 void ADPPlayerController::SwitchLevelComponent(ELevelComponentType Type)
 {
+	if (ActiveComponent == LevelComponents[static_cast<uint32>(Type)])
+	{
+		return ;
+	}
 	if (ActiveComponent)
 	{
 		DeactiveCurrentComponent();
@@ -184,6 +211,11 @@ void ADPPlayerController::SwitchLevelComponent(ELevelComponentType Type)
 UBaseLevelComponent* ADPPlayerController::GetLevelComponent() const
 {
 	return ActiveComponent;
+}
+
+UBaseLevelComponent* ADPPlayerController::GetLevelComponent(ELevelComponentType Type) const
+{
+	return LevelComponents[static_cast<uint32>(Type)];
 }
 
 void ADPPlayerController::DeactiveCurrentComponent()

@@ -85,7 +85,7 @@ void UDPWeaponActorComponent::AddWeapons(TSubclassOf<ADPWeapon> weaponClass)
 		spawnParams.Owner = Cast<AActor>(playerCharacter);
 		ADPWeapon* newWeapon = GetWorld()->SpawnActor<ADPWeaponGun>(ADPWeaponGun::StaticClass(), spawnParams);
 		if (newWeapon)
-		{
+		{	
 			weapons.Add(newWeapon); UE_LOG(LogTemp, Warning, TEXT("add weapon : %s"), *newWeapon->GetName());
 			newWeapon->AttachToComponent(playerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("gunSocket"));
 			newWeapon->RegisterAllComponents();

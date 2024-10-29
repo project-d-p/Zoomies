@@ -19,6 +19,7 @@ class PROJ_A_API ADPPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
+	void InitializeLevelComponent();
 	ADPPlayerController();
 	virtual ~ADPPlayerController() override;
 	
@@ -35,6 +36,14 @@ public:
 	/* Get Level Component */
 	UFUNCTION(BlueprintCallable)
 	UBaseLevelComponent* GetLevelComponent() const;
+	UBaseLevelComponent* GetLevelComponent(ELevelComponentType Type) const;
+
+	template <typename T>
+	T* GetLevelComponentAs(const ELevelComponentType E) const
+	{
+		UBaseLevelComponent* LevelComponent = GetLevelComponent(E);
+		return LevelComponent ? Cast<T>(LevelComponent) : nullptr;
+	}
 
 	UPlayerScoreComp* GetScoreManagerComponent() const;
 	UPrivateScoreManager* GetPrivateScoreManagerComponent() const;
@@ -58,6 +67,7 @@ protected:
 	virtual void OnPossess(APawn* InPawn) override;
 	
 private:
+	void SetLevelComponent();
 	void DeactiveCurrentComponent();
 	void ActivateComponent(ELevelComponentType Type);
 
@@ -70,6 +80,8 @@ private:
 
 	UPROPERTY()
 	TMap<uint32, UBaseLevelComponent*> LevelComponents;
+	UPROPERTY()
+	TMap<FString, uint32> LevelEnumMap;
 
 	UPROPERTY()
 	UBaseLevelComponent* ActiveComponent;

@@ -14,7 +14,11 @@
 #include "MessageMaker.h"
 #include "ServerNetworkManager.h"
 #include "CompileMode.h"
+#include "MonsterData.h"
+#include "TimeData.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
+
+class UTimeData;
 
 ADPGameModeBase::ADPGameModeBase()
 {
@@ -22,7 +26,7 @@ ADPGameModeBase::ADPGameModeBase()
 	bReplicates = true;
 	PrimaryActorTick.bCanEverTick = true;
 	
-	DefaultPawnClass = ADPCharacter::StaticClass();
+	DefaultPawnClass = nullptr;
 	PlayerControllerClass = ADPPlayerController::StaticClass();
 	PlayerStateClass = ADPPlayerState::StaticClass();
 	GameStateClass = ADPInGameState::StaticClass();
@@ -39,14 +43,6 @@ ADPGameModeBase::ADPGameModeBase()
 #else
 	NetworkManager = CreateDefaultSubobject<UServerNetworkManager>(TEXT("NetworkManager"));
 #endif	
-
-	monster_controllers_.resize(NUM_OF_MAX_MONSTERS, nullptr);
-	empty_monster_slots_.reserve(NUM_OF_MAX_MONSTERS);
-
-	for (int i = 0; i < NUM_OF_MAX_MONSTERS; i++)
-	{
-		empty_monster_slots_.push_back(i);
-	}
 }
 
 void ADPGameModeBase::OnGameStart()
@@ -82,20 +78,23 @@ void ADPGameModeBase::GetSeamlessTravelActorList(bool bToTransition, TArray<AAct
 void ADPGameModeBase::SpawnNewCharacter(APlayerController* NewPlayer)
 {
 	FVector Location[4] = {
-		FVector(-230.000000,230.000000,10.000000),
-		FVector(-230.000000,-250.000000,10.000000),
-		FVector(270.000000,-250.000000,10.000000),
-		FVector(270.000000,230.000000,10.000000),
+		FVector(13833.768291,-469.843764,82.428649),
+		FVector(13833.768291,79.326964,82.428649),
+		FVector(14166.601644,79.326964,82.428649),
+		FVector(14166.601644,-469.843764,82.428649),
 	};
 	static int idx = 0;
 	if (idx >= 4)
 		idx = 0;
 	FVector SpawnLocation = Location[idx++];
 
-	// ADPCharacter* NewCharacter = GetWorld()->SpawnActor<ADPCharacter>(DefaultPawnClass, SpawnLocation, FRotator::ZeroRotator);
-	
+	ADPCharacter* NewCharacter = GetWorld()->SpawnActor<ADPCharacter>(ADPCharacter::StaticClass(), SpawnLocation, FRotator::ZeroRotator);
+	if (NewPlayer)
+	{
+		NewPlayer->Possess(NewCharacter);
+	}
 	// As we set the default pawn class to ADPCharacter, we can use the following code to relocate an existing character.
-	NewPlayer->GetCharacter()->SetActorLocation(SpawnLocation);
+	// NewPlayer->GetCharacter()->SetActorLocation(SpawnLocation);
 }
 
 void ADPGameModeBase::UpdateMonsterData(ABaseMonsterCharacter* InMonster)
@@ -104,8 +103,6 @@ void ADPGameModeBase::UpdateMonsterData(ABaseMonsterCharacter* InMonster)
 	if (ClosestPlayer)
 	{
 		float MoveInterval = CalculateMoveInterval(MinDistance);
-		// FNetLogger::EditerLog(FColor::Green, TEXT("Monster: %s, ClosestPlayer: %s, Distance: %f, Interval: %f"),
-		// 	*InMonster->GetName(), *ClosestPlayer->GetName(), MinDistance, MoveInterval);
 		
 		FMonsterOptimizationData MOD;
 		MOD.ClosestPlayer = ClosestPlayer;
@@ -203,6 +200,8 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 	ADPPlayerState* player_state = Cast<ADPPlayerState>(newPlayer->PlayerState);
 	check(player_state);
 
+#if LAN_MODE || EDITOR_MODE
+// #if EDITOR_MODE
 	FString name = player_state->GetPlayerName();
 	std::string key(TCHAR_TO_UTF8(*name));
 	
@@ -211,10 +210,24 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 		player_state->SetPlayerName(name + "1");
 		key = std::string(TCHAR_TO_UTF8(*player_state->GetPlayerName()));
 	}
+#else
+	// Online Mode : Steam ID
+	std::string key(TCHAR_TO_UTF8(*player_state->GetUniqueId()->ToString()));
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Player ID : %s"), *FString(key.c_str()));
+#endif
+	
 	player_controllers_[key] = Cast<ADPPlayerController>(newPlayer);
-	player_controllers_[key]->SwitchLevelComponent(ELevelComponentType::MAIN);
+	if (!player_controllers_[key]->IsLocalController())
+	{
+		player_controllers_[key]->SwitchLevelComponent(ELevelComponentType::MAIN);
+	}
 
-	SpawnNewCharacter(newPlayer); 
+	// Spawn Character in New Place
+	SpawnNewCharacter(newPlayer);
+	
+	// Set Player Random Job
+	player_state->SetPlayerRandomJob();
+	
 	if (!newPlayer->IsLocalController())
 	{
 		player_controllers_[key]->ConnectToServer(ELevelComponentType::MAIN);
@@ -239,12 +252,20 @@ void ADPGameModeBase::CheckAllPlayersConnected()
 	check(GS)
 	if (GS && GS->AreAllPlayersConnected())
 	{
-		StartGame();
+		// StartGame();
 	}
 }
 
 void ADPGameModeBase::StartGame()
 {
+	ADPInGameState* GS = GetGameState<ADPInGameState>();
+	if (GS)
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([GS]() {
+			GS->MulticastPlayerJob();
+		}), 0.5f, false); 
+	}
 }
 
 void ADPGameModeBase::Logout(AController* Exiting)
@@ -259,8 +280,13 @@ void ADPGameModeBase::Logout(AController* Exiting)
 	{
 		return ;
 	}
+	// 여기 고쳐야 함! 이름으로 되어 있음!! SteamID로 바뀌어야 함
+#if LAN_MODE || EDITOR_MODE
 	std::string key(TCHAR_TO_UTF8(*controller->PlayerState->GetPlayerName()));
-	if (player_controllers_.find(key) != player_controllers_.end())
+#else
+	std::string key(TCHAR_TO_UTF8(*controller->PlayerState->GetUniqueId()->ToString()));
+#endif
+	if (player_controllers_.contains(key))
 	{
 		player_controllers_.erase(key);
 	}
@@ -271,11 +297,72 @@ void ADPGameModeBase::Logout(AController* Exiting)
 	}
 }
 
+void ADPGameModeBase::InitializeGame()
+{
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	check(GameInstance);
+	int NumMaxPlayers = GameInstance->network_failure_manager_->GetDesiredMaxPlayers();
+	if (NumMaxPlayers == 0)
+	{
+		BlockingVolume = GetWorld()->SpawnActor<ABlockingBoxVolume>(ABlockingBoxVolume::StaticClass(), FVector(13380.0f, -253.279822f, 60.0f), FRotator(0.0f, 0.0f, 0.0f));
+	}
+	else
+	{
+		bRestarted = true;
+	}
+	NumMaxPlayers = NumMaxPlayers > 0 ? NumMaxPlayers : NUM_OF_MAX_CLIENTS;
+	NetworkManager->SetGameStartCallback(NumMaxPlayers, [this]()
+	{
+		this->OnGameStart();
+	});
+	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
+	check(DataManager);
+
+	UTimeData* TimeData = DataManager->GetSingleDataAs<UTimeData>(TEXT("TimeData"));
+	if (TimeData)
+	{
+		PlayTime = TimeData->GetTimeRemaining();
+	}
+	else
+	{
+		PlayTime = Zoomies::GAME_TIME;
+	}
+
+	monster_controllers_.resize(NUM_OF_MAX_MONSTERS, nullptr);
+	empty_monster_slots_.reserve(NUM_OF_MAX_MONSTERS);
+	
+	for (int i = 0; i < NUM_OF_MAX_MONSTERS; i++)
+	{
+		empty_monster_slots_.push_back(i);
+	}
+	UDataArray* MonsterDataArray = DataManager->GetDataArray(TEXT("MonsterData"));
+	if (MonsterDataArray)
+	{
+		for (UBaseData* Data : MonsterDataArray->DataArray)
+		{
+			UMonsterData* MonsterData = Cast<UMonsterData>(Data);
+			if (MonsterData)
+			{
+				// Monster Stuff
+			}
+		}
+	}
+}
+
 void ADPGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	BlockingVolume = GetWorld()->SpawnActor<ABlockingBoxVolume>(ABlockingBoxVolume::StaticClass(), FVector(0.0f, 0.0f, 0.0f), FRotator(0.0f, 0.0f, 0.0f));
+
+#if EDITOR_MODE
+	NetworkManager->Initialize(ENetworkTypeZoomies::NONE);
+#elif LAN_MODE
+	// NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
+	NetworkManager->Initialize(ENetworkTypeZoomies::ENGINE_SOCKET);
+#else
+	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
+#endif
+
+	InitializeGame();
 }
 
 void ADPGameModeBase::EndGame()
@@ -288,19 +375,6 @@ void ADPGameModeBase::EndGame()
 void ADPGameModeBase::StartPlay()
 {
 	Super::StartPlay();
-
-#if EDITOR_MODE
-	NetworkManager->Initialize(ENetworkTypeZoomies::NONE);
-#elif LAN_MODE
-	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
-#else
-	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
-#endif
-	
-	NetworkManager->SetGameStartCallback(NUM_OF_MAX_CLIENTS, [this]()
-	{
-		this->OnGameStart();
-	});
 }
 
 void ADPGameModeBase::Tick(float delta_time)
@@ -312,7 +386,25 @@ void ADPGameModeBase::Tick(float delta_time)
 #endif
 		if (bTimeSet == false)
 		{
-			BlockingVolume->DeactiveBlockingVolume();
+			if (bRestarted == false)
+			{
+				ADPInGameState* GS = GetGameState<ADPInGameState>();
+				if (GS)
+				{
+					FTimerHandle TimerHandle;
+					GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([GS]() {
+						GS->MulticastPlayerJob();
+					}), 2.0f, false); 
+				}
+			}
+			if (BlockingVolume)
+			{
+				BlockingVolume->DeactiveBlockingVolume(bWallDisappear);
+			}
+			else
+			{
+				bWallDisappear = true;
+			}
 			bTimeSet = true;
 			for (auto& pair: player_controllers_)
 			{
@@ -324,7 +416,7 @@ void ADPGameModeBase::Tick(float delta_time)
 				}
 				Character->SetNameTag();
 			}
-			TimerManager->StartTimer<ADPInGameState>(300.f, &ADPGameModeBase::EndGame, this);
+			TimerManager->StartTimer<ADPInGameState>(PlayTime, &ADPGameModeBase::EndGame, this);
 		}
 		this->ProcessData(delta_time);
 #if EDITOR_MODE != 1
@@ -335,7 +427,6 @@ void ADPGameModeBase::Tick(float delta_time)
 void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-	UE_LOG(LogTemp, Warning, TEXT("Call end play."));
 
 	NetworkManager->Shutdown();
 }
@@ -344,14 +435,26 @@ void ADPGameModeBase::ProcessData(float delta_time)
 {
 	message_queue_ = NetworkManager->GetRecievedMessages();
 
-	this->SpawnMonsters(delta_time);
-	this->MonsterMoveSimulate(delta_time);
+	if (bWallDisappear)
+	{
+		this->SpawnMonsters(delta_time);
+		this->MonsterMoveSimulate(delta_time);
+	}
 	while (!this->message_queue_.empty())
 	{
 		Message message = this->message_queue_.front();
 		this->message_queue_.pop();
 		ADPPlayerController* controller = this->player_controllers_[message.player_id()];
-		message_handler_.HandleMessage(message)->ExecuteIfBound(controller, message, delta_time);
+		if (!controller)
+		{
+			FNetLogger::LogError(TEXT("Failed to get PlayerController. (Method: ProcessData)"));
+			continue;
+		}
+		FServerMessageDelegate* delegate = this->message_handler_.HandleMessage(message);
+		if (delegate)
+		{
+			delegate->ExecuteIfBound(controller, message, delta_time);
+		}
 	}
 	this->SimulateAiming();
 	this->SimulateGunFire();
@@ -443,9 +546,14 @@ ADPGameModeBase::~ADPGameModeBase()
 
 void ADPGameModeBase::SyncMovement()
 {
+	static int count = 0;
 	for (auto& pair: player_controllers_)
 	{
 		Message msg = MessageMaker::MakePositionMessage(pair.second);
+		if (pair.second->IsLocalController())
+		{
+			// FNetLogger::EditerLog(FColor::Cyan, TEXT("Local Player Position : %d"), count++);
+		}
 		NetworkManager->SendData(msg);
 	}
 }

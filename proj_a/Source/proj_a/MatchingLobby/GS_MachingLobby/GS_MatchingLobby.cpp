@@ -1,11 +1,15 @@
 #include "GS_MatchingLobby.h"
 
+#include "CompileMode.h"
 #include "DPCharacter.h"
+#include "FNetLogger.h"
+#include "TestData.h"
 #include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
+#include "proj_a/GameInstance/GI_Zoomies.h"
 #include "proj_a/MatchingLobby/GM_MatchingLobby/GM_MatchingLobby.h"
 
 AGS_MatchingLobby::AGS_MatchingLobby() {
@@ -34,8 +38,14 @@ void AGS_MatchingLobby::UpdateLobbyInfo() const
 			UUserWidget* Widget = Character->LobbyInfoWidgetComponent->GetUserWidgetObject();
 			if (Widget)
 			{
-				FString Command = FString::Printf(TEXT("Update %d"), j);
-				Widget->CallFunctionByNameWithArguments(*Command, *GLog, nullptr, true);
+				// for (int32 i = 0; i < LobbyInfos.Num(); i++)
+				// {
+				// 	if (LobbyInfos[i].Name == Character->GetPlayerState()->GetPlayerName())
+				// 	{
+						FString Command = FString::Printf(TEXT("Update %d"), j);
+						Widget->CallFunctionByNameWithArguments(*Command, *GLog, nullptr, true);
+				// 	}
+				// }
 			}
 			else
 			{
@@ -71,6 +81,41 @@ void AGS_MatchingLobby::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(AGS_MatchingLobby, LobbyInfos);
 	DOREPLIFETIME(AGS_MatchingLobby, LowestAveragePing);
 	DOREPLIFETIME(AGS_MatchingLobby, BestHostPlayer);
+}
+
+void AGS_MatchingLobby::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// Delegate for handling network failure On This Level
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (!HasAuthority())
+	{
+		if (GameInstance)
+		{
+			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &AGS_MatchingLobby::OnHostMigration);
+		}
+	}
+}
+
+void AGS_MatchingLobby::OnHostMigration(UWorld* World, UDataManager* DataManager)
+{
+}
+
+void AGS_MatchingLobby::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	// Delegate for handling network failure On This Level
+	if (!HasAuthority())
+	{
+		UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+		if (GameInstance)
+		{
+			FNetLogger::EditerLog(FColor::Red, TEXT("GameInstance is not null"));
+			GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
+		}
+	}
 }
 
 bool AGS_MatchingLobby::AreAllPlayersReady()
@@ -155,3 +200,20 @@ void AGS_MatchingLobby::MulticastShowLoadingWidget_Implementation()
 }
 
 
+// ���� ����
+// 1. ��Ʈ��ũ ���� ����
+// 2. �ش� ������ �ִ� �����͵��� ����
+// 2-1. �� �������� ������ �����Ͱ� �ٸ�
+// 3. �ش� ������ �ٸ� Ŭ���̾�Ʈ�� �ٽ� ȣ������
+// 4. �ٽ� ȣ���õ� Ŭ���̾�Ʈ�� ������ �����͸� �ҷ���
+// 5. �ҷ��� �����͸� ������� �ٽ� ������ ������
+
+// 1. 현재의 객체가 파괴되도 다음에 접근이 가능해야 함 - 전역적으로 들고 있어야 함.
+
+// ABSTRACT
+// 1. GameInstance
+// 2. 각 클래스마다 자신의 정보를 저장하는 세부적으로 다른 구체화된 클래스를 GameInstance에 선언된
+// 추상 클래스 내부를 계속해서 바꿔줘야 함.
+
+// EVENT
+// 해당 이벤트에 바인딩만 해주면 된다.

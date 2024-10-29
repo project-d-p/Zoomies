@@ -18,7 +18,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Result_Widget")
 	UUserWidget* GetWidget() const;
 
-	void StartWidget();
+	void StartWidget(const TArray<FFinalScoreData>& InFinalScoreDataArray);
 	
 protected:
 	virtual void BeginPlay() override;

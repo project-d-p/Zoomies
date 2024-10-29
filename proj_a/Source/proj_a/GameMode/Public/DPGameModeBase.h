@@ -102,6 +102,7 @@ public:
 	UServerTimerManager* GetTimerManager() const { return TimerManager; }
 
 private:
+	void InitializeGame();
 	// Implementations
 	void SyncMovement();
 	void SimulateGunFire();
@@ -124,6 +125,7 @@ private:
 	FMessageQueue_T message_queue_;
 	std::map<std::string, ADPPlayerController*> player_controllers_;
 	ServerMessageHandler message_handler_;
+	bool bRestarted = false;
 
 private:
 	UPROPERTY()
@@ -137,9 +139,10 @@ private:
 	bool bStart = false;
 	bool bTimeSet = false;
 	/* Set Play Time */
-	const float PLAY_TIME = Zoomies::GAME_TIME;
+	float PlayTime = 999999.0f;
 
 	/* For Monster Movement Manage (Interval & Process) */
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	TMap<ABaseMonsterCharacter*, FMonsterOptimizationData> MonsterOptimizationData;
+	bool bWallDisappear = false;
 };

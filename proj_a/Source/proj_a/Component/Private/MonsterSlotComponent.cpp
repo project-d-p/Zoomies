@@ -106,6 +106,24 @@ bool UMonsterSlotComponent::AddMonsterToSlot(ADPCharacter* character, const FStr
 	return AddMonsterToSlot(character, monsterMeshMap[monster_type], monster_type);
 }
 
+bool UMonsterSlotComponent::AddMonsterToSlot(ADPCharacter* character, EAnimal monster_type)
+{
+	FString monsterTypeString = "";
+	for (const auto& monster : monsterTypeMap)
+	{
+		if (monster.second == monster_type)
+		{
+			monsterTypeString = monster.first;
+			break;
+		}
+	}
+	if (monsterTypeString.IsEmpty())
+	{
+		return false;
+	}
+	return AddMonsterToSlot(character, monsterTypeString);
+}
+
 TArray<EAnimal> UMonsterSlotComponent::RemoveMonstersFromSlot()
 {
 	TArray<EAnimal> result;

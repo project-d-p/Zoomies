@@ -13,7 +13,10 @@ void UGI_Zoomies::Init()
 {
 	Super::Init();
 	CheckSteamInit();
-
+	
+	network_failure_manager_ = NewObject<UNetworkFailureManager>(this, UNetworkFailureManager::StaticClass());
+	network_failure_manager_->Init();
+	
 #if EDITOR_MODE
 	bIsOnline = false;
 #elif LAN_MODE
@@ -339,20 +342,20 @@ void UGI_Zoomies::OnDestroyComplete(FName session_name, bool bWasSuccessful)
 
 bool UGI_Zoomies::ResetSession()
 {
-	if (session_interface_.IsValid())
-	{
-		if (session_interface_->GetNamedSession(NAME_GameSession) != nullptr)
-		{
-			// Register OnDestroySessionComplete delegate
-			dh_on_destroy_complete = session_interface_->AddOnDestroySessionCompleteDelegate_Handle(
-				FOnDestroySessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::OnDestroyComplete)
-			);
-			// Destroy the current session
-			session_interface_->DestroySession(NAME_GameSession);
-			return true;
-		}
-	}
-	UE_LOG(LogTemp, Log, TEXT("no existing session to reset"));
+	// if (session_interface_.IsValid())
+	// {
+	// 	if (session_interface_->GetNamedSession(NAME_GameSession) != nullptr)
+	// 	{
+	// 		// Register OnDestroySessionComplete delegate
+	// 		dh_on_destroy_complete = session_interface_->AddOnDestroySessionCompleteDelegate_Handle(
+	// 			FOnDestroySessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::OnDestroyComplete)
+	// 		);
+	// 		// Destroy the current session
+	// 		session_interface_->DestroySession(NAME_GameSession);
+	// 		return true;
+	// 	}
+	// }
+	// UE_LOG(LogTemp, Log, TEXT("no existing session to reset"));
 	return false;
 }
 
@@ -380,6 +383,7 @@ void UGI_Zoomies::CheckSteamInit()
 
 void UGI_Zoomies::InitSteamAPI()
 {
+#if not (EDITOR_MODE || LAN_MODE)
 	if (!is_steamAPI_init && SteamAPI_Init())
 	{
 		is_steamAPI_init = true;
@@ -412,18 +416,27 @@ void UGI_Zoomies::InitSteamAPI()
 			TimerHandle,
 			this, &UGI_Zoomies::InitOnlineSubsystemSteam,
 			0.5f, false);
+#endif
+		InitOnlineSubsystemSteam();
+#if not (EDITOR_MODE || LAN_MODE)
 	}
+#endif
 }
 
 void UGI_Zoomies::InitOnlineSubsystemSteam()
 {
 	if (!is_online_session_steam_init)
 	{
+#if EDITOR_MODE || LAN_MODE
+		online_subsystem_ = IOnlineSubsystem::Get(/*STEAM_SUBSYSTEM*/);
+#else
 		online_subsystem_ = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
+#endif
 		if (online_subsystem_)
 		{
 			session_interface_ = online_subsystem_->GetSessionInterface();
 			is_online_session_steam_init = true;
+			// network_failure_manager_->Init(session_interface_);
 			if (session_interface_.IsValid())
 			{
 				UE_LOG(

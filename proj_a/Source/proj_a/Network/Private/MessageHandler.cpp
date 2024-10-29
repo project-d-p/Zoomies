@@ -46,9 +46,18 @@ FMessageHandler::FMessageHandler()
 
 void FMessageHandler::HandleMessage(const Message& Msg)
 {
+	static int count = 0;
 	const FMessageDelegate* foundDelegate = MessageHandlers.Find(Msg.message_type_case());
 	if (foundDelegate)
 	{
+		// if (count == 500)
+		// {
+		// 	FString DebuggedString = FString(Msg.DebugString().c_str());
+		// 	FNetLogger::EditerLog(FColor::Cyan, TEXT("Local Player Position : %s"), *DebuggedString);
+		// 	count = 0;
+		// }
+		// count++;
+		// FNetLogger::EditerLog(FColor::Cyan, TEXT("Local Player Position : %d"), count++);
 		// UE_LOG(LogNetwork, Warning, TEXT("Found message type: %d"), Msg.message_type_case());
 		(void)foundDelegate->ExecuteIfBound(Msg);
 	}

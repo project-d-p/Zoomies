@@ -1,5 +1,6 @@
 #include "ServerNetworkManager.h"
 
+#include "FNetLogger.h"
 #include "ISocketFactory.h"
 #include "ISocketInterface.h"
 #include "NetworkWorker.h"
@@ -8,7 +9,6 @@ void UServerNetworkManager::Initialize(ENetworkTypeZoomies SocketType)
 {
 	UISocketInterface* SocketInterface = SocketFactory->CreateSocketInterface(SocketType);
 	check(SocketInterface);
-	SocketInterface->SetAsServer();
 	SocketInterface->ActivateServer();
 
 	Worker = NewObject<UNetworkWorker>();
@@ -35,7 +35,10 @@ void UServerNetworkManager::SendData(const Message& Data)
 void UServerNetworkManager::Shutdown()
 {
 	if (Worker)
+	{
 		Worker->Stop();
+		Worker = nullptr;
+	}
 }
 
 void UServerNetworkManager::SetGameStartCallback(int NumOfPlayers, const TFunction<void()>& Callback)
@@ -49,9 +52,6 @@ UServerNetworkManager::~UServerNetworkManager()
 	UServerNetworkManager::Shutdown();
 	if (WorkerThread)
 	{
-		WorkerThread->Kill();
-		WorkerThread->WaitForCompletion();
-		delete WorkerThread;
 		WorkerThread = nullptr;
 	}
 }

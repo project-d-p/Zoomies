@@ -7,6 +7,7 @@
 #include "JudgeGameState.h"
 #include "JudgeLevelUI.h"
 #include "JudgePlayerState.h"
+#include "NetworkMessage.h"
 #include "PathManager.h"
 #include "ServerChatManager.h"
 #include "Blueprint/UserWidget.h"
@@ -80,10 +81,14 @@ void AJudgePlayerController::RequestUIData_Implementation()
 		return ;
 	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 	{
-		AJudgePlayerController* JPS = Cast<AJudgePlayerController>(*It);
-		if (!JPS)
+		AJudgePlayerController* JPC = Cast<AJudgePlayerController>(*It);
+		if (!JPC)
 			continue;
-		JPS->InitializeUI(GM->GetUiData());
+		FUIInitData Data = GM->GetUiData();
+		if (Data.bInitSuccessful)
+		{
+			JPC->InitializeUI(Data);
+		}
 	}
 }
 
@@ -113,10 +118,6 @@ void AJudgePlayerController::SeamlessTravelFrom(APlayerController* OldPC)
 	AJudgePlayerState* GS = GetPlayerState<AJudgePlayerState>();
 	checkf(GS, TEXT("Failed to get JudgePlayerState"))
 	checkf(MainPC->GetPrivateScoreManagerComponent(), TEXT("Failed to get PrivateScoreManagerComponent"))
-	GS->SetScore(MainPC->GetPrivateScoreManagerComponent()->GetPrivatePlayerScore());
-
-	GS->SetCapturedAnimals(MainPC->GetPrivateScoreManagerComponent()->GetCapturedAnimals());
-	GS->SetScoreDatas(MainPC->GetPrivateScoreManagerComponent()->GetScoreDatas());
 }
 
 void AJudgePlayerController::SeamlessTravelTo(APlayerController* NewPC)
@@ -129,5 +130,5 @@ void AJudgePlayerController::SeamlessTravelTo(APlayerController* NewPC)
 	check(NGS)
 	AJudgePlayerState* GS = GetPlayerState<AJudgePlayerState>();
 	check(GS)
-	NGS->SetFinalScoreData(GS->GetFinalScoreData());
+	NGS->SetPlayerScoreData(GS->GetPlayerScoreData());
 }

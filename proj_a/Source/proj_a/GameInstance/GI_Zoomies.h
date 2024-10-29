@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "DPCharacter.h"
 #include "DPPlayerController.h"
+#include "NetworkFailureManager.h"
 #include "Engine/GameInstance.h"
 #include "OnlineSubsystem.h"
 #include "Interfaces/OnlineSessionInterface.h"
@@ -31,6 +32,8 @@ public:
 	void AddBanPlayer(const FString& String);
 
 	int player_count = 0;
+	UPROPERTY()
+	UNetworkFailureManager* network_failure_manager_;
 private:
 	// Online subsystem & session interface pointers
 	IOnlineSubsystem* online_subsystem_;

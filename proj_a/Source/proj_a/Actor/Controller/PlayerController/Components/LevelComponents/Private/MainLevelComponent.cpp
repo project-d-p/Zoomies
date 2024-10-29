@@ -10,6 +10,7 @@
 #include "FNetLogger.h"
 #include "HitScan.h"
 #include "MainInputComponent.h"
+#include "CompileMode.h"
 #include "MessageMaker.h"
 #include "ReturnTriggerVolume.h"
 #include "proj_a/Component/InGame/Score/PrivateScoreManager.h"
@@ -21,22 +22,54 @@ UMainLevelComponent::UMainLevelComponent()
 	SoundComponent = CreateDefaultSubobject<USoundComponent>(TEXT("MainSoundComponent"));
 	CatchRay = CreateDefaultSubobject<UHitScan>(TEXT("CatchRay"));
 
+	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetBPClass(TEXT("/Game/widget/widget_ingame.widget_ingame_C"));
+	if (WidgetBPClass.Succeeded())
+	{
+		WidgetClass = WidgetBPClass.Class;
+	}
+
 	InputComponent->SetLevelComponent(this);
+
 }
 
 void UMainLevelComponent::Activate(bool bReset)
 {
 	Super::Activate(bReset);
+
+	if (Cast<APlayerController>(GetOwner())->IsLocalPlayerController())
+	{
+		if (!InGameWidget)
+		{
+			InGameWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+		}
+	}
+	if (InGameWidget)
+	{
+		InGameWidget->AddToViewport();
+	}
 }
 
 void UMainLevelComponent::Deactivate()
 {
 	Super::Deactivate();
+
+	if (InGameWidget)
+	{
+		InGameWidget->RemoveFromParent();
+		InGameWidget = nullptr;		
+	}
 }
 
 void UMainLevelComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	if (Cast<APlayerController>(GetOwner())->IsLocalPlayerController())
+	{
+		if (!InGameWidget)
+		{
+			InGameWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+		}
+	}
 }
 
 void UMainLevelComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -178,39 +211,35 @@ void UMainLevelComponent::ServerNotifyReturnAnimals_Implementation()
 	ADPPlayerController* PlayerController = GetPlayerController();
 	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
 	if (!Character) return;
-	// ���� ���� ����
+	
 	ADPPlayerState* PlayerState = Cast<ADPPlayerState>(PlayerController->PlayerState);
 	if (!PlayerState)
 	{
 		return ;
 	}
-	
-	// Ŭ���̾�Ʈ�� ���� ��ȯ ó���� ó���Ѵ�.
+
 	TArray<EAnimal> animals = Character->ReturnMonsters();
-
-	PlayerController->GetPrivateScoreManagerComponent()->IncreasePrivatePlayerScoreByServer(PlayerState->GetPlayerJob(), animals);
-
-	uint32 score = PlayerController->GetPrivateScoreManagerComponent()->GetPrivatePlayerScore();
-	FString playerName = PlayerState->GetPlayerName();
-	
-	ADPGameModeBase* GM = GetWorld()->GetAuthGameMode<ADPGameModeBase>();
-	if (GM)
+	if (animals.Num() != 0)
 	{
-		GM->ScoreManager->IncreasePlayerScore(PlayerController, animals);
-	}
-
-	if (Character->ReturnTriggerVolume)
-	{
-		Character->ReturnTriggerVolume->SpawnReturnEffect(animals);
+		PlayerState->IncreaseScore(animals);
+		FString playerName = PlayerState->GetPlayerName();
+		if (Character->ReturnTriggerVolume)
+		{
+			Character->ReturnTriggerVolume->SpawnReturnEffect(animals);
+		}
 	}
 	
 	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 	{
 		ADPPlayerController* PC = Cast<ADPPlayerController>(It->Get());
-		if (PC && PC != PlayerController) // �ڱ� �ڽ��� ������ ��� Ŭ���̾�Ʈ
+		if (PC && PC != PlayerController)
 		{
 			ADPCharacter* OtherCharacter = Cast<ADPCharacter>(PC->GetPawn());
+#if EDITOR_MODE || LAN_MODE
 			OtherCharacter->ClientNotifyAnimalReturn(PlayerState->GetPlayerName());
+#else
+			OtherCharacter->ClientNotifyAnimalReturn(PlayerState->GetUniqueId()->ToString());
+#endif
 		}
 	}
 }
@@ -382,4 +411,9 @@ void UMainLevelComponent::SimulateAim(UANetworkManager* NetworkManager)
 		}
 		NetworkManager->SendData(aimState);
 	}
+}
+
+UUserWidget* UMainLevelComponent::GetInGameWidget() const
+{
+	return InGameWidget;
 }

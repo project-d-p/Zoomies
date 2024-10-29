@@ -105,14 +105,14 @@ void AResultLevelGameMode::CheckPlayersAllTraveled()
 	AResultLevelGameState* GS = Cast<AResultLevelGameState>(GetWorld()->GetGameState());
 	check(GS)
 
-	if (CurrentPlayerCount == GI->player_count)
+	if (CurrentPlayerCount >= GI->player_count)
 	{
 		FTimerHandle StartTimerHandle;
 		FTimerDelegate StartTimerDelegate;
 
 		StartTimerDelegate.BindLambda([this, GS]()
 		{
-			GS->MulticastPlayersAllTraveled();
+			GS->NotifyPlayersAllTraveled();
 
 			for (auto it = GetWorld()->GetPlayerControllerIterator(); it; ++it)
 			{
@@ -132,4 +132,13 @@ void AResultLevelGameMode::CheckPlayersAllTraveled()
 		});
 		GetWorld()->GetTimerManager().SetTimer(StartTimerHandle, StartTimerDelegate, 1.0f, false);
 	}
+}
+
+void AResultLevelGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	AResultLevelGameState* GS = Cast<AResultLevelGameState>(GetWorld()->GetGameState());
+	check(GS)
+	// GS->MulticastPlayersAllTraveled();
 }
