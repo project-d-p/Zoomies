@@ -17,6 +17,8 @@ public:
 	UNetworkedDynamicTextureComponent* GetDynamicTextureComponent() const { return NetworkedDynamicTexture; }
 	UPROPERTY(EditAnywhere, Category = "DynamicTexture")
 	bool bPlayerAssigned = false;
+	UFUNCTION(Client, Reliable)
+	void Client_SetOwner(APlayerController* NewOwner);
 	FTimerHandle TimerHandle_InitializeDynamicTexture;
 protected:
 	virtual void BeginPlay() override;

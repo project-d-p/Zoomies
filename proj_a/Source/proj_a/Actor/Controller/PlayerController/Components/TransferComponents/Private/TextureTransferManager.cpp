@@ -11,7 +11,7 @@ void UTextureTransferManager::RequestTextureToServer_Implementation(int32 Player
 		RetryRequestTexture(PlayerId);
 		return;
 	}
-
+	
 	UNetworkedDynamicTextureComponent* DynamicTextureComp = Character->GetDynamicTextureComponent();
 	if (!DynamicTextureComp || !DynamicTextureComp->bCustomTextureUploaded)
 	{

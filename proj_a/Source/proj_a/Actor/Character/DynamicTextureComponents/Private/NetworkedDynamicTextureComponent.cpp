@@ -29,16 +29,18 @@ void UNetworkedDynamicTextureComponent::OnTransferComplete(const TArray<uint8>& 
 {
 	if (FullData.Num() > 0)
 	{
-		ADPCharacter* C = Cast<ADPCharacter>(GetOwner());
+		ADynamicTexturedCharacter* C = Cast<ADynamicTexturedCharacter>(GetOwner());
 		if (!C)
 			return;
-		GetWorld()->GetTimerManager().ClearTimer(C->TimerHandle_InitializeDynamicTexture);
 		
 		FSerializedTextureData STD;
 		STD.CompressedTextureData = FullData;
 		STD.Width = 1024;
 		STD.Height = 1024;
 		UTexture2D* Texture = DeserializeTexture(STD);
+		if (!Texture)
+			return;
+		GetWorld()->GetTimerManager().ClearTimer(C->TimerHandle_InitializeDynamicTexture);
 		UpdateTexture(Texture);
 	}
 }
@@ -107,10 +109,11 @@ void UNetworkedDynamicTextureComponent::LoadTexture()
 
 void UNetworkedDynamicTextureComponent::HandleLocalNetOwner(UTexture2D* CustomTexture)
 {
-	ADPCharacter* C = Cast<ADPCharacter>(GetOwner());
+	ADynamicTexturedCharacter* C = Cast<ADynamicTexturedCharacter>(GetOwner());
 	if (!C)
 		return;
 	GetWorld()->GetTimerManager().ClearTimer(C->TimerHandle_InitializeDynamicTexture);
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Transfer Complete."));
 	if (GetWorld()->GetNetMode() != NM_Standalone)
 	{
 		if (GetOwner()->HasAuthority())
@@ -144,6 +147,10 @@ UTexture2D* UNetworkedDynamicTextureComponent::DeserializeTexture(FSerializedTex
 	}
 	
 	UTexture2D* Texture = GetDynamicTexture();
+	if (!Texture)
+	{
+		return nullptr;
+	}
 
 	FTexturePlatformData* PlatformData = Texture->GetPlatformData();
 	FTexture2DMipMap* Mip = &PlatformData->Mips[0];

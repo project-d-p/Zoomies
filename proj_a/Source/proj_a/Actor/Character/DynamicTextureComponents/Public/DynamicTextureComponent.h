@@ -12,7 +12,7 @@ class UDynamicTextureComponent : public UActorComponent
 
 private:
 	UPROPERTY()
-	UTexture2D* DynamicTexture;
+	UTexture2D* DynamicTexture = nullptr;
 	FUpdateTextureRegion2D* TextureRegion;
 
 public:

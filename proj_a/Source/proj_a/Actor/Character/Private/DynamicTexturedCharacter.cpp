@@ -11,7 +11,17 @@ ADynamicTexturedCharacter::ADynamicTexturedCharacter()
 	{
 		GetMesh()->SetSkeletalMesh(SK_CHARACTER.Object);
 	}
+	bNetLoadOnClient = true;
+	bReplicates = true;
 	NetworkedDynamicTexture = CreateDefaultSubobject<UNetworkedDynamicTextureComponent>(TEXT("UNetworkedDynamicTextureComponent"));
+}
+
+void ADynamicTexturedCharacter::Client_SetOwner_Implementation(APlayerController* NewOwner)
+{
+	if (NewOwner)
+	{
+		SetOwner(NewOwner);
+	}
 }
 
 void ADynamicTexturedCharacter::BeginPlay()
@@ -46,7 +56,7 @@ void ADynamicTexturedCharacter::OnRep_Owner()
 
 void ADynamicTexturedCharacter::TryInItializeDynamicTexture()
 {
-	if (bInitialized || !dynamicMaterialInstance || !NetworkedDynamicTexture || !bPlayerAssigned)
+	if (bInitialized || !dynamicMaterialInstance || !NetworkedDynamicTexture || bPlayerAssigned)
 	{
 		return;
 	}

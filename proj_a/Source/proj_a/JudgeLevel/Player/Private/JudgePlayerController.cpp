@@ -109,7 +109,7 @@ void AJudgePlayerController::RequestCharacter_Implementation()
 		{
 			if (FoundCharacter->bPlayerAssigned == false)
 			{
-				FoundCharacter->SetOwner(this);
+				Possess(FoundCharacter);
 				FoundCharacter->bPlayerAssigned = true;
 				break;
 			}
@@ -131,6 +131,7 @@ void AJudgePlayerController::BeginPlay()
 		bShowMouseCursor = true;
 		
 		GetWorldTimerManager().SetTimer(TH, this, &AJudgePlayerController::RequestUIData, 1.f, true);
+		RequestCharacter();
 		GetWorldTimerManager().SetTimer(CTH, this, &AJudgePlayerController::RequestCharacter, 1.f, true);
 	}
 }
