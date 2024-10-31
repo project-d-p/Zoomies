@@ -20,6 +20,21 @@ public:
 			default: check(false) return nullptr;;
 		}
 	}
+
+	static constexpr const TCHAR* GetOccupationImagePath_White(EPlayerJob OType)
+	{
+		switch (OType)
+		{
+		case EPlayerJob::JOB_ARCHAEOLOGIST: return TEXT("/Game/image/character/JobText/archa_white");
+		case EPlayerJob::JOB_POACHER: return TEXT("/Game/image/character/JobText/poacher_white");
+		case EPlayerJob::JOB_ENVIRONMENTALIST: return TEXT("/Game/image/character/JobText/environmentalist_white");
+		case EPlayerJob::JOB_RINGMASTER: return TEXT("/Game/image/character/JobText/ringMaster_white");
+		case EPlayerJob::JOB_TERRORIST: return TEXT("/Game/image/character/JobText/terrorist_white");
+		case EPlayerJob::JOB_CHECK: return TEXT("/Game/image/ui/check");
+		case EPlayerJob::JOB_CROSS: return TEXT("/Game/image/ui/cross");
+		default: check(false) return nullptr;;
+		}
+	}
 	
 	static constexpr const TCHAR* GetWidgetPath(EWidget WType)
 	{

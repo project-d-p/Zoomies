@@ -41,6 +41,10 @@ public:
         VoterName->SetText(FText::FromString(Name));
         TargetUserName->SetText(FText::FromString(Name));
     }
+    UPROPERTY(meta = (BindWidget))
+    UVerticalBox* VoteButtonsGrid;
+    TArray<EPlayerJob> OccupationTypes;
+    EPlayerJob CurrentVoterOcc;
     
 protected:
     UPROPERTY(meta = (BindWidget))
@@ -52,16 +56,12 @@ protected:
     UPROPERTY(meta = (BindWidget))
     UCanvasPanel* VotableListPannel;
     UPROPERTY(meta = (BindWidget))
-    UVerticalBox* VoteButtonsGrid;
-    UPROPERTY(meta = (BindWidget))
     UTextBlock* TargetUserName;
     
     
     virtual void NativeConstruct() override;
 
 private:
-    TArray<EPlayerJob> OccupationTypes;
-    EPlayerJob CurrentVoterOcc;
 
     void InitializEPlayerJobs();
     UFUNCTION()
