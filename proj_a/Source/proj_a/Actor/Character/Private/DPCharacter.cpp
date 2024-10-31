@@ -57,8 +57,8 @@ ADPCharacter::ADPCharacter()
 	springArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SPRINGARM"));
 	camera = CreateDefaultSubobject<UCameraComponent>(TEXT("CAMERA"));
 
-	sceneCaptureSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SCENECAPTURESPRINGARM"));
-	sceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SCENECAPTURE"));
+	//sceneCaptureSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SCENECAPTURESPRINGARM"));
+	//sceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SCENECAPTURE"));
 
 	// tag
 	Tags.Add(FName("player"));
@@ -66,8 +66,8 @@ ADPCharacter::ADPCharacter()
 	springArm->SetupAttachment(RootComponent);
 	camera->SetupAttachment(springArm);
 
-	sceneCaptureSpringArm->SetupAttachment(RootComponent);
-	sceneCapture->SetupAttachment(sceneCaptureSpringArm);
+	//sceneCaptureSpringArm->SetupAttachment(RootComponent);
+	//sceneCapture->SetupAttachment(sceneCaptureSpringArm);
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CHARACTER
 	(TEXT("/Game/model/steve/StickManForMixamo.StickManForMixamo"));
@@ -83,21 +83,24 @@ ADPCharacter::ADPCharacter()
 	springArm->bUsePawnControlRotation = true;
 	camera->SetRelativeLocation(FVector(0.f, 50.f, 150.f));
 
-	// minimap
-	static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D> RENDERTARGET
-	(TEXT("/Game/widget/minimap/rt_minimap.rt_minimap"));
-	if (RENDERTARGET.Succeeded()){
-		sceneCapture->TextureTarget = RENDERTARGET.Object;
-	}
+	// player collision object type
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Player"));
 
-	sceneCaptureSpringArm->TargetArmLength = 700.0f;
-	sceneCaptureSpringArm->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
-	sceneCaptureSpringArm->bInheritPitch = false;
-	sceneCaptureSpringArm->bInheritYaw = false;
-	sceneCaptureSpringArm->bInheritRoll = false;
-	sceneCaptureSpringArm->bDoCollisionTest = false;
-	sceneCapture->ProjectionType = ECameraProjectionMode::Type::Orthographic;
-	sceneCapture->OrthoWidth = 1024.0f;
+	// minimap
+	//static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D> RENDERTARGET
+	//(TEXT("/Game/widget/minimap/rt_minimap.rt_minimap"));
+	//if (RENDERTARGET.Succeeded()){
+	//	sceneCapture->TextureTarget = RENDERTARGET.Object;
+	//}
+
+	//sceneCaptureSpringArm->TargetArmLength = 700.0f;
+	//sceneCaptureSpringArm->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
+	//sceneCaptureSpringArm->bInheritPitch = false;
+	//sceneCaptureSpringArm->bInheritYaw = false;
+	//sceneCaptureSpringArm->bInheritRoll = false;
+	//sceneCaptureSpringArm->bDoCollisionTest = false;
+	//sceneCapture->ProjectionType = ECameraProjectionMode::Type::Orthographic;
+	//sceneCapture->OrthoWidth = 1024.0f;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
@@ -241,6 +244,9 @@ ADPCharacter::ADPCharacter()
 	{
 		Crown = CrownMesh.Object;
 	}
+
+	GetCharacterMovement()->SetWalkableFloorAngle(80.f);
+	GetCharacterMovement()->MaxStepHeight = 50.f;
 }
 
 ADPCharacter::~ADPCharacter()
@@ -258,7 +264,11 @@ void ADPCharacter::OnHostMigration(UWorld* World, UDataManager* DataManager)
 	if (CharacterData)
 	{
 		CharacterData->InitializeData();
-		FString PlayerName = GetPlayerState()->GetPlayerName();
+		FString PlayerName = TEXT("");
+		if (GetPlayerState())
+		{
+			PlayerName = GetPlayerState()->GetPlayerName();
+		}
 		CharacterData->SetActorName(PlayerName);
 		CharacterData->SetActorLocation(GetActorLocation());
 		CharacterData->SetActorRotation(GetActorRotation());

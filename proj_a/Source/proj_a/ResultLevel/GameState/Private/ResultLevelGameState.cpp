@@ -32,30 +32,35 @@ AResultLevelGameState::AResultLevelGameState()
 	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
 }
 
-void AResultLevelGameState::MulticastPlayersAllTraveled_Implementation()
+void AResultLevelGameState::NotifyPlayersAllTraveled()
 {
-	NotifyPlayersAllTraveled();
+	this->SetPlayerScores();
+	this->SetMyRank();
+
+	NotifyAllScoresCalculated(FinalScoreDataArray);
 }
 
-void AResultLevelGameState::NotifyPlayersAllTraveled_Implementation()
+void AResultLevelGameState::NotifyAllScoresCalculated_Implementation(
+	const TArray<FFinalScoreData>& InFinalScoreDataArray)
 {
-	if (HasAuthority())
+	// TArray<AActor*> FoundActors;
+	// UGameplayStatics::GetAllActorsOfClass(GetWorld(), AResultWidgetActor::StaticClass(), FoundActors);
+	//
+	// if (FoundActors.Num() > 0)
+	// {
+	// 	AResultWidgetActor* ResultActor = Cast<AResultWidgetActor>(FoundActors[0]);
+	// 	if (ResultActor)
+	// 	{
+	// 		ResultActor->StartWidget(InFinalScoreDataArray);
+	// 	}
+	// }
+
+	/* Create Widget */
+	CalculateWidgetInstance = CreateWidget<UDPCalculateWidget>(GetWorld(), ResultWidget);
+	if (CalculateWidgetInstance)
 	{
-		this->SetPlayerScores();
-		this->SetMyRank();
-		this->isAllSet = true;
-		this->OnRep_IsAllSet();
-	}
-	
-	ADPPlayerController* Controller = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
-	if (Controller)
-	{
-		Controller->SwitchLevelComponent(ELevelComponentType::RESULT);
-	}
-	ADPCharacter* Character = Cast<ADPCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
-	if (Character)
-	{
-		Character->SetReplicatingMovement(true);
+		CalculateWidgetInstance->AddToViewport();
+		CalculateWidgetInstance->OnScoresUpdated(InFinalScoreDataArray);
 	}
 }
 
@@ -64,69 +69,17 @@ void AResultLevelGameState::AddPlayerState(APlayerState* PlayerState)
 	Super::AddPlayerState(PlayerState);
 }
 
-TArray<FAnimalList> AResultLevelGameState::GetCapturedAnimals(/*ADPPlayerController* Controller*/ TArray<TArray<EAnimal>> InCapturedAnimals)
-{
-	TArray<FAnimalList> CapturedAnimals;
-	
-	for (const TArray<EAnimal>& Animals : InCapturedAnimals)
-	{
-		FAnimalList AnimalList;
-		AnimalList.Animals = Animals;
-		CapturedAnimals.Add(AnimalList);
-	}
-	
-	return CapturedAnimals;
-}
-
 void AResultLevelGameState::SetMyRank()
 {
-	PlayerScores.Sort([](const FPlayerScore& A, const FPlayerScore& B) {
-		return A.Scores[4] > B.Scores[4];
+	FinalScoreDataArray.Sort([](const FFinalScoreData& A, const FFinalScoreData& B) {
+		float ScoreA = A.bIsDetected ? A.PublicTotalScore : A.PrivateTotalScore;
+		float ScoreB = B.bIsDetected ? B.PublicTotalScore : B.PrivateTotalScore;
+		return ScoreA > ScoreB;
 	});
-
-	int rank = 1;
-	PlayerScores[0].Rank = rank;
-
-	for (int i = 1; i < PlayerScores.Num(); i++)
-	{
-		if (PlayerScores[i - 1].Scores[4] != PlayerScores[i].Scores[4])
-		{
-			rank += 1;
-		}
-		PlayerScores[i].Rank = rank;
-	}
-
-	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-	{
-		ADPPlayerController* PlayerController = Cast<ADPPlayerController>(*Iterator);
-		if (!PlayerController)
-		{
-			continue;
-		}	
-		ADPPlayerState* PlayerState = Cast<ADPPlayerState>(PlayerController->PlayerState);
-		if (!PlayerState)
-		{
-			continue;
-		}
-		FPlayerScore* PlayerScore = PlayerScores.FindByPredicate([PlayerState](const FPlayerScore& Score) {
-			return Score.PlayerName == PlayerState->GetPlayerName();
-		});
-		if (!PlayerScore)
-		{
-			continue;
-		}
-		PlayerState->Rank = PlayerScore->Rank;
-		if (PlayerController->IsLocalController())
-		{
-			MyRank = PlayerScore->Rank;
-		}
-	}
 }
 
 void AResultLevelGameState::SetPlayerScores()
 {
-	FPlayerScore PlayerScore;
-
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
 		ADPPlayerController* PlayerController = Cast<ADPPlayerController>(*Iterator);
@@ -139,73 +92,53 @@ void AResultLevelGameState::SetPlayerScores()
 		{
 			continue ;
 		}
-		PlayerScore.PlayerName = PlayerState->GetPlayerName();
-		PlayerScore.PlayerJob = EPlayerJob::JOB_ARCHAEOLOGIST /*PlayerState->GetPlayerJob()*/;
-		FFinalScoreData FD = PlayerState->GetFinalScoreData();
-		PlayerScore.Scores = this->CalculateScores(FD.CapturedAnimals, FD.ScoreDatas /*PlayerController*/);
-		PlayerScore.CapturedAnimals = this->GetCapturedAnimals(FD.CapturedAnimals/*PlayerController*/);
-		PlayerScore.bIsDetected = FD.bIsDetected;
-		PlayerScores.Add(PlayerScore);
+		FFinalScoreData FinalScoreData;
+		FinalScoreData = PlayerState->GetPlayerScoreData()->GetScore();
+		FinalScoreDataArray.Add(FinalScoreData);
 	}
 
-	if (PlayerScores.Num() < 4)
+	if (FinalScoreDataArray.Num() < 4)
 	{
-		FPlayerScore DummyPlayerScore;
-
-		for (int i = PlayerScores.Num(); i < 4; i++)
+		for (int i = FinalScoreDataArray.Num(); i < 4; i++)
 		{
-			DummyPlayerScore.PlayerName = FText::FromString(TEXT("Player")).ToString() + FString::FromInt(i + 1);
-			DummyPlayerScore.PlayerJob = EPlayerJob::JOB_ARCHAEOLOGIST;
-			DummyPlayerScore.Scores = {0, 0, 0, 0, 0};
-			DummyPlayerScore.CapturedAnimals = {};
-			DummyPlayerScore.bIsDetected = false;
-			PlayerScores.Add(DummyPlayerScore);
+			FFinalScoreData FinalScoreData;
+			FinalScoreData.PlayerName = TEXT("NONE");
+			FinalScoreDataArray.Add(FinalScoreData);
 		}
 	}
-}
-
-TArray<int32> AResultLevelGameState::CalculateScores(/* ADPPlayerController* Controller */ TArray<TArray<EAnimal>> InCapturedAnimals, TArray<FScoreData> InScores)
-{
-	TArray<int32> Scores;
-
-	Scores.SetNum(5);
-
-	// UPrivateScoreManager* ScoreManager = Controller->GetPrivateScoreManagerComponent();
-	// if (!ScoreManager)
-	// {
-	// 	return Scores;
-	// }
-
-	TArray<TArray<EAnimal>> CapturedAnimals = InCapturedAnimals /*ScoreManager->GetCapturedAnimals()*/;
-	TArray<FScoreData> ScoreDatas = InScores /*ScoreManager->GetScoreDatas()*/;
-
-	int BaseScore = 0;
-	int BaseScoreAlpha = 0;
-	int AddMulScore = 0;
-	int MulMulScore = 1;
-	
-	for (int32 i = 0; i < ScoreDatas.Num(); i++)
-	{
-		BaseScore += CapturedAnimals[i].Num() * 100;
-		BaseScoreAlpha += ScoreDatas[i].baseScore;
-		AddMulScore += ScoreDatas[i].addMulScore;
-		MulMulScore *= ScoreDatas[i].mulMulScore;
-	}
-
-	Scores[0] = BaseScore;
-	Scores[1] = BaseScoreAlpha;
-	Scores[2] = BaseScoreAlpha * (AddMulScore == 0 ? 1 : AddMulScore);
-	Scores[3] = Scores[2] * MulMulScore;
-	Scores[4] = Scores[3];
-	
-	return Scores;
 }
 
 void AResultLevelGameState::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	// this->SetMyRank();
+
+	// ADPPlayerController* Controller = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
+	// if (Controller)
+	// {
+	// 	Controller->SwitchLevelComponent(ELevelComponentType::RESULT);
+	// }
+	ADPCharacter* Character = Cast<ADPCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	if (Character)
+	{
+		Character->SetReplicatingMovement(true);
+	}
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (!HasAuthority())
+	{
+		if (GameInstance)
+		{
+			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &AResultLevelGameState::OnHostMigration);
+		}
+	}
+}
+
+void AResultLevelGameState::OnHostMigration(UWorld* World, UDataManager* DataManager)
+{
+	// TODO: Result Level에서 저장되어야 할 것
+	// 1. 플레이어들의 최종 점수 : PlayerState에서 어차피 저장되지 않나?
+	// 2. 플레이어들의 위치
+	// 3. 어떤 점수가 보여지고 있는가.. 정확히는 어떤 Widget이 보여지고 있는가?
+	//    ㄴ 만약 처음부터 다시 시작되면 굉장히 불쾌한 경험이 될 수 있음.
 }
 
 void AResultLevelGameState::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -221,35 +154,18 @@ void AResultLevelGameState::EndPlay(const EEndPlayReason::Type EndPlayReason)
     	{
     		SessionInt->DestroySession(GameInstance->SessionName);
     	}
+		GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
     }
 }
 
 void AResultLevelGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(AResultLevelGameState, PlayerScores);
-	DOREPLIFETIME(AResultLevelGameState, isAllSet);
-}
-
-void AResultLevelGameState::OnRep_IsAllSet()
-{
-	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AResultWidgetActor::StaticClass(), FoundActors);
-
-	if (FoundActors.Num() > 0)
-	{
-		AResultWidgetActor* ResultActor = Cast<AResultWidgetActor>(FoundActors[0]);
-		if (ResultActor)
-		{
-			ResultActor->StartWidget();
-		}
-	}
 }
 
 void AResultLevelGameState::SetWinner()
 {
-	FString Winner = PlayerScores[0].PlayerName;
+	FString Winner = FinalScoreDataArray[0].PlayerName;
 	UE_LOG(LogTemp, Warning, TEXT("Winner : %s"), *Winner);
 
 	FString MyName = GetWorld()->GetFirstPlayerController()->PlayerState->GetPlayerName();

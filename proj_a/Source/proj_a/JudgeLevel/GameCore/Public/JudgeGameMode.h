@@ -58,7 +58,7 @@ private:
     void EndTimer();
 
     int CurrentPlayerIndex = 0;
-    float WAIT_TIME = Zoomies::JUDGE_TIME;
+    const float WAIT_TIME = 30.f;
     TArray<EPlayerJob> PlayerVotes;
     
 protected:

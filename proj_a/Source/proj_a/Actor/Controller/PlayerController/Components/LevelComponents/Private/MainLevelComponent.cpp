@@ -10,6 +10,7 @@
 #include "FNetLogger.h"
 #include "HitScan.h"
 #include "MainInputComponent.h"
+#include "CompileMode.h"
 #include "MessageMaker.h"
 #include "ReturnTriggerVolume.h"
 #include "proj_a/Component/InGame/Score/PrivateScoreManager.h"
@@ -234,7 +235,11 @@ void UMainLevelComponent::ServerNotifyReturnAnimals_Implementation()
 		if (PC && PC != PlayerController)
 		{
 			ADPCharacter* OtherCharacter = Cast<ADPCharacter>(PC->GetPawn());
+#if EDITOR_MODE || LAN_MODE
 			OtherCharacter->ClientNotifyAnimalReturn(PlayerState->GetPlayerName());
+#else
+			OtherCharacter->ClientNotifyAnimalReturn(PlayerState->GetUniqueId()->ToString());
+#endif
 		}
 	}
 }

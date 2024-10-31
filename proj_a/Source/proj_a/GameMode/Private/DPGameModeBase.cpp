@@ -103,8 +103,6 @@ void ADPGameModeBase::UpdateMonsterData(ABaseMonsterCharacter* InMonster)
 	if (ClosestPlayer)
 	{
 		float MoveInterval = CalculateMoveInterval(MinDistance);
-		// FNetLogger::EditerLog(FColor::Green, TEXT("Monster: %s, ClosestPlayer: %s, Distance: %f, Interval: %f"),
-		// 	*InMonster->GetName(), *ClosestPlayer->GetName(), MinDistance, MoveInterval);
 		
 		FMonsterOptimizationData MOD;
 		MOD.ClosestPlayer = ClosestPlayer;
@@ -203,6 +201,7 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 	check(player_state);
 
 #if LAN_MODE || EDITOR_MODE
+// #if EDITOR_MODE
 	FString name = player_state->GetPlayerName();
 	std::string key(TCHAR_TO_UTF8(*name));
 	
@@ -253,7 +252,7 @@ void ADPGameModeBase::CheckAllPlayersConnected()
 	check(GS)
 	if (GS && GS->AreAllPlayersConnected())
 	{
-		StartGame();
+		// StartGame();
 	}
 }
 
@@ -265,7 +264,7 @@ void ADPGameModeBase::StartGame()
 		FTimerHandle TimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([GS]() {
 			GS->MulticastPlayerJob();
-		}), 5.0f, false); 
+		}), 0.5f, false); 
 	}
 }
 
@@ -304,14 +303,17 @@ void ADPGameModeBase::InitializeGame()
 	int NumMaxPlayers = GameInstance->network_failure_manager_->GetDesiredMaxPlayers();
 	if (NumMaxPlayers == 0)
 	{
-		BlockingVolume = GetWorld()->SpawnActor<ABlockingBoxVolume>(ABlockingBoxVolume::StaticClass(), FVector(13380.0f, -270.0f, 140.0f), FRotator(0.0f, 0.0f, 0.0f));
+		BlockingVolume = GetWorld()->SpawnActor<ABlockingBoxVolume>(ABlockingBoxVolume::StaticClass(), FVector(13380.0f, -253.279822f, 60.0f), FRotator(0.0f, 0.0f, 0.0f));
+	}
+	else
+	{
+		bRestarted = true;
 	}
 	NumMaxPlayers = NumMaxPlayers > 0 ? NumMaxPlayers : NUM_OF_MAX_CLIENTS;
 	NetworkManager->SetGameStartCallback(NumMaxPlayers, [this]()
 	{
 		this->OnGameStart();
 	});
-
 	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
 	check(DataManager);
 
@@ -383,6 +385,17 @@ void ADPGameModeBase::Tick(float delta_time)
 #endif
 		if (bTimeSet == false)
 		{
+			if (bRestarted == false)
+			{
+				ADPInGameState* GS = GetGameState<ADPInGameState>();
+				if (GS)
+				{
+					FTimerHandle TimerHandle;
+					GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([GS]() {
+						GS->MulticastPlayerJob();
+					}), 2.0f, false); 
+				}
+			}
 			if (BlockingVolume)
 			{
 				BlockingVolume->DeactiveBlockingVolume(bWallDisappear);
@@ -425,7 +438,7 @@ void ADPGameModeBase::ProcessData(float delta_time)
 	if (bWallDisappear)
 	{
 		this->SpawnMonsters(delta_time);
-		// this->MonsterMoveSimulate(delta_time);
+		this->MonsterMoveSimulate(delta_time);
 	}
 	while (!this->message_queue_.empty())
 	{
@@ -533,9 +546,14 @@ ADPGameModeBase::~ADPGameModeBase()
 
 void ADPGameModeBase::SyncMovement()
 {
+	static int count = 0;
 	for (auto& pair: player_controllers_)
 	{
 		Message msg = MessageMaker::MakePositionMessage(pair.second);
+		if (pair.second->IsLocalController())
+		{
+			// FNetLogger::EditerLog(FColor::Cyan, TEXT("Local Player Position : %d"), count++);
+		}
 		NetworkManager->SendData(msg);
 	}
 }

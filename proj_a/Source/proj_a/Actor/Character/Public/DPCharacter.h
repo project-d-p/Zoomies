@@ -148,10 +148,10 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class UCameraComponent* camera;
 
-	UPROPERTY(VisibleAnywhere, Category = Camera)
-	class USpringArmComponent* sceneCaptureSpringArm;
-	UPROPERTY(VisibleAnywhere, Category = Camera)
-	class  USceneCaptureComponent2D* sceneCapture;
+	//UPROPERTY(VisibleAnywhere, Category = Camera)
+	//class USpringArmComponent* sceneCaptureSpringArm;
+	//UPROPERTY(VisibleAnywhere, Category = Camera)
+	//class  USceneCaptureComponent2D* sceneCapture;
 
 	UPROPERTY()
 	UCharacterPositionSync* syncer = nullptr;
@@ -166,6 +166,7 @@ public:
 	FVector currentVelocity{ 0.f, 0.f, 0.f };
 	UPROPERTY(BlueprintReadWrite)
 	float speed{ 0.f };
+	UPROPERTY(BlueprintReadWrite)
 	bool isAim{ false };
 	bool mIsAtReturnPlace{ true };
 	UPROPERTY(BlueprintReadWrite)

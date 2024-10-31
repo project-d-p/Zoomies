@@ -111,7 +111,7 @@ void AResultLevelGameMode::CheckPlayersAllTraveled()
 
 		StartTimerDelegate.BindLambda([this, GS]()
 		{
-			GS->MulticastPlayersAllTraveled();
+			GS->NotifyPlayersAllTraveled();
 
 			for (auto it = GetWorld()->GetPlayerControllerIterator(); it; ++it)
 			{

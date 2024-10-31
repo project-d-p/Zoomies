@@ -3,6 +3,8 @@
 #include "DPCalculateWidget.h"
 #include "FNetLogger.h"
 
+struct FFinalScoreData;
+
 AResultWidgetActor::AResultWidgetActor()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -25,14 +27,14 @@ UUserWidget* AResultWidgetActor::GetWidget() const
 	return nullptr;
 }
 
-void AResultWidgetActor::StartWidget()
+void AResultWidgetActor::StartWidget(const TArray<FFinalScoreData>& InFinalScoreDataArray)
 {
 	if (WidgetComponent)
 	{
 		UDPCalculateWidget* CalculateWidget = Cast<UDPCalculateWidget>(GetWidget());
 		if (CalculateWidget)
 		{
-			CalculateWidget->OnScoresUpdated();
+			CalculateWidget->OnScoresUpdated(InFinalScoreDataArray);
 		}
 	}
 }

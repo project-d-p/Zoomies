@@ -1,5 +1,6 @@
 #include "DPInGameState.h"
 
+#include "DPJobAssign.h"
 #include "DPPlayerController.h"
 #include "FNetLogger.h"
 #include "TimeData.h"
@@ -15,6 +16,12 @@ ADPInGameState::ADPInGameState()
 	TimerManager = CreateDefaultSubobject<UClientTimerManager>(TEXT("TimerManager"));
 	ScoreManager = CreateDefaultSubobject<UClientScoreMananger>(TEXT("ScoreManager"));
 	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetBPClass(TEXT("/Game/widget/widget_jobAssign.widget_jobAssign_C"));
+	if (WidgetBPClass.Succeeded())
+	{
+		WidgetClass = WidgetBPClass.Class;
+	}
 }
 
 void ADPInGameState::MulticastPlayerJob_Implementation() const
@@ -22,6 +29,7 @@ void ADPInGameState::MulticastPlayerJob_Implementation() const
 	ADPPlayerController* PlayerController = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
 	if (PlayerController)
 	{
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("MulticastPlayerJob_Implementation"));
 		ADPPlayerState* PlayerState = Cast<ADPPlayerState>(PlayerController->PlayerState);
 		if (PlayerState)
 		{
@@ -46,6 +54,13 @@ void ADPInGameState::MulticastPlayerJob_Implementation() const
 				break;
 			}
 		}
+		if (JobWidgetInstance)
+		{
+			UDPJobAssign* JobWidget = Cast<UDPJobAssign>(JobWidgetInstance);
+			check(JobWidget)
+			JobWidget->AddToViewport();
+			JobWidget->OnJobAssigned(PlayerState->GetPlayerJob());
+		}
 	}
 }
 
@@ -61,12 +76,15 @@ void ADPInGameState::BeginPlay()
 			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &ADPInGameState::OnHostMigration);
 		}
 	}
-	ADPPlayerController* PlayerController = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
-	if (PlayerController)
+	// ADPPlayerController* PlayerController = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
+	// if (PlayerController)
+	// {
+	// 	PlayerController->SwitchLevelComponent(ELevelComponentType::MAIN);
+	// }
+	if (!JobWidgetInstance)
 	{
-		PlayerController->SwitchLevelComponent(ELevelComponentType::MAIN);
+		JobWidgetInstance = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
 	}
-
 }
 
 void ADPInGameState::EndPlay(const EEndPlayReason::Type EndPlayReason)

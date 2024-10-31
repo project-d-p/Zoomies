@@ -37,6 +37,20 @@ void ADPPlayerState::IncreaseScore(const TArray<EAnimal>& InAnimals)
 	PlayerScoreData->IncreaseScore(PlayerJob, InAnimals);
 }
 
+void ADPPlayerState::SeamlessTravelTo(APlayerState* NewPlayerState)
+{
+	Super::SeamlessTravelTo(NewPlayerState);
+
+	AJudgePlayerState* JPS = Cast<AJudgePlayerState>(NewPlayerState);
+	if (JPS)
+	{
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("SeamlessTravel To in PlayerState"));
+		JPS->SetPlayerJob(PlayerJob);
+		JPS->SetPlayerScoreData(PlayerScoreData);
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Seamless: %s"), *(JPS->GetPlayerScoreData()->GetPlayerName()));
+	}
+}
+
 void ADPPlayerState::CopyProperties(APlayerState* PlayerState)
 {
 	Super::CopyProperties(PlayerState);
@@ -87,6 +101,11 @@ void ADPPlayerState::InitializePlayerState()
 	}
 }
 
+void ADPPlayerState::SetPlayerNameDelayed()
+{
+	PlayerScoreData->SetPlayerName(GetPlayerName());
+}
+
 void ADPPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
@@ -115,6 +134,7 @@ void ADPPlayerState::BeginPlay()
 			PlayerScoreData->OnDataChanged.AddDynamic(InGameWidget, &UDPIngameWidget::OnScoreChanged);
 			PlayerScoreData->SetPlayerName(this->GetPlayerName());
 			PlayerScoreData->SetPlayerId(this->GetPlayerId());
+			GetWorld()->GetTimerManager().SetTimer(PlayerNameTimerHandle, this, &ADPPlayerState::SetPlayerNameDelayed, 0.5f, false);
 		}
 	}
 	InitializePlayerState();
