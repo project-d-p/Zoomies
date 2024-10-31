@@ -4,9 +4,11 @@
 #include "ScoreTypes.h"
 #include "GameFramework/GameState.h"
 #include "ChatManager.h"
+#include "DataManager.h"
 #include "DPCalculateWidget.h"
 #include "DPResultWidget.h"
 #include "IChatGameState.h"
+#include "NetworkFailureManager.h"
 #include "ResultLevelGameState.generated.h"
 
 UCLASS()
@@ -31,6 +33,7 @@ public:
 protected:
 	virtual void AddPlayerState(APlayerState* PlayerState) override;
 	virtual void BeginPlay() override;
+	void OnHostMigration(UWorld* World, UDataManager* DataManager);
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -51,4 +54,6 @@ protected:
 	UDPCalculateWidget* CalculateWidgetInstance;
 	UPROPERTY()
 	UDPResultWidget* ResultWidgetInstance;
+	
+	FDelegateHandle OnHostMigrationDelegate;
 };

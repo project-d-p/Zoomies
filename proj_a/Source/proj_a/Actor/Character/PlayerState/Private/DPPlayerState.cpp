@@ -44,9 +44,10 @@ void ADPPlayerState::SeamlessTravelTo(APlayerState* NewPlayerState)
 	AJudgePlayerState* JPS = Cast<AJudgePlayerState>(NewPlayerState);
 	if (JPS)
 	{
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("SeamlessTravelTo in PlayerState"));
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("SeamlessTravel To in PlayerState"));
 		JPS->SetPlayerJob(PlayerJob);
 		JPS->SetPlayerScoreData(PlayerScoreData);
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Seamless: %s"), *(JPS->GetPlayerScoreData()->GetPlayerName()));
 	}
 }
 
@@ -100,6 +101,11 @@ void ADPPlayerState::InitializePlayerState()
 	}
 }
 
+void ADPPlayerState::SetPlayerNameDelayed()
+{
+	PlayerScoreData->SetPlayerName(GetPlayerName());
+}
+
 void ADPPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
@@ -120,8 +126,12 @@ void ADPPlayerState::BeginPlay()
 		if (MainLevelComponent)
 		{
 			UDPIngameWidget* InGameWidget = Cast<UDPIngameWidget>(MainLevelComponent->GetInGameWidget());
-			PlayerScoreData->OnDataChanged.AddDynamic(InGameWidget, &UDPIngameWidget::OnScoreChanged);
-			PlayerScoreData->SetPlayerName(GetPlayerName());
+			if (InGameWidget)
+			{
+				PlayerScoreData->OnDataChanged.AddDynamic(InGameWidget, &UDPIngameWidget::OnScoreChanged);
+
+				GetWorld()->GetTimerManager().SetTimer(PlayerNameTimerHandle, this, &ADPPlayerState::SetPlayerNameDelayed, 0.5f, false);
+			}
 		}
 	}
 	InitializePlayerState();

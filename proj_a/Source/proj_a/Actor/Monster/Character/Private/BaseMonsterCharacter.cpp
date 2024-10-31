@@ -19,7 +19,7 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
 	SetReplicatingMovement(false);
 	
     PrimaryActorTick.bCanEverTick = true;
-	
+
 	GetMesh()->SetCollisionProfileName(UCollisionProfile::BlockAllDynamic_ProfileName);
 	GetMesh()->SetupAttachment(RootComponent);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -68,6 +68,9 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
 	}
 
 	this->MonsterId = -1;
+
+	GetCharacterMovement()->SetWalkableFloorAngle(85.f);
+	GetCharacterMovement()->MaxStepHeight = 200.f;
 }
 
 void ABaseMonsterCharacter::BeginPlay()
@@ -105,6 +108,10 @@ void ABaseMonsterCharacter::BeginPlay()
 
 	GetCapsuleComponent()->SetCollisionObjectType(ECC_MonsterChannel);
 	GetMesh()->SetCollisionObjectType(ECC_MonsterChannel);
+
+	//// monster collision object type
+	//GetCapsuleComponent()->SetCollisionProfileName(TEXT("Monster"));
+	//GetMesh()->SetCollisionProfileName(TEXT("Monster"));
 }
 
 void ABaseMonsterCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)

@@ -125,6 +125,7 @@ private:
 	FMessageQueue_T message_queue_;
 	std::map<std::string, ADPPlayerController*> player_controllers_;
 	ServerMessageHandler message_handler_;
+	bool bRestarted = false;
 
 private:
 	UPROPERTY()

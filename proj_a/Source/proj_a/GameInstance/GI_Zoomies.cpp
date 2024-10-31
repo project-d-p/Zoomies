@@ -383,7 +383,7 @@ void UGI_Zoomies::CheckSteamInit()
 
 void UGI_Zoomies::InitSteamAPI()
 {
-#if not EDITOR_MODE || LAN_MODE
+#if not (EDITOR_MODE || LAN_MODE)
 	if (!is_steamAPI_init && SteamAPI_Init())
 	{
 		is_steamAPI_init = true;
@@ -418,7 +418,7 @@ void UGI_Zoomies::InitSteamAPI()
 			0.5f, false);
 #endif
 		InitOnlineSubsystemSteam();
-#if not EDITOR_MODE || LAN_MODE
+#if not (EDITOR_MODE || LAN_MODE)
 	}
 #endif
 }

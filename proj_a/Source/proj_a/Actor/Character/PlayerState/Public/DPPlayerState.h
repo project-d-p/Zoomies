@@ -57,6 +57,7 @@ private:
 
 	void OnHostMigration(UWorld* World, UDataManager* DataManager);
 	void InitializePlayerState();
+	void SetPlayerNameDelayed();
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -64,4 +65,5 @@ private:
 	UPROPERTY()
 	UPlayerScoreData* PlayerScoreData = nullptr;
 	FDelegateHandle OnHostMigrationDelegate;
+	FTimerHandle PlayerNameTimerHandle;
 };

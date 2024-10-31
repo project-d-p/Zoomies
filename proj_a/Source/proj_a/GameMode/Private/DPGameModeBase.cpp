@@ -304,7 +304,11 @@ void ADPGameModeBase::InitializeGame()
 	int NumMaxPlayers = GameInstance->network_failure_manager_->GetDesiredMaxPlayers();
 	if (NumMaxPlayers == 0)
 	{
-		BlockingVolume = GetWorld()->SpawnActor<ABlockingBoxVolume>(ABlockingBoxVolume::StaticClass(), FVector(13380.0f, -270.0f, 140.0f), FRotator(0.0f, 0.0f, 0.0f));
+		BlockingVolume = GetWorld()->SpawnActor<ABlockingBoxVolume>(ABlockingBoxVolume::StaticClass(), FVector(13380.0f, -253.279822f, 60.0f), FRotator(0.0f, 0.0f, 0.0f));
+	}
+	else
+	{
+		bRestarted = true;
 	}
 	NumMaxPlayers = NumMaxPlayers > 0 ? NumMaxPlayers : NUM_OF_MAX_CLIENTS;
 	NetworkManager->SetGameStartCallback(NumMaxPlayers, [this]()
@@ -382,13 +386,16 @@ void ADPGameModeBase::Tick(float delta_time)
 #endif
 		if (bTimeSet == false)
 		{
-			ADPInGameState* GS = GetGameState<ADPInGameState>();
-			if (GS)
+			if (bRestarted == false)
 			{
-				FTimerHandle TimerHandle;
-				GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([GS]() {
-					GS->MulticastPlayerJob();
-				}), 0.5f, false); 
+				ADPInGameState* GS = GetGameState<ADPInGameState>();
+				if (GS)
+				{
+					FTimerHandle TimerHandle;
+					GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([GS]() {
+						GS->MulticastPlayerJob();
+					}), 2.0f, false); 
+				}
 			}
 			if (BlockingVolume)
 			{
@@ -431,7 +438,7 @@ void ADPGameModeBase::ProcessData(float delta_time)
 	if (bWallDisappear)
 	{
 		this->SpawnMonsters(delta_time);
-		// this->MonsterMoveSimulate(delta_time);
+		this->MonsterMoveSimulate(delta_time);
 	}
 	while (!this->message_queue_.empty())
 	{
