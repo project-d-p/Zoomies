@@ -1,8 +1,10 @@
 ﻿#include "JudgeGameMode.h"
 
 #include "CompileMode.h"
+#include "EngineUtils.h"
 #include "FNetLogger.h"
 #include "JudgeGameState.h"
+#include "JudgeLevelComponent.h"
 #include "JudgePlayerController.h"
 #include "JudgePlayerState.h"
 #include "Algo/MaxElement.h"
@@ -13,11 +15,12 @@ AJudgeGameMode::AJudgeGameMode()
 {
     PlayerStateClass = AJudgePlayerState::StaticClass();
     PlayerControllerClass = AJudgePlayerController::StaticClass();
+    // PlayerControllerClass = ADPPlayerController::StaticClass();
+    // DefaultPawnClass = ADynamicTexturedCharacter::StaticClass();
     GameStateClass = AJudgeGameState::StaticClass();
     
     TimerManager = CreateDefaultSubobject<UServerTimerManager>(TEXT("TimerManager"));
     ChatManager = CreateDefaultSubobject<UServerChatManager>(TEXT("ChatManager"));
-    
     bUseSeamlessTravel = true;
 }
 
@@ -27,6 +30,7 @@ FUIInitData AJudgeGameMode::GetUiData()
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         AJudgePlayerController* PC = Cast<AJudgePlayerController>(*It);
+        // ADPPlayerController* PC = Cast<ADPPlayerController>(*It);
         if (!PC)
             return UIData;
         AJudgePlayerState* PS = Cast<AJudgePlayerState>(PC->PlayerState);
@@ -95,7 +99,11 @@ void AJudgeGameMode::ProcessVotingResults()
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         AJudgePlayerController* PC = Cast<AJudgePlayerController>(*It);
+        // ADPPlayerController* PC = Cast<ADPPlayerController>(*It);
         check(PC)
+        // UJudgeLevelComponent* JLC = Cast<UJudgeLevelComponent>(PC->GetLevelComponent());
+        // check(JLC)
+        // JLC->SetOccupationeName(CurrentPlayerIndex - 1, OccupationToString(MostVotedOccupation));
         PC->SetOccupationeName(CurrentPlayerIndex - 1, OccupationToString(MostVotedOccupation));
     }
     TimerManager->StartTimer<AJudgeGameState>(WAIT_TIME, &AJudgeGameMode::EndTimer, this);
@@ -133,18 +141,16 @@ void AJudgeGameMode::HandleStartingNewPlayer_Implementation(APlayerController* N
 {
     Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 
-    UWorld* W = GetWorld();
-    check(W)
-
-    FActorSpawnParameters SpawnParams;
-    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-    const FVector Loc = FVector(0.069079f, 1673.736449f, 1410.153101f);
-    const FRotator Rot = FRotator(-30.0f, -90.0f, 0.0f);
-    ACameraActor* CamAct =
-        W->SpawnActor<ACameraActor>(ACameraActor::StaticClass(), Loc, Rot, SpawnParams);
-    check(CamAct)
-
-    AJudgePlayerController* PC = Cast<AJudgePlayerController>(NewPlayer);
-    check(PC)
-    PC->SetViewTarget(CamAct);
+    // UWorld* W = GetWorld();
+    // check(W)
+    //
+    // FActorSpawnParameters SpawnParams;
+    // SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+    // const FVector Loc = FVector(0.069079f, 1673.736449f, 1410.153101f);
+    // const FRotator Rot = FRotator(-30.0f, -90.0f, 0.0f);
+    // ACameraActor* CamAct =
+    //     W->SpawnActor<ACameraActor>(ACameraActor::StaticClass(), Loc, Rot, SpawnParams);
+    // check(CamAct)
+    //
+    // NewPlayer->SetViewTarget(CamAct);
 }

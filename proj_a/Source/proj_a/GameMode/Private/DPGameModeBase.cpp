@@ -280,7 +280,7 @@ void ADPGameModeBase::Logout(AController* Exiting)
 	{
 		return ;
 	}
-	// ¿©±â °íÃÄ¾ß ÇÔ! ÀÌ¸§À¸·Î µÇ¾î ÀÖÀ½!! SteamID·Î ¹Ù²î¾î¾ß ÇÔ
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ä¾ï¿½ ï¿½ï¿½! ï¿½Ì¸ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ç¾ï¿½ ï¿½ï¿½ï¿½ï¿½!! SteamIDï¿½ï¿½ ï¿½Ù²ï¿½ï¿½ï¿½ ï¿½ï¿½
 #if LAN_MODE || EDITOR_MODE
 	std::string key(TCHAR_TO_UTF8(*controller->PlayerState->GetPlayerName()));
 #else
@@ -394,7 +394,7 @@ void ADPGameModeBase::Tick(float delta_time)
 					FTimerHandle TimerHandle;
 					GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([GS]() {
 						GS->MulticastPlayerJob();
-					}), 2.0f, false); 
+					}), 10.0f, false); 
 				}
 			}
 			if (BlockingVolume)

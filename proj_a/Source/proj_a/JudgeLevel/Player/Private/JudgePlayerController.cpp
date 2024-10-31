@@ -1,17 +1,19 @@
 ﻿#include "JudgePlayerController.h"
 
 #include "DPPlayerController.h"
-#include "FNetLogger.h"
+#include "EngineUtils.h"
 #include "IChatGameMode.h"
 #include "JudgeGameMode.h"
-#include "JudgeGameState.h"
 #include "JudgeLevelUI.h"
 #include "JudgePlayerState.h"
 #include "NetworkMessage.h"
 #include "PathManager.h"
 #include "ServerChatManager.h"
 #include "Blueprint/UserWidget.h"
+#include "JudgeLevelComponent.h"
+#include "JudgeInputComponent.h"
 #include "GameFramework/GameStateBase.h"
+#include "Kismet/GameplayStatics.h"
 
 AJudgePlayerController::AJudgePlayerController()
 {
@@ -22,6 +24,15 @@ AJudgePlayerController::AJudgePlayerController()
 	{
 		JudgeLevelUI_BP = WidgetClassFinder.Class;
 	}
+	TextureTransferManager = CreateDefaultSubobject<UTextureTransferManager>(TEXT("TextureTransferManager"));
+	TextureTransferManager->OnDataTransferComplete.BindDynamic(TextureTransferManager, &UTextureTransferManager::OnTextureTransferComplete);
+	static ConstructorHelpers::FObjectFinder<USoundWave> SoundAsset(TEXT("/Game/sounds/effect/Turn/Chin.Chin"));
+	if (SoundAsset.Succeeded())
+	{
+		TurnStartSound = SoundAsset.Object;
+	}
+	
+	LevelComponent = CreateDefaultSubobject<UJudgeLevelComponent>(TEXT("ULC_JudgeLevel"));
 }
 
 void AJudgePlayerController::SetOccupationeName_Implementation(int index, const FString& Name)
@@ -29,32 +40,41 @@ void AJudgePlayerController::SetOccupationeName_Implementation(int index, const 
 	// XXX: If the client experiences slow loading times, issues may arise with the code below.
 	if (JudgeLevelUI)
 		return ;
-	// check(JudgeLevelUI)
-	JudgeLevelUI->SetBlockContent(ETextBlockType::Occupation, index, Name);
 }
 
 void AJudgePlayerController::InitializeUI_Implementation(const FUIInitData UIData)
 {
 	if (JudgeLevelUI)
 	{
-		for (int32 i = 0; i < UIData.PlayerData.Num(); i++)
-		{
-			const FPlayerInitData& PlayerData = UIData.PlayerData[i];
-    
-			JudgeLevelUI->SetBlockContent(ETextBlockType::Id, i, PlayerData.PlayerName);
-			JudgeLevelUI->SetBlockContent(ETextBlockType::Score, i, FString::FromInt(PlayerData.Score));
-			JudgeLevelUI->SetBlockContent(ETextBlockType::Occupation, i, PlayerData.Occupation);
-		}
 		JudgeLevelUI->SetVoterName(UIData.VoterName);
+		if (TurnStartSound)
+		{
+			float VolumeMultiplier = 0.2f;
+
+			UGameplayStatics::PlaySound2D(this, TurnStartSound, VolumeMultiplier);
+		}
 	}
 	GetWorldTimerManager().ClearTimer(TH);
 }
+
+
 
 void AJudgePlayerController::SetVoterName_Implementation(const FString& Name)
 {
 	if (JudgeLevelUI)
 	{
 		JudgeLevelUI->SetVoterName(Name);
+		if (TurnStartSound)  // 사운드가 유효한지 확인
+		{
+			// 2D 사운드를 재생 (UI에서 사용)
+			UGameplayStatics::PlaySound2D(this, TurnStartSound);
+			//log on screen
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("TurnStartSound"));
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("TurnStartSound is not valid"));
+		}
 	}
 }
 
@@ -92,6 +112,27 @@ void AJudgePlayerController::RequestUIData_Implementation()
 	}
 }
 
+void AJudgePlayerController::RequestCharacter_Implementation()
+{
+	if (this->GetCharacter() != nullptr)
+		return;
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADynamicTexturedCharacter::StaticClass(), FoundActors);
+	for (AActor* Actor : FoundActors)
+	{
+		ADynamicTexturedCharacter* FoundCharacter = Cast<ADynamicTexturedCharacter>(Actor);
+		if (FoundCharacter)
+		{
+			if (FoundCharacter->bPlayerAssigned == false)
+			{
+				Possess(FoundCharacter);
+				FoundCharacter->bPlayerAssigned = true;
+				break;
+			}
+		}
+	}
+}
+
 void AJudgePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -106,7 +147,10 @@ void AJudgePlayerController::BeginPlay()
 		bShowMouseCursor = true;
 		
 		GetWorldTimerManager().SetTimer(TH, this, &AJudgePlayerController::RequestUIData, 1.f, true);
+		RequestCharacter();
+		GetWorldTimerManager().SetTimer(CTH, this, &AJudgePlayerController::RequestCharacter, 1.f, true);
 	}
+	SetInputMode(FInputModeGameAndUI());
 }
 
 void AJudgePlayerController::SeamlessTravelFrom(APlayerController* OldPC)
@@ -131,4 +175,79 @@ void AJudgePlayerController::SeamlessTravelTo(APlayerController* NewPC)
 	AJudgePlayerState* GS = GetPlayerState<AJudgePlayerState>();
 	check(GS)
 	NGS->SetPlayerScoreData(GS->GetPlayerScoreData());
+}
+
+void AJudgePlayerController::PostSeamlessTravel()
+{
+	Super::PostSeamlessTravel();
+
+	// for (TActorIterator<ADynamicTexturedCharacter> It(GetWorld()); It; ++It)
+	// {
+	// 	if (It->bPlayerAssigned)
+	// 		continue;
+	// 	It->SetOwner(this);
+	// 	It->bPlayerAssigned = true;
+	// 	break;
+	// }
+}
+
+void AJudgePlayerController::ShowUI_ESC()
+{
+	if (JudgeLevelUI == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("JudgeLevelUI is nullptr"));
+		return;
+	}
+	UUserWidget* WidgetESC = Cast<UUserWidget>(JudgeLevelUI->GetWidgetFromName("WBP_Esc_Menu"));
+	if (WidgetESC)
+	{
+		ESlateVisibility CurrentVisibility = WidgetESC->GetVisibility();
+		if (CurrentVisibility == ESlateVisibility::Visible)
+		{
+			WidgetESC->SetVisibility(ESlateVisibility::Hidden);
+		}
+		else
+		{
+			WidgetESC->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DPPlayerController:: UIWidget->GetWidgetFromName(ESC) is nullptr"));
+	}
+}
+
+void AJudgePlayerController::ActivateCurrentComponent(AJudgePlayerController* LocalPlayerController)
+{
+	
+	if (LevelComponent)
+	{
+		LevelComponent->PrimaryComponentTick.bCanEverTick = true;
+		LevelComponent->Activate(true);
+		LevelComponent->SetComponentTickEnabled(true);
+		LevelComponent->RegisterComponent();
+		if (LocalPlayerController)
+		{
+			LevelComponent->Set_PC(LocalPlayerController);
+			if (!LocalPlayerController->IsLocalController())
+			{
+				UE_LOG(LogTemp, Warning, TEXT("PC_MatchingLobby::LocalPlayerController is not local controller"));
+				return ;
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("PC_MatchingLobby::LocalPlayerController is nullptr"));
+			return ;
+		}
+
+		if (UJudgeInputComponent* IC_Local = LevelComponent->GetInputComponent())
+		{
+			IC_Local->Activate(true);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("PC_MatchingLobby::InputComponent is nullptr"));
+		}
+	}
 }

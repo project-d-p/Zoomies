@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "CompileMode.h"
 #include "IChatGameMode.h"
 #include "ServerTimerManager.h"
 #include "ServerChatManager.h"
@@ -57,7 +58,7 @@ private:
     void EndTimer();
 
     int CurrentPlayerIndex = 0;
-    const float WAIT_TIME = 10.f;
+    float WAIT_TIME = Zoomies::JUDGE_TIME;
     TArray<EPlayerJob> PlayerVotes;
     
 protected:

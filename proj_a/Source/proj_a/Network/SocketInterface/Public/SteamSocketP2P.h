@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "SteamSocket.h"
+#include "Engine/World.h"
 #include "SteamSocketP2P.generated.h"
 
 UCLASS()

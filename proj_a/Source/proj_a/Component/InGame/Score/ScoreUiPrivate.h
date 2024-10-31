@@ -13,6 +13,14 @@ struct FPrivateScoreUiInitializer
 	UWorld* InWorld;
 	UPROPERTY()
 	UTextBlock* ScoreTextPrivate;
+	UPROPERTY()
+	UTextBlock* ScoreTextPrivate_Front;
+	UPROPERTY()
+	UTextBlock* ScoreTextPrivate_Back;
+	UPROPERTY()
+	UTextBlock* ScoreTextPrivate_Job;
+	UPROPERTY()
+	UTextBlock* ScoreTextPrivate_Total;
 };
 
 UCLASS()
@@ -24,7 +32,23 @@ public:
 	void InitScoreUiPrivate(const FPrivateScoreUiInitializer& Initializer);
 	UFUNCTION()
 	UTextBlock* GetPrivateScoreTextBlock() const;
+	UFUNCTION()
+	UTextBlock* GetPrivateScoreTextBlock_Front() const;
+	UFUNCTION()
+	UTextBlock* GetPrivateScoreTextBlock_Back() const;
+	UFUNCTION()
+	UTextBlock* GetPrivateScoreTextBlock_Job() const;
+	UFUNCTION()
+	UTextBlock* GetPrivateScoreTextBlock_Total() const;
 private:
 	UPROPERTY()
 	UTextBlock* PrivateScoreTextBlock = nullptr;
+	UPROPERTY()
+	UTextBlock* PrivateScoreTextBlock_Front = nullptr;
+	UPROPERTY()
+	UTextBlock* PrivateScoreTextBlock_Back = nullptr;
+	UPROPERTY()
+	UTextBlock* PrivateScoreTextBlock_Job = nullptr;
+	UPROPERTY()
+	UTextBlock* PrivateScoreTextBlock_Total = nullptr;
 };
