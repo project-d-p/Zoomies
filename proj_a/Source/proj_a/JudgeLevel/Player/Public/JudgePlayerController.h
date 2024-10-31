@@ -5,7 +5,10 @@
 #include "JudgeLevelUI.h"
 #include "JudgeGameMode.h"
 #include "EnumTypes.h"
+#include "TextureTransferManager.h"
 #include "JudgePlayerController.generated.h"
+
+class UJudgeLevelComponent;
 
 // Enum for player jobs
 inline FString OccupationToString(EPlayerJob Occupation)
@@ -56,20 +59,33 @@ public:
 	UFUNCTION(Server, Reliable)
 	void RequestUIData();
 
+	void ShowUI_ESC();
+
+	void ActivateCurrentComponent(AJudgePlayerController* LocalPlayerController);
+	void DeactivateCurrentComponent();
+
+	UFUNCTION(Server, Reliable)
+	void RequestCharacter();
+
 	UJudgeLevelUI* GetJudgeLevelUI() const { return JudgeLevelUI; }
 protected:
 	virtual void BeginPlay() override;
 	virtual void SeamlessTravelFrom(APlayerController* OldPC) override;
 	virtual void SeamlessTravelTo(APlayerController* NewPC) override;
-	
+	virtual void PostSeamlessTravel() override;
 private:
 	bool IsBeginPlay = false;
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UJudgeLevelUI> JudgeLevelUI_BP;
-
 	UPROPERTY()
 	UJudgeLevelUI* JudgeLevelUI;
+	UPROPERTY()
+	UTextureTransferManager* TextureTransferManager;
+
+	USoundBase *TurnStartSound;
+	UJudgeLevelComponent* LevelComponent = nullptr;
 
 	FTimerHandle TH;
+	FTimerHandle CTH;
 };

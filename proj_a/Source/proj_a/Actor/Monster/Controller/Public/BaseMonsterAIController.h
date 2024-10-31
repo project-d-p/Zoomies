@@ -19,7 +19,15 @@ class PROJ_A_API ABaseMonsterAIController : public AAIController, public ICrowdA
 
 public:
 	ABaseMonsterAIController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-	int32 GetMonsterId() const { return Cast<ABaseMonsterCharacter>(GetCharacter())->MonsterId; }
+	int32 GetMonsterId() const
+	{
+		ABaseMonsterCharacter* MonsterCharacter = Cast<ABaseMonsterCharacter>(GetCharacter());
+		if (MonsterCharacter == nullptr)
+		{
+			return -1;
+		}
+		return MonsterCharacter->MonsterId;
+	}
 	void RemovePawnAndController();
 	void TakeMonsterDamage(float dmg);
 	virtual void SimulateMovement(float delta_time);

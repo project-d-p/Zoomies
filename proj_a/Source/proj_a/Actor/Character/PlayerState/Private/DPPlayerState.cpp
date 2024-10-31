@@ -126,12 +126,15 @@ void ADPPlayerState::BeginPlay()
 		if (MainLevelComponent)
 		{
 			UDPIngameWidget* InGameWidget = Cast<UDPIngameWidget>(MainLevelComponent->GetInGameWidget());
-			if (InGameWidget)
+			if (InGameWidget == nullptr)
 			{
-				PlayerScoreData->OnDataChanged.AddDynamic(InGameWidget, &UDPIngameWidget::OnScoreChanged);
-
-				GetWorld()->GetTimerManager().SetTimer(PlayerNameTimerHandle, this, &ADPPlayerState::SetPlayerNameDelayed, 0.5f, false);
+				FNetLogger::EditerLog(FColor::Red, TEXT("InGameWidget is nullptr"));
+				return;
 			}
+			PlayerScoreData->OnDataChanged.AddDynamic(InGameWidget, &UDPIngameWidget::OnScoreChanged);
+			PlayerScoreData->SetPlayerName(this->GetPlayerName());
+			PlayerScoreData->SetPlayerId(this->GetPlayerId());
+			GetWorld()->GetTimerManager().SetTimer(PlayerNameTimerHandle, this, &ADPPlayerState::SetPlayerNameDelayed, 0.5f, false);
 		}
 	}
 	InitializePlayerState();
@@ -141,7 +144,6 @@ void ADPPlayerState::BeginPlay()
 void ADPPlayerState::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
 	if (GameInstance)
 	{

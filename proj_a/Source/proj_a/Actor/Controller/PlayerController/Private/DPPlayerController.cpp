@@ -11,8 +11,11 @@
 #include "MainLevelComponent.h"
 #include "ResultLevelComponent.h"
 #include "CompileMode.h"
+#include "EngineUtils.h"
+#include "JudgeLevelComponent.h"
 #include "LobbyLevelComponent.h"
 #include "Chaos/ChaosPerfTest.h"
+#include "Kismet/GameplayStatics.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 DEFINE_LOG_CATEGORY(LogNetwork);
@@ -25,17 +28,22 @@ ADPPlayerController::ADPPlayerController()
 	NetworkManager = CreateDefaultSubobject<UClientNetworkManager>(TEXT("NetworkManager"));
 #endif
 	
+	TextureTransferManager = CreateDefaultSubobject<UTextureTransferManager>(TEXT("DataTransferManager"));
+	TextureTransferManager->OnDataTransferComplete.BindDynamic(TextureTransferManager, &UTextureTransferManager::OnTextureTransferComplete);
 	PrivateScoreManager = CreateDefaultSubobject<UPrivateScoreManager>(TEXT("PrivateScoreManager"));
 	
 	UBaseLevelComponent* MainLevelComponet = CreateDefaultSubobject<UMainLevelComponent>(TEXT("MainLevelComponent"));
+	// UBaseLevelComponent* JudgeLevelComponent = CreateDefaultSubobject<UJudgeLevelComponent>(TEXT("JudgeLevelComponent"));
 	UBaseLevelComponent* ResultLevelComponet = CreateDefaultSubobject<UResultLevelComponent>(TEXT("ResultLevelComponent"));
 	UBaseLevelComponent* LobbyLevelComponent = CreateDefaultSubobject<ULobbyLevelComponent>(TEXT("LobbyLevelComponent"));
 
 	MainLevelComponet->InitializeController(this);
 	ResultLevelComponet->InitializeController(this);
 	LobbyLevelComponent->InitializeController(this);
+	// JudgeLevelComponent->InitializeController(this);
 	
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::MAIN), MainLevelComponet);
+	// LevelComponents.Add(static_cast<uint32>(ELevelComponentType::JUDGE), JudgeLevelComponent);
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::RESULT), ResultLevelComponet);
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::LOBBY), LobbyLevelComponent);
 	LevelComponents.Add(static_cast<uint32>(ELevelComponentType::NONE), nullptr);
@@ -115,7 +123,7 @@ void ADPPlayerController::ClientDestroySession_Implementation()
 		IOnlineSessionPtr SessionInt = GameInstance->GetOnlineSessionInterface();
 		if (SessionInt.IsValid())
 		{
-			SessionInt->DestroySession(NAME_GameSession);
+			SessionInt->DestroySession(GameInstance->SessionName);
 		}
 	}
 }
@@ -271,4 +279,71 @@ void ADPPlayerController::GetSeamlessTravelActorList(bool bToTransitionMap, TArr
 		NetworkManager->Shutdown();
 	}
 	this->SwitchLevelComponent(ELevelComponentType::NONE);
+}
+
+void ADPPlayerController::getUIWidget()
+{
+	if (UWorld* World = GetWorld())
+	{
+		FString CurrentLevelName = World->GetMapName();
+		if (CurrentLevelName.Contains("main"))
+		{
+			UMainLevelComponent* ML = Cast<UMainLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::MAIN)]);
+			UIWidget = ML->GetInGameWidget();
+		}
+	}
+	if (UIWidget == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DPPlayerController::getUIWidget: Widget is nullptr"));
+	}
+}
+
+void ADPPlayerController::RemoveUIWidget()
+{
+	if (UIWidget != nullptr)
+	{
+		UIWidget->RemoveFromParent();
+		UIWidget = nullptr;
+		UE_LOG(LogTemp, Log, TEXT("DPPlayerController::RemoveMatchLobbyUI: Widget successfully removed from viewport and cleared."));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DPPlayerController::RemoveMatchLobbyUI: MatchLobbyWidget is nullptr, nothing to remove."));
+	}
+}
+
+void ADPPlayerController::ShowUI_ESC()
+{
+	if (UIWidget == nullptr)
+	{
+		getUIWidget();
+	}
+	if (UIWidget)
+	{
+		UUserWidget* WidgetESC = Cast<UUserWidget>(UIWidget->GetWidgetFromName("WBP_Esc_Menu"));
+		if (WidgetESC)
+		{
+			ESlateVisibility CurrentVisibility = WidgetESC->GetVisibility();
+			if (CurrentVisibility == ESlateVisibility::Visible)
+			{
+				WidgetESC->SetVisibility(ESlateVisibility::Hidden);
+				bShowMouseCursor = false;
+				SetInputMode(FInputModeGameOnly());
+			}
+			else
+			{
+				WidgetESC->SetVisibility(ESlateVisibility::Visible);
+				bShowMouseCursor = true;
+				SetInputMode(FInputModeGameAndUI());
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("DPPlayerController:: UIWidget->GetWidgetFromName(ESC) is nullptr"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DPPlayerController:: UIWidget is nullptr"));
+	}
 }

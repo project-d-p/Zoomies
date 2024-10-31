@@ -15,6 +15,7 @@ public:
 
 	virtual void Activate(bool bReset=false) override;
 	virtual void Deactivate() override;
+	void Set_PC(ADPPlayerController* PlayerController);
 	
 private:
 	void BindBasicLevelActions();
@@ -36,4 +37,8 @@ private:
 	class UInputAction* RotateAction;
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* RunAction;
+
+
+protected:
+	ADPPlayerController* PC = nullptr;
 };

@@ -37,7 +37,6 @@ void AResultLevelGameMode::Logout(AController* Exiting)
 
 void AResultLevelGameMode::SpawnNewPlayerPawn(AController* PC)
 {
-	// �� ĳ���� ���� ���� ���� ĳ���� ���� ���� ����
 	static int i = 0;
 	if (i == 2)
 	{
@@ -49,7 +48,7 @@ void AResultLevelGameMode::SpawnNewPlayerPawn(AController* PC)
 		{-527.514681,138.648437,85.462503}
 	};
 
-	FVector SpawnLocation = Location[i++];  // ������ ���� ��ġ ����
+	FVector SpawnLocation = Location[i++];
 
 	ADPCharacter* NewCharacter = GetWorld()->SpawnActor<ADPCharacter>(DefaultPawnClass, SpawnLocation, FRotator::ZeroRotator);
 	if (NewCharacter)
