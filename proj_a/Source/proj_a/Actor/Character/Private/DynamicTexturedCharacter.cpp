@@ -30,7 +30,7 @@ void ADynamicTexturedCharacter::BeginPlay()
 
 	// TryInItializeDynamicTexture();
 	dynamicMaterialInstance = UMaterialInstanceDynamic::Create(GetMesh()->GetMaterial(0), this, TEXT("DynamicMaterial"));
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle_InitializeDynamicTexture, this, &ADynamicTexturedCharacter::TryInItializeDynamicTexture, 0.5f, true);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_InitializeDynamicTexture, this, &ADynamicTexturedCharacter::TryInItializeDynamicTexture, 1.5f, true);
 }
 
 void ADynamicTexturedCharacter::OnRep_PlayerState()
