@@ -202,6 +202,10 @@ MonsterPosition MessageMaker::MakeMonsterPositionMessage(ABaseMonsterAIControlle
 		Monster_Controller->RemovePawnAndController();
 		return msg;
 	}
+	if (Monster_Controller->GetMonsterId() == -1)
+	{
+		return msg;
+	}
 	msg.set_monster_id(TCHAR_TO_UTF8(*FString::FromInt(Monster_Controller->GetMonsterId())));
 	Vec3 position;
 	

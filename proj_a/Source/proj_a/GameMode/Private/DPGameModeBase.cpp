@@ -280,7 +280,6 @@ void ADPGameModeBase::Logout(AController* Exiting)
 	{
 		return ;
 	}
-	// ���� ���ľ� ��! �̸����� �Ǿ� ����!! SteamID�� �ٲ��� ��
 #if LAN_MODE || EDITOR_MODE
 	std::string key(TCHAR_TO_UTF8(*controller->PlayerState->GetPlayerName()));
 #else
@@ -418,6 +417,7 @@ void ADPGameModeBase::Tick(float delta_time)
 			}
 			TimerManager->StartTimer<ADPInGameState>(PlayTime, &ADPGameModeBase::EndGame, this);
 		}
+
 		this->ProcessData(delta_time);
 #if EDITOR_MODE != 1
 	}

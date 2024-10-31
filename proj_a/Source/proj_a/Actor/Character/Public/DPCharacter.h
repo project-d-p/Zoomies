@@ -72,6 +72,9 @@ public:	// component
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MatchLobby")
 	UWidgetComponent* LobbyInfoWidgetComponent = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MatchLobby")
+	UWidgetComponent* LobbyInfoWidgetComponentBack = nullptr;
 
 	UPROPERTY()
 	TSubclassOf<UNameTag> NameTag_BP;
@@ -104,6 +107,7 @@ public:	// component
 	void ApplyKockback(const FHitResult& HitResult);
 	UFUNCTION(NetMulticast, Reliable)
 	void SetNameTag();
+	void UpdateLobbyInfo();
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void SetCrownMesh();
 
@@ -167,4 +171,7 @@ public:
 	bool mIsAtReturnPlace{ true };
 	UPROPERTY(BlueprintReadWrite)
 	bool isKnockback{ false };
+
+	UPROPERTY(BlueprintReadWrite)
+	bool canInteract{ false };
 };

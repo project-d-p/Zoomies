@@ -30,4 +30,5 @@ private:
 	UClientTimerManager* TimerManager;
 	UPROPERTY()
 	UChatManager* ChatManager;
+    USoundBase *TurnStartSound;
 };

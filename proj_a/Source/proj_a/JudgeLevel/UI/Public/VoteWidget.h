@@ -9,6 +9,7 @@
 #include "Components/UniformGridPanel.h"
 #include "ScoreTypes.h"
 #include "Components/TextBlock.h"
+#include "Components/VerticalBox.h"
 #include "VoteWidget.generated.h"
 
 // refer ScoreTypes.h
@@ -35,7 +36,15 @@ class PROJ_A_API UVoteWidget : public UUserWidget
 
 public:
     EPlayerJob GetVote() const { return CurrentVoterOcc; }
-    void SetVoterName(const FString& Name) { VoterName->SetText(FText::FromString(Name)); }
+    void SetVoterName(const FString& Name)
+    {
+        VoterName->SetText(FText::FromString(Name));
+        TargetUserName->SetText(FText::FromString(Name));
+    }
+    UPROPERTY(meta = (BindWidget))
+    UVerticalBox* VoteButtonsGrid;
+    TArray<EPlayerJob> OccupationTypes;
+    EPlayerJob CurrentVoterOcc;
     
 protected:
     UPROPERTY(meta = (BindWidget))
@@ -47,13 +56,12 @@ protected:
     UPROPERTY(meta = (BindWidget))
     UCanvasPanel* VotableListPannel;
     UPROPERTY(meta = (BindWidget))
-    UUniformGridPanel* VoteButtonsGrid;
+    UTextBlock* TargetUserName;
+    
     
     virtual void NativeConstruct() override;
 
 private:
-    TArray<EPlayerJob> OccupationTypes;
-    EPlayerJob CurrentVoterOcc;
 
     void InitializEPlayerJobs();
     UFUNCTION()

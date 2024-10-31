@@ -57,10 +57,14 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ClientDestroySession();
 
-	/// TEST
 	UFUNCTION(Client, Reliable)
 	void ConnectToServer(ELevelComponentType Type);
-	///
+	
+	UPROPERTY(BlueprintReadOnly, Category= "UI")
+	UUserWidget* UIWidget = nullptr;
+	void getUIWidget();
+	void RemoveUIWidget();
+	void ShowUI_ESC();
 	
 protected:
 	virtual void BeginPlay() override;
@@ -71,6 +75,7 @@ private:
 	void SetLevelComponent();
 	void DeactiveCurrentComponent();
 	void ActivateComponent(ELevelComponentType Type);
+	
 
 	// Move To PlayerState
 	UPROPERTY(VisibleAnywhere)

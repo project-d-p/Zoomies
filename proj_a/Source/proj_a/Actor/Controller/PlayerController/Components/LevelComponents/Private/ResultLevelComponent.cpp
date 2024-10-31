@@ -15,8 +15,8 @@ UResultLevelComponent::UResultLevelComponent()
 
 void UResultLevelComponent::SetFixedCameraView()
 {
-	ADPPlayerController* PC = Cast<ADPPlayerController>(GetOwner());
-	check(PC)
+	ADPPlayerController* PC2 = Cast<ADPPlayerController>(GetOwner());
+	check(PC2)
 	ADPCharacter* Char = Cast<ADPCharacter>(PC->GetCharacter());
 	check(Char)
 	Char->RemoveSpringArm();
@@ -45,4 +45,14 @@ void UResultLevelComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 void UResultLevelComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+}
+
+void UResultLevelComponent::Set_PC(ADPPlayerController* PlayerController)
+{
+	PC = PlayerController;
+	if (!PlayerController->IsLocalController())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UResultLevelComponent::PlayerController is not local"));
+	}
+	Cast<UBasicInputComponent>(InputComponent)->Set_PC(PlayerController);
 }

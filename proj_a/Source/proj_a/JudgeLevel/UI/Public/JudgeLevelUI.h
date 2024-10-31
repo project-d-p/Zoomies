@@ -37,20 +37,7 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* Time_Text;
 	UPROPERTY(meta = (BindWidget))
-	UVerticalBox* IdContainer;
-	UPROPERTY(meta = (BindWidget))
-	UVerticalBox* ScoreContainer;
-	UPROPERTY(meta = (BindWidget))
-	UVerticalBox* OccupationContainer;
-	UPROPERTY(meta = (BindWidget))
 	UVoteWidget* widget_vote = nullptr;
-
-	UPROPERTY()
-	TArray<UTextBlock*> IdBlocks;
-	UPROPERTY()
-	TArray<UTextBlock*> ScoreBlocks;
-	UPROPERTY()
-	TArray<UTextBlock*> OccupationBlocks;
 
 	TMap<ETextBlockType, TArray<UTextBlock*>> TextBlockMap;
 };

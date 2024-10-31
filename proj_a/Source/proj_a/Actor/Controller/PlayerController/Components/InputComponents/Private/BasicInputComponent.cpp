@@ -141,3 +141,12 @@ void UBasicInputComponent::Run(const FInputActionValue& value)
 
 	Character->GetCharacterMovement()->MaxWalkSpeed = 1000.0f;
 }
+
+void UBasicInputComponent::Set_PC(ADPPlayerController* PlayerController)
+{
+	if (PlayerController == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("IC_MatchLobby::PlayerController is nullptr."));
+	}
+	PC = PlayerController;
+}

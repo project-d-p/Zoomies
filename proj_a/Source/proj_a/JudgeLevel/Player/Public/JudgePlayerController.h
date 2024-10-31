@@ -8,6 +8,8 @@
 #include "TextureTransferManager.h"
 #include "JudgePlayerController.generated.h"
 
+class UJudgeLevelComponent;
+
 // Enum for player jobs
 inline FString OccupationToString(EPlayerJob Occupation)
 {
@@ -57,6 +59,11 @@ public:
 	UFUNCTION(Server, Reliable)
 	void RequestUIData();
 
+	void ShowUI_ESC();
+
+	void ActivateCurrentComponent(AJudgePlayerController* LocalPlayerController);
+	void DeactivateCurrentComponent();
+
 	UFUNCTION(Server, Reliable)
 	void RequestCharacter();
 
@@ -75,6 +82,9 @@ private:
 	UJudgeLevelUI* JudgeLevelUI;
 	UPROPERTY()
 	UTextureTransferManager* TextureTransferManager;
+
+	USoundBase *TurnStartSound;
+	UJudgeLevelComponent* LevelComponent = nullptr;
 
 	FTimerHandle TH;
 	FTimerHandle CTH;

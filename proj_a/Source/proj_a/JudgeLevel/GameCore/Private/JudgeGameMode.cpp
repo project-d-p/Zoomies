@@ -21,7 +21,6 @@ AJudgeGameMode::AJudgeGameMode()
     
     TimerManager = CreateDefaultSubobject<UServerTimerManager>(TEXT("TimerManager"));
     ChatManager = CreateDefaultSubobject<UServerChatManager>(TEXT("ChatManager"));
-    
     bUseSeamlessTravel = true;
 }
 
@@ -31,6 +30,7 @@ FUIInitData AJudgeGameMode::GetUiData()
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         AJudgePlayerController* PC = Cast<AJudgePlayerController>(*It);
+        // ADPPlayerController* PC = Cast<ADPPlayerController>(*It);
         if (!PC)
             return UIData;
         AJudgePlayerState* PS = Cast<AJudgePlayerState>(PC->PlayerState);
