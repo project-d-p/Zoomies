@@ -24,8 +24,10 @@ public:
 	void ResetInstance();
 	void TryReset();
 	void Init();
-	void SetSessionName(FName Name) { DesiredSessionName = Name; }
+	void SetSessionName(FName Name) { SessionNameGI = Name; }
 
+	bool bMigrating;
+	FName SessionNameGI;
 private:
 	void ShowCapturedTextureToPlayer(UTextureRenderTarget2D* CapturedTexture, const TArray<FColor>& Bitmap);
 	void DestroyPreviousSession(FOnSessionDestroyedCallback OnSessionDestroyedCallback);
@@ -63,7 +65,5 @@ private:
 	UPROPERTY()
 	UTexture2D* CapturedTexture2D;
 	TSubclassOf<UCapturedImageWidget> CapturedImageWidgetClass;
-	bool bMigrating;
 
-	FName SessionNameGI;
 };

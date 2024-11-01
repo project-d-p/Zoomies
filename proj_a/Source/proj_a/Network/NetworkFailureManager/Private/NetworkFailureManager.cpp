@@ -454,6 +454,8 @@ void UNetworkFailureManager::CreateNewSessionMetaData(UWorld* World, const FUniq
 
 	DesiredMapName = FName(*FString::Printf(TEXT("%s"), *World->GetMapName()));
 	FNetLogger::EditerLog(FColor::Red, TEXT("New Map Name: %s"), *DesiredMapName.ToString());
+
+	SessionNameGI = DesiredSessionName;
 }
 
 void UNetworkFailureManager::CaptureViewport()
@@ -486,6 +488,8 @@ void UNetworkFailureManager::CaptureViewport()
 
 void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 {
+	FNetLogger::EditerLog(FColor::Green, TEXT("Name of Session: %s"), *SessionNameGI.ToString());
+	FNetLogger::LogError(TEXT("Name of Session: %s"), *SessionNameGI.ToString());
 	FNamedOnlineSession* CurrentSession = SessionInterface->GetNamedSession(SessionNameGI);
 	if (CurrentSession)
 	{
@@ -564,6 +568,7 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 	else
 	{
 		FNetLogger::EditerLog(FColor::Green, TEXT("CurrentSession is null"));
+		FNetLogger::LogError(TEXT("CurrentSession is null"));
 	}
 }
 

@@ -173,7 +173,7 @@ void UGI_Zoomies::CreateSession()
 	SessionName = FName(*FString::Printf(TEXT("Zoomies_%s"), *FGuid::NewGuid().ToString()));
 	network_failure_manager_->SetSessionName(SessionName);
 	session_settings_->Set(FName("SessionName"), SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
-	
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("SessionName: %s"), *SessionName.ToString());
 	// Create session
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
 	session_interface_->CreateSession(*local_player->GetPreferredUniqueNetId(), SessionName, *session_settings_);
@@ -239,7 +239,7 @@ bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& se
 		SessionName = FName(*search_result.Session.GetSessionIdStr());
 		network_failure_manager_->SetSessionName(SessionName);
 	}
-	
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("SessionName: %s"), *SessionName.ToString());
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
 	session_interface_->JoinSession(*local_player->GetPreferredUniqueNetId(), SessionName, search_result);
 	return true;
@@ -264,6 +264,7 @@ void UGI_Zoomies::OnInviteAccepted(const bool bWasSuccessful, const int32 LocalP
 		
 		SessionName = FName(*InviteResult.Session.GetSessionIdStr());
 		network_failure_manager_->SetSessionName(SessionName);
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("SessionName: %s"), *SessionName.ToString());
 
 		const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
 		session_interface_->JoinSession(*local_player->GetPreferredUniqueNetId(), SessionName, InviteResult);
@@ -433,15 +434,16 @@ void UGI_Zoomies::OnDestroyComplete(FName session_name, bool bWasSuccessful)
 
 bool UGI_Zoomies::ResetSession()
 {
-	if (session_interface_.IsValid())
+	if (session_interface_.IsValid() && !network_failure_manager_->bMigrating)
 	{
-		if (session_interface_->GetNamedSession(SessionName) != nullptr)
+		if (session_interface_->GetNamedSession(network_failure_manager_->SessionNameGI) != nullptr)
 		{
 			dh_on_destroy_complete = session_interface_->AddOnDestroySessionCompleteDelegate_Handle(
 				FOnDestroySessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::OnDestroyComplete)
 			);
-			session_interface_->DestroySession(SessionName);
+			session_interface_->DestroySession(network_failure_manager_->SessionNameGI);
 			SessionName = "";
+			network_failure_manager_->SessionNameGI = FName("");
 			
 			FriendsList.Empty();
 			FriendsArray.Empty();
