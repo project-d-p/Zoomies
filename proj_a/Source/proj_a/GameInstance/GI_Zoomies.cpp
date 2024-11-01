@@ -442,7 +442,7 @@ bool UGI_Zoomies::ResetSession()
 			
 			FriendsList.Empty();
 			FriendsArray.Empty();
-			return false;
+			return true;
 		}
 	}
 	UE_LOG(LogTemp, Log, TEXT("no existing session to reset"));
