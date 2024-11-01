@@ -65,5 +65,5 @@ private:
 	TSubclassOf<UCapturedImageWidget> CapturedImageWidgetClass;
 	bool bMigrating;
 
-	FName SessionName;
+	FName SessionNameGI;
 };

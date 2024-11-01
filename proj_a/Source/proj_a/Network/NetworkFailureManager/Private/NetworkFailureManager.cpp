@@ -486,7 +486,7 @@ void UNetworkFailureManager::CaptureViewport()
 
 void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 {
-	FNamedOnlineSession* CurrentSession = SessionInterface->GetNamedSession(SessionName);
+	FNamedOnlineSession* CurrentSession = SessionInterface->GetNamedSession(SessionNameGI);
 	if (CurrentSession)
 	{
 		TArray<FUniqueNetIdRef> RegisteredPlayers;
