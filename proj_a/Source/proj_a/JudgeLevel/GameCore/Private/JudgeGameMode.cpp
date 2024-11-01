@@ -111,7 +111,10 @@ void AJudgeGameMode::ProcessVotingResults()
 
 void AJudgeGameMode::EndTimer()
 {
-    constexpr int TOTAL_PLAYER = Zoomies::MAX_PLAYERS;
+    UGI_Zoomies* GI = Cast<UGI_Zoomies>(GetGameInstance());
+    check(GI)
+    
+    constexpr int TOTAL_PLAYER = GI->player_count;
     if (CurrentPlayerIndex++ < TOTAL_PLAYER)
     {
         AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
