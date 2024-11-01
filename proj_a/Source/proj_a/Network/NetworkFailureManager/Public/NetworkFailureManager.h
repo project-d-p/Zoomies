@@ -24,6 +24,7 @@ public:
 	void ResetInstance();
 	void TryReset();
 	void Init();
+	void SetSessionName(FName Name) { DesiredSessionName = Name; }
 
 private:
 	void ShowCapturedTextureToPlayer(UTextureRenderTarget2D* CapturedTexture, const TArray<FColor>& Bitmap);
@@ -63,4 +64,6 @@ private:
 	UTexture2D* CapturedTexture2D;
 	TSubclassOf<UCapturedImageWidget> CapturedImageWidgetClass;
 	bool bMigrating;
+
+	FName SessionName;
 };

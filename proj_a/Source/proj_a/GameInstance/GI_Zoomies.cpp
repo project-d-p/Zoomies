@@ -171,6 +171,7 @@ void UGI_Zoomies::CreateSession()
 	   FOnCreateSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onCreateComplete));
 	// set SessionName to Unique
 	SessionName = FName(*FString::Printf(TEXT("Zoomies_%s"), *FGuid::NewGuid().ToString()));
+	network_failure_manager_->SetSessionName(SessionName);
 	session_settings_->Set(FName("SessionName"), SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
 	
 	// Create session
@@ -441,7 +442,7 @@ bool UGI_Zoomies::ResetSession()
 			
 			FriendsList.Empty();
 			FriendsArray.Empty();
-			return true;
+			return false;
 		}
 	}
 	UE_LOG(LogTemp, Log, TEXT("no existing session to reset"));
