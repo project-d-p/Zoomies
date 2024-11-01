@@ -232,10 +232,12 @@ bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& se
 	if (search_result.Session.SessionSettings.Get(FName("SessionName"), RetrievedSessionName))
 	{
 		SessionName = FName(*RetrievedSessionName);
+		network_failure_manager_->SetSessionName(SessionName);
 	}
 	else
 	{
 		SessionName = FName(*search_result.Session.GetSessionIdStr());
+		network_failure_manager_->SetSessionName(SessionName);
 	}
 	
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
@@ -261,6 +263,7 @@ void UGI_Zoomies::OnInviteAccepted(const bool bWasSuccessful, const int32 LocalP
 			FOnJoinSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onJoinComplete));
 		
 		SessionName = FName(*InviteResult.Session.GetSessionIdStr());
+		network_failure_manager_->SetSessionName(SessionName);
 
 		const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
 		session_interface_->JoinSession(*local_player->GetPreferredUniqueNetId(), SessionName, InviteResult);
