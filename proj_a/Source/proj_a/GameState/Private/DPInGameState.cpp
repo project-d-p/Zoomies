@@ -22,6 +22,12 @@ ADPInGameState::ADPInGameState()
 	{
 		WidgetClass = WidgetBPClass.Class;
 	}
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetLoadingClass(TEXT("/Game/widget/widget_loading.widget_loading_C"));
+	if (WidgetLoadingClass.Succeeded())
+	{
+		WidgetLoading = WidgetLoadingClass.Class;
+	}
 }
 
 void ADPInGameState::MulticastPlayerJob_Implementation() const
@@ -76,14 +82,14 @@ void ADPInGameState::BeginPlay()
 			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &ADPInGameState::OnHostMigration);
 		}
 	}
-	// ADPPlayerController* PlayerController = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
-	// if (PlayerController)
-	// {
-	// 	PlayerController->SwitchLevelComponent(ELevelComponentType::MAIN);
-	// }
 	if (!JobWidgetInstance)
 	{
 		JobWidgetInstance = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+	}
+	if (!LoadingWidgetInstance)
+	{
+		LoadingWidgetInstance = CreateWidget<UDPLoadingWidget>(GetWorld(), WidgetLoading);
+		LoadingWidgetInstance->AddToViewport(99);
 	}
 }
 
@@ -95,6 +101,14 @@ void ADPInGameState::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	if (GameInstance)
 	{
 		GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
+	}
+}
+
+void ADPInGameState::LevelAllReady_Implementation()
+{
+	if (LoadingWidgetInstance)
+	{
+		LoadingWidgetInstance->RemoveFromParent();
 	}
 }
 
@@ -126,3 +140,5 @@ void ADPInGameState::OnHostMigration(UWorld* World, UDataManager* DataManager)
 		DataManager->AddDataToSingle(TEXT("TimeData"), TimeData);
 	}
 }
+
+// /Script/UMGEditor.WidgetBlueprint'/Game/widget/widget_loading.widget_loading'

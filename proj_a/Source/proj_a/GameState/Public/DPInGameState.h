@@ -5,6 +5,7 @@
 #include "ClientScoreMananger.h"
 #include "ChatManager.h"
 #include "CompileMode.h"
+#include "DPLoadingWidget.h"
 #include "IChatGameState.h"
 #include "NetworkFailureManager.h"
 #include "DPInGameState.generated.h"
@@ -27,7 +28,9 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastPlayerJob() const;
-	
+	UFUNCTION(NetMulticast, Reliable)
+	void LevelAllReady();
+
 	/*
 	 * TEST: COMMENT
 	UPROPERTY(ReplicatedUsing=OnRep_ServerTraveled)
@@ -56,6 +59,9 @@ protected:
 	FDelegateHandle OnHostMigrationDelegate;
 
 	TSubclassOf<UUserWidget> WidgetClass;
+	TSubclassOf<UUserWidget> WidgetLoading;
+	UPROPERTY()
+	UDPLoadingWidget* LoadingWidgetInstance;
 	UPROPERTY()
 	UUserWidget* JobWidgetInstance;
 };

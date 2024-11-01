@@ -50,8 +50,13 @@ void ADPGameModeBase::OnGameStart()
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
 	check(GameInstance);
 
-	GameInstance->ChangeJoinInProgress(false);
-	this->bStart = true;
+	AsyncTask(ENamedThreads::GameThread, [this]()
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]() {
+			this->bStart = true;
+		}), 10.0f, false);
+	});
 }
 
 // Only Called in Server : PlayerController && PlayerState Automatically Travel
@@ -386,15 +391,14 @@ void ADPGameModeBase::Tick(float delta_time)
 #endif
 		if (bTimeSet == false)
 		{
+			bTimeSet = true;
 			if (bRestarted == false)
 			{
 				ADPInGameState* GS = GetGameState<ADPInGameState>();
 				if (GS)
 				{
-					FTimerHandle TimerHandle;
-					GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([GS]() {
-						GS->MulticastPlayerJob();
-					}), 10.0f, false); 
+					GS->LevelAllReady();
+					GS->MulticastPlayerJob();
 				}
 			}
 			if (BlockingVolume)
@@ -405,7 +409,6 @@ void ADPGameModeBase::Tick(float delta_time)
 			{
 				bWallDisappear = true;
 			}
-			bTimeSet = true;
 			for (auto& pair: player_controllers_)
 			{
 				ADPPlayerController* Controller = pair.second;
