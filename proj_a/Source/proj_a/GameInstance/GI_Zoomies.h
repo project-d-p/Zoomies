@@ -9,6 +9,7 @@
 #include "Interfaces/OnlineSessionInterface.h"
 #include "ScoreTypes.h"
 #include "proj_a/MatchingLobby/TYPE_MatchingLobby/TYPE_MatchingLobby.h"
+#include "CompileMode.h"
 #include "GI_Zoomies.generated.h"
 
 UCLASS()

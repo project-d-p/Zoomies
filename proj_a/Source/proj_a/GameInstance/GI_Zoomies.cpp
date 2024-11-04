@@ -10,6 +10,7 @@
 #include "Online/OnlineSessionNames.h"
 #include "Interfaces/OnlineFriendsInterface.h"
 #include "Online.h"
+#include "EntitySystem/MovieSceneComponentDebug.h"
 #include "Interfaces/OnlinePresenceInterface.h"
 #include "proj_a/MatchingLobby/TYPE_MatchingLobby/TYPE_MatchingLobby.h"
 
