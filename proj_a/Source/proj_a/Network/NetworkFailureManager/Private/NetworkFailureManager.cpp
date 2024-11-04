@@ -495,7 +495,8 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 	{
 		TArray<FUniqueNetIdRef> RegisteredPlayers;
 		TSet<FString> UniqueNicknames;  // 중복 확인을 위한 닉네임 저장소
-		
+
+		FNetLogger::LogError(TEXT("Num of Registered Players: %d"), CurrentSession->RegisteredPlayers.Num());
 		for (int32 i = 0; i < CurrentSession->RegisteredPlayers.Num(); i++)
 		{
 			FUniqueNetIdRef PlayerID = CurrentSession->RegisteredPlayers[i];

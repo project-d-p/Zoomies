@@ -76,7 +76,11 @@ private:
 	int max_count = 5;
 	bool is_steamAPI_init = false;
 	bool is_online_session_steam_init=false;
+#if not (EDITOR_MODE || LAN_MODE)
+	bool bIsOnline = true;
+#else
 	bool bIsOnline = false;
+#endif
 
 	FTimerHandle UnusedHandle;
 	void CheckSteamInit();

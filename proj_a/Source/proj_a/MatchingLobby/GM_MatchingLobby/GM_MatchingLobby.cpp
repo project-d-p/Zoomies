@@ -32,6 +32,17 @@ void AGM_MatchingLobby::PostLogin(APlayerController* NewPlayer) {
 	
 	PCs.Add(NewPlayer);
 	CheckAndUpdateLobbyPlatform();
+
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	FName SessionNameGI = GameInstance->network_failure_manager_->SessionNameGI;
+	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
+	IOnlineSessionPtr SessionInterface = OnlineSubsystem->GetSessionInterface();
+	FNamedOnlineSession* CurrentSession = SessionInterface->GetNamedSession(SessionNameGI);
+	if (CurrentSession)
+	{
+		// FNetLogger::LogError(TEXT("Num of players: %d"), CurrentSession->NumOpenPublicConnections);
+			FNetLogger::LogError(TEXT("Num of players: %d"), CurrentSession->RegisteredPlayers.Num());
+	}
 }
 
 void AGM_MatchingLobby::Logout(AController* Exiting) {
