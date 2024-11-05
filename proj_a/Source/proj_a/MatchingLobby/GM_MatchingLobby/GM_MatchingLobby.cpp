@@ -34,7 +34,7 @@ void AGM_MatchingLobby::PostLogin(APlayerController* NewPlayer) {
 	
 	PCs.Add(NewPlayer);
 	CheckAndUpdateLobbyPlatform();
-
+	/* TEST CODE
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
 	FName SessionNameGI = GameInstance->network_failure_manager_->SessionNameGI;
 	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
@@ -75,6 +75,7 @@ void AGM_MatchingLobby::PostLogin(APlayerController* NewPlayer) {
 			FNetLogger::LogError(TEXT("Session does not exist"));
 		}
 	}
+	*/
 }
 
 void AGM_MatchingLobby::Logout(AController* Exiting) {

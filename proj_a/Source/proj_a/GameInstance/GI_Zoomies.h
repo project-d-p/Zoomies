@@ -19,6 +19,7 @@ class PROJ_A_API UGI_Zoomies : public UGameInstance
 public:
 	void OnHostDisconnected();
 	void HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type Arg, const FString& String);
+	FName GetSessionName() const;
 	virtual void Init() override;
 
 	// Matching starting function

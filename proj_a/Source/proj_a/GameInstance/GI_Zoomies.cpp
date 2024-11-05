@@ -14,6 +14,11 @@
 #include "Interfaces/OnlinePresenceInterface.h"
 #include "proj_a/MatchingLobby/TYPE_MatchingLobby/TYPE_MatchingLobby.h"
 
+FName UGI_Zoomies::GetSessionName() const
+{
+	return network_failure_manager_->SessionNameGI;
+}
+
 void UGI_Zoomies::Init()
 {
 	Super::Init();

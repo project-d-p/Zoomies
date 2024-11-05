@@ -106,6 +106,15 @@ void ADPPlayerState::SetPlayerNameDelayed()
 	PlayerScoreData->SetPlayerName(GetPlayerName());
 }
 
+void ADPPlayerState::SetSessionName()
+{
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (GameInstance)
+	{
+		SessionName = GameInstance->GetSessionName();
+	}
+}
+
 void ADPPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
@@ -139,6 +148,7 @@ void ADPPlayerState::BeginPlay()
 	}
 	InitializePlayerState();
 	PlayerScoreData->TestBroadcast();
+	SetSessionName();
 }
 
 void ADPPlayerState::EndPlay(const EEndPlayReason::Type EndPlayReason)
