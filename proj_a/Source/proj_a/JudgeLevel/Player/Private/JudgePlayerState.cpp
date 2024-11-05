@@ -4,7 +4,14 @@
 
 AJudgePlayerState::AJudgePlayerState()
 {
+	// SetSessionName();
+}
+
+void AJudgePlayerState::OnRep_UniqueId()
+{
 	SetSessionName();
+	
+	Super::OnRep_UniqueId();
 }
 
 void AJudgePlayerState::BeginPlay()

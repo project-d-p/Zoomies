@@ -22,6 +22,8 @@ public:
 	EPlayerJob GetPlayerJob() const { return PlayerJob; }
 	void SetPlayerScoreData(UPlayerScoreData* InPlayerScoreData) { PlayerScoreData = Cast<UPlayerScoreData>(InPlayerScoreData->Clone(this)); }
 
+	virtual void OnRep_UniqueId() override;
+
 protected:
 	virtual void BeginPlay() override;
 	void SetSessionName();

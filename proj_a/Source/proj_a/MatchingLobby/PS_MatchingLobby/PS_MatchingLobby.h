@@ -14,6 +14,7 @@ class PROJ_A_API APS_MatchingLobby : public APlayerState
 	GENERATED_BODY()
 public:
 	APS_MatchingLobby();
+	virtual void OnRep_UniqueId() override;
 protected:
 	void SetSessionName();
 	virtual void BeginPlay() override;

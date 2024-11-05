@@ -6,7 +6,13 @@
 
 APS_MatchingLobby::APS_MatchingLobby()
 {
+	// SetSessionName();
+}
+
+void APS_MatchingLobby::OnRep_UniqueId()
+{
 	SetSessionName();
+	Super::OnRep_UniqueId();
 }
 
 void APS_MatchingLobby::SetSessionName()

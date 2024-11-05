@@ -20,7 +20,7 @@ ADPPlayerState::ADPPlayerState()
 	PlayerScoreData->InitializeData();
 	FString PlayerName = FGuid::NewGuid().ToString();
 	APlayerState::SetPlayerName(PlayerName);
-	SetSessionName();
+	// SetSessionName();
 }
 
 UPlayerScoreComp* ADPPlayerState::GetPlayerScoreComp() const
@@ -50,6 +50,13 @@ void ADPPlayerState::SeamlessTravelTo(APlayerState* NewPlayerState)
 		JPS->SetPlayerScoreData(PlayerScoreData);
 		FNetLogger::EditerLog(FColor::Cyan, TEXT("Seamless: %s"), *(JPS->GetPlayerScoreData()->GetPlayerName()));
 	}
+}
+
+void ADPPlayerState::OnRep_UniqueId()
+{
+	SetSessionName();
+	
+	Super::OnRep_UniqueId();
 }
 
 void ADPPlayerState::CopyProperties(APlayerState* PlayerState)

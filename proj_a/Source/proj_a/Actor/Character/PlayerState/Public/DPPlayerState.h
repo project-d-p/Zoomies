@@ -45,6 +45,7 @@ public:
 	void IncreaseScore(const TArray<EAnimal>& InAnimals);
 
 	virtual void SeamlessTravelTo(APlayerState* NewPlayerState) override;
+	virtual void OnRep_UniqueId() override;
 protected:
 	virtual void CopyProperties(APlayerState* PlayerState) override;
 	
