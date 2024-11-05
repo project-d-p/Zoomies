@@ -20,6 +20,10 @@ public:
 	void SetPlayerJob(EPlayerJob InPlayerJob) { PlayerJob = InPlayerJob; }
 	EPlayerJob GetPlayerJob() const { return PlayerJob; }
 	void SetPlayerScoreData(UPlayerScoreData* InPlayerScoreData) { PlayerScoreData = Cast<UPlayerScoreData>(InPlayerScoreData->Clone(this)); }
+
+protected:
+	virtual void BeginPlay() override;
+	void SetSessionName();
 	
 private:
 	UPROPERTY()

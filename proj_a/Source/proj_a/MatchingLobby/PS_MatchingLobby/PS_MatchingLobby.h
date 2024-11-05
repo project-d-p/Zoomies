@@ -12,4 +12,8 @@ UCLASS()
 class PROJ_A_API APS_MatchingLobby : public APlayerState
 {
 	GENERATED_BODY()
+
+protected:
+	void SetSessionName();
+	virtual void BeginPlay() override;
 };
