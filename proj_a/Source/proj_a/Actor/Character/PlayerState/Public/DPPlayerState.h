@@ -45,7 +45,11 @@ public:
 	void IncreaseScore(const TArray<EAnimal>& InAnimals);
 
 	virtual void SeamlessTravelTo(APlayerState* NewPlayerState) override;
-	virtual void OnRep_UniqueId() override;
+
+	virtual void RegisterPlayerWithSession(bool bWasFromInvite) override;
+
+	/** Unregister a player with the online subsystem */
+	virtual void UnregisterPlayerWithSession() override;
 protected:
 	virtual void CopyProperties(APlayerState* PlayerState) override;
 	

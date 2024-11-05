@@ -11,7 +11,6 @@ class PROJ_A_API AJudgePlayerState : public APlayerState
 {
 	GENERATED_BODY()
 public:
-	AJudgePlayerState();
 	void SetCapturedAnimals(const TArray<TArray<EAnimal>>& CapturedAnimals) { FinalScoreData.CapturedAnimals = CapturedAnimals; }
 	void SetScoreDatas(const TArray<FScoreData>& ScoreDatas) { FinalScoreData.ScoreDatas = ScoreDatas; }
 	void SetIsDetected(bool bIsDetected) { if(PlayerScoreData) {PlayerScoreData->SetIsDetected(bIsDetected);} }
@@ -22,10 +21,12 @@ public:
 	EPlayerJob GetPlayerJob() const { return PlayerJob; }
 	void SetPlayerScoreData(UPlayerScoreData* InPlayerScoreData) { PlayerScoreData = Cast<UPlayerScoreData>(InPlayerScoreData->Clone(this)); }
 
-	virtual void OnRep_UniqueId() override;
+	virtual void RegisterPlayerWithSession(bool bWasFromInvite) override;
 
+	/** Unregister a player with the online subsystem */
+	virtual void UnregisterPlayerWithSession() override;
+	
 protected:
-	virtual void BeginPlay() override;
 	void SetSessionName();
 	
 private:

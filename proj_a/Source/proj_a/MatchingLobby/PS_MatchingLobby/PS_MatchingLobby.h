@@ -13,9 +13,10 @@ class PROJ_A_API APS_MatchingLobby : public APlayerState
 {
 	GENERATED_BODY()
 public:
-	APS_MatchingLobby();
-	virtual void OnRep_UniqueId() override;
+	virtual void RegisterPlayerWithSession(bool bWasFromInvite) override;
+
+	/** Unregister a player with the online subsystem */
+	virtual void UnregisterPlayerWithSession() override;
 protected:
 	void SetSessionName();
-	virtual void BeginPlay() override;
 };

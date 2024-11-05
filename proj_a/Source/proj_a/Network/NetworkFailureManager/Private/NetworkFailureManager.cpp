@@ -127,12 +127,13 @@ void UNetworkFailureManager::DestroyPreviousSession(FOnSessionDestroyedCallback 
 				if (bWasSuccessful)
 				{
 					const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
+					StrongThis->SessionNameGI = StrongThis->DesiredSessionName;
 					if (GameMapsSettings)
 					{
 						FName DefaultLevel = FName(*GameMapsSettings->GetGameDefaultMap());
 						FString DefaultLevelWithOption = DefaultLevel.ToString() + TEXT("?closed");
 						FName NewLevelName = FName(*DefaultLevelWithOption);
-
+						
 						UWorld* World = StrongThis->GetWorld();
 						if (World)
 						{
@@ -155,7 +156,7 @@ void UNetworkFailureManager::DestroyPreviousSession(FOnSessionDestroyedCallback 
 			}
 		});
 
-		SessionInterface->DestroySession(NAME_GameSession);
+		SessionInterface->DestroySession(SessionNameGI);
 	}
 }
 
@@ -454,8 +455,6 @@ void UNetworkFailureManager::CreateNewSessionMetaData(UWorld* World, const FUniq
 
 	DesiredMapName = FName(*FString::Printf(TEXT("%s"), *World->GetMapName()));
 	FNetLogger::EditerLog(FColor::Red, TEXT("New Map Name: %s"), *DesiredMapName.ToString());
-
-	SessionNameGI = DesiredSessionName;
 }
 
 void UNetworkFailureManager::CaptureViewport()

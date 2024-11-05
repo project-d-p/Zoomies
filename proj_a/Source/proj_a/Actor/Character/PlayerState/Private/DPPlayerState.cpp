@@ -8,6 +8,7 @@
 #include "PlayerName.h"
 #include "PlayerScoreComp.h"
 #include "PlayerScoreData.h"
+#include "Net/OnlineEngineInterface.h"
 #include "Net/UnrealNetwork.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
@@ -52,11 +53,41 @@ void ADPPlayerState::SeamlessTravelTo(APlayerState* NewPlayerState)
 	}
 }
 
-void ADPPlayerState::OnRep_UniqueId()
+void ADPPlayerState::RegisterPlayerWithSession(bool bWasFromInvite)
 {
 	SetSessionName();
 	
-	Super::OnRep_UniqueId();
+	Super::RegisterPlayerWithSession(bWasFromInvite);
+
+	if (GetNetMode() != NM_Standalone)
+	{
+		if (GetUniqueId().IsValid()) // May not be valid if this is was created via DebugCreatePlayer
+		{
+			// Register the player as part of the session
+			if (UOnlineEngineInterface::Get()->DoesSessionExist(GetWorld(), this->SessionName))
+			{
+				UOnlineEngineInterface::Get()->RegisterPlayer(GetWorld(), this->SessionName, GetUniqueId(), bWasFromInvite);
+			}
+		}
+	}
+}
+
+void ADPPlayerState::UnregisterPlayerWithSession()
+{
+	SetSessionName();
+	
+	Super::UnregisterPlayerWithSession();
+
+	if (GetNetMode() == NM_Client && GetUniqueId().IsValid())
+	{
+		if (this->SessionName != NAME_None)
+		{
+			if (UOnlineEngineInterface::Get()->DoesSessionExist(GetWorld(), this->SessionName))
+			{
+				UOnlineEngineInterface::Get()->UnregisterPlayer(GetWorld(), this->SessionName, GetUniqueId());
+			}
+		}
+	}
 }
 
 void ADPPlayerState::CopyProperties(APlayerState* PlayerState)
