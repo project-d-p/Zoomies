@@ -2,11 +2,14 @@
 
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
+AJudgePlayerState::AJudgePlayerState()
+{
+	SetSessionName();
+}
+
 void AJudgePlayerState::BeginPlay()
 {
 	Super::BeginPlay();
-
-	SetSessionName();
 }
 
 void AJudgePlayerState::SetSessionName()

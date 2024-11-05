@@ -20,6 +20,7 @@ ADPPlayerState::ADPPlayerState()
 	PlayerScoreData->InitializeData();
 	FString PlayerName = FGuid::NewGuid().ToString();
 	APlayerState::SetPlayerName(PlayerName);
+	SetSessionName();
 }
 
 UPlayerScoreComp* ADPPlayerState::GetPlayerScoreComp() const
@@ -148,7 +149,6 @@ void ADPPlayerState::BeginPlay()
 	}
 	InitializePlayerState();
 	PlayerScoreData->TestBroadcast();
-	SetSessionName();
 }
 
 void ADPPlayerState::EndPlay(const EEndPlayReason::Type EndPlayReason)

@@ -4,6 +4,11 @@
 
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
+APS_MatchingLobby::APS_MatchingLobby()
+{
+	SetSessionName();
+}
+
 void APS_MatchingLobby::SetSessionName()
 {
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
@@ -16,6 +21,4 @@ void APS_MatchingLobby::SetSessionName()
 void APS_MatchingLobby::BeginPlay()
 {
 	Super::BeginPlay();
-
-	SetSessionName();
 }
