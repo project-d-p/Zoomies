@@ -64,16 +64,9 @@ void AJudgePlayerController::SetVoterName_Implementation(const FString& Name)
 	if (JudgeLevelUI)
 	{
 		JudgeLevelUI->SetVoterName(Name);
-		if (TurnStartSound)  // 사운드가 유효한지 확인
+		if (TurnStartSound) 
 		{
-			// 2D 사운드를 재생 (UI에서 사용)
 			UGameplayStatics::PlaySound2D(this, TurnStartSound);
-			//log on screen
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("TurnStartSound"));
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("TurnStartSound is not valid"));
 		}
 	}
 }
@@ -151,6 +144,7 @@ void AJudgePlayerController::BeginPlay()
 		GetWorldTimerManager().SetTimer(CTH, this, &AJudgePlayerController::RequestCharacter, 1.f, true);
 	}
 	SetInputMode(FInputModeGameAndUI());
+	ActivateCurrentComponent(this);
 }
 
 void AJudgePlayerController::SeamlessTravelFrom(APlayerController* OldPC)
