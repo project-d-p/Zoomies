@@ -68,6 +68,7 @@ public:
 	void RequestCharacter();
 
 	UJudgeLevelUI* GetJudgeLevelUI() const { return JudgeLevelUI; }
+	AActor* CameraActor = nullptr;
 protected:
 	virtual void BeginPlay() override;
 	virtual void SeamlessTravelFrom(APlayerController* OldPC) override;

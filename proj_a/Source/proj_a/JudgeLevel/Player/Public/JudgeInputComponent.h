@@ -27,6 +27,7 @@ private:
 	
 	void Active(const FInputActionValue& value);
 	void Esc(const FInputActionValue& value);
+	void Rotate(const FInputActionValue& value);
 	
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputMappingContext* LobbyLevelContext;
@@ -34,6 +35,8 @@ private:
 	class UInputAction* ActiveAction;
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* EscAction;
+	UPROPERTY(VisibleAnywhere, Category = Input)
+	class UInputAction* RotateAction;
 	
 protected:
 	AJudgePlayerController* PC_JudgeLevel = nullptr;

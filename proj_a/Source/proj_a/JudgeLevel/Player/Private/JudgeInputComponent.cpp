@@ -22,6 +22,11 @@ UJudgeInputComponent::UJudgeInputComponent()
 	(TEXT("/Game/input/ia_esc.ia_esc"));
 	if (IA_ESC.Succeeded())
 		EscAction = IA_ESC.Object;
+	
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_ROTATE
+	(TEXT("/Game/input/ia_rotate.ia_rotate"));
+	if (IA_ESC.Succeeded())
+		RotateAction = IA_ROTATE.Object;
 }
 
 void UJudgeInputComponent::Activate(bool bReset)
@@ -62,6 +67,8 @@ void UJudgeInputComponent::BindJudgeLevelActions()
 	{
 		EnhancedInputComponent->BindAction(ActiveAction, ETriggerEvent::Triggered, this, &UJudgeInputComponent::Active);
 		EnhancedInputComponent->BindAction(EscAction, ETriggerEvent::Started, this, &UJudgeInputComponent::Esc);
+		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &UJudgeInputComponent::Rotate);
+
 	}
 }
 
@@ -89,6 +96,23 @@ void UJudgeInputComponent::UnbindJudgeLevelActions()
 void UJudgeInputComponent::Active(const FInputActionValue& value)
 {
 	return ;
+}
+
+void UJudgeInputComponent::Rotate(const FInputActionValue& value)
+{
+	AJudgePlayerController* PlayerController = PC_JudgeLevel;
+	if (!PlayerController || !PlayerController->CameraActor) return;
+
+	const float SpeedScale = 2.0f; 
+
+	FVector2D actionValue = value.Get<FVector2D>();
+
+	FRotator CameraRotation = PlayerController->CameraActor->GetActorRotation();
+
+	CameraRotation.Yaw += actionValue.X * SpeedScale;
+	CameraRotation.Pitch = FMath::Clamp(CameraRotation.Pitch - actionValue.Y * SpeedScale, -80.0f, 80.0f); 
+
+	PlayerController->CameraActor->SetActorRotation(CameraRotation);
 }
 
 void UJudgeInputComponent::Esc(const FInputActionValue& value)

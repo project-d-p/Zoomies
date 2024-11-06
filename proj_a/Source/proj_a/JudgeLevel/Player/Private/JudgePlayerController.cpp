@@ -144,6 +144,7 @@ void AJudgePlayerController::BeginPlay()
 		GetWorldTimerManager().SetTimer(CTH, this, &AJudgePlayerController::RequestCharacter, 1.f, true);
 	}
 	SetInputMode(FInputModeGameAndUI());
+	CameraActor = GetViewTarget();
 	ActivateCurrentComponent(this);
 }
 
