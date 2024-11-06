@@ -197,7 +197,9 @@ void UNetworkFailureManager::CreateNewSession(UWorld* World)
 	OnCreateCompleteDelegateHandle = SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UNetworkFailureManager::CreateSessionComplete, World);
 
 	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
-	SessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, SessionSettings);
+
+	/* TODO: NAME_GameSession °íÄ¡±â */
+	SessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), SessionNameGI, SessionSettings);
 }
 
 void UNetworkFailureManager::CreateSessionComplete(FName SessionName, bool bWasSuccessful, UWorld* World)
@@ -340,7 +342,7 @@ void UNetworkFailureManager::JoinSession(const FOnlineSessionSearchResult& Searc
 	FNetLogger::EditerLog(FColor::Green, TEXT("Joining Session..."));
 	OnJoinCompleteDelegateHandle = SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UNetworkFailureManager::JoinSessionComplete, World);
 	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
-	SessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, SearchResult);
+	SessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), SessionNameGI, SearchResult);
 }
 
 void UNetworkFailureManager::ResetInstance()
