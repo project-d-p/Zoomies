@@ -368,6 +368,7 @@ void UGI_Zoomies::OnSessionFailure()
 			World->ServerTravel(TEXT("lobbyLevel?closed"), true);
 			session_interface_->DestroySession(SessionName);
 			SessionName = "";
+			network_failure_manager_->SessionNameGI = SessionName;
 		}
 		else
 		{

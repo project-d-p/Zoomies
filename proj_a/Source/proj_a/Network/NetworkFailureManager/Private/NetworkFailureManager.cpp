@@ -192,7 +192,7 @@ void UNetworkFailureManager::CreateNewSession(UWorld* World)
 	}
 
 	SessionSettings.Set(SETTING_MAPNAME, DesiredMapName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
-	SessionSettings.Set(FName("SESSION_NAME"), DesiredSessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
+	SessionSettings.Set(FName("SessionName"), DesiredSessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
 	
 	OnCreateCompleteDelegateHandle = SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UNetworkFailureManager::CreateSessionComplete, World);
 
@@ -232,7 +232,7 @@ void UNetworkFailureManager::JoinNewSession(UWorld* World)
 	SessionSearch->MaxSearchResults = 10;
 	SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 	SessionSearch->QuerySettings.Set(SETTING_MAPNAME, DesiredMapName.ToString(), EOnlineComparisonOp::Equals);
-	SessionSearch->QuerySettings.Set(FName("SESSION_NAME"), DesiredSessionName.ToString(), EOnlineComparisonOp::Equals);
+	SessionSearch->QuerySettings.Set(FName("SessionName"), DesiredSessionName.ToString(), EOnlineComparisonOp::Equals);
 	if (!SessionSearch->bIsLanQuery)
 	{
 		SessionSearch->QuerySettings.Set(SEARCH_LOBBIES, true, EOnlineComparisonOp::Equals);
@@ -255,7 +255,7 @@ void UNetworkFailureManager::FindSessionComplete(bool bWasSuccessful, UWorld* Wo
 		for (const FOnlineSessionSearchResult& SearchResult : SessionSearch->SearchResults)
 		{
 			FString SessionName;
-			SearchResult.Session.SessionSettings.Get(FName("SESSION_NAME"), SessionName);
+			SearchResult.Session.SessionSettings.Get(FName("SessionName"), SessionName);
 			// 세션 이름 확인
 			/* TODO: 로그 출력해서 확인해보기 */
 			FNetLogger::LogError(TEXT("Session Name[JOIN]: %s"), *SessionName);
@@ -446,11 +446,8 @@ void UNetworkFailureManager::HandleNetworkFailure(UWorld* World, UNetDriver* Net
 	}
 	else
 	{
-		UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(World->GetGameInstance());
-		if (GameInstance)
-		{
-			GameInstance->ResetSession();
-		}
+		SessionInterface->DestroySession(SessionNameGI);
+		SessionNameGI = "";
 	}
 }
 
