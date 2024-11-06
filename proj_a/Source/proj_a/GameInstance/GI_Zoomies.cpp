@@ -124,6 +124,10 @@ void UGI_Zoomies::OnFindComplete(bool bWasSuccessful)
 			FNetLogger::LogError(TEXT("FindSession_t[Create]"));
 		}
 	}
+	else
+	{
+		FindSession();
+	}
 }
 
 void UGI_Zoomies::CreateSession()
