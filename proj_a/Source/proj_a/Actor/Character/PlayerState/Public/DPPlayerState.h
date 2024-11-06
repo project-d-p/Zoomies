@@ -61,6 +61,7 @@ private:
 	//
 
 	void OnHostMigration(UWorld* World, UDataManager* DataManager);
+	void AddInGameWidgetFunctionToDelegate();
 	void InitializePlayerState();
 	void SetPlayerNameDelayed();
 	void SetSessionName();

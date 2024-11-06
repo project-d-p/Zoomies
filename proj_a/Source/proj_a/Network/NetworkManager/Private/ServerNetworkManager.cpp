@@ -49,7 +49,7 @@ void UServerNetworkManager::SetGameStartCallback(int NumOfPlayers, const TFuncti
 
 UServerNetworkManager::~UServerNetworkManager()
 {
-	UServerNetworkManager::Shutdown();
+	// UServerNetworkManager::Shutdown();
 	if (WorkerThread)
 	{
 		WorkerThread = nullptr;

@@ -120,8 +120,45 @@ void ADPPlayerState::OnHostMigration(UWorld* World, UDataManager* DataManager)
 	}
 }
 
+void ADPPlayerState::AddInGameWidgetFunctionToDelegate()
+{
+	ADPPlayerController* LocalPC = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (LocalPC)
+	{
+		UMainLevelComponent* MainLevelComponent = LocalPC->GetLevelComponentAs<UMainLevelComponent>(ELevelComponentType::MAIN);
+		if (MainLevelComponent)
+		{
+			UDPIngameWidget* InGameWidget = Cast<UDPIngameWidget>(MainLevelComponent->GetInGameWidget());
+			if (InGameWidget == nullptr)
+			{
+				FNetLogger::EditerLog(FColor::Red, TEXT("InGameWidget is nullptr"));
+				FTimerHandle TimerHandle;
+				GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
+				{
+					AddInGameWidgetFunctionToDelegate();
+				}, 0.5f, false);
+			}
+			else
+			{
+				PlayerScoreData->OnDataChanged.AddDynamic(InGameWidget, &UDPIngameWidget::OnScoreChanged);
+				PlayerScoreData->TestBroadcast();
+			}
+		}
+	}
+}
+
 void ADPPlayerState::InitializePlayerState()
 {
+	if (!GetWorld()->GetMapName().Contains(TEXT("mainLevel")))
+	{
+		return ;
+	}
+	AddInGameWidgetFunctionToDelegate();
+	
+	PlayerScoreData->SetPlayerName(this->GetPlayerName());
+	PlayerScoreData->SetPlayerId(this->GetPlayerId());
+	GetWorld()->GetTimerManager().SetTimer(PlayerNameTimerHandle, this, &ADPPlayerState::SetPlayerNameDelayed, 0.5f, false);
+	
  	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
  	check(GameInstance);
  	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
@@ -138,6 +175,8 @@ void ADPPlayerState::InitializePlayerState()
 			}
 		}
 	}
+
+	PlayerScoreData->TestBroadcast();
 }
 
 void ADPPlayerState::SetPlayerNameDelayed()
@@ -166,27 +205,8 @@ void ADPPlayerState::BeginPlay()
 			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &ADPPlayerState::OnHostMigration);
 		}
 	}
-	
-	ADPPlayerController* LocalPC = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
-	if (LocalPC)
-	{
-		UMainLevelComponent* MainLevelComponent = LocalPC->GetLevelComponentAs<UMainLevelComponent>(ELevelComponentType::MAIN);
-		if (MainLevelComponent)
-		{
-			UDPIngameWidget* InGameWidget = Cast<UDPIngameWidget>(MainLevelComponent->GetInGameWidget());
-			if (InGameWidget == nullptr)
-			{
-				FNetLogger::EditerLog(FColor::Red, TEXT("InGameWidget is nullptr"));
-				return;
-			}
-			PlayerScoreData->OnDataChanged.AddDynamic(InGameWidget, &UDPIngameWidget::OnScoreChanged);
-			PlayerScoreData->SetPlayerName(this->GetPlayerName());
-			PlayerScoreData->SetPlayerId(this->GetPlayerId());
-			GetWorld()->GetTimerManager().SetTimer(PlayerNameTimerHandle, this, &ADPPlayerState::SetPlayerNameDelayed, 0.5f, false);
-		}
-	}
+
 	InitializePlayerState();
-	PlayerScoreData->TestBroadcast();
 }
 
 void ADPPlayerState::EndPlay(const EEndPlayReason::Type EndPlayReason)
