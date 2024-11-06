@@ -425,7 +425,7 @@ void UNetworkFailureManager::HandleNetworkFailure(UWorld* World, UNetDriver* Net
 	UE_LOG(LogTemp, Warning, TEXT("Network Failure: %s"), *String);
 	FNetLogger::EditerLog(FColor::Red, TEXT("Network Failure: %s"), *String);
 
-	if (Arg == ENetworkFailure::ConnectionLost)
+	if (Arg == ENetworkFailure::ConnectionLost || Arg == ENetworkFailure::FailureReceived)
 	{
 		this->SaveSessionMetaData(World);
 		OnHostMigrationDelegate.Broadcast(World, DataManager);
