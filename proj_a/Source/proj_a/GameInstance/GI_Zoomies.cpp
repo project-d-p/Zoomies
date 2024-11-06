@@ -449,7 +449,7 @@ bool UGI_Zoomies::ResetSession()
 			);
 			session_interface_->DestroySession(network_failure_manager_->SessionNameGI);
 			SessionName = "";
-			network_failure_manager_->SessionNameGI = FName("");
+			network_failure_manager_->SessionNameGI = SessionName;
 			
 			FriendsList.Empty();
 			FriendsArray.Empty();

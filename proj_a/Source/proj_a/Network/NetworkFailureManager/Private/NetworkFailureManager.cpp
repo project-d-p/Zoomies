@@ -444,6 +444,14 @@ void UNetworkFailureManager::HandleNetworkFailure(UWorld* World, UNetDriver* Net
 			DestroyPreviousSession(&UNetworkFailureManager::JoinNewSession);
 		}
 	}
+	else
+	{
+		UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(World->GetGameInstance());
+		if (GameInstance)
+		{
+			GameInstance->ResetSession();
+		}
+	}
 }
 
 void UNetworkFailureManager::CreateNewSessionMetaData(UWorld* World, const FUniqueNetIdRef& NewHostPlayerID)
