@@ -181,7 +181,7 @@ void UGI_Zoomies::CreateSession()
 	   FOnCreateSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onCreateComplete));
 	// set SessionName to Unique
 	SessionName = FName(*FString::Printf(TEXT("Zoomies_%s"), *FGuid::NewGuid().ToString()));
-	network_failure_manager_->SetSessionName(SessionName);
+	network_failure_manager_->SessionNameGI = SessionName;
 	session_settings_->Set(FName("SessionName"), SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
 	FNetLogger::EditerLog(FColor::Cyan, TEXT("SessionName: %s"), *SessionName.ToString());
 	// Create session
@@ -343,47 +343,55 @@ void UGI_Zoomies::OnSessionFailure()
 		UE_LOG( LogTemp, Error, TEXT("OnSessionFailure: Validation failed") );
 		return;
 	}
-	UWorld* World = GetWorld();
-	if (World)
+
+	// session_interface_->DestroySession(network_failure_manager_->SessionNameGI);
+	APlayerController* CurrentPlayerController = GetWorld()->GetFirstPlayerController();
+	if (CurrentPlayerController)
 	{
-		if (World->GetNetMode() == NM_ListenServer)
-		{
-			IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
-			if (OnlineSubsystem)
-			{
-				IOnlineSessionPtr Sessions = OnlineSubsystem->GetSessionInterface();
-				if (Sessions.IsValid())
-				{
-					FNamedOnlineSession* Session = Sessions->GetNamedSession(SessionName);
-					if (Session)
-					{
-						Sessions->EndSession(SessionName);
-					}
-				}
-			}
-			for (FConstPlayerControllerIterator It = World->GetPlayerControllerIterator(); It; ++It)
-			{
-				APlayerController* PlayerController = It->Get();
-				if (PlayerController)
-				{
-					PlayerController->ClientTravel(TEXT("lobbyLevel?closed"), ETravelType::TRAVEL_Absolute);
-				}
-			}
-			World->ServerTravel(TEXT("lobbyLevel?closed"), true);
-			session_interface_->DestroySession(SessionName);
-			SessionName = "";
-			network_failure_manager_->SessionNameGI = SessionName;
-		}
-		else
-		{
-			APlayerController* CurrentPlayerController = GetWorld()->GetFirstPlayerController();
-			if (CurrentPlayerController)
-			{
-				CurrentPlayerController->ClientTravel(TEXT("lobbyLevel?closed"), ETravelType::TRAVEL_Absolute);
-				session_interface_->DestroySession(SessionName);
-			}
-		}
+		CurrentPlayerController->ClientTravel(TEXT("lobbyLevel?closed"), ETravelType::TRAVEL_Absolute);
 	}
+	
+	// UWorld* World = GetWorld();
+	// if (World)
+	// {
+	// 	if (World->GetNetMode() == NM_ListenServer)
+	// 	{
+	// 		IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
+	// 		if (OnlineSubsystem)
+	// 		{
+	// 			IOnlineSessionPtr Sessions = OnlineSubsystem->GetSessionInterface();
+	// 			if (Sessions.IsValid())
+	// 			{
+	// 				FNamedOnlineSession* Session = Sessions->GetNamedSession(network_failure_manager_->SessionNameGI);
+	// 				if (Session)
+	// 				{
+	// 					Sessions->EndSession(network_failure_manager_->SessionNameGI);
+	// 				}
+	// 			}
+	// 		}
+	// 		for (FConstPlayerControllerIterator It = World->GetPlayerControllerIterator(); It; ++It)
+	// 		{
+	// 			APlayerController* PlayerController = It->Get();
+	// 			if (PlayerController)
+	// 			{
+	// 				PlayerController->ClientTravel(TEXT("lobbyLevel?closed"), ETravelType::TRAVEL_Absolute);
+	// 			}
+	// 		}
+	// 		World->ServerTravel(TEXT("lobbyLevel?closed"), true);
+	// 		session_interface_->DestroySession(network_failure_manager_->SessionNameGI);
+	// 		SessionName = "";
+	// 		network_failure_manager_->SessionNameGI = SessionName;
+	// 	}
+	// 	else
+	// 	{
+	// 		APlayerController* CurrentPlayerController = GetWorld()->GetFirstPlayerController();
+	// 		if (CurrentPlayerController)
+	// 		{
+	// 			CurrentPlayerController->ClientTravel(TEXT("lobbyLevel?closed"), ETravelType::TRAVEL_Absolute);
+	// 			session_interface_->DestroySession(network_failure_manager_->SessionNameGI);
+	// 		}
+	// 	}
+	// }
 }
 
 void UGI_Zoomies::ChangeJoinInProgress(bool bCond)
@@ -461,7 +469,8 @@ bool UGI_Zoomies::ResetSession()
 			return true;
 		}
 	}
-	UE_LOG(LogTemp, Log, TEXT("no existing session to reset"));
+	// UE_LOG(LogTemp, Log, TEXT("no existing session to reset"));
+	FNetLogger::LogError(TEXT("No Existing Session to Reset"));
 	return false;
 }
 
