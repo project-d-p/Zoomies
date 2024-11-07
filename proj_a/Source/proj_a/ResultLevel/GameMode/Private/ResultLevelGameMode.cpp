@@ -101,10 +101,12 @@ void AResultLevelGameMode::CheckPlayersAllTraveled()
 	UGI_Zoomies* GI = Cast<UGI_Zoomies>(GetGameInstance());
 	check(GI)
 
+	int MaxPlayers = GI->network_failure_manager_->GetDesiredMaxPlayers() ? GI->network_failure_manager_->GetDesiredMaxPlayers() : GI->player_count;
+	
 	AResultLevelGameState* GS = Cast<AResultLevelGameState>(GetWorld()->GetGameState());
 	check(GS)
 
-	if (CurrentPlayerCount >= GI->player_count)
+	if (CurrentPlayerCount >= MaxPlayers)
 	{
 		FTimerHandle StartTimerHandle;
 		FTimerDelegate StartTimerDelegate;

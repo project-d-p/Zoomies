@@ -149,11 +149,10 @@ void ADPPlayerState::AddInGameWidgetFunctionToDelegate()
 
 void ADPPlayerState::InitializePlayerState()
 {
-	if (!GetWorld()->GetMapName().Contains(TEXT("mainLevel")))
+	if (GetWorld()->GetMapName().Contains(TEXT("mainLevel")))
 	{
-		return ;
+		AddInGameWidgetFunctionToDelegate();
 	}
-	AddInGameWidgetFunctionToDelegate();
 	
 	PlayerScoreData->SetPlayerName(this->GetPlayerName());
 	PlayerScoreData->SetPlayerId(this->GetPlayerId());

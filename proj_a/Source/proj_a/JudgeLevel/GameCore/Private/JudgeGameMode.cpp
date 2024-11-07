@@ -99,11 +99,7 @@ void AJudgeGameMode::ProcessVotingResults()
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         AJudgePlayerController* PC = Cast<AJudgePlayerController>(*It);
-        // ADPPlayerController* PC = Cast<ADPPlayerController>(*It);
         check(PC)
-        // UJudgeLevelComponent* JLC = Cast<UJudgeLevelComponent>(PC->GetLevelComponent());
-        // check(JLC)
-        // JLC->SetOccupationeName(CurrentPlayerIndex - 1, OccupationToString(MostVotedOccupation));
         PC->SetOccupationeName(CurrentPlayerIndex - 1, OccupationToString(MostVotedOccupation));
     }
     TimerManager->StartTimer<AJudgeGameState>(WAIT_TIME, &AJudgeGameMode::EndTimer, this);
