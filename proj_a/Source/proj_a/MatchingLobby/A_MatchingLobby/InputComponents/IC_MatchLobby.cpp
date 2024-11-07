@@ -127,7 +127,7 @@ void UIC_MatchLobby::BindMatchLobbyActions()
 void UIC_MatchLobby::UnbindMatchLobbyActions()
 {
 	APC_MatchingLobby* PlayerController = Get_PC(); 
-	if (PlayerController)
+	if (!PlayerController && !PlayerController->IsValidLowLevel())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("IC_MatchLobby::Can't found PlayerController to Unbind Input."));
 		return ;

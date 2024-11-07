@@ -5,6 +5,7 @@
 #include "isteamfriends.h"
 #include "isteamuser.h"
 #include "isteamutils.h"
+#include "OnlineSubsystemUtils.h"
 #include "steamclientpublic.h"
 #include "Components/BackgroundBlur.h"
 #include "GameFramework/PlayerState.h"
@@ -12,6 +13,7 @@
 #include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
 #include "proj_a/MatchingLobby/PS_MatchingLobby/PS_MatchingLobby.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/OnlineEngineInterface.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 AGM_MatchingLobby::AGM_MatchingLobby() {
@@ -32,6 +34,48 @@ void AGM_MatchingLobby::PostLogin(APlayerController* NewPlayer) {
 	
 	PCs.Add(NewPlayer);
 	CheckAndUpdateLobbyPlatform();
+	/* TEST CODE
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	FName SessionNameGI = GameInstance->network_failure_manager_->SessionNameGI;
+	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
+	IOnlineSessionPtr SessionInterface = OnlineSubsystem->GetSessionInterface();
+	
+	FNamedOnlineSession* CurrentSession = SessionInterface->GetNamedSession(SessionNameGI);
+	if (CurrentSession)
+	{
+		// FNetLogger::LogError(TEXT("Num of players: %d"), CurrentSession->NumOpenPublicConnections);
+		FNetLogger::LogError(TEXT("Num of players: %d"), CurrentSession->RegisteredPlayers.Num());
+		FNetLogger::LogError(TEXT("Seesion Name Post Login: %s"), *(SessionNameGI.ToString()));
+	}
+	FNetLogger::LogError(TEXT("Name_GameSession: %s"), LexToString(NAME_GameSession));
+
+	if (UOnlineEngineInterface::Get()->DoesSessionExist(GetWorld(), NewPlayer->PlayerState->SessionName))
+	{
+		// FNetLogger::EditerLog(TEXT("Num of players: %d"), UOnlineEngineInterface::Get()->GetNumPlayers(GetWorld(), NewPlayer->PlayerState->SessionName));
+		IOnlineSessionPtr SessionInterfaces = Online::GetSessionInterface(GetWorld());
+		FNamedOnlineSession* CurrentSessions = SessionInterfaces->GetNamedSession(NewPlayer->PlayerState->SessionName);
+		if (CurrentSessions)
+		{
+			FNetLogger::LogError(TEXT("Num of players CurrentSessions: %d"), CurrentSessions->RegisteredPlayers.Num());
+			FNetLogger::LogError(TEXT("Session Name Post Login ToStrings: %s"), *(NewPlayer->PlayerState->SessionName.ToString()));
+		}
+		// UOnlineEngineInterface::Get()->RegisterPlayer(GetWorld(), PlayerState->SessionName, GetUniqueId(), bWasFromInvite);
+	}
+	else
+	{
+		FNetLogger::LogError(TEXT("Session does not exist"));
+		if (UOnlineEngineInterface::Get()->DoesSessionExist(GetWorld(), SessionNameGI))
+		{
+			FNetLogger::LogError(TEXT("Session does exist"));
+			UOnlineEngineInterface::Get()->RegisterPlayer(GetWorld(), SessionNameGI, NewPlayer->PlayerState->GetUniqueId(), false);
+			FNetLogger::LogError(TEXT("Num of players after: %d"), CurrentSession->RegisteredPlayers.Num());
+		}
+		else
+		{
+			FNetLogger::LogError(TEXT("Session does not exist"));
+		}
+	}
+	*/
 }
 
 void AGM_MatchingLobby::Logout(AController* Exiting) {

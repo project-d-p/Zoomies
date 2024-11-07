@@ -8,6 +8,7 @@
 #include "PlayerName.h"
 #include "PlayerScoreComp.h"
 #include "PlayerScoreData.h"
+#include "Net/OnlineEngineInterface.h"
 #include "Net/UnrealNetwork.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
@@ -20,6 +21,7 @@ ADPPlayerState::ADPPlayerState()
 	PlayerScoreData->InitializeData();
 	FString PlayerName = FGuid::NewGuid().ToString();
 	APlayerState::SetPlayerName(PlayerName);
+	// SetSessionName();
 }
 
 UPlayerScoreComp* ADPPlayerState::GetPlayerScoreComp() const
@@ -48,6 +50,43 @@ void ADPPlayerState::SeamlessTravelTo(APlayerState* NewPlayerState)
 		JPS->SetPlayerJob(PlayerJob);
 		JPS->SetPlayerScoreData(PlayerScoreData);
 		FNetLogger::EditerLog(FColor::Cyan, TEXT("Seamless: %s"), *(JPS->GetPlayerScoreData()->GetPlayerName()));
+	}
+}
+
+void ADPPlayerState::RegisterPlayerWithSession(bool bWasFromInvite)
+{
+	SetSessionName();
+	
+	Super::RegisterPlayerWithSession(bWasFromInvite);
+
+	if (GetNetMode() != NM_Standalone)
+	{
+		if (GetUniqueId().IsValid()) // May not be valid if this is was created via DebugCreatePlayer
+		{
+			// Register the player as part of the session
+			if (UOnlineEngineInterface::Get()->DoesSessionExist(GetWorld(), this->SessionName))
+			{
+				UOnlineEngineInterface::Get()->RegisterPlayer(GetWorld(), this->SessionName, GetUniqueId(), bWasFromInvite);
+			}
+		}
+	}
+}
+
+void ADPPlayerState::UnregisterPlayerWithSession()
+{
+	SetSessionName();
+	
+	Super::UnregisterPlayerWithSession();
+
+	if (GetNetMode() == NM_Client && GetUniqueId().IsValid())
+	{
+		if (this->SessionName != NAME_None)
+		{
+			if (UOnlineEngineInterface::Get()->DoesSessionExist(GetWorld(), this->SessionName))
+			{
+				UOnlineEngineInterface::Get()->UnregisterPlayer(GetWorld(), this->SessionName, GetUniqueId());
+			}
+		}
 	}
 }
 
@@ -81,8 +120,45 @@ void ADPPlayerState::OnHostMigration(UWorld* World, UDataManager* DataManager)
 	}
 }
 
+void ADPPlayerState::AddInGameWidgetFunctionToDelegate()
+{
+	ADPPlayerController* LocalPC = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (LocalPC)
+	{
+		UMainLevelComponent* MainLevelComponent = LocalPC->GetLevelComponentAs<UMainLevelComponent>(ELevelComponentType::MAIN);
+		if (MainLevelComponent)
+		{
+			UDPIngameWidget* InGameWidget = Cast<UDPIngameWidget>(MainLevelComponent->GetInGameWidget());
+			if (InGameWidget == nullptr)
+			{
+				FNetLogger::EditerLog(FColor::Red, TEXT("InGameWidget is nullptr"));
+				FTimerHandle TimerHandle;
+				GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
+				{
+					AddInGameWidgetFunctionToDelegate();
+				}, 0.5f, false);
+			}
+			else
+			{
+				PlayerScoreData->OnDataChanged.AddDynamic(InGameWidget, &UDPIngameWidget::OnScoreChanged);
+				PlayerScoreData->TestBroadcast();
+			}
+		}
+	}
+}
+
 void ADPPlayerState::InitializePlayerState()
 {
+	if (!GetWorld()->GetMapName().Contains(TEXT("mainLevel")))
+	{
+		return ;
+	}
+	AddInGameWidgetFunctionToDelegate();
+	
+	PlayerScoreData->SetPlayerName(this->GetPlayerName());
+	PlayerScoreData->SetPlayerId(this->GetPlayerId());
+	GetWorld()->GetTimerManager().SetTimer(PlayerNameTimerHandle, this, &ADPPlayerState::SetPlayerNameDelayed, 0.5f, false);
+	
  	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
  	check(GameInstance);
  	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
@@ -99,11 +175,22 @@ void ADPPlayerState::InitializePlayerState()
 			}
 		}
 	}
+
+	PlayerScoreData->TestBroadcast();
 }
 
 void ADPPlayerState::SetPlayerNameDelayed()
 {
 	PlayerScoreData->SetPlayerName(GetPlayerName());
+}
+
+void ADPPlayerState::SetSessionName()
+{
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (GameInstance)
+	{
+		SessionName = GameInstance->GetSessionName();
+	}
 }
 
 void ADPPlayerState::BeginPlay()
@@ -118,27 +205,8 @@ void ADPPlayerState::BeginPlay()
 			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &ADPPlayerState::OnHostMigration);
 		}
 	}
-	
-	ADPPlayerController* LocalPC = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
-	if (LocalPC)
-	{
-		UMainLevelComponent* MainLevelComponent = LocalPC->GetLevelComponentAs<UMainLevelComponent>(ELevelComponentType::MAIN);
-		if (MainLevelComponent)
-		{
-			UDPIngameWidget* InGameWidget = Cast<UDPIngameWidget>(MainLevelComponent->GetInGameWidget());
-			if (InGameWidget == nullptr)
-			{
-				FNetLogger::EditerLog(FColor::Red, TEXT("InGameWidget is nullptr"));
-				return;
-			}
-			PlayerScoreData->OnDataChanged.AddDynamic(InGameWidget, &UDPIngameWidget::OnScoreChanged);
-			PlayerScoreData->SetPlayerName(this->GetPlayerName());
-			PlayerScoreData->SetPlayerId(this->GetPlayerId());
-			GetWorld()->GetTimerManager().SetTimer(PlayerNameTimerHandle, this, &ADPPlayerState::SetPlayerNameDelayed, 0.5f, false);
-		}
-	}
+
 	InitializePlayerState();
-	PlayerScoreData->TestBroadcast();
 }
 
 void ADPPlayerState::EndPlay(const EEndPlayReason::Type EndPlayReason)

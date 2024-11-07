@@ -45,6 +45,11 @@ public:
 	void IncreaseScore(const TArray<EAnimal>& InAnimals);
 
 	virtual void SeamlessTravelTo(APlayerState* NewPlayerState) override;
+
+	virtual void RegisterPlayerWithSession(bool bWasFromInvite) override;
+
+	/** Unregister a player with the online subsystem */
+	virtual void UnregisterPlayerWithSession() override;
 protected:
 	virtual void CopyProperties(APlayerState* PlayerState) override;
 	
@@ -56,8 +61,10 @@ private:
 	//
 
 	void OnHostMigration(UWorld* World, UDataManager* DataManager);
+	void AddInGameWidgetFunctionToDelegate();
 	void InitializePlayerState();
 	void SetPlayerNameDelayed();
+	void SetSessionName();
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

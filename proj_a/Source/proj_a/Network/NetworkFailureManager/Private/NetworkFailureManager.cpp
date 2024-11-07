@@ -127,12 +127,13 @@ void UNetworkFailureManager::DestroyPreviousSession(FOnSessionDestroyedCallback 
 				if (bWasSuccessful)
 				{
 					const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
+					StrongThis->SessionNameGI = StrongThis->DesiredSessionName;
 					if (GameMapsSettings)
 					{
 						FName DefaultLevel = FName(*GameMapsSettings->GetGameDefaultMap());
 						FString DefaultLevelWithOption = DefaultLevel.ToString() + TEXT("?closed");
 						FName NewLevelName = FName(*DefaultLevelWithOption);
-
+						
 						UWorld* World = StrongThis->GetWorld();
 						if (World)
 						{
@@ -155,7 +156,7 @@ void UNetworkFailureManager::DestroyPreviousSession(FOnSessionDestroyedCallback 
 			}
 		});
 
-		SessionInterface->DestroySession(NAME_GameSession);
+		SessionInterface->DestroySession(SessionNameGI);
 	}
 }
 
@@ -191,12 +192,14 @@ void UNetworkFailureManager::CreateNewSession(UWorld* World)
 	}
 
 	SessionSettings.Set(SETTING_MAPNAME, DesiredMapName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
-	SessionSettings.Set(FName("SESSION_NAME"), DesiredSessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
+	SessionSettings.Set(FName("SessionName"), DesiredSessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
 	
 	OnCreateCompleteDelegateHandle = SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UNetworkFailureManager::CreateSessionComplete, World);
 
 	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
-	SessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, SessionSettings);
+
+	/* TODO: NAME_GameSession 고치기 */
+	SessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), SessionNameGI, SessionSettings);
 }
 
 void UNetworkFailureManager::CreateSessionComplete(FName SessionName, bool bWasSuccessful, UWorld* World)
@@ -229,7 +232,7 @@ void UNetworkFailureManager::JoinNewSession(UWorld* World)
 	SessionSearch->MaxSearchResults = 10;
 	SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 	SessionSearch->QuerySettings.Set(SETTING_MAPNAME, DesiredMapName.ToString(), EOnlineComparisonOp::Equals);
-	SessionSearch->QuerySettings.Set(FName("SESSION_NAME"), DesiredSessionName.ToString(), EOnlineComparisonOp::Equals);
+	SessionSearch->QuerySettings.Set(FName("SessionName"), DesiredSessionName.ToString(), EOnlineComparisonOp::Equals);
 	if (!SessionSearch->bIsLanQuery)
 	{
 		SessionSearch->QuerySettings.Set(SEARCH_LOBBIES, true, EOnlineComparisonOp::Equals);
@@ -252,7 +255,7 @@ void UNetworkFailureManager::FindSessionComplete(bool bWasSuccessful, UWorld* Wo
 		for (const FOnlineSessionSearchResult& SearchResult : SessionSearch->SearchResults)
 		{
 			FString SessionName;
-			SearchResult.Session.SessionSettings.Get(FName("SESSION_NAME"), SessionName);
+			SearchResult.Session.SessionSettings.Get(FName("SessionName"), SessionName);
 			// 세션 이름 확인
 			/* TODO: 로그 출력해서 확인해보기 */
 			FNetLogger::LogError(TEXT("Session Name[JOIN]: %s"), *SessionName);
@@ -339,7 +342,7 @@ void UNetworkFailureManager::JoinSession(const FOnlineSessionSearchResult& Searc
 	FNetLogger::EditerLog(FColor::Green, TEXT("Joining Session..."));
 	OnJoinCompleteDelegateHandle = SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UNetworkFailureManager::JoinSessionComplete, World);
 	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
-	SessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, SearchResult);
+	SessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), SessionNameGI, SearchResult);
 }
 
 void UNetworkFailureManager::ResetInstance()
@@ -422,16 +425,14 @@ void UNetworkFailureManager::HandleNetworkFailure(UWorld* World, UNetDriver* Net
 	UE_LOG(LogTemp, Warning, TEXT("Network Failure: %s"), *String);
 	FNetLogger::EditerLog(FColor::Red, TEXT("Network Failure: %s"), *String);
 
-	if (Arg == ENetworkFailure::ConnectionLost)
+	if (Arg == ENetworkFailure::ConnectionLost || Arg == ENetworkFailure::FailureReceived)
 	{
 		this->SaveSessionMetaData(World);
 		OnHostMigrationDelegate.Broadcast(World, DataManager);
 		if (bNextHost)
 		{
 			FNetLogger::EditerLog(FColor::Green, TEXT("Next Host"));
-			// OnHostMigrationDelegate.Broadcast(World, DataManager);
 			OnSessionDestroyedDelegate.AddUObject(this, &UNetworkFailureManager::CreateNewSession);
-			// OnSessionDestroyedDelegate.AddUObject(this, &UNetworkFailureManager::JoinNewSession);
 			DestroyPreviousSession(&UNetworkFailureManager::CreateNewSession);
 		}
 		else
@@ -440,6 +441,11 @@ void UNetworkFailureManager::HandleNetworkFailure(UWorld* World, UNetDriver* Net
 			OnSessionDestroyedDelegate.AddUObject(this, &UNetworkFailureManager::JoinNewSession);
 			DestroyPreviousSession(&UNetworkFailureManager::JoinNewSession);
 		}
+	}
+	else
+	{
+		SessionInterface->DestroySession(SessionNameGI);
+		SessionNameGI = "";
 	}
 }
 
@@ -486,12 +492,15 @@ void UNetworkFailureManager::CaptureViewport()
 
 void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 {
-	FNamedOnlineSession* CurrentSession = SessionInterface->GetNamedSession(NAME_GameSession);
+	FNetLogger::EditerLog(FColor::Green, TEXT("Name of Session: %s"), *SessionNameGI.ToString());
+	FNetLogger::LogError(TEXT("Name of Session: %s"), *SessionNameGI.ToString());
+	FNamedOnlineSession* CurrentSession = SessionInterface->GetNamedSession(SessionNameGI);
 	if (CurrentSession)
 	{
 		TArray<FUniqueNetIdRef> RegisteredPlayers;
 		TSet<FString> UniqueNicknames;  // 중복 확인을 위한 닉네임 저장소
-		
+
+		FNetLogger::LogError(TEXT("Num of Registered Players: %d"), CurrentSession->RegisteredPlayers.Num());
 		for (int32 i = 0; i < CurrentSession->RegisteredPlayers.Num(); i++)
 		{
 			FUniqueNetIdRef PlayerID = CurrentSession->RegisteredPlayers[i];
@@ -564,6 +573,7 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 	else
 	{
 		FNetLogger::EditerLog(FColor::Green, TEXT("CurrentSession is null"));
+		FNetLogger::LogError(TEXT("CurrentSession is null"));
 	}
 }
 

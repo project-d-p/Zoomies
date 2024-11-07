@@ -152,7 +152,7 @@ void AResultLevelGameState::EndPlay(const EEndPlayReason::Type EndPlayReason)
     	IOnlineSessionPtr SessionInt = GameInstance->GetOnlineSessionInterface();
     	if (SessionInt.IsValid())
     	{
-    		SessionInt->DestroySession(GameInstance->SessionName);
+    		SessionInt->DestroySession(GameInstance->GetSessionName());
     	}
 		GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
     }

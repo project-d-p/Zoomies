@@ -8,6 +8,7 @@
 #include "ScoreUI.h"
 #include "../../../Component/InGame/Score/ScoreUiPrivate.h"
 #include "Components/PanelWidget.h"
+#include "BaseData.h"
 #include "DPIngameWidget.generated.h"
 
 /**

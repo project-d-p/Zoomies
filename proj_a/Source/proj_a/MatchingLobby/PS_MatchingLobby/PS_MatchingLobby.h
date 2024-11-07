@@ -12,4 +12,11 @@ UCLASS()
 class PROJ_A_API APS_MatchingLobby : public APlayerState
 {
 	GENERATED_BODY()
+public:
+	virtual void RegisterPlayerWithSession(bool bWasFromInvite) override;
+
+	/** Unregister a player with the online subsystem */
+	virtual void UnregisterPlayerWithSession() override;
+protected:
+	void SetSessionName();
 };
