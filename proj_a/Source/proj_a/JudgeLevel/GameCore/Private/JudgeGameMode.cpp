@@ -16,7 +16,7 @@ AJudgeGameMode::AJudgeGameMode()
     PlayerStateClass = AJudgePlayerState::StaticClass();
     PlayerControllerClass = AJudgePlayerController::StaticClass();
     // PlayerControllerClass = ADPPlayerController::StaticClass();
-    // DefaultPawnClass = ADynamicTexturedCharacter::StaticClass();
+    DefaultPawnClass = ADynamicTexturedCharacter::StaticClass();
     GameStateClass = AJudgeGameState::StaticClass();
     
     TimerManager = CreateDefaultSubobject<UServerTimerManager>(TEXT("TimerManager"));
