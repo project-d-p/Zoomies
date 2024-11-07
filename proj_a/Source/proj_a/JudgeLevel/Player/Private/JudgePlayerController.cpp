@@ -4,6 +4,7 @@
 #include "EngineUtils.h"
 #include "IChatGameMode.h"
 #include "JudgeGameMode.h"
+#include "JudgeGameState.h"
 #include "JudgeLevelUI.h"
 #include "JudgePlayerState.h"
 #include "NetworkMessage.h"
@@ -47,10 +48,13 @@ void AJudgePlayerController::InitializeUI_Implementation(const FUIInitData UIDat
 	if (JudgeLevelUI)
 	{
 		JudgeLevelUI->SetVoterName(UIData.VoterName);
+		AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
+		check(GS)
+		GS->CurrentVotedPlayerName = UIData.VoterName;
 		if (TurnStartSound)
 		{
 			float VolumeMultiplier = 0.2f;
-
+		
 			UGameplayStatics::PlaySound2D(this, TurnStartSound, VolumeMultiplier);
 		}
 	}
@@ -115,7 +119,9 @@ void AJudgePlayerController::RequestUIData_Implementation()
 void AJudgePlayerController::RequestCharacter_Implementation()
 {
 	if (this->GetCharacter() != nullptr)
+	{
 		return;
+	}
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADynamicTexturedCharacter::StaticClass(), FoundActors);
 	for (AActor* Actor : FoundActors)
@@ -131,6 +137,11 @@ void AJudgePlayerController::RequestCharacter_Implementation()
 			}
 		}
 	}
+}
+
+void AJudgePlayerController::OnPossessEvent(APawn* /*OldPawn*/, APawn* /*NewPawn*/)
+{
+	GetWorldTimerManager().ClearTimer(CTH);
 }
 
 void AJudgePlayerController::BeginPlay()
@@ -149,6 +160,13 @@ void AJudgePlayerController::BeginPlay()
 		GetWorldTimerManager().SetTimer(TH, this, &AJudgePlayerController::RequestUIData, 1.f, true);
 		RequestCharacter();
 		GetWorldTimerManager().SetTimer(CTH, this, &AJudgePlayerController::RequestCharacter, 1.f, true);
+		/*
+		 * This Delegate will Called when the Controller Possess New Pawn or UnPossess Old Pawn on both Server and Client Side
+		 * Look at the Possess() function in APlayerController Class
+		 * Pawn is Set as Replicated so OnRep_Pawn() will be called on both Server and Client Side
+		 * OnRep_Pawn() will call OnPossessedPawnChanged Delegate to Broadcast the Possess Event
+		*/
+		OnPossessedPawnChanged.AddDynamic(this, &AJudgePlayerController::OnPossessEvent);
 	}
 	SetInputMode(FInputModeGameAndUI());
 }

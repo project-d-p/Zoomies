@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "CompileMode.h"
 #include "IChatGameMode.h"
+#include "JudgeData.h"
 #include "ServerTimerManager.h"
 #include "ServerChatManager.h"
 #include "ScoreTypes.h"
@@ -53,15 +54,20 @@ public:
     FUIInitData GetUiData();
 
 private:
-    EPlayerJob CollateVotingResults();
+    EPlayerJob CollectVotingResults();
     void ProcessVotingResults();
     void EndTimer();
 
     int CurrentPlayerIndex = 0;
     float WAIT_TIME = Zoomies::JUDGE_TIME;
     TArray<EPlayerJob> PlayerVotes;
-    
+    int TOTAL_PLAYER;
+
+    UPROPERTY()
+    UJudgeData* JudgedInformation;
+
 protected:
+    void InitializeGameMode();
     virtual void StartPlay() override;
     virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
     

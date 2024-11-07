@@ -41,6 +41,7 @@ public:
         VoterName->SetText(FText::FromString(Name));
         TargetUserName->SetText(FText::FromString(Name));
     }
+
     UPROPERTY(meta = (BindWidget))
     UVerticalBox* VoteButtonsGrid;
     TArray<EPlayerJob> OccupationTypes;

@@ -69,6 +69,8 @@ public:
 
 	UJudgeLevelUI* GetJudgeLevelUI() const { return JudgeLevelUI; }
 protected:
+	UFUNCTION()
+	void OnPossessEvent(APawn* OldPawn, APawn* NewPawn);
 	virtual void BeginPlay() override;
 	virtual void SeamlessTravelFrom(APlayerController* OldPC) override;
 	virtual void SeamlessTravelTo(APlayerController* NewPC) override;

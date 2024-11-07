@@ -3,6 +3,9 @@
 #include "ClientTimerManager.h"
 #include "IChatGameState.h"
 #include "ChatManager.h"
+#include "DataManager.h"
+#include "JudgeData.h"
+#include "NetworkFailureManager.h"
 #include "GameFramework/GameStateBase.h"
 #include "JudgeGameState.generated.h"
 
@@ -22,8 +25,10 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void SetVoterName(const FString& Name);
 	
+	FString CurrentVotedPlayerName;
 protected:
 	virtual void BeginPlay() override;
+	void OnHostMigration(UWorld* World, UDataManager* DataManager);
 
 private:
 	UPROPERTY(Replicated)
@@ -31,4 +36,7 @@ private:
 	UPROPERTY()
 	UChatManager* ChatManager;
     USoundBase *TurnStartSound;
+	FDelegateHandle OnHostMigrationDelegate;
+	UPROPERTY()
+	UJudgeData* JudgedInformation;
 };
