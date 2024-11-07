@@ -432,9 +432,7 @@ void UNetworkFailureManager::HandleNetworkFailure(UWorld* World, UNetDriver* Net
 		if (bNextHost)
 		{
 			FNetLogger::EditerLog(FColor::Green, TEXT("Next Host"));
-			// OnHostMigrationDelegate.Broadcast(World, DataManager);
 			OnSessionDestroyedDelegate.AddUObject(this, &UNetworkFailureManager::CreateNewSession);
-			// OnSessionDestroyedDelegate.AddUObject(this, &UNetworkFailureManager::JoinNewSession);
 			DestroyPreviousSession(&UNetworkFailureManager::CreateNewSession);
 		}
 		else
