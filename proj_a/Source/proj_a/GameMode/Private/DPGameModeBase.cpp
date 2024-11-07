@@ -392,14 +392,12 @@ void ADPGameModeBase::Tick(float delta_time)
 		if (bTimeSet == false)
 		{
 			bTimeSet = true;
+			ADPInGameState* GS = GetGameState<ADPInGameState>();
+			check(GS)
+			GS->LevelAllReady();
 			if (bRestarted == false)
 			{
-				ADPInGameState* GS = GetGameState<ADPInGameState>();
-				if (GS)
-				{
-					GS->LevelAllReady();
-					GS->MulticastPlayerJob();
-				}
+				GS->MulticastPlayerJob();
 			}
 			if (BlockingVolume)
 			{

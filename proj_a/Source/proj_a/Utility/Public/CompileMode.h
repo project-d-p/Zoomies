@@ -15,7 +15,7 @@
 	#define LAN_MODE 0
 #endif
 
-namespace Zoomies	
+namespace Zoomies
 {
 	constexpr int MAX_MONSTERS = 15;
 	constexpr int MAX_PLAYERS = 3;
