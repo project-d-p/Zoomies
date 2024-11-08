@@ -100,6 +100,7 @@ void UJudgeInputComponent::Active(const FInputActionValue& value)
 
 void UJudgeInputComponent::Rotate(const FInputActionValue& value)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Rotate"));
 	AJudgePlayerController* PlayerController = PC_JudgeLevel;
 	if (!PlayerController || !PlayerController->CameraActor) return;
 
