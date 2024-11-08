@@ -420,13 +420,13 @@ void UNetworkFailureManager::JoinSessionComplete(FName SessionName, EOnJoinSessi
 void UNetworkFailureManager::HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type Arg,
                                                   const FString& String)
 {
-	this->ResetInstance();
-	this->bMigrating = true;
 	UE_LOG(LogTemp, Warning, TEXT("Network Failure: %s"), *String);
 	FNetLogger::EditerLog(FColor::Red, TEXT("Network Failure: %s"), *String);
 
-	if (Arg == ENetworkFailure::ConnectionLost || Arg == ENetworkFailure::FailureReceived)
+	if (Arg == ENetworkFailure::ConnectionLost || Arg == ENetworkFailure::FailureReceived && !bMigrating)
 	{
+		this->bMigrating = true;
+		this->ResetInstance();
 		this->SaveSessionMetaData(World);
 		OnHostMigrationDelegate.Broadcast(World, DataManager);
 		if (bNextHost)
