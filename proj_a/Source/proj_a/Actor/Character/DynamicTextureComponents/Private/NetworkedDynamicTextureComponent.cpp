@@ -2,6 +2,7 @@
 
 #include "FNetLogger.h"
 #include "JudgeGameMode.h"
+#include "JudgeGameState.h"
 #include "JudgePlayerController.h"
 #include "TextureTransferManager.h"
 #include "Animation/SkeletalMeshActor.h"
@@ -184,28 +185,26 @@ void UNetworkedDynamicTextureComponent::UpdateTexture(UTexture2D* NewTexture)
 	int32 PlayerIndex = 0;
 	if (LevelName.Contains("judge"))
 	{
-		AJudgeGameMode* GM = Cast<AJudgeGameMode>(GetWorld()->GetAuthGameMode());
-		if (!GM)
-			return ;
+		AJudgeGameState* GS = Cast<AJudgeGameState>(GetWorld()->GetGameState());
+		
 		for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 		{
 			AJudgePlayerController* JPC = Cast<AJudgePlayerController>(*It);
 			if (!JPC)
 				continue;
-			FUIInitData Data = GM->GetUiData();
-			if (Data.bInitSuccessful)
+			
+			if (GS->GS_PlayerData.Num() > 0)
 			{
-				//iterate Data.PlayerData and find the player with the same id as PlayerState->GetPlayerId()
-				for (FPlayerInitData& PlayerData : Data.PlayerData)
+				PlayerIndex = 0;
+				for (FPlayerInitData& PlayerData : GS->GS_PlayerData)
 				{
-					if (PlayerData.PlayerName == PlayerState->GetPlayerName())
+					if (PlayerData.PlayerId == PlayerState->GetPlayerId())
 					{
 						break;
 					}
 					PlayerIndex++;
 				}
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("PlayerIndex: %d"), PlayerIndex));
-				if (PlayerIndex > Data.PlayerData.Num())
+				if (PlayerIndex > GS->GS_PlayerData.Num())
 				{
 					FNetLogger::LogError(TEXT("Failed to find player data in 'UNetworkedDynamicTextureComponent'."));
 					return ;
@@ -219,7 +218,6 @@ void UNetworkedDynamicTextureComponent::UpdateTexture(UTexture2D* NewTexture)
 		for (AActor* Actor : FoundActors)
 		{
 			FString ActorName = Actor->GetActorLabel();
-			//compare with ActorName and "Character_<PlayerIndx>"
 			if (ActorName == FString::Printf(TEXT("Character_%d"), PlayerIndex))
 			{
 				ASkeletalMeshActor* SkeletalMeshActor = Cast<ASkeletalMeshActor>(Actor);

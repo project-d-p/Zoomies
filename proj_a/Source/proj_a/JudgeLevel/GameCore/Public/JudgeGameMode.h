@@ -20,6 +20,8 @@ struct FPlayerInitData
     int32 Score;
     UPROPERTY()
     FString Occupation;
+    UPROPERTY()
+    int32 PlayerId;
 
     FPlayerInitData() : Score(0), Occupation(TEXT("None")) {}
 

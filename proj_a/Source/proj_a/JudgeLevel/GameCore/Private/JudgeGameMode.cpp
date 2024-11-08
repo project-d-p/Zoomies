@@ -27,19 +27,35 @@ AJudgeGameMode::AJudgeGameMode()
 FUIInitData AJudgeGameMode::GetUiData()
 {
     FUIInitData UIData;
+    int32 i = 0;
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         AJudgePlayerController* PC = Cast<AJudgePlayerController>(*It);
-        // ADPPlayerController* PC = Cast<ADPPlayerController>(*It);
         if (!PC)
             return UIData;
         AJudgePlayerState* PS = Cast<AJudgePlayerState>(PC->PlayerState);
         if (!PS)
             return UIData;
+        AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
         FPlayerInitData PlayerData;
         PlayerData.PlayerName = PS->GetPlayerName();
         PlayerData.Score = PS->GetScore();
-        UIData.PlayerData.Add(PlayerData);
+        PlayerData.PlayerId = PS->GetPlayerId();
+        bool bIsDuplicated = false;
+        for (const FPlayerInitData& Data : GS->GS_PlayerData)
+        {
+            if (Data.PlayerId == PlayerData.PlayerId)
+            {
+                bIsDuplicated = true;
+            }
+        }
+        if (!bIsDuplicated)
+        {
+            GS->GS_PlayerData.Add(PlayerData);
+            UIData.PlayerData.Add(PlayerData);
+        }
+        i++;
+        
     }
     // for now, following code is temporary. (Current player index)
     UIData.VoterName = Cast<AJudgePlayerState>(GetWorld()->GetGameState<AJudgeGameState>()->PlayerArray[CurrentPlayerIndex])->GetPlayerName();
