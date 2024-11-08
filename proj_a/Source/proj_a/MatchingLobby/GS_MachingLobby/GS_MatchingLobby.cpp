@@ -102,6 +102,7 @@ void AGS_MatchingLobby::BeginPlay()
 
 void AGS_MatchingLobby::OnHostMigration(UWorld* World, UDataManager* DataManager)
 {
+	FNetLogger::EditerLog(FColor::Red, TEXT("AGS_MatchingLobby::OnHostMigration"));
 }
 
 void AGS_MatchingLobby::EndPlay(const EEndPlayReason::Type EndPlayReason)

@@ -347,6 +347,7 @@ void UNetworkFailureManager::JoinSession(const FOnlineSessionSearchResult& Searc
 
 void UNetworkFailureManager::ResetInstance()
 {
+	FNetLogger::EditerLog(FColor::Green, TEXT("Resetting Instance"));
 	DataManager->Clear();
 	DesiredMaxPlayers = 0;
 	bNextHost = false;
@@ -423,7 +424,7 @@ void UNetworkFailureManager::HandleNetworkFailure(UWorld* World, UNetDriver* Net
 	UE_LOG(LogTemp, Warning, TEXT("Network Failure: %s"), *String);
 	FNetLogger::EditerLog(FColor::Red, TEXT("Network Failure: %s"), *String);
 
-	if (Arg == ENetworkFailure::ConnectionLost || Arg == ENetworkFailure::FailureReceived && !bMigrating)
+	if ((Arg == ENetworkFailure::ConnectionLost || Arg == ENetworkFailure::FailureReceived) && !bMigrating)
 	{
 		this->bMigrating = true;
 		this->ResetInstance();
@@ -444,8 +445,11 @@ void UNetworkFailureManager::HandleNetworkFailure(UWorld* World, UNetDriver* Net
 	}
 	else
 	{
-		SessionInterface->DestroySession(SessionNameGI);
-		SessionNameGI = "";
+		if (!bMigrating)
+		{
+			SessionInterface->DestroySession(SessionNameGI);
+			SessionNameGI = "";
+		}
 	}
 }
 
