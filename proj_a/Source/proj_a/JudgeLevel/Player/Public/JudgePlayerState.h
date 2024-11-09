@@ -21,17 +21,22 @@ public:
 	EPlayerJob GetPlayerJob() const { return PlayerJob; }
 	void SetPlayerScoreData(UPlayerScoreData* InPlayerScoreData) { PlayerScoreData = Cast<UPlayerScoreData>(InPlayerScoreData->Clone(this)); }
 
-	virtual void RegisterPlayerWithSession(bool bWasFromInvite) override;
 
-	/** Unregister a player with the online subsystem */
+	/* Register and Unregister a player with the online subsystem */
+	virtual void RegisterPlayerWithSession(bool bWasFromInvite) override;
 	virtual void UnregisterPlayerWithSession() override;
-	
+
+	/*
+	 * Call RegisterPlayerWithSession for all players (escpecially for host) during seamless travel
+	 * Becuase OnRep_UniqueID() is not calling for host during Seamless Travel
+	 */ 
+	virtual void CopyProperties(APlayerState* PlayerState) override;
 protected:
 	void SetSessionName();
-	
 private:
 	UPROPERTY()
 	UPlayerScoreData* PlayerScoreData;
 	FFinalScoreData FinalScoreData;
 	EPlayerJob PlayerJob;
+	bool SeamlessTravling;
 };

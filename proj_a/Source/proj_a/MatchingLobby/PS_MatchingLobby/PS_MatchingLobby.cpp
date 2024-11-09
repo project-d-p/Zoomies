@@ -10,7 +10,7 @@ void APS_MatchingLobby::RegisterPlayerWithSession(bool bWasFromInvite)
 {
 	SetSessionName();
 	
-	Super::RegisterPlayerWithSession(bWasFromInvite);
+	// Super::RegisterPlayerWithSession(bWasFromInvite);
 
 	if (GetNetMode() != NM_Standalone)
 	{
@@ -29,9 +29,9 @@ void APS_MatchingLobby::UnregisterPlayerWithSession()
 {
 	SetSessionName();
 	
-	Super::UnregisterPlayerWithSession();
+	// Super::UnregisterPlayerWithSession();
 
-	if (GetNetMode() == NM_Client && GetUniqueId().IsValid())
+	if ((GetNetMode() == NM_Client && GetUniqueId().IsValid()) && !this->SeamlessTravling)
 	{
 		if (this->SessionName != NAME_None)
 		{
@@ -41,6 +41,14 @@ void APS_MatchingLobby::UnregisterPlayerWithSession()
 			}
 		}
 	}
+}
+
+void APS_MatchingLobby::CopyProperties(APlayerState* PlayerState)
+{
+	Super::CopyProperties(PlayerState);
+
+	SeamlessTravling = true;
+	PlayerState->OnRep_UniqueId();
 }
 
 void APS_MatchingLobby::SetSessionName()

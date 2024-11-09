@@ -57,7 +57,7 @@ void ADPPlayerState::RegisterPlayerWithSession(bool bWasFromInvite)
 {
 	SetSessionName();
 	
-	Super::RegisterPlayerWithSession(bWasFromInvite);
+	// Super::RegisterPlayerWithSession(bWasFromInvite);
 
 	if (GetNetMode() != NM_Standalone)
 	{
@@ -76,9 +76,9 @@ void ADPPlayerState::UnregisterPlayerWithSession()
 {
 	SetSessionName();
 	
-	Super::UnregisterPlayerWithSession();
+	// Super::UnregisterPlayerWithSession();
 
-	if (GetNetMode() == NM_Client && GetUniqueId().IsValid())
+	if ((GetNetMode() == NM_Client && GetUniqueId().IsValid()) && !this->SeamlessTraviling)
 	{
 		if (this->SessionName != NAME_None)
 		{
@@ -93,12 +93,14 @@ void ADPPlayerState::UnregisterPlayerWithSession()
 void ADPPlayerState::CopyProperties(APlayerState* PlayerState)
 {
 	Super::CopyProperties(PlayerState);
-	
+
+	this->SeamlessTraviling = true;
 	AJudgePlayerState* JPS = Cast<AJudgePlayerState>(PlayerState);
 	if (JPS)
 	{
 		JPS->SetPlayerJob(PlayerJob);
 	}
+	PlayerState->OnRep_UniqueId();
 }
 
 void ADPPlayerState::ServerSetRank_Implementation(int InRank)
