@@ -7,15 +7,16 @@ void AJudgePlayerState::RegisterPlayerWithSession(bool bWasFromInvite)
 {
 	SetSessionName();
 	
-	Super::UnregisterPlayerWithSession();
+	Super::RegisterPlayerWithSession(bWasFromInvite);
 
-	if (GetNetMode() == NM_Client && GetUniqueId().IsValid())
+	if (GetNetMode() != NM_Standalone)
 	{
-		if (this->SessionName != NAME_None)
+		if (GetUniqueId().IsValid()) // May not be valid if this is was created via DebugCreatePlayer
 		{
+			// Register the player as part of the session
 			if (UOnlineEngineInterface::Get()->DoesSessionExist(GetWorld(), this->SessionName))
 			{
-				UOnlineEngineInterface::Get()->UnregisterPlayer(GetWorld(), this->SessionName, GetUniqueId());
+				UOnlineEngineInterface::Get()->RegisterPlayer(GetWorld(), this->SessionName, GetUniqueId(), bWasFromInvite);
 			}
 		}
 	}
