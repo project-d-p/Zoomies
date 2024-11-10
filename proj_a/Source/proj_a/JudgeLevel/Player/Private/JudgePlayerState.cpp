@@ -4,6 +4,20 @@
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 
+void AJudgePlayerState::SeamlessTravelTo(APlayerState* NewPlayerState)
+{
+	Super::SeamlessTravelTo(NewPlayerState);
+
+	ADPPlayerState* DPS = Cast<ADPPlayerState>(NewPlayerState);
+	if (DPS)
+	{
+		if (this->PlayerScoreData)
+		{
+			DPS->SetPlayerScoreData(this->PlayerScoreData);
+		}
+	}
+}
+
 void AJudgePlayerState::RegisterPlayerWithSession(bool bWasFromInvite)
 {
 	SetSessionName();

@@ -16,6 +16,7 @@ public:
 	void SetIsDetected(bool bIsDetected) { if(PlayerScoreData) {PlayerScoreData->SetIsDetected(bIsDetected);} }
 	FFinalScoreData GetFinalScoreData() const { return FinalScoreData; }
 	UPlayerScoreData* GetPlayerScoreData() const { return PlayerScoreData; }
+	virtual void SeamlessTravelTo(APlayerState* NewPlayerState) override;
 
 	void SetPlayerJob(EPlayerJob InPlayerJob) { PlayerJob = InPlayerJob; }
 	EPlayerJob GetPlayerJob() const { return PlayerJob; }

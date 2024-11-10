@@ -83,6 +83,11 @@ void UMainLevelComponent::SetStateComponent()
 	{
 		StateComponent = Cast<UDPStateActorComponent>(Character->GetComponentByClass(UDPStateActorComponent::StaticClass()));
 	}
+	else
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UMainLevelComponent::SetStateComponent, 1.0f, false);
+	}
 }
 
 UDPStateActorComponent* UMainLevelComponent::GetStateComponent() const

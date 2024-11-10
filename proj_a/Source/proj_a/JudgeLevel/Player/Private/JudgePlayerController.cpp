@@ -185,14 +185,6 @@ void AJudgePlayerController::SeamlessTravelFrom(APlayerController* OldPC)
 void AJudgePlayerController::SeamlessTravelTo(APlayerController* NewPC)
 {
 	Super::SeamlessTravelTo(NewPC);
-
-	ADPPlayerController* NPC = Cast<ADPPlayerController>(NewPC);
-	check(NPC)
-	ADPPlayerState* NGS = NPC->GetPlayerState<ADPPlayerState>();
-	check(NGS)
-	AJudgePlayerState* GS = GetPlayerState<AJudgePlayerState>();
-	check(GS)
-	NGS->SetPlayerScoreData(GS->GetPlayerScoreData());
 }
 
 void AJudgePlayerController::PostSeamlessTravel()

@@ -146,6 +146,15 @@ void ADPPlayerState::AddInGameWidgetFunctionToDelegate()
 				PlayerScoreData->TestBroadcast();
 			}
 		}
+		else
+		{
+			FNetLogger::EditerLog(FColor::Red, TEXT("MainLevelComponent is nullptr"));
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
+			{
+				AddInGameWidgetFunctionToDelegate();
+			}, 0.5f, false);
+		}
 	}
 }
 
