@@ -15,6 +15,10 @@
 #include "Algo/Sort.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "CompileMode.h"
+#include "isteamuser.h"
+#include "steamclientpublic.h"
+#include "Chaos/AABB.h"
+#include "Chaos/AABB.h"
 #include "Kismet/KismetRenderingLibrary.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
@@ -191,6 +195,7 @@ void UNetworkFailureManager::CreateNewSession(UWorld* World)
 		SessionSettings.bUseLobbiesIfAvailable = true;
 	}
 
+	SessionSettings.Set(FName("BanList"), SavedBanList, EOnlineDataAdvertisementType::ViaOnlineService);
 	SessionSettings.Set(SETTING_MAPNAME, DesiredMapName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
 	SessionSettings.Set(FName("SessionName"), DesiredSessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
 	
@@ -453,7 +458,7 @@ void UNetworkFailureManager::HandleNetworkFailure(UWorld* World, UNetDriver* Net
 	}
 }
 
-void UNetworkFailureManager::CreateNewSessionMetaData(UWorld* World, const FUniqueNetIdRef& NewHostPlayerID)
+void UNetworkFailureManager::CreateNewSessionMetaData(UWorld* World, FNamedOnlineSession* CurrentSession, const FUniqueNetIdRef& NewHostPlayerID)
 {
 	FString PlayerName = NewHostPlayerID->ToString();
 
@@ -464,6 +469,12 @@ void UNetworkFailureManager::CreateNewSessionMetaData(UWorld* World, const FUniq
 
 	DesiredMapName = FName(*FString::Printf(TEXT("%s"), *World->GetMapName()));
 	FNetLogger::EditerLog(FColor::Red, TEXT("New Map Name: %s"), *DesiredMapName.ToString());
+
+	SavedBanList = "";
+	if (CurrentSession->SessionSettings.Get(FName("BanList"), SavedBanList))
+	{
+		SavedBanList += TEXT(",") + NewHostPlayerID->ToString();
+	}
 }
 
 void UNetworkFailureManager::CaptureViewport()
@@ -571,7 +582,7 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 		{
 			bNextHost = false;
 		}
-		CreateNewSessionMetaData(World, NextHostID);
+		CreateNewSessionMetaData(World, CurrentSession, NextHostID);
 		// CaptureViewport();
 	}
 	else

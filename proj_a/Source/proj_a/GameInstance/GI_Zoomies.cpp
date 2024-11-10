@@ -229,7 +229,8 @@ bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& se
 		FNetLogger::EditerLog(FColor::Red, TEXT("BanList: %s"), *BanList);
 		CSteamID SteamIDRaw = SteamUser()->GetSteamID();
 		FString PlayerID = FString::Printf(TEXT("%llu"), SteamIDRaw.ConvertToUint64());
-		if (BanList.Contains(PlayerID))
+		FUniqueNetIdRepl LocalID = GetWorld()->GetFirstLocalPlayerFromController()->GetUniqueNetIdFromCachedControllerId();
+		if (BanList.Contains(PlayerID) || BanList.Contains(LocalID->ToString()))
 		{
 			FNetLogger::EditerLog(FColor::Red, TEXT("You are banned from this session"));
 			return false;
