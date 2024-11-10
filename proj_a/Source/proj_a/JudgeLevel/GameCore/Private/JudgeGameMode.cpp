@@ -75,19 +75,56 @@ EPlayerJob AJudgeGameMode::CollectVotingResults()
     return MostVotedPair->Key;
 }
 
+AJudgePlayerState* AJudgeGameMode::GetCurrentVotedPlayerState()
+{
+    AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
+    check(GS)
+    for (APlayerState* PS : GS->PlayerArray)
+    {
+        AJudgePlayerState* JPS = Cast<AJudgePlayerState>(PS);
+        if (JPS->GetPlayerName().Contains(GS->CurrentVotedPlayerName))
+        {
+            return JPS;
+        }
+    }
+    return nullptr;
+}
+
+void AJudgeGameMode::HandlePlayerStateNull()
+{
+    AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
+    if (!GS->PlayerArray.IsValidIndex(CurrentPlayerIndex - 1))
+    {
+        // 중간에 나간 클라이언트가 마지막 순번이었을 경우
+        EndTimer();
+    }
+    else
+    {
+        // 중간에 나간 클라이언트가 중간의 순번이었을 경우
+        CurrentPlayerIndex--;
+        TOTAL_PLAYER--;
+        EndTimer();
+    }
+}
+
 void AJudgeGameMode::ProcessVotingResults()
 {
     EPlayerJob MostVotedOccupation = CollectVotingResults();
 
     AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
     check(GS)
-    if (!GS->PlayerArray.IsValidIndex(CurrentPlayerIndex - 1))
+    // if (!GS->PlayerArray.IsValidIndex(CurrentPlayerIndex - 1))
+    // {
+    //     FNetLogger::LogError(TEXT("Failed to get %d player state."), CurrentPlayerIndex - 1);
+    //     return ;
+    // }
+    AJudgePlayerState* PS = GetCurrentVotedPlayerState();
+    if (!PS)
     {
-        FNetLogger::LogError(TEXT("Failed to get %d player state."), CurrentPlayerIndex - 1);
+        HandlePlayerStateNull();
         return ;
     }
-    AJudgePlayerState* PS = Cast<AJudgePlayerState>(GetWorld()->GetGameState<AJudgeGameState>()->PlayerArray[CurrentPlayerIndex - 1]);
-    check(PS)
+    
     if (PS->GetPlayerJob() == MostVotedOccupation)
     {
         PS->SetIsDetected(true);
@@ -175,6 +212,18 @@ void AJudgeGameMode::StartPlay()
 
     InitializeGameMode();
     TimerManager->StartTimer<AJudgeGameState>(WAIT_TIME, &AJudgeGameMode::EndTimer, this);
+}
+
+void AJudgeGameMode::Logout(AController* Exiting)
+{
+    Super::Logout(Exiting);
+
+    UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+    if (GameInstance)
+    {
+        GameInstance->AddBanPlayer(Exiting->PlayerState->GetUniqueId()->ToString());
+    }
+    JudgedInformation->AddJudgedPlayerName(Exiting->PlayerState->GetPlayerName());
 }
 
 void AJudgeGameMode::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)

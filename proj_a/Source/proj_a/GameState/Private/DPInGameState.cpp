@@ -110,6 +110,7 @@ void ADPInGameState::LevelAllReady_Implementation()
 	{
 		LoadingWidgetInstance->RemoveFromParent();
 	}
+	bAllReady = true;
 }
 
 void ADPInGameState::AddPlayerState(APlayerState* PlayerState)

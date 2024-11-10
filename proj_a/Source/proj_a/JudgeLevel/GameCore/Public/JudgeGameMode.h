@@ -4,6 +4,7 @@
 #include "CompileMode.h"
 #include "IChatGameMode.h"
 #include "JudgeData.h"
+#include "JudgePlayerState.h"
 #include "ServerTimerManager.h"
 #include "ServerChatManager.h"
 #include "ScoreTypes.h"
@@ -55,6 +56,8 @@ public:
 
 private:
     EPlayerJob CollectVotingResults();
+    AJudgePlayerState* GetCurrentVotedPlayerState();
+    void HandlePlayerStateNull();
     void ProcessVotingResults();
     void EndTimer();
 
@@ -69,6 +72,7 @@ private:
 protected:
     void InitializeGameMode();
     virtual void StartPlay() override;
+    virtual void Logout(AController* Exiting) override;
     virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
     
     UPROPERTY()

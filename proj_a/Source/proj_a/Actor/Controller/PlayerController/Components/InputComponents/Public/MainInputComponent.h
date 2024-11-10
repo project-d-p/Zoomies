@@ -17,6 +17,7 @@ public:
 	virtual void Deactivate() override;
 
 private:
+	bool IsValidateToRunThisFunction();
 	void BindMainLevelActions();
 	void UnbindMainLevelActions();
 	

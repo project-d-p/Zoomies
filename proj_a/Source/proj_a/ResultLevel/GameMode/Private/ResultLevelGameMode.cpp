@@ -33,6 +33,12 @@ void AResultLevelGameMode::Logout(AController* Exiting)
 {
 	// Clear the session when the player leaves the game
 	Super::Logout(Exiting);
+
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (GameInstance)
+	{
+		GameInstance->AddBanPlayer(Exiting->PlayerState->GetUniqueId()->ToString());
+	}
 }
 
 void AResultLevelGameMode::SpawnNewPlayerPawn(AController* PC)

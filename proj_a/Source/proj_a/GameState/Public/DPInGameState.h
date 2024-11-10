@@ -30,7 +30,7 @@ public:
 	void MulticastPlayerJob() const;
 	UFUNCTION(NetMulticast, Reliable)
 	void LevelAllReady();
-
+	bool bAllReady;
 	/*
 	 * TEST: COMMENT
 	UPROPERTY(ReplicatedUsing=OnRep_ServerTraveled)

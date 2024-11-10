@@ -141,8 +141,6 @@ void ADPPlayerController::ConnectToServer_Implementation(ELevelComponentType Typ
 #else
 	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
 #endif
-	//
-	// SwitchLevelComponent(Type);
 	}
 }
 
