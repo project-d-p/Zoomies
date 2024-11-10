@@ -96,6 +96,10 @@ void AJudgeGameMode::HandlePlayerStateNull()
     if (!GS->PlayerArray.IsValidIndex(CurrentPlayerIndex - 1))
     {
         // 중간에 나간 클라이언트가 마지막 순번이었을 경우
+        if (CurrentPlayerIndex < TOTAL_PLAYER)
+        {
+            TOTAL_PLAYER--;
+        }
         EndTimer();
     }
     else
