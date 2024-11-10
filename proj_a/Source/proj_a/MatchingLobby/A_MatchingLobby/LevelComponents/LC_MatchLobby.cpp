@@ -41,6 +41,11 @@ void ULC_MatchLobby::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 void ULC_MatchLobby::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+
+	if (EndPlayReason == EEndPlayReason::LevelTransition)
+	{
+		DestroyComponent();
+	}
 }
 
 APC_MatchingLobby* ULC_MatchLobby::GetPlayerController() const

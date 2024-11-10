@@ -60,11 +60,16 @@ void APC_MatchingLobby::BeginPlay()
 	getMatchLobbyUI();
 }
 
-void APC_MatchingLobby::EndPlay( const EEndPlayReason::Type EndPlayReason)
+void APC_MatchingLobby::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 	RemoveMatchLobbyUI();
 	DeactiveCurrentComponent();
+
+	if (EndPlayReason == EEndPlayReason::LevelTransition)
+	{
+		Destroy();
+	}
 }
 
 void APC_MatchingLobby::SetCineCameraView()
