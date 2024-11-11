@@ -1,8 +1,8 @@
 ﻿#include "JudgePlayerState.h"
 
 #include "Net/OnlineEngineInterface.h"
+#include "Net/UnrealNetwork.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
-
 
 AJudgePlayerState::AJudgePlayerState()
 {
@@ -102,10 +102,15 @@ void AJudgePlayerState::OnHostMigration(UWorld* World, UDataManager* DataManager
 	{
 		GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
 	}
-	UPlayerScoreData* ClonedPlayerScoreData = Cast<UPlayerScoreData>(PlayerScoreData->Clone(DataManager));
-	if (ClonedPlayerScoreData)
+	UPlayerScoreData* NewData = NewObject<UPlayerScoreData>(DataManager, TEXT("PlayerScoreData"));
+	if (NewData)
 	{
-		DataManager->AddDataToArray(TEXT("PlayerScore"), ClonedPlayerScoreData);
+		NewData->InitializeData();
+		NewData->SetPlayerName(this->GetPlayerName());
+		NewData->SetPlayerId(this->GetPlayerId());
+		NewData->SetPlayerJob(this->PlayerJob);
+		NewData->SetScore(this->PlayerScoreData->GetScore());
+		DataManager->AddDataToArray(TEXT("PlayerScore"), NewData);
 	}
 }
 
@@ -163,3 +168,9 @@ void AJudgePlayerState::BeginPlay()
 	InitializePlayerState();
 }
 
+void AJudgePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AJudgePlayerState, PlayerScoreData);
+}

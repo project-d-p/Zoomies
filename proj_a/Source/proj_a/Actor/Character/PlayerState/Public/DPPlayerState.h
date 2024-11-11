@@ -67,7 +67,7 @@ private:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	UPlayerScoreData* PlayerScoreData = nullptr;
 	FDelegateHandle OnHostMigrationDelegate;
 	FTimerHandle PlayerNameTimerHandle;

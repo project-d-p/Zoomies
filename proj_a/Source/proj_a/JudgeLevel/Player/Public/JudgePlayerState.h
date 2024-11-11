@@ -41,8 +41,9 @@ protected:
 	void SetPlayerNameDelayed();
 	void InitializePlayerState();
 	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 private:
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	UPlayerScoreData* PlayerScoreData;
 	FFinalScoreData FinalScoreData;
 	EPlayerJob PlayerJob;

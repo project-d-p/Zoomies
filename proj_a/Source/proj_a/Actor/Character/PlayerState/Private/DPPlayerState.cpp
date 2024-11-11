@@ -235,6 +235,7 @@ void ADPPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	DOREPLIFETIME(ADPPlayerState, PlayerJob);
 	DOREPLIFETIME(ADPPlayerState, Rank);
+	DOREPLIFETIME(ADPPlayerState, PlayerScoreData);
 }
 
 void ADPPlayerState::SetPlayerRandomJob()
