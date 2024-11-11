@@ -32,12 +32,21 @@ public:
 	 * Becuase OnRep_UniqueID() is not calling for host during Seamless Travel
 	 */ 
 	virtual void CopyProperties(APlayerState* PlayerState) override;
+
+	UFUNCTION()
+	void OnHostMigration(UWorld* World, UDataManager* DataManager);
 protected:
 	void SetSessionName();
+
+	void SetPlayerNameDelayed();
+	void InitializePlayerState();
+	virtual void BeginPlay() override;
 private:
 	UPROPERTY()
 	UPlayerScoreData* PlayerScoreData;
 	FFinalScoreData FinalScoreData;
 	EPlayerJob PlayerJob;
 	bool SeamlessTravling;
+	FDelegateHandle OnHostMigrationDelegate;
+	FTimerHandle PlayerNameTimerHandle;
 };

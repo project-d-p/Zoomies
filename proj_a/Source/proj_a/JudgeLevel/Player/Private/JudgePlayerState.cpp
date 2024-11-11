@@ -80,6 +80,20 @@ void AJudgePlayerState::CopyProperties(APlayerState* PlayerState)
 	PlayerState->OnRep_UniqueId();
 }
 
+void AJudgePlayerState::OnHostMigration(UWorld* World, UDataManager* DataManager)
+{
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (GameInstance)
+	{
+		GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
+	}
+	UPlayerScoreData* ClonedPlayerScoreData = Cast<UPlayerScoreData>(PlayerScoreData->Clone(DataManager));
+	if (ClonedPlayerScoreData)
+	{
+		DataManager->AddDataToArray(TEXT("PlayerScore"), ClonedPlayerScoreData);
+	}
+}
+
 void AJudgePlayerState::SetSessionName()
 {
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
@@ -88,3 +102,48 @@ void AJudgePlayerState::SetSessionName()
 		SessionName = GameInstance->GetSessionName();
 	}
 }
+
+void AJudgePlayerState::SetPlayerNameDelayed()
+{
+	PlayerScoreData->SetPlayerName(GetPlayerName());
+}
+
+void AJudgePlayerState::InitializePlayerState()
+{
+	PlayerScoreData->SetPlayerName(this->GetPlayerName());
+	PlayerScoreData->SetPlayerId(this->GetPlayerId());
+	GetWorld()->GetTimerManager().SetTimer(PlayerNameTimerHandle, this, &AJudgePlayerState::SetPlayerNameDelayed, 0.5f, false);
+	
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	check(GameInstance);
+	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
+	check(DataManager);
+	UDataArray* PlayerScoreDataArray = DataManager->GetDataArray(TEXT("PlayerScore"));
+	if (PlayerScoreDataArray)
+	{
+		for (UBaseData* Data : PlayerScoreDataArray->DataArray)
+		{
+			UPlayerScoreData* SavedScoreData = Cast<UPlayerScoreData>(Data);
+			if (SavedScoreData && SavedScoreData->GetPlayerName() == GetPlayerName())
+			{
+				PlayerScoreData->SetScore(SavedScoreData->GetScore());
+			}
+		}
+	}
+}
+
+void AJudgePlayerState::BeginPlay()
+{
+	Super::BeginPlay();
+
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (!HasAuthority())
+	{
+		if (GameInstance)
+		{
+			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &AJudgePlayerState::OnHostMigration);
+		}
+	}
+	InitializePlayerState();
+}
+

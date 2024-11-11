@@ -86,3 +86,4 @@ void AJudgeGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 	DOREPLIFETIME(AJudgeGameState, TimerManager);
 }
+
