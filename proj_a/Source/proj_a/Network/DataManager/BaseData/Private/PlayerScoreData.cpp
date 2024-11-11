@@ -49,11 +49,11 @@ FName UPlayerScoreData::GetDataType() const
 	return Super::GetDataType();
 }
 
-void UPlayerScoreData::IncreaseScore(const EPlayerJob& PlayerJob, const TArray<EAnimal>& Animals)
+void UPlayerScoreData::IncreaseScore(const EPlayerJob& PlayerJob_, const TArray<EAnimal>& Animals)
 {
 	int BaseAnimalScore = 100;
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Animals Num is %d and Job is %d"), Animals.Num(), static_cast<int>(PlayerJob));
-	FScoreData scoreData = UCalculateScoreByJobs::CalculateScoreByJobs(PlayerJob, Animals);
+	FNetLogger::EditerLog(FColor::Cyan, TEXT("Animals Num is %d and Job is %d"), Animals.Num(), static_cast<int>(PlayerJob_));
+	FScoreData scoreData = UCalculateScoreByJobs::CalculateScoreByJobs(PlayerJob_, Animals);
 	Score.ScoreDatas.Add(scoreData);
 	Score.CapturedAnimals.Add(Animals);
 	Score.PublicTotalScore += Animals.Num() * BaseAnimalScore;
