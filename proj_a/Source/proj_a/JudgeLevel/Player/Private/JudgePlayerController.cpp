@@ -292,8 +292,6 @@ void AJudgePlayerController::findMyCamera()
 		}
 	}
 	
-	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("CameraIndex: %d"), CameraIndex));
-
 	if (CameraIndex == -1)
 	{
 		return;
@@ -304,7 +302,6 @@ void AJudgePlayerController::findMyCamera()
 		FString ActorName = Actor->GetActorLabel();
 		if (ActorName == FString::Printf(TEXT("CameraActor_%d"), CameraIndex))
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("CameraActor_%d found!"), CameraIndex));
 			CameraActor = Actor;
 			SetViewTarget(Actor);
 			break;
