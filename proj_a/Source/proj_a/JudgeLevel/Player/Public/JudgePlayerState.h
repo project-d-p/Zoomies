@@ -34,6 +34,10 @@ public:
 	 */ 
 	virtual void CopyProperties(APlayerState* PlayerState) override;
 
+	UFUNCTION(Server, Reliable)
+	void RequestMyInfo();
+	UFUNCTION(Client, Reliable)
+	void ResponseMyInfo(UPlayerScoreData* InPlayerScoreData);
 protected:
 	void SetSessionName();
 	void OnHostMigration(UWorld* World, UDataManager* DataManager);
@@ -43,11 +47,12 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 private:
-	UPROPERTY(Replicated)
+	UPROPERTY()
 	UPlayerScoreData* PlayerScoreData;
 	FFinalScoreData FinalScoreData;
 	EPlayerJob PlayerJob;
 	bool SeamlessTravling;
 	FDelegateHandle OnHostMigrationDelegate;
 	FTimerHandle PlayerNameTimerHandle;
+	bool bResponsedMyInfo;
 };

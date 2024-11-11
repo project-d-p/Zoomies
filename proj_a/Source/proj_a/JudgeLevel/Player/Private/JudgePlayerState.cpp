@@ -153,6 +153,17 @@ void AJudgePlayerState::InitializePlayerState()
 	}
 }
 
+void AJudgePlayerState::RequestMyInfo_Implementation()
+{
+	ResponseMyInfo(this->PlayerScoreData);
+}
+
+void AJudgePlayerState::ResponseMyInfo_Implementation(UPlayerScoreData* InPlayerScoreData)
+{
+	this->SetPlayerScoreData(InPlayerScoreData);
+	bResponsedMyInfo = true;
+}
+
 void AJudgePlayerState::BeginPlay()
 {
 	Super::BeginPlay();
@@ -164,6 +175,15 @@ void AJudgePlayerState::BeginPlay()
 		{
 			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &AJudgePlayerState::OnHostMigration);
 		}
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+		{
+			if (!bResponsedMyInfo)
+			{
+				FTimerHandle ReTry;
+				GetWorld()->GetTimerManager().SetTimer(ReTry, this, &AJudgePlayerState::RequestMyInfo, 0.5f, false);
+			}
+		}), 0.5f, false);
 	}
 	InitializePlayerState();
 }
@@ -172,5 +192,5 @@ void AJudgePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(AJudgePlayerState, PlayerScoreData);
+	// DOREPLIFETIME(AJudgePlayerState, PlayerScoreData);
 }

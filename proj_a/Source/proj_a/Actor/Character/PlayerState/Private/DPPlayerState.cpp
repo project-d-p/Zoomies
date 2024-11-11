@@ -203,6 +203,17 @@ void ADPPlayerState::SetSessionName()
 	}
 }
 
+void ADPPlayerState::RequestMyInfo_Implementation()
+{
+	ResponseMyInfo(this->PlayerScoreData);
+}
+
+void ADPPlayerState::ResponseMyInfo_Implementation(UPlayerScoreData* InPlayerScoreData)
+{
+	this->SetPlayerScoreData(InPlayerScoreData);
+	bResponsedMyInfo = true;
+}
+
 void ADPPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
@@ -214,8 +225,19 @@ void ADPPlayerState::BeginPlay()
 		{
 			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &ADPPlayerState::OnHostMigration);
 		}
+		if (GetWorld()->GetMapName() == TEXT("calculateLevel"))
+		{
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+			{
+				if (!bResponsedMyInfo)
+				{
+					FTimerHandle ReTry;
+					GetWorld()->GetTimerManager().SetTimer(ReTry, this, &ADPPlayerState::RequestMyInfo, 0.5f, false);
+				}
+			}), 0.5f, false);
+		}
 	}
-
 	InitializePlayerState();
 }
 
@@ -235,7 +257,6 @@ void ADPPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	DOREPLIFETIME(ADPPlayerState, PlayerJob);
 	DOREPLIFETIME(ADPPlayerState, Rank);
-	DOREPLIFETIME(ADPPlayerState, PlayerScoreData);
 }
 
 void ADPPlayerState::SetPlayerRandomJob()

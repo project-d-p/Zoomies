@@ -51,6 +51,11 @@ public:
 	 * Becuase OnRep_UniqueID() is not calling for host during Seamless Travel
 	 */ 
 	virtual void CopyProperties(APlayerState* PlayerState) override;
+
+	UFUNCTION(Server, Reliable)
+	void RequestMyInfo();
+	UFUNCTION(Client, Reliable)
+	void ResponseMyInfo(UPlayerScoreData* InPlayerScoreData);
 private:
 	// Will Delete
 	UPROPERTY()
@@ -67,11 +72,12 @@ private:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
-	UPROPERTY(Replicated)
+	UPROPERTY()
 	UPlayerScoreData* PlayerScoreData = nullptr;
 	FDelegateHandle OnHostMigrationDelegate;
 	FTimerHandle PlayerNameTimerHandle;
 
 	/* For Seamless Travel */
 	bool SeamlessTraviling;
+	bool bResponsedMyInfo;
 };
