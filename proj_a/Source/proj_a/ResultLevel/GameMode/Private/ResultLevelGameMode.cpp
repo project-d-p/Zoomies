@@ -12,7 +12,7 @@ AResultLevelGameMode::AResultLevelGameMode()
 
 	PrimaryActorTick.bCanEverTick = true;
 	
-	DefaultPawnClass = ADPCharacter::StaticClass();
+	DefaultPawnClass = nullptr;
 	PlayerControllerClass = ADPPlayerController::StaticClass();
 	PlayerStateClass = ADPPlayerState::StaticClass();
 	GameStateClass = AResultLevelGameState::StaticClass();
@@ -138,7 +138,7 @@ void AResultLevelGameMode::CheckPlayersAllTraveled()
 				{
 					continue;
 				}
-				ADPCharacter* Character = Cast<ADPCharacter>(Controller->GetCharacter());
+				ADPCharacter* Character = Cast<ADPCharacter>(Controller->GetPawn());
 				if (Character == nullptr)
 				{
 					check(false)

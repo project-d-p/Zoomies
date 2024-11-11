@@ -71,6 +71,7 @@ public:
 
 	UJudgeLevelUI* GetJudgeLevelUI() const { return JudgeLevelUI; }
 protected:
+	// 
 	UFUNCTION()
 	void OnPossessEvent(APawn* OldPawn, APawn* NewPawn);
 	virtual void BeginPlay() override;

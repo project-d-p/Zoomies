@@ -94,7 +94,7 @@ void ADPPlayerController::AcknowledgePossession(APawn* P)
 		if (UWorld* World = GetWorld())
 		{
 			FString CurrentLevelName = World->GetMapName();
-			if (CurrentLevelName.Contains("resultLevel"))
+			if (CurrentLevelName.Contains("calculateLevel"))
 			{
 				DPCharacter->SetReplicatingMovement(true);
 				SwitchLevelComponent(ELevelComponentType::RESULT);
