@@ -64,13 +64,19 @@ void AResultLevelGameMode::SpawnNewPlayerPawn(AController* PC)
 		{-527.514681,138.648437,85.462503}
 	};
 
-	FVector SpawnLocation = Location[i++];
-
-	ADPCharacter* NewCharacter = GetWorld()->SpawnActor<ADPCharacter>(DefaultPawnClass, SpawnLocation, FRotator::ZeroRotator);
-	if (NewCharacter)
+	ADPCharacter* Character = Cast<ADPCharacter>(PC->GetPawn());
+	if (Character)
 	{
-		PC->Possess(NewCharacter);
+		Character->SetActorLocation(Location[i++]);
 	}
+
+	// FVector SpawnLocation = Location[i++];
+	//
+	// ADPCharacter* NewCharacter = GetWorld()->SpawnActor<ADPCharacter>(DefaultPawnClass, SpawnLocation, FRotator::ZeroRotator);
+	// if (NewCharacter)
+	// {
+	// 	PC->Possess(NewCharacter);
+	// }
 
 	// ADPPlayerController* PlayerController = Cast<ADPPlayerController>(PC);
 	// if (PlayerController)
