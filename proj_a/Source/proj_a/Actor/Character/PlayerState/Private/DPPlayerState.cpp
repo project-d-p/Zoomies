@@ -120,10 +120,15 @@ void ADPPlayerState::OnHostMigration(UWorld* World, UDataManager* DataManager)
 	{
 		GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
 	}
-	UPlayerScoreData* ClonedPlayerScoreData = Cast<UPlayerScoreData>(PlayerScoreData->Clone(DataManager));
-	if (ClonedPlayerScoreData)
+	UPlayerScoreData* NewData = NewObject<UPlayerScoreData>(DataManager, TEXT("PlayerScoreData"));
+	if (NewData)
 	{
-		DataManager->AddDataToArray(TEXT("PlayerScore"), ClonedPlayerScoreData);
+		NewData->InitializeData();
+		NewData->SetPlayerName(this->GetPlayerName());
+		NewData->SetPlayerId(this->GetPlayerId());
+		NewData->SetPlayerJob(this->PlayerJob);
+		NewData->SetScore(this->PlayerScoreData->GetScore());
+		DataManager->AddDataToArray(TEXT("PlayerScore"), NewData);
 	}
 }
 
