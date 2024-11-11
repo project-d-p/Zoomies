@@ -214,12 +214,12 @@ void AJudgePlayerController::GetSeamlessTravelActorList(bool bToTransitionMap, T
 	AJudgeGameState* GameState = GetWorld()->GetGameState<AJudgeGameState>();
 	check(GameState)
 
-	for (auto PlayerState : GameState->PlayerArray)
+	for (auto PlayerState_ : GameState->PlayerArray)
 	{
-		AJudgePlayerState* DPPlayerState = Cast<AJudgePlayerState>(PlayerState);
-		if (DPPlayerState)
+		AJudgePlayerState* JudgePlayerState = Cast<AJudgePlayerState>(PlayerState_);
+		if (JudgePlayerState)
 		{
-			UPlayerScoreData* ClonedPlayerScoreData = Cast<UPlayerScoreData>(DPPlayerState->GetPlayerScoreData()->Clone(DataManager));
+			UPlayerScoreData* ClonedPlayerScoreData = Cast<UPlayerScoreData>(JudgePlayerState->GetPlayerScoreData()->Clone(DataManager));
 			if (ClonedPlayerScoreData)
 			{
 				DataManager->AddDataToArray(TEXT("PlayerScoreSeamless"), ClonedPlayerScoreData);

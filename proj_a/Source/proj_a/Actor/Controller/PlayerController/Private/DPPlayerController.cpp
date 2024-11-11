@@ -286,9 +286,9 @@ void ADPPlayerController::GetSeamlessTravelActorList(bool bToTransitionMap, TArr
 	ADPInGameState* DPInGameState = GetWorld()->GetGameState<ADPInGameState>();
 	check(DPInGameState)
 
-	for (auto PlayerState : DPInGameState->PlayerArray)
+	for (auto PlayerState_ : DPInGameState->PlayerArray)
 	{
-		ADPPlayerState* DPPlayerState = Cast<ADPPlayerState>(PlayerState);
+		ADPPlayerState* DPPlayerState = Cast<ADPPlayerState>(PlayerState_);
 		if (DPPlayerState)
 		{
 			UPlayerScoreData* ClonedPlayerScoreData = Cast<UPlayerScoreData>(DPPlayerState->GetPlayerScoreData()->Clone(DataManager));
