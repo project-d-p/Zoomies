@@ -49,6 +49,7 @@ void APC_MatchingLobby::BeginPlay()
 	Super::BeginPlay();
 
 	bShowMouseCursor = true;
+	bAutoManageActiveCameraTarget = false;
 
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
 	if (IsValid(GameInstance) && GameInstance->FriendsArray.Num() == 0)
@@ -56,7 +57,6 @@ void APC_MatchingLobby::BeginPlay()
 		GameInstance->LoadFriendsList();
 	}
 	SetCineCameraView();
-	this->bAutoManageActiveCameraTarget = false;
 	getMatchLobbyUI();
 }
 

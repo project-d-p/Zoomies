@@ -130,6 +130,7 @@ void AJudgePlayerController::RequestCharacter_Implementation()
 void AJudgePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	bAutoManageActiveCameraTarget = false;
 
 	if (IsLocalController())
 	{
@@ -141,8 +142,8 @@ void AJudgePlayerController::BeginPlay()
 		bShowMouseCursor = true;
 		
 		GetWorldTimerManager().SetTimer(TH, this, &AJudgePlayerController::RequestUIData, 1.f, true);
-		RequestCharacter();
 		findMyCamera();
+		RequestCharacter();
 		GetWorldTimerManager().SetTimer(CTH, this, &AJudgePlayerController::RequestCharacter, 1.f, true);
 	}
 	SetInputMode(FInputModeGameAndUI());
@@ -304,8 +305,8 @@ void AJudgePlayerController::findMyCamera()
 		if (ActorName == FString::Printf(TEXT("CameraActor_%d"), CameraIndex))
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("CameraActor_%d found!"), CameraIndex));
-			SetViewTarget(Actor);
 			CameraActor = Actor;
+			SetViewTarget(Actor);
 			break;
 		}
 	}

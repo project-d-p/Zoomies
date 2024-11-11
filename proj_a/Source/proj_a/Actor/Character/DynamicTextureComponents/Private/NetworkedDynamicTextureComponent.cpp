@@ -209,6 +209,7 @@ void UNetworkedDynamicTextureComponent::UpdateTexture(UTexture2D* NewTexture)
 					if (PlayerData.PlayerId == PlayerState->GetPlayerId())
 					{
 						PlayerIndex = PlayerData.CameraIndex;
+						GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("PlayerIndex: %d is Loaded!"), PlayerIndex));
 						break;
 					}
 				}
