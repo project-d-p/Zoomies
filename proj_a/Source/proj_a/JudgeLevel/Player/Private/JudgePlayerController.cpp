@@ -258,6 +258,15 @@ void AJudgePlayerController::findMyCamera()
 	{
 		return;
 	}
+	if (GS->GS_PlayerData.Num() == 0)
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+		{
+			findMyCamera();
+		}), 0.1f, false);
+		return;
+	}
 	
 	AJudgePlayerState* PS = Cast<AJudgePlayerState>(PlayerState);
 	if (!PS)

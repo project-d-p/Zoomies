@@ -45,7 +45,14 @@ FUIInitData AJudgeGameMode::GetUiData()
 
         AJudgePlayerState* PS = Cast<AJudgePlayerState>(PC->PlayerState);
         if (!PS)
+        {
+            FTimerHandle TimerHandle;
+            GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+            {
+                GetUiData();
+            }), 0.1f, false);
             return UIData;
+        }
 
         AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
         if (!GS)
@@ -56,7 +63,6 @@ FUIInitData AJudgeGameMode::GetUiData()
         PlayerData.Score = PS->GetScore();
         PlayerData.PlayerId = PS->GetPlayerId();
 
-        // 중복 체크
         bool bIsDuplicated = false;
         for (const FPlayerInitData& Data : GS->GS_PlayerData)
         {
@@ -75,23 +81,19 @@ FUIInitData AJudgeGameMode::GetUiData()
         i++;
     }
 
-    // PlayerId를 기반으로 GS_PlayerData 정렬 및 CameraIndex 설정
     AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
     if (!GS)
         return UIData;
 
-    // PlayerId를 기준으로 오름차순 정렬
     GS->GS_PlayerData.Sort([](const FPlayerInitData& A, const FPlayerInitData& B) {
         return A.PlayerId < B.PlayerId;
     });
 
-    // 정렬된 순서대로 CameraIndex 설정
     for (int32 Index = 0; Index < GS->GS_PlayerData.Num(); ++Index)
     {
         GS->GS_PlayerData[Index].CameraIndex = Index;
     }
 
-    // 현재 플레이어의 이름을 UIData에 설정
     UIData.VoterName = Cast<AJudgePlayerState>(GetWorld()->GetGameState<AJudgeGameState>()->PlayerArray[CurrentPlayerIndex])->GetPlayerName();
     UIData.bInitSuccessful = true;
 
