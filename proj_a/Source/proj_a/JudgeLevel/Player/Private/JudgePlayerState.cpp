@@ -23,6 +23,14 @@ void AJudgePlayerState::SeamlessTravelTo(APlayerState* NewPlayerState)
 	}
 }
 
+void AJudgePlayerState::SetPlayerScoreData(UPlayerScoreData* InPlayerScoreData)
+{
+	// PlayerScoreData = Cast<UPlayerScoreData>(InPlayerScoreData->Clone(this));
+	PlayerScoreData->SetPlayerName(InPlayerScoreData->GetPlayerName());
+	PlayerScoreData->SetPlayerId(InPlayerScoreData->GetPlayerId());
+	PlayerScoreData->SetScore(InPlayerScoreData->GetScore());
+}
+
 void AJudgePlayerState::RegisterPlayerWithSession(bool bWasFromInvite)
 {
 	SetSessionName();

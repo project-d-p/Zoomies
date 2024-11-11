@@ -241,3 +241,10 @@ void ADPPlayerState::SetPlayerRandomJob()
 {
 	PlayerJob = static_cast<EPlayerJob>(FMath::RandRange(0, static_cast<int>(EPlayerJob::JOB_MAX) - 1));
 }
+
+void ADPPlayerState::SetPlayerScoreData(UPlayerScoreData* InPlayerScoreData)
+{
+	PlayerScoreData->SetPlayerName(InPlayerScoreData->GetPlayerName());
+	PlayerScoreData->SetPlayerId(InPlayerScoreData->GetPlayerId());
+	PlayerScoreData->SetScore(InPlayerScoreData->GetScore());
+}

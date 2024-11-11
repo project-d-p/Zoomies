@@ -21,8 +21,7 @@ public:
 
 	void SetPlayerJob(EPlayerJob InPlayerJob) { PlayerJob = InPlayerJob; }
 	EPlayerJob GetPlayerJob() const { return PlayerJob; }
-	void SetPlayerScoreData(UPlayerScoreData* InPlayerScoreData) { PlayerScoreData = Cast<UPlayerScoreData>(InPlayerScoreData->Clone(this)); }
-
+	void SetPlayerScoreData(UPlayerScoreData* InPlayerScoreData);
 
 	/* Register and Unregister a player with the online subsystem */
 	virtual void RegisterPlayerWithSession(bool bWasFromInvite) override;

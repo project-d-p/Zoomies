@@ -27,11 +27,7 @@ public:
 	void SetPlayerRandomJob();
 	void SetFinalScoreData(const FFinalScoreData& InFinalScoreData) { FinalScoreData = InFinalScoreData; }
 	const FFinalScoreData& GetFinalScoreData() const { return FinalScoreData; }
-	void SetPlayerScoreData(UPlayerScoreData* InPlayerScoreData)
-	{
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("SetPlayerScoreData"));
-		PlayerScoreData = Cast<UPlayerScoreData>(InPlayerScoreData->Clone(this));
-	}
+	void SetPlayerScoreData(UPlayerScoreData* InPlayerScoreData);
 
 	UPROPERTY(Replicated, BlueprintReadWrite, Category = "PlayerRank")
 	int Rank;
