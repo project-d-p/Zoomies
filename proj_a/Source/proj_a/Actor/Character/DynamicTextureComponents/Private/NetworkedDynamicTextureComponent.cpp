@@ -203,13 +203,14 @@ void UNetworkedDynamicTextureComponent::UpdateTexture(UTexture2D* NewTexture)
 			if (GS->GS_PlayerData.Num() > 0)
 			{
 				int32 PlayerIndex = 0;
+				
 				for (FPlayerInitData& PlayerData : GS->GS_PlayerData)
 				{
 					if (PlayerData.PlayerId == PlayerState->GetPlayerId())
 					{
+						PlayerIndex = PlayerData.CameraIndex;
 						break;
 					}
-					PlayerIndex++;
 				}
 				if (PlayerIndex >= GS->GS_PlayerData.Num())
 				{
