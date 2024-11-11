@@ -86,6 +86,7 @@ private:
 
 	USoundBase *TurnStartSound;
 	UJudgeLevelComponent* LevelComponent = nullptr;
+	void findMyCamera();
 
 	FTimerHandle TH;
 	FTimerHandle CTH;

@@ -41,8 +41,11 @@ FUIInitData AJudgeGameMode::GetUiData()
         PlayerData.PlayerName = PS->GetPlayerName();
         PlayerData.Score = PS->GetScore();
         PlayerData.PlayerId = PS->GetPlayerId();
+        /*
         FString CameraName = PC->CameraActor->GetActorLabel();
         PlayerData.CameraIndex = FCString::Atoi(*CameraName.Right(1));
+        */
+        PlayerData.CameraIndex = 0; 
         bool bIsDuplicated = false;
         for (const FPlayerInitData& Data : GS->GS_PlayerData)
         {

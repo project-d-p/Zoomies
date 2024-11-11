@@ -4,6 +4,7 @@
 #include "EngineUtils.h"
 #include "IChatGameMode.h"
 #include "JudgeGameMode.h"
+#include "JudgeGameState.h"
 #include "JudgeLevelUI.h"
 #include "JudgePlayerState.h"
 #include "NetworkMessage.h"
@@ -132,6 +133,7 @@ void AJudgePlayerController::BeginPlay()
 
 	if (IsLocalController())
 	{
+		findMyCamera();
 		checkf(JudgeLevelUI_BP, TEXT("JudgeLevelUI Widget is nullptr"));
 		JudgeLevelUI = CreateWidget<UJudgeLevelUI>(this, JudgeLevelUI_BP);
 		checkf(JudgeLevelUI, TEXT("Failed to create JudgeLevelUI"));
@@ -144,7 +146,6 @@ void AJudgePlayerController::BeginPlay()
 		GetWorldTimerManager().SetTimer(CTH, this, &AJudgePlayerController::RequestCharacter, 1.f, true);
 	}
 	SetInputMode(FInputModeGameAndUI());
-	CameraActor = GetViewTarget();
 	ActivateCurrentComponent(this);
 }
 
@@ -243,6 +244,27 @@ void AJudgePlayerController::ActivateCurrentComponent(AJudgePlayerController* Lo
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("PC_MatchingLobby::InputComponent is nullptr"));
+		}
+	}
+}
+
+void AJudgePlayerController::findMyCamera()
+{
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor::StaticClass(), FoundActors);
+	int32 PlayerIndex = -1;
+	if (HasAuthority())
+	{
+		PlayerIndex = -1;
+		for (AActor* Actor : FoundActors)
+		{
+			FString ActorName = Actor->GetActorLabel();
+			if (ActorName == FString::Printf(TEXT("CameraActor_%d"), PlayerIndex))
+			{
+				SetViewTarget(Actor);
+				CameraActor = Actor;
+				break;
+			}
 		}
 	}
 }
