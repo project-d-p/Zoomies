@@ -4,6 +4,11 @@
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 
+AJudgePlayerState::AJudgePlayerState()
+{
+	PlayerScoreData = NewObject<UPlayerScoreData>(this, TEXT("PlayerScoreData"));
+}
+
 void AJudgePlayerState::SeamlessTravelTo(APlayerState* NewPlayerState)
 {
 	Super::SeamlessTravelTo(NewPlayerState);
