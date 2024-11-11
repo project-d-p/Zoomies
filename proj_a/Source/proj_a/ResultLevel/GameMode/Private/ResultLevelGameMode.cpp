@@ -69,14 +69,15 @@ void AResultLevelGameMode::SpawnNewPlayerPawn(AController* PC)
 	ADPCharacter* NewCharacter = GetWorld()->SpawnActor<ADPCharacter>(DefaultPawnClass, SpawnLocation, FRotator::ZeroRotator);
 	if (NewCharacter)
 	{
+		NewCharacter->SetReplicatingMovement(true);
 		PC->Possess(NewCharacter);
 	}
 
-	// ADPPlayerController* PlayerController = Cast<ADPPlayerController>(PC);
-	// if (PlayerController)
-	// {
-	// 	PlayerController->SwitchLevelComponent(ELevelComponentType::RESULT);
-	// }
+	ADPPlayerController* PlayerController = Cast<ADPPlayerController>(PC);
+	if (PlayerController)
+	{
+		PlayerController->SwitchLevelComponent(ELevelComponentType::RESULT);
+	}
 }
 
 /* Seamless Travel : Reuse PlayerControllers */
@@ -136,8 +137,4 @@ void AResultLevelGameMode::CheckPlayersAllTraveled()
 void AResultLevelGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-
-	AResultLevelGameState* GS = Cast<AResultLevelGameState>(GetWorld()->GetGameState());
-	check(GS)
-	// GS->MulticastPlayersAllTraveled();
 }
