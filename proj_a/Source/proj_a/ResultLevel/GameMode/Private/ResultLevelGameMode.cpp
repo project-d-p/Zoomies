@@ -24,6 +24,16 @@ AResultLevelGameMode::~AResultLevelGameMode()
 {
 }
 
+// Only Called On Server durign Host Migration
+void AResultLevelGameMode::PostLogin(APlayerController* NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+
+	SpawnNewPlayerPawn(NewPlayer);
+	this->CurrentPlayerCount += 1;
+	CheckPlayersAllTraveled();
+}
+
 void AResultLevelGameMode::PostSeamlessTravel()
 {
 	Super::PostSeamlessTravel();

@@ -125,7 +125,9 @@ void AJudgeGameMode::ProcessVotingResults()
         HandlePlayerStateNull();
         return ;
     }
-    
+
+    // Environmentalist를 했는데 왜 Poacher가 나오지?
+    // 설마 이전의 투표했던 거가 나오는건가?
     if (PS->GetPlayerJob() == MostVotedOccupation)
     {
         PS->SetIsDetected(true);
