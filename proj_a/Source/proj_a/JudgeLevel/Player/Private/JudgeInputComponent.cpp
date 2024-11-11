@@ -101,7 +101,7 @@ void UJudgeInputComponent::Active(const FInputActionValue& value)
 void UJudgeInputComponent::Rotate(const FInputActionValue& value)
 {
 	AJudgePlayerController* PlayerController = PC_JudgeLevel;
-	if (!PlayerController || !PlayerController->CameraActor) return;
+	if (!PlayerController || !IsValid(PlayerController->CameraActor)) return;
 
 	const float SpeedScale = 2.0f; 
 

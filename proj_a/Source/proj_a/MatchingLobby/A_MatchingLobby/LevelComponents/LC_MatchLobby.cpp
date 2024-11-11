@@ -31,6 +31,7 @@ void ULC_MatchLobby::Activate(bool bReset)
 void ULC_MatchLobby::Deactivate()
 {
 	Super::Deactivate();
+	InputComponent->Deactivate();
 }
 
 void ULC_MatchLobby::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -41,9 +42,10 @@ void ULC_MatchLobby::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 void ULC_MatchLobby::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-
+	
 	if (EndPlayReason == EEndPlayReason::LevelTransition)
 	{
+		Deactivate();
 		DestroyComponent();
 	}
 }
