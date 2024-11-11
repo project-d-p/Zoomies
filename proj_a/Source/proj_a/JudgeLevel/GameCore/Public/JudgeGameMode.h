@@ -51,6 +51,7 @@ class PROJ_A_API AJudgeGameMode : public AGameModeBase, public IChatGameMode
 
 public:
     AJudgeGameMode();
+    virtual void PostLogin(APlayerController* NewPlayer) override;
 
     void AddVote(EPlayerJob Occupation) { PlayerVotes.Add(Occupation); }
     virtual UServerChatManager* GetChatManager() const override { return ChatManager; }
