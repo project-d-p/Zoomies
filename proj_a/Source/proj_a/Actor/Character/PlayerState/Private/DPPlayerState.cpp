@@ -205,13 +205,23 @@ void ADPPlayerState::SetSessionName()
 
 void ADPPlayerState::RequestMyInfo_Implementation()
 {
-	ResponseMyInfo(this->PlayerScoreData);
+	if (this->PlayerScoreData)
+	{
+		ResponseMyInfo(this->PlayerScoreData);
+	}
 }
 
 void ADPPlayerState::ResponseMyInfo_Implementation(UPlayerScoreData* InPlayerScoreData)
 {
-	this->SetPlayerScoreData(InPlayerScoreData);
-	bResponsedMyInfo = true;
+	if (InPlayerScoreData)
+	{
+		this->SetPlayerScoreData(InPlayerScoreData);
+		bResponsedMyInfo = true;
+	}
+	else
+	{
+		FNetLogger::LogError(TEXT("ResponseMyInfo_Implementation: InPlayerScoreData is nullptr"));
+	}
 }
 
 void ADPPlayerState::BeginPlay()

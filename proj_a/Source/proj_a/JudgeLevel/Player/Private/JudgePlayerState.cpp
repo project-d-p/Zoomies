@@ -155,13 +155,23 @@ void AJudgePlayerState::InitializePlayerState()
 
 void AJudgePlayerState::RequestMyInfo_Implementation()
 {
-	ResponseMyInfo(this->PlayerScoreData);
+	if (this->PlayerScoreData)
+	{
+		ResponseMyInfo(this->PlayerScoreData);
+	}
 }
 
 void AJudgePlayerState::ResponseMyInfo_Implementation(UPlayerScoreData* InPlayerScoreData)
 {
-	this->SetPlayerScoreData(InPlayerScoreData);
-	bResponsedMyInfo = true;
+	if (InPlayerScoreData)
+	{
+		this->SetPlayerScoreData(InPlayerScoreData);
+		bResponsedMyInfo = true;
+	}
+	else
+	{
+		FNetLogger::LogError(TEXT("ResponseMyInfo_Implementation: InPlayerScoreData is nullptr"));
+	}
 }
 
 void AJudgePlayerState::BeginPlay()
