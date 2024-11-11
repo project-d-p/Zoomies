@@ -296,10 +296,16 @@ void ADPPlayerController::GetSeamlessTravelActorList(bool bToTransitionMap, TArr
 		ADPPlayerState* DPPlayerState = Cast<ADPPlayerState>(PlayerState_);
 		if (DPPlayerState)
 		{
-			UPlayerScoreData* ClonedPlayerScoreData = Cast<UPlayerScoreData>(DPPlayerState->GetPlayerScoreData()->Clone(DataManager));
-			if (ClonedPlayerScoreData)
+			UPlayerScoreData* NewData = NewObject<UPlayerScoreData>(DataManager, TEXT("PlayerScoreData"));
+			if (NewData)
 			{
-				DataManager->AddDataToArray(TEXT("PlayerScoreSeamless"), ClonedPlayerScoreData);
+				NewData->InitializeData();
+				NewData->SetPlayerName(DPPlayerState->GetPlayerName());
+				NewData->SetPlayerId(DPPlayerState->GetPlayerId());
+				NewData->SetPlayerJob(DPPlayerState->GetPlayerJob());
+				UPlayerScoreData* PlayerScoreData = DPPlayerState->GetPlayerScoreData();
+				NewData->SetScore(PlayerScoreData->GetScore());
+				DataManager->AddDataToArray(TEXT("PlayerScoreSeamless"), NewData);
 			}
 		}
 	}
