@@ -158,6 +158,7 @@ void AJudgePlayerState::RequestMyInfoRecursive()
 	if (!bResponsedMyInfo)
 	{
 		FTimerHandle ReTry;
+		RequestMyInfo();
 		GetWorld()->GetTimerManager().SetTimer(ReTry, this, &AJudgePlayerState::RequestMyInfoRecursive, 0.5f, false);
 	}
 }

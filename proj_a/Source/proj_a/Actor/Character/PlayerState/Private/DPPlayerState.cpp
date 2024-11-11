@@ -208,6 +208,7 @@ void ADPPlayerState::RequestMyInfoRecursive()
 	if (!bResponsedMyInfo)
 	{
 		FTimerHandle ReTry;
+		RequestMyInfo();
 		GetWorld()->GetTimerManager().SetTimer(ReTry, this, &ADPPlayerState::RequestMyInfoRecursive, 0.5f, false);
 	}
 }
