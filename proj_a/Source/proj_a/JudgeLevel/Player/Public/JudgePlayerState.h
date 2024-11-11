@@ -36,7 +36,7 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void RequestMyInfo();
-	UFUNCTION(Client, Reliable)
+	UFUNCTION(NetMulticast, Reliable)
 	void ResponseMyInfo(UPlayerScoreData* InPlayerScoreData);
 protected:
 	void SetSessionName();

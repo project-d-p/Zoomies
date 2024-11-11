@@ -222,6 +222,10 @@ void ADPPlayerState::RequestMyInfo_Implementation()
 
 void ADPPlayerState::ResponseMyInfo_Implementation(UPlayerScoreData* InPlayerScoreData)
 {
+	if (HasAuthority())
+	{
+		return ;
+	}
 	if (InPlayerScoreData)
 	{
 		this->SetPlayerScoreData(InPlayerScoreData);

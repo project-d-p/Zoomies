@@ -172,6 +172,10 @@ void AJudgePlayerState::RequestMyInfo_Implementation()
 
 void AJudgePlayerState::ResponseMyInfo_Implementation(UPlayerScoreData* InPlayerScoreData)
 {
+	if (HasAuthority())
+	{
+		return ;
+	}
 	if (InPlayerScoreData)
 	{
 		this->SetPlayerScoreData(InPlayerScoreData);
