@@ -102,7 +102,7 @@ void AJudgePlayerState::OnHostMigration(UWorld* World, UDataManager* DataManager
 	{
 		GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
 	}
-	UPlayerScoreData* NewData = NewObject<UPlayerScoreData>(DataManager, TEXT("PlayerScoreData"));
+	UPlayerScoreData* NewData = NewObject<UPlayerScoreData>(DataManager);
 	if (NewData)
 	{
 		NewData->InitializeData();

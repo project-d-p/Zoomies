@@ -296,7 +296,7 @@ void ADPPlayerController::GetSeamlessTravelActorList(bool bToTransitionMap, TArr
 		ADPPlayerState* DPPlayerState = Cast<ADPPlayerState>(PlayerState_);
 		if (DPPlayerState)
 		{
-			UPlayerScoreData* NewData = NewObject<UPlayerScoreData>(DataManager, TEXT("PlayerScoreData"));
+			UPlayerScoreData* NewData = NewObject<UPlayerScoreData>(DataManager);
 			if (NewData)
 			{
 				NewData->InitializeData();

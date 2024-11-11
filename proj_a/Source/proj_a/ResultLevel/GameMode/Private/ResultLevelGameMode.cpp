@@ -72,29 +72,11 @@ void AResultLevelGameMode::SpawnNewPlayerPawn(AController* PC)
 		PC->Possess(NewCharacter);
 	}
 
-	ADPPlayerController* PlayerController = Cast<ADPPlayerController>(PC);
-	if (PlayerController)
-	{
-		PlayerController->SwitchLevelComponent(ELevelComponentType::RESULT);
-	}
-	///
-	ADPPlayerState* PS = PlayerController->GetPlayerState<ADPPlayerState>();
-	check(PS)
-	FFinalScoreData fd = PS->GetFinalScoreData();
-	UE_LOG(LogTemp, Warning, TEXT("Player Name : %s"), *PS->GetPlayerName());
-	for (int k = 0; k < fd.CapturedAnimals.Num(); k++)
-	{
-		for (int j = 0; j < fd.CapturedAnimals[k].Num(); j++)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Captured Animals : %d"), fd.CapturedAnimals[k][j]);
-		}
-	}
-	for (int k = 0; k < fd.ScoreDatas.Num(); k++)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Score Data : %d"), fd.ScoreDatas[k].baseScore);
-	}
-	UE_LOG(LogTemp, Warning, TEXT("Is Detected : %d"), fd.bIsDetected);
-	///
+	// ADPPlayerController* PlayerController = Cast<ADPPlayerController>(PC);
+	// if (PlayerController)
+	// {
+	// 	PlayerController->SwitchLevelComponent(ELevelComponentType::RESULT);
+	// }
 }
 
 /* Seamless Travel : Reuse PlayerControllers */

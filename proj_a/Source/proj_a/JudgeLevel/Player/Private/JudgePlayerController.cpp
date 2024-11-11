@@ -223,7 +223,7 @@ void AJudgePlayerController::GetSeamlessTravelActorList(bool bToTransitionMap, T
 		AJudgePlayerState* JudgePlayerState = Cast<AJudgePlayerState>(PlayerState_);
 		if (JudgePlayerState)
 		{
-			UPlayerScoreData* NewData = NewObject<UPlayerScoreData>(DataManager, TEXT("PlayerScoreData"));
+			UPlayerScoreData* NewData = NewObject<UPlayerScoreData>(DataManager);
 			if (NewData)
 			{
 				NewData->InitializeData();
