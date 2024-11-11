@@ -153,6 +153,15 @@ void AJudgePlayerState::InitializePlayerState()
 	}
 }
 
+void AJudgePlayerState::RequestMyInfoRecursive()
+{
+	if (!bResponsedMyInfo)
+	{
+		FTimerHandle ReTry;
+		GetWorld()->GetTimerManager().SetTimer(ReTry, this, &AJudgePlayerState::RequestMyInfoRecursive, 0.5f, false);
+	}
+}
+
 void AJudgePlayerState::RequestMyInfo_Implementation()
 {
 	if (this->PlayerScoreData)
@@ -185,15 +194,7 @@ void AJudgePlayerState::BeginPlay()
 		{
 			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &AJudgePlayerState::OnHostMigration);
 		}
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
-		{
-			if (!bResponsedMyInfo)
-			{
-				FTimerHandle ReTry;
-				GetWorld()->GetTimerManager().SetTimer(ReTry, this, &AJudgePlayerState::RequestMyInfo, 0.5f, false);
-			}
-		}), 0.5f, false);
+		RequestMyInfoRecursive();
 	}
 	InitializePlayerState();
 }

@@ -203,6 +203,15 @@ void ADPPlayerState::SetSessionName()
 	}
 }
 
+void ADPPlayerState::RequestMyInfoRecursive()
+{
+	if (!bResponsedMyInfo)
+	{
+		FTimerHandle ReTry;
+		GetWorld()->GetTimerManager().SetTimer(ReTry, this, &ADPPlayerState::RequestMyInfoRecursive, 0.5f, false);
+	}
+}
+
 void ADPPlayerState::RequestMyInfo_Implementation()
 {
 	if (this->PlayerScoreData)
@@ -237,15 +246,7 @@ void ADPPlayerState::BeginPlay()
 		}
 		if (GetWorld()->GetMapName() == TEXT("calculateLevel"))
 		{
-			FTimerHandle TimerHandle;
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
-			{
-				if (!bResponsedMyInfo)
-				{
-					FTimerHandle ReTry;
-					GetWorld()->GetTimerManager().SetTimer(ReTry, this, &ADPPlayerState::RequestMyInfo, 0.5f, false);
-				}
-			}), 0.5f, false);
+			RequestMyInfoRecursive();
 		}
 	}
 	InitializePlayerState();
