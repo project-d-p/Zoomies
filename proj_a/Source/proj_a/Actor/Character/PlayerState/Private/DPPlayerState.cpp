@@ -34,6 +34,11 @@ EPlayerJob ADPPlayerState::GetPlayerJob() const
 	return PlayerJob;
 }
 
+void ADPPlayerState::OnRep_PlayerJob()
+{
+	PlayerScoreData->SetPlayerJob(PlayerJob);
+}
+
 void ADPPlayerState::IncreaseScore(const TArray<EAnimal>& InAnimals)
 {
 	PlayerScoreData->IncreaseScore(PlayerJob, InAnimals);

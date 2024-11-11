@@ -260,7 +260,6 @@ void AJudgePlayerController::ShowUI_ESC()
 
 void AJudgePlayerController::ActivateCurrentComponent(AJudgePlayerController* LocalPlayerController)
 {
-	
 	if (LevelComponent)
 	{
 		LevelComponent->PrimaryComponentTick.bCanEverTick = true;

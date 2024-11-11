@@ -35,9 +35,11 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerSetRank(int InRank);
 
-	UPROPERTY(Replicated, BlueprintReadWrite, Category = "PlayerJob")
+	UPROPERTY(ReplicatedUsing=OnRep_PlayerJob, BlueprintReadWrite, Category = "PlayerJob")
 	EPlayerJob PlayerJob;
-
+	UFUNCTION()
+	void OnRep_PlayerJob();
+	
 	void IncreaseScore(const TArray<EAnimal>& InAnimals);
 
 	virtual void SeamlessTravelTo(APlayerState* NewPlayerState) override;
