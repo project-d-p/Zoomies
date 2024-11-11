@@ -264,10 +264,15 @@ void ADPPlayerController::ActivateComponent(ELevelComponentType Type)
 }
 
 // Local PlayerController && Local PlayerState (Server && Client) Automatically Saved && Called Right Before Seamless Travel
+// this is called for both parts of the transition because actors might change while in the middle (e.g. players might join or leave the game)
 void ADPPlayerController::GetSeamlessTravelActorList(bool bToTransitionMap, TArray<AActor*>& ActorList)
 {
 	Super::GetSeamlessTravelActorList(bToTransitionMap, ActorList);
 
+	if (!GetWorld()->GetMapName().Contains("mainLevel"))
+	{
+		return ;
+	}
 	if (IsLocalPlayerController())
 	{
 		UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());

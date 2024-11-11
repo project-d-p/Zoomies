@@ -206,6 +206,10 @@ void AJudgePlayerController::GetSeamlessTravelActorList(bool bToTransitionMap, T
 {
 	Super::GetSeamlessTravelActorList(bToTransitionMap, ActorList);
 
+	if (!GetWorld()->GetMapName().Contains("judgeLevel"))
+	{
+		return ;
+	}
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
 	check(GameInstance)
 	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
