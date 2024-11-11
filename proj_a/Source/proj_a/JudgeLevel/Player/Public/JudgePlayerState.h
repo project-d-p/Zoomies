@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "DataManager.h"
 #include "PlayerScoreData.h"
 #include "GameFramework/PlayerState.h"
 #include "ScoreTypes.h"
@@ -33,10 +34,9 @@ public:
 	 */ 
 	virtual void CopyProperties(APlayerState* PlayerState) override;
 
-	UFUNCTION()
-	void OnHostMigration(UWorld* World, UDataManager* DataManager);
 protected:
 	void SetSessionName();
+	void OnHostMigration(UWorld* World, UDataManager* DataManager);
 
 	void SetPlayerNameDelayed();
 	void InitializePlayerState();

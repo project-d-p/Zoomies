@@ -18,6 +18,7 @@ void AJudgePlayerState::SeamlessTravelTo(APlayerState* NewPlayerState)
 	{
 		if (this->PlayerScoreData)
 		{
+			DPS->PlayerJob = this->PlayerJob;
 			DPS->SetPlayerScoreData(this->PlayerScoreData);
 		}
 	}
@@ -29,6 +30,7 @@ void AJudgePlayerState::SetPlayerScoreData(UPlayerScoreData* InPlayerScoreData)
 	PlayerScoreData->SetPlayerName(InPlayerScoreData->GetPlayerName());
 	PlayerScoreData->SetPlayerId(InPlayerScoreData->GetPlayerId());
 	PlayerScoreData->SetScore(InPlayerScoreData->GetScore());
+	PlayerScoreData->SetPlayerJob(InPlayerScoreData->GetPlayerJob());
 }
 
 void AJudgePlayerState::RegisterPlayerWithSession(bool bWasFromInvite)
@@ -139,7 +141,8 @@ void AJudgePlayerState::InitializePlayerState()
 			UPlayerScoreData* SavedScoreData = Cast<UPlayerScoreData>(Data);
 			if (SavedScoreData && SavedScoreData->GetPlayerName() == GetPlayerName())
 			{
-				PlayerScoreData->SetScore(SavedScoreData->GetScore());
+				this->SetPlayerScoreData(SavedScoreData);
+				this->PlayerJob = SavedScoreData->GetPlayerJob();
 			}
 		}
 	}

@@ -181,11 +181,11 @@ void ADPPlayerState::InitializePlayerState()
 			UPlayerScoreData* SavedScoreData = Cast<UPlayerScoreData>(Data);
 			if (SavedScoreData && SavedScoreData->GetPlayerName() == GetPlayerName())
 			{
-				PlayerScoreData->SetScore(SavedScoreData->GetScore());
+				this->SetPlayerScoreData(SavedScoreData);
+				this->PlayerJob = SavedScoreData->GetPlayerJob();
 			}
 		}
 	}
-
 	PlayerScoreData->TestBroadcast();
 }
 
@@ -240,6 +240,7 @@ void ADPPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 void ADPPlayerState::SetPlayerRandomJob()
 {
 	PlayerJob = static_cast<EPlayerJob>(FMath::RandRange(0, static_cast<int>(EPlayerJob::JOB_MAX) - 1));
+	PlayerScoreData->SetPlayerJob(PlayerJob);
 }
 
 void ADPPlayerState::SetPlayerScoreData(UPlayerScoreData* InPlayerScoreData)
@@ -247,4 +248,5 @@ void ADPPlayerState::SetPlayerScoreData(UPlayerScoreData* InPlayerScoreData)
 	PlayerScoreData->SetPlayerName(InPlayerScoreData->GetPlayerName());
 	PlayerScoreData->SetPlayerId(InPlayerScoreData->GetPlayerId());
 	PlayerScoreData->SetScore(InPlayerScoreData->GetScore());
+	PlayerScoreData->SetPlayerJob(InPlayerScoreData->GetPlayerJob());
 }
