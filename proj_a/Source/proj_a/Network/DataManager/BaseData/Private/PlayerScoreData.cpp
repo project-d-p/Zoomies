@@ -1,6 +1,7 @@
 #include "PlayerScoreData.h"
 
 #include "FNetLogger.h"
+#include "EnumTypes.h"
 #include "proj_a/Component/InGame/Score/CalculateScoreByJobs.h"
 
 void UPlayerScoreData::InitializeData_Implementation()
@@ -38,6 +39,7 @@ UBaseData* UPlayerScoreData::Clone_Implementation(UObject* Outer)
 	{
 		ClonedObject->Score = Score;
 		ClonedObject->PlayerName = PlayerName;
+		ClonedObject->PlayerJob = PlayerJob;
 	}
 	return ClonedObject;
 }
