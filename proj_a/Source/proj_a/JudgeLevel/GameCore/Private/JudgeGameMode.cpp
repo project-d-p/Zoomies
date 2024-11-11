@@ -100,14 +100,16 @@ void AJudgeGameMode::HandlePlayerStateNull()
         {
             TOTAL_PLAYER--;
         }
-        EndTimer();
+        FTimerHandle VoteCollectionTimerHandle;
+        GetWorld()->GetTimerManager().SetTimer(VoteCollectionTimerHandle, this, &AJudgeGameMode::EndTimer, 1.0f, false);
     }
     else
     {
         // 중간에 나간 클라이언트가 중간의 순번이었을 경우
         CurrentPlayerIndex--;
         TOTAL_PLAYER--;
-        EndTimer();
+        FTimerHandle VoteCollectionTimerHandle;
+        GetWorld()->GetTimerManager().SetTimer(VoteCollectionTimerHandle, this, &AJudgeGameMode::EndTimer, 1.0f, false);
     }
 }
 
@@ -117,11 +119,6 @@ void AJudgeGameMode::ProcessVotingResults()
 
     AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
     check(GS)
-    // if (!GS->PlayerArray.IsValidIndex(CurrentPlayerIndex - 1))
-    // {
-    //     FNetLogger::LogError(TEXT("Failed to get %d player state."), CurrentPlayerIndex - 1);
-    //     return ;
-    // }
     AJudgePlayerState* PS = GetCurrentVotedPlayerState();
     if (!PS)
     {
@@ -136,13 +133,15 @@ void AJudgeGameMode::ProcessVotingResults()
 
     if (CurrentPlayerIndex >= TOTAL_PLAYER)
     {
-        EndTimer();
+        FTimerHandle VoteCollectionTimerHandle;
+        GetWorld()->GetTimerManager().SetTimer(VoteCollectionTimerHandle, this, &AJudgeGameMode::EndTimer, 1.0f, false);
         return;
     }
 
     if (!GS->PlayerArray.IsValidIndex(CurrentPlayerIndex))
     {
-        FNetLogger::LogError(TEXT("Failed to get %d player state."), CurrentPlayerIndex);
+        FTimerHandle VoteCollectionTimerHandle;
+        GetWorld()->GetTimerManager().SetTimer(VoteCollectionTimerHandle, this, &AJudgeGameMode::EndTimer, 1.0f, false);
         return ;
     }
 
@@ -164,7 +163,15 @@ void AJudgeGameMode::ProcessVotingResults()
         check(PC)
         PC->SetOccupationeName(CurrentPlayerIndex - 1, OccupationToString(MostVotedOccupation));
     }
-    TimerManager->StartTimer<AJudgeGameState>(WAIT_TIME, &AJudgeGameMode::EndTimer, this);
+    if (CurrentPlayerIndex < TOTAL_PLAYER && GS->PlayerArray.IsValidIndex(CurrentPlayerIndex))
+    {
+        TimerManager->StartTimer<AJudgeGameState>(WAIT_TIME, &AJudgeGameMode::EndTimer, this);
+    }
+    else
+    {
+        FTimerHandle VoteCollectionTimerHandle;
+        GetWorld()->GetTimerManager().SetTimer(VoteCollectionTimerHandle, this, &AJudgeGameMode::EndTimer, 1.0f, false);
+    }
 }
 
 void AJudgeGameMode::EndTimer()
@@ -178,8 +185,9 @@ void AJudgeGameMode::EndTimer()
         check(GS)
         GS->NotifyTimerEnd();
 
-        FTimerHandle VoteCollationTimerHandle;
-        GetWorldTimerManager().SetTimer(VoteCollationTimerHandle, this, &AJudgeGameMode::ProcessVotingResults, 1.0f, false);
+        // FTimerHandle VoteCollationTimerHandle;
+        // GetWorldTimerManager().SetTimer(VoteCollationTimerHandle, this, &AJudgeGameMode::ProcessVotingResults, 1.0f, false);
+        ProcessVotingResults();
     }
     else
     {
