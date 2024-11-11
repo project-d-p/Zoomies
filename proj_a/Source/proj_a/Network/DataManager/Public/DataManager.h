@@ -90,7 +90,21 @@ public:
 
 	void Clear()
 	{
-		DataArrayMap.Empty();
+		TArray<FString> KeysToRemove; // 삭제할 Key를 저장할 배열
+		// DataArrayMap.Empty();
+		for (auto& Elem : DataArrayMap)
+		{
+			if (Elem.Key != "PlayerScoreSeamless") // Key가 PlayerScoreSeamless가 아닌 경우
+			{
+				KeysToRemove.Add(Elem.Key); // 삭제 대상 Key를 수집
+			}
+		}
+
+		// 수집한 Key를 이용해 TMap에서 삭제
+		for (const FString& Key : KeysToRemove)
+		{
+			DataArrayMap.Remove(Key); // Key에 해당하는 요소를 제거
+		}
 		DataSingleMap.Empty();
 	}
 
@@ -103,7 +117,7 @@ public:
 	{
 		DataArrayMap.Remove(Key);
 	}
-	
+
 private:
 	UPROPERTY()
 	TMap<FString, UDataArray*> DataArrayMap;

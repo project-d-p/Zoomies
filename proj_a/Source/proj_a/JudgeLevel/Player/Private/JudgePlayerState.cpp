@@ -138,6 +138,19 @@ void AJudgePlayerState::InitializePlayerState()
 	check(GameInstance);
 	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
 	check(DataManager);
+	UDataArray* PlayerScoreSeamlessArray = DataManager->GetDataArray(TEXT("PlayerScoreSeamless"));
+	if (PlayerScoreSeamlessArray)
+	{
+		for (UBaseData* Data : PlayerScoreSeamlessArray->DataArray)
+		{
+			UPlayerScoreData* SavedScoreData = Cast<UPlayerScoreData>(Data);
+			if (SavedScoreData && SavedScoreData->GetPlayerName() == GetPlayerName())
+			{
+				this->SetPlayerScoreData(SavedScoreData);
+				this->PlayerJob = SavedScoreData->GetPlayerJob();
+			}
+		}
+	}
 	UDataArray* PlayerScoreDataArray = DataManager->GetDataArray(TEXT("PlayerScore"));
 	if (PlayerScoreDataArray)
 	{
@@ -153,41 +166,6 @@ void AJudgePlayerState::InitializePlayerState()
 	}
 }
 
-void AJudgePlayerState::RequestMyInfoRecursive()
-{
-	if (!bResponsedMyInfo)
-	{
-		FTimerHandle ReTry;
-		RequestMyInfo();
-		GetWorld()->GetTimerManager().SetTimer(ReTry, this, &AJudgePlayerState::RequestMyInfoRecursive, 0.5f, false);
-	}
-}
-
-void AJudgePlayerState::RequestMyInfo_Implementation()
-{
-	if (this->PlayerScoreData)
-	{
-		ResponseMyInfo(this->PlayerScoreData);
-	}
-}
-
-void AJudgePlayerState::ResponseMyInfo_Implementation(UPlayerScoreData* InPlayerScoreData)
-{
-	if (HasAuthority())
-	{
-		return ;
-	}
-	if (InPlayerScoreData)
-	{
-		this->SetPlayerScoreData(InPlayerScoreData);
-		bResponsedMyInfo = true;
-	}
-	else
-	{
-		FNetLogger::LogError(TEXT("ResponseMyInfo_Implementation: InPlayerScoreData is nullptr"));
-	}
-}
-
 void AJudgePlayerState::BeginPlay()
 {
 	Super::BeginPlay();
@@ -199,7 +177,6 @@ void AJudgePlayerState::BeginPlay()
 		{
 			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &AJudgePlayerState::OnHostMigration);
 		}
-		RequestMyInfoRecursive();
 	}
 	InitializePlayerState();
 }

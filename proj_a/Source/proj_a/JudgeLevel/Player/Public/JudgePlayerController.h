@@ -59,6 +59,8 @@ public:
 	UFUNCTION(Server, Reliable)
 	void RequestUIData();
 
+	virtual void GetSeamlessTravelActorList(bool bToTransitionMap, TArray<AActor*>& ActorList) override;
+	
 	void ShowUI_ESC();
 
 	void ActivateCurrentComponent(AJudgePlayerController* LocalPlayerController);

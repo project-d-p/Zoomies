@@ -33,11 +33,6 @@ public:
 	 * Becuase OnRep_UniqueID() is not calling for host during Seamless Travel
 	 */ 
 	virtual void CopyProperties(APlayerState* PlayerState) override;
-
-	UFUNCTION(Server, Reliable)
-	void RequestMyInfo();
-	UFUNCTION(NetMulticast, Reliable)
-	void ResponseMyInfo(UPlayerScoreData* InPlayerScoreData);
 protected:
 	void SetSessionName();
 	void OnHostMigration(UWorld* World, UDataManager* DataManager);

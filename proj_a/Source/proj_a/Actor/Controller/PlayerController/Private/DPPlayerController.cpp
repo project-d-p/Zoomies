@@ -11,6 +11,7 @@
 #include "MainLevelComponent.h"
 #include "ResultLevelComponent.h"
 #include "CompileMode.h"
+#include "DPInGameState.h"
 #include "EngineUtils.h"
 #include "JudgeLevelComponent.h"
 #include "LobbyLevelComponent.h"
@@ -275,6 +276,27 @@ void ADPPlayerController::GetSeamlessTravelActorList(bool bToTransitionMap, TArr
 			return ;
 		}
 		NetworkManager->Shutdown();
+	}
+
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	check(GameInstance)
+	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
+	check(DataManager)
+	DataManager->RemoveDataArray(TEXT("PlayerScoreSeamless"));
+	ADPInGameState* DPInGameState = GetWorld()->GetGameState<ADPInGameState>();
+	check(DPInGameState)
+
+	for (auto PlayerState : DPInGameState->PlayerArray)
+	{
+		ADPPlayerState* DPPlayerState = Cast<ADPPlayerState>(PlayerState);
+		if (DPPlayerState)
+		{
+			UPlayerScoreData* ClonedPlayerScoreData = Cast<UPlayerScoreData>(DPPlayerState->GetPlayerScoreData()->Clone(DataManager));
+			if (ClonedPlayerScoreData)
+			{
+				DataManager->AddDataToArray(TEXT("PlayerScoreSeamless"), ClonedPlayerScoreData);
+			}
+		}
 	}
 	this->SwitchLevelComponent(ELevelComponentType::NONE);
 }

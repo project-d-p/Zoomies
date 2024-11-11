@@ -15,6 +15,7 @@
 #include "JudgeInputComponent.h"
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "proj_a/GameInstance/GI_Zoomies.h"
 
 AJudgePlayerController::AJudgePlayerController()
 {
@@ -199,6 +200,32 @@ void AJudgePlayerController::PostSeamlessTravel()
 	// 	It->bPlayerAssigned = true;
 	// 	break;
 	// }
+}
+
+void AJudgePlayerController::GetSeamlessTravelActorList(bool bToTransitionMap, TArray<AActor*>& ActorList)
+{
+	Super::GetSeamlessTravelActorList(bToTransitionMap, ActorList);
+
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	check(GameInstance)
+	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
+	check(DataManager)
+	DataManager->RemoveDataArray(TEXT("PlayerScoreSeamless"));
+	AJudgeGameState* GameState = GetWorld()->GetGameState<AJudgeGameState>();
+	check(GameState)
+
+	for (auto PlayerState : GameState->PlayerArray)
+	{
+		AJudgePlayerState* DPPlayerState = Cast<AJudgePlayerState>(PlayerState);
+		if (DPPlayerState)
+		{
+			UPlayerScoreData* ClonedPlayerScoreData = Cast<UPlayerScoreData>(DPPlayerState->GetPlayerScoreData()->Clone(DataManager));
+			if (ClonedPlayerScoreData)
+			{
+				DataManager->AddDataToArray(TEXT("PlayerScoreSeamless"), ClonedPlayerScoreData);
+			}
+		}
+	}
 }
 
 void AJudgePlayerController::ShowUI_ESC()
