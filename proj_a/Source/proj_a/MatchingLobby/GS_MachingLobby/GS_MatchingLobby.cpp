@@ -213,4 +213,30 @@ void AGS_MatchingLobby::MulticastShowLoadingWidget_Implementation()
 	}
 }
 
+void AGS_MatchingLobby::MulticastShowCountDown_Implementation()
+{
+	UClass* WidgetClass = nullptr;
+	FString WidgetPath = TEXT("/Game/widget/WBP_Common/CountDown/WBP_CountDown.WBP_CountDown_C");
+
+	WidgetClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *WidgetPath));
+
+	if (WidgetClass != nullptr)
+	{
+		UUserWidget* CountWidget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), WidgetClass);
+
+		if (CountWidget != nullptr)
+		{
+			CountWidget->AddToViewport();
+			UE_LOG(LogTemp, Log, TEXT("StartCountDown::CountDownStarted"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("StartCountDown::Failed to create widget"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("StartCountDown::Failed to load widget class"));
+	}
+}
 

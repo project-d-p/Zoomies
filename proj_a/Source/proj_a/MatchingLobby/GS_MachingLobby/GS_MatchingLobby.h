@@ -32,6 +32,8 @@ public:
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastShowLoadingWidget();
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastShowCountDown();
 
 	UFUNCTION(Server, Reliable)
 	void ReportPing(APlayerState* ReportingPlayer, float AveragePing);
