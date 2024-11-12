@@ -227,6 +227,8 @@ void AGS_MatchingLobby::MulticastShowCountDown_Implementation()
 		if (CountWidget != nullptr)
 		{
 			CountWidget->AddToViewport();
+			APC_MatchingLobby* PC = Cast<APC_MatchingLobby>(GetWorld()->GetFirstPlayerController());
+			PC->DisableMouseInput();
 			UE_LOG(LogTemp, Log, TEXT("StartCountDown::CountDownStarted"));
 		}
 		else

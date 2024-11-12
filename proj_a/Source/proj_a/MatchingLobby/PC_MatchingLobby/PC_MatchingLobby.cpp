@@ -323,3 +323,10 @@ void APC_MatchingLobby::RemoveMatchLobbyUI()
 		UE_LOG(LogTemp, Warning, TEXT("APC_MatchingLobby::RemoveMatchLobbyUI: MatchLobbyWidget is nullptr, nothing to remove."));
 	}
 }
+
+void APC_MatchingLobby::DisableMouseInput()
+{
+	FInputModeGameOnly InputMode;
+	SetInputMode(InputMode);
+	bShowMouseCursor = false;
+}
