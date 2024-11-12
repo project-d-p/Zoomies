@@ -67,6 +67,7 @@ void UBasicInputComponent::BindBasicLevelActions()
 		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &UBasicInputComponent::Rotate);
 		// 달리기 ( shift )
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Triggered, this, &UBasicInputComponent::Run);
+		FNetLogger::LogError(TEXT("BindBasicLevelActions: %s, %s"), *PlayerController->PlayerState->GetName(), GetWorld()->GetMapName());
 	}
 }
 
