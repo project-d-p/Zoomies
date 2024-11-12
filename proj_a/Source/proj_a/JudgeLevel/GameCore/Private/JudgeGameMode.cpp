@@ -102,10 +102,16 @@ FUIInitData AJudgeGameMode::GetUiData()
 
 EPlayerJob AJudgeGameMode::CollateVotingResults()
 {
+    if (PlayerVotes.IsEmpty())
+    {
+        return EPlayerJob::JOB_NONE;
+    }
+
     TMap<EPlayerJob, int32> VoteCounts;
 
     for (const EPlayerJob& Vote : PlayerVotes)
     {
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, OccupationToString(Vote));
         VoteCounts.FindOrAdd(Vote)++;
     }
     PlayerVotes.Empty();
@@ -118,6 +124,7 @@ EPlayerJob AJudgeGameMode::CollateVotingResults()
 void AJudgeGameMode::ProcessVotingResults()
 {
     EPlayerJob MostVotedOccupation = CollateVotingResults();
+    GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::White, OccupationToString(MostVotedOccupation));
 
     AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
     check(GS)
