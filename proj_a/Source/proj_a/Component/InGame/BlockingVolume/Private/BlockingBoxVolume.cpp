@@ -4,6 +4,7 @@ ABlockingBoxVolume::ABlockingBoxVolume()
 {
 	bReplicates = true;
 	PrimaryActorTick.bCanEverTick = false;
+	bAlwaysRelevant = true;
 
 	// UStaticMeshComponent를 생성하고 기본 박스 메쉬를 할당합니다.
 	BlockingBox = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BlockingBox"));
