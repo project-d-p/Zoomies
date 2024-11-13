@@ -48,7 +48,8 @@ void UNetworkFailureManager::Init()
 	{
 		FNetLogger::EditerLog(FColor::Green, TEXT("NetworkFailureManager::Init"));
 		GEngine->OnNetworkFailure().AddUObject(this, &UNetworkFailureManager::HandleNetworkFailure);
-		FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
+		FWorldDelegates::LevelAddedToWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
+		// FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
 		// Below One Is Not Called During Seamless Travel
 		// FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
 	}
@@ -288,6 +289,29 @@ void UNetworkFailureManager::FindSessionComplete(bool bWasSuccessful, UWorld* Wo
 	{
 		FNetLogger::EditerLog(FColor::Green,TEXT("Failed to find session: Retrying..."));
 		JoinNewSession(World);
+	}
+}
+
+void UNetworkFailureManager::OnNewLevelLoaded(ULevel* InLevel, UWorld* InWorld)
+{
+	FString LevelName = InWorld->GetMapName();
+	const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
+	FString DefaultLevel = GameMapsSettings->GetGameDefaultMap();
+	// FString CurrentLevel = World->GetMapName();
+	if (bMigrating)
+	{
+		if (DefaultLevel.Contains(LevelName))
+		{
+			return ;
+		}
+		if (LevelName.Contains(DesiredMapName.ToString()))
+		{
+			bMigrating = false;
+		}
+	}
+	else
+	{
+		ResetInstance();
 	}
 }
 

@@ -37,6 +37,7 @@ private:
 	void CreateSessionComplete(FName SessionName, bool bWasSuccessful, UWorld* World);
 	void JoinNewSession(UWorld* World);
 	void FindSessionComplete(bool bWasSuccessful, UWorld* World);
+	void OnNewLevelLoaded(ULevel* InLevel, UWorld* InWorld);
 	void OnNewLevelLoaded(UWorld* World);
 	void OnNewLevelLoaded(const FString& LevelName);
 	void JoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result, UWorld* World);
