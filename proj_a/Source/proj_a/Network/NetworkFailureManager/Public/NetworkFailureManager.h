@@ -22,7 +22,7 @@ public:
 	UDataManager* GetDataManager() { return DataManager; }
 	int GetDesiredMaxPlayers() { return DesiredMaxPlayers; }
 	void ResetInstance();
-	void TryReset();
+	void TryReset(FString LevelName);
 	void Init();
 	void SetSessionName(FName Name) { SessionNameGI = Name; }
 
@@ -37,6 +37,7 @@ private:
 	void CreateSessionComplete(FName SessionName, bool bWasSuccessful, UWorld* World);
 	void JoinNewSession(UWorld* World);
 	void FindSessionComplete(bool bWasSuccessful, UWorld* World);
+	void OnNewLevelLoaded(UWorld* World);
 	void OnNewLevelLoaded(const FString& LevelName);
 	void JoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result, UWorld* World);
 	void JoinSession(const FOnlineSessionSearchResult& SearchResult, UWorld* World);

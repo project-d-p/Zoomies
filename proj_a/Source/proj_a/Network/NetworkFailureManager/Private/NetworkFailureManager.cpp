@@ -48,8 +48,9 @@ void UNetworkFailureManager::Init()
 	{
 		FNetLogger::EditerLog(FColor::Green, TEXT("NetworkFailureManager::Init"));
 		GEngine->OnNetworkFailure().AddUObject(this, &UNetworkFailureManager::HandleNetworkFailure);
-		// FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
-		FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
+		FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
+		// Below One Is Not Called During Seamless Travel
+		// FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
 	}
 }
 
@@ -290,6 +291,29 @@ void UNetworkFailureManager::FindSessionComplete(bool bWasSuccessful, UWorld* Wo
 	}
 }
 
+void UNetworkFailureManager::OnNewLevelLoaded(UWorld* World)
+{
+	FString LevelName = World->GetMapName();
+	const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
+	FString DefaultLevel = GameMapsSettings->GetGameDefaultMap();
+	// FString CurrentLevel = World->GetMapName();
+	if (bMigrating)
+	{
+		if (DefaultLevel.Contains(LevelName))
+		{
+			return ;
+		}
+		if (LevelName.Contains(DesiredMapName.ToString()))
+		{
+			bMigrating = false;
+		}
+	}
+	else
+	{
+		ResetInstance();
+	}
+}
+
 void UNetworkFailureManager::OnNewLevelLoaded(const FString& LevelName)
 {
 	const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
@@ -367,9 +391,23 @@ void UNetworkFailureManager::ResetInstance()
 	}
 }
 
-void UNetworkFailureManager::TryReset()
+void UNetworkFailureManager::TryReset(FString LevelName)
 {
-	if (DataManager->IsEmpty())
+	const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
+	FString DefaultLevel = GameMapsSettings->GetGameDefaultMap();
+	// FString CurrentLevel = World->GetMapName();
+	if (bMigrating)
+	{
+		if (DefaultLevel.Contains(LevelName))
+		{
+			return ;
+		}
+		if (LevelName.Contains(DesiredMapName.ToString()))
+		{
+			bMigrating = false;
+		}
+	}
+	else
 	{
 		ResetInstance();
 	}
