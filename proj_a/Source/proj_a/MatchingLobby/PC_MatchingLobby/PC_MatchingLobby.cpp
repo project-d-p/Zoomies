@@ -49,6 +49,7 @@ void APC_MatchingLobby::BeginPlay()
 	Super::BeginPlay();
 
 	bShowMouseCursor = true;
+	bAutoManageActiveCameraTarget = false;
 
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
 	if (IsValid(GameInstance) && GameInstance->FriendsArray.Num() == 0)
@@ -56,15 +57,19 @@ void APC_MatchingLobby::BeginPlay()
 		GameInstance->LoadFriendsList();
 	}
 	SetCineCameraView();
-	this->bAutoManageActiveCameraTarget = false;
 	getMatchLobbyUI();
 }
 
-void APC_MatchingLobby::EndPlay( const EEndPlayReason::Type EndPlayReason)
+void APC_MatchingLobby::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 	RemoveMatchLobbyUI();
 	DeactiveCurrentComponent();
+
+	if (EndPlayReason == EEndPlayReason::LevelTransition)
+	{
+		Destroy();
+	}
 }
 
 void APC_MatchingLobby::SetCineCameraView()
@@ -317,4 +322,11 @@ void APC_MatchingLobby::RemoveMatchLobbyUI()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("APC_MatchingLobby::RemoveMatchLobbyUI: MatchLobbyWidget is nullptr, nothing to remove."));
 	}
+}
+
+void APC_MatchingLobby::DisableMouseInput()
+{
+	FInputModeGameOnly InputMode;
+	SetInputMode(InputMode);
+	bShowMouseCursor = false;
 }

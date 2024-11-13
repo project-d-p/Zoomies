@@ -35,7 +35,40 @@ class PROJ_A_API UVoteWidget : public UUserWidget
     GENERATED_BODY()
 
 public:
-    EPlayerJob GetVote() const { return CurrentVoterOcc; }
+
+    FString OccupationToString(EPlayerJob Occupation)
+    {
+        switch(Occupation)
+        {
+        case EPlayerJob::JOB_ARCHAEOLOGIST:
+            return FString("ARCHAEOLOGIST");
+        case EPlayerJob::JOB_POACHER:
+            return FString("POACHER");
+        case EPlayerJob::JOB_ENVIRONMENTALIST:
+            return FString("ENVIRONMENTALIST");
+        case EPlayerJob::JOB_RINGMASTER:
+            return FString("RINGMASTER");
+        case EPlayerJob::JOB_TERRORIST:
+            return FString("TERRORIST");
+        case EPlayerJob::JOB_CHECK:
+            return FString("CHECK");
+        case EPlayerJob::JOB_CROSS:
+            return FString("CROSS");
+        default:
+            return FString("UNKNOWN");
+        }
+    }
+    
+    EPlayerJob GetVote() 
+    {
+        FString CurrentVoterOccStr = OccupationToString(CurrentVoterOcc);
+
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Yellow, CurrentVoterOccStr);
+        }
+        return CurrentVoterOcc;
+    }
     void SetVoterName(const FString& Name)
     {
         VoterName->SetText(FText::FromString(Name));

@@ -13,7 +13,7 @@ FScoreData UCalculateScoreByJobs::CalculateScoreByJobs(EPlayerJob Job, const TAr
 		case EPlayerJob::JOB_ARCHAEOLOGIST:
 				score = CalScoreByJobs(
 					animals,
-					EAnimal::ANIMAL_WHALE,
+					EAnimal::ANIMAL_MAMMOTH,
 					{TArray<EAnimal>{
 						EAnimal::ANIMAL_MAMMOTH,
 						EAnimal::ANIMAL_ELEPHANT,
@@ -31,8 +31,8 @@ FScoreData UCalculateScoreByJobs::CalculateScoreByJobs(EPlayerJob Job, const TAr
 					EAnimal::ANIMAL_GIRAFFE,
 					{TArray<EAnimal>{
 						EAnimal::ANIMAL_GIRAFFE,
-						// EAnimal::ANIMAL_RABBIT,
-						// EAnimal::ANIMAL_SHEPHERD
+						EAnimal::ANIMAL_CHAMELEON,
+						EAnimal::ANIMAL_HORSE
 						}},
 					{TArray<EAnimal>{
 						EAnimal::ANIMAL_SABER_TOOTH_TIGER,
@@ -53,7 +53,7 @@ FScoreData UCalculateScoreByJobs::CalculateScoreByJobs(EPlayerJob Job, const TAr
 					EAnimal::ANIMAL_LION,
 					EAnimal::ANIMAL_SABER_TOOTH_TIGER,
 					EAnimal::ANIMAL_SEAL,
-					// EAnimal::ANIMAL_RABBIT,
+					EAnimal::ANIMAL_CHAMELEON,
 					EAnimal::ANIMAL_FOX}});
 			break;
 		case EPlayerJob::JOB_TERRORIST:

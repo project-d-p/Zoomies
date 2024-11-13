@@ -70,6 +70,7 @@ public:
 	void RequestCharacter();
 
 	UJudgeLevelUI* GetJudgeLevelUI() const { return JudgeLevelUI; }
+	AActor* CameraActor = nullptr;
 protected:
 	// 
 	UFUNCTION()
@@ -90,6 +91,7 @@ private:
 
 	USoundBase *TurnStartSound;
 	UJudgeLevelComponent* LevelComponent = nullptr;
+	void findMyCamera();
 
 	FTimerHandle TH;
 	FTimerHandle CTH;

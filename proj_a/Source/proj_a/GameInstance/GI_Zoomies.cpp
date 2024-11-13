@@ -250,7 +250,7 @@ bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& se
 		SessionName = FName(*search_result.Session.GetSessionIdStr());
 		network_failure_manager_->SetSessionName(SessionName);
 	}
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("SessionName: %s"), *SessionName.ToString());
+	
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
 	session_interface_->JoinSession(*local_player->GetPreferredUniqueNetId(), SessionName, search_result);
 	return true;
@@ -272,10 +272,20 @@ void UGI_Zoomies::OnInviteAccepted(const bool bWasSuccessful, const int32 LocalP
 
 		dh_on_join_complete = session_interface_->AddOnJoinSessionCompleteDelegate_Handle(
 			FOnJoinSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onJoinComplete));
+
+		FString RetrievedSessionName;
+		if (InviteResult.Session.SessionSettings.Get(FName("SessionName"), RetrievedSessionName))
+		{
+			SessionName = FName(*RetrievedSessionName);
+			network_failure_manager_->SetSessionName(SessionName);
 		
-		SessionName = FName(*InviteResult.Session.GetSessionIdStr());
-		network_failure_manager_->SetSessionName(SessionName);
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("SessionName: %s"), *SessionName.ToString());
+		}
+		else
+		{
+			SessionName = FName(*InviteResult.Session.GetSessionIdStr());
+			network_failure_manager_->SetSessionName(SessionName);
+		}
+
 
 		const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
 		session_interface_->JoinSession(*local_player->GetPreferredUniqueNetId(), SessionName, InviteResult);

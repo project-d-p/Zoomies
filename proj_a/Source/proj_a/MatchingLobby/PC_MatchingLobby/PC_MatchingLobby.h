@@ -45,6 +45,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 	ACineCameraActor* FixedCamera = nullptr;
 	void FindCineCamera();
+	void DisableMouseInput();
 	
 	
 	UTextureTransferManager* GetTextureTransferManager() const { return TextureTransferManager; }
