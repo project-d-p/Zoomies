@@ -509,10 +509,8 @@ void UNetworkFailureManager::CreateNewSessionMetaData(UWorld* World, FNamedOnlin
 	FNetLogger::EditerLog(FColor::Red, TEXT("New Map Name: %s"), *DesiredMapName.ToString());
 
 	SavedBanList = "";
-	if (CurrentSession->SessionSettings.Get(FName("BanList"), SavedBanList))
-	{
-		SavedBanList += TEXT(",") + NewHostPlayerID->ToString();
-	}
+	CurrentSession->SessionSettings.Get(FName("BanList"), SavedBanList);
+	SavedBanList += TEXT(",") + NewHostPlayerID->ToString();
 }
 
 void UNetworkFailureManager::CaptureViewport()
