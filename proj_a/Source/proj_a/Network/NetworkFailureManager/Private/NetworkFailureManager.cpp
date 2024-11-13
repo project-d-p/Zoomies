@@ -48,10 +48,11 @@ void UNetworkFailureManager::Init()
 	{
 		FNetLogger::EditerLog(FColor::Green, TEXT("NetworkFailureManager::Init"));
 		GEngine->OnNetworkFailure().AddUObject(this, &UNetworkFailureManager::HandleNetworkFailure);
-		FWorldDelegates::LevelAddedToWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
+		// FWorldDelegates::LevelAddedToWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
 		// FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
 		// Below One Is Not Called During Seamless Travel
 		// FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
+		FCoreUObjectDelegates::PreLoadMapWithContext.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
 	}
 }
 
@@ -292,9 +293,8 @@ void UNetworkFailureManager::FindSessionComplete(bool bWasSuccessful, UWorld* Wo
 	}
 }
 
-void UNetworkFailureManager::OnNewLevelLoaded(ULevel* InLevel, UWorld* InWorld)
+void UNetworkFailureManager::OnNewLevelLoaded(const FWorldContext& WorldContext, const FString& LevelName)
 {
-	FString LevelName = InWorld->GetMapName();
 	const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
 	FString DefaultLevel = GameMapsSettings->GetGameDefaultMap();
 	// FString CurrentLevel = World->GetMapName();
