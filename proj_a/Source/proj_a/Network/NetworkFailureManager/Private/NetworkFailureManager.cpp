@@ -341,6 +341,7 @@ void UNetworkFailureManager::OnNewLevelLoaded(UWorld* World)
 
 void UNetworkFailureManager::OnNewLevelLoaded(const FString& LevelName)
 {
+	FNetLogger::LogError(TEXT("OnNewLevelLoaded %s"), *LevelName);
 	const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
 	FString DefaultLevel = GameMapsSettings->GetGameDefaultMap();
 	// FString CurrentLevel = World->GetMapName();
@@ -603,7 +604,7 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 			FString NicknameA = A->ToString();
 			FString NicknameB = B->ToString();
 
-			return NicknameA < NicknameB;  // 문자열을 기준으로 사전순 정렬
+			return NicknameA > NicknameB;  // 문자열을 기준으로 사전순 정렬
 		};
 		
 		RegisteredPlayers.Sort(CompareByNickname);
