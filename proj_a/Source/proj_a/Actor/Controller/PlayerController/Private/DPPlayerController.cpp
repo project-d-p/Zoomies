@@ -287,7 +287,7 @@ void ADPPlayerController::GetSeamlessTravelActorList(bool bToTransitionMap, TArr
 	check(GameInstance)
 	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
 	check(DataManager)
-	DataManager->RemoveDataArray(TEXT("PlayerScoreSeamless"));
+	DataManager->ClearSeamlessDataArray();
 	ADPInGameState* DPInGameState = GetWorld()->GetGameState<ADPInGameState>();
 	check(DPInGameState)
 
@@ -299,13 +299,13 @@ void ADPPlayerController::GetSeamlessTravelActorList(bool bToTransitionMap, TArr
 			UPlayerScoreData* NewData = NewObject<UPlayerScoreData>(DataManager);
 			if (NewData)
 			{
-				NewData->InitializeData();
-				NewData->SetPlayerName(DPPlayerState->GetPlayerName());
-				NewData->SetPlayerId(DPPlayerState->GetPlayerId());
-				NewData->SetPlayerJob(DPPlayerState->GetPlayerJob());
 				UPlayerScoreData* PlayerScoreData = DPPlayerState->GetPlayerScoreData();
+				NewData->InitializeData();
+				NewData->SetPlayerName(PlayerScoreData->GetPlayerName());
+				NewData->SetPlayerId(PlayerScoreData->GetPlayerId());
+				NewData->SetPlayerJob(PlayerScoreData->GetPlayerJob());
 				NewData->SetScore(PlayerScoreData->GetScore());
-				DataManager->AddDataToArray(TEXT("PlayerScoreSeamless"), NewData);
+				DataManager->AddSeamlessDataToArray(TEXT("PlayerScoreSeamless"), NewData);
 			}
 		}
 	}

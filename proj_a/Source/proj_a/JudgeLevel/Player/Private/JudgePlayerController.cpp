@@ -214,7 +214,7 @@ void AJudgePlayerController::GetSeamlessTravelActorList(bool bToTransitionMap, T
 	check(GameInstance)
 	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
 	check(DataManager)
-	DataManager->RemoveDataArray(TEXT("PlayerScoreSeamless"));
+	DataManager->ClearSeamlessDataArray();
 	AJudgeGameState* GameState = GetWorld()->GetGameState<AJudgeGameState>();
 	check(GameState)
 
@@ -226,13 +226,13 @@ void AJudgePlayerController::GetSeamlessTravelActorList(bool bToTransitionMap, T
 			UPlayerScoreData* NewData = NewObject<UPlayerScoreData>(DataManager);
 			if (NewData)
 			{
-				NewData->InitializeData();
-				NewData->SetPlayerName(JudgePlayerState->GetPlayerName());
-				NewData->SetPlayerId(JudgePlayerState->GetPlayerId());
-				NewData->SetPlayerJob(JudgePlayerState->GetPlayerJob());
 				UPlayerScoreData* PlayerScoreData = JudgePlayerState->GetPlayerScoreData();
+				NewData->InitializeData();
+				NewData->SetPlayerName(PlayerScoreData->GetPlayerName());
+				NewData->SetPlayerId(PlayerScoreData->GetPlayerId());
+				NewData->SetPlayerJob(PlayerScoreData->GetPlayerJob());
 				NewData->SetScore(PlayerScoreData->GetScore());
-				DataManager->AddDataToArray(TEXT("PlayerScoreSeamless"), NewData);
+				DataManager->AddSeamlessDataToArray(TEXT("PlayerScoreSeamless"), NewData);
 			}
 		}
 	}

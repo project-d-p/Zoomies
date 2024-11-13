@@ -95,6 +95,13 @@ void AJudgePlayerState::CopyProperties(APlayerState* PlayerState)
 	PlayerState->OnRep_UniqueId();
 }
 
+void AJudgePlayerState::OnSetUniqueId()
+{
+	Super::OnSetUniqueId();
+
+	PlayerScoreData->SetPlayerId(GetUniqueId()->ToString());
+}
+
 void AJudgePlayerState::OnHostMigration(UWorld* World, UDataManager* DataManager)
 {
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
@@ -107,7 +114,7 @@ void AJudgePlayerState::OnHostMigration(UWorld* World, UDataManager* DataManager
 	{
 		NewData->InitializeData();
 		NewData->SetPlayerName(this->GetPlayerName());
-		NewData->SetPlayerId(this->GetPlayerId());
+		NewData->SetPlayerId(PlayerScoreData->GetPlayerId());
 		NewData->SetPlayerJob(this->PlayerJob);
 		NewData->SetScore(this->PlayerScoreData->GetScore());
 		DataManager->AddDataToArray(TEXT("PlayerScore"), NewData);
@@ -131,14 +138,14 @@ void AJudgePlayerState::SetPlayerNameDelayed()
 void AJudgePlayerState::InitializePlayerState()
 {
 	PlayerScoreData->SetPlayerName(this->GetPlayerName());
-	PlayerScoreData->SetPlayerId(this->GetPlayerId());
-	GetWorld()->GetTimerManager().SetTimer(PlayerNameTimerHandle, this, &AJudgePlayerState::SetPlayerNameDelayed, 0.5f, false);
+	
+	// GetWorld()->GetTimerManager().SetTimer(PlayerNameTimerHandle, this, &AJudgePlayerState::SetPlayerNameDelayed, 0.5f, false);
 	
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
 	check(GameInstance);
 	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
 	check(DataManager);
-	UDataArray* PlayerScoreSeamlessArray = DataManager->GetDataArray(TEXT("PlayerScoreSeamless"));
+	UDataArray* PlayerScoreSeamlessArray = DataManager->GetSeamlessDataArray(TEXT("PlayerScoreSeamless"));
 	if (PlayerScoreSeamlessArray)
 	{
 		for (UBaseData* Data : PlayerScoreSeamlessArray->DataArray)
@@ -178,7 +185,8 @@ void AJudgePlayerState::BeginPlay()
 			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &AJudgePlayerState::OnHostMigration);
 		}
 	}
-	InitializePlayerState();
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AJudgePlayerState::InitializePlayerState, 0.5f, false);
 }
 
 void AJudgePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

@@ -20,6 +20,8 @@ void UDataManager::AddDataToArray(const FString& Key, UBaseData* Data)
 	}
 }
 
+
+
 void UDataManager::AddDataToSingle(const FString& Key, UBaseData* Data)
 {
 	if (Data && Data->ValidateData())
@@ -38,4 +40,33 @@ UDataArray* UDataManager::GetDataArray(const FString& Key)
 {
 	UDataArray** DataArrayPtr = DataArrayMap.Find(Key);
 	return DataArrayPtr ? *DataArrayPtr : nullptr;
+}
+
+UDataArray* UDataManager::GetSeamlessDataArray(const FString& Key)
+{
+	UDataArray** DataArrayPtr = SeamlessDataArrayMap.Find(Key);
+	return DataArrayPtr ? *DataArrayPtr : nullptr;
+}
+
+void UDataManager::ClearSeamlessDataArray()
+{
+	SeamlessDataArrayMap.Empty();
+}
+
+void UDataManager::AddSeamlessDataToArray(const FString& Key, UBaseData* Data)
+{
+	if (Data && Data->ValidateData())
+	{
+		if (UDataArray** ExistingDataArray = SeamlessDataArrayMap.Find(Key))
+		{
+			(*ExistingDataArray)->AddData(Data);
+		}
+		else
+		{
+			UDataArray* NewDataArray = NewObject<UDataArray>(this);
+			NewDataArray->AddData(Data);
+
+			SeamlessDataArrayMap.Add(Key, NewDataArray);
+		}
+	}
 }
