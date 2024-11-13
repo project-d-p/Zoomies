@@ -510,7 +510,8 @@ void UNetworkFailureManager::CreateNewSessionMetaData(UWorld* World, FNamedOnlin
 
 	SavedBanList = "";
 	CurrentSession->SessionSettings.Get(FName("BanList"), SavedBanList);
-	SavedBanList += TEXT(",") + NewHostPlayerID->ToString();
+	FUniqueNetIdPtr HostID = CurrentSession->OwningUserId;
+	SavedBanList += TEXT(",") + HostID->ToString();
 }
 
 void UNetworkFailureManager::CaptureViewport()
