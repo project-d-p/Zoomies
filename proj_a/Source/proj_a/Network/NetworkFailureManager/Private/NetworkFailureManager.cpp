@@ -50,9 +50,10 @@ void UNetworkFailureManager::Init()
 		GEngine->OnNetworkFailure().AddUObject(this, &UNetworkFailureManager::HandleNetworkFailure);
 		// FWorldDelegates::LevelAddedToWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
 		// FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
-		// Below One Is Not Called During Seamless Travel
+		
+		// Below Functions Is Not Called During Seamless Travel
 		// FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
-		FCoreUObjectDelegates::PreLoadMapWithContext.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
+		// FCoreUObjectDelegates::PreLoadMapWithContext.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
 	}
 }
 

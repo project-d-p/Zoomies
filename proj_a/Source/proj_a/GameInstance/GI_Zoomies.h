@@ -17,6 +17,7 @@ class PROJ_A_API UGI_Zoomies : public UGameInstance
 {
 	GENERATED_BODY()
 public:
+	virtual void LoadComplete(const float LoadTime, const FString& MapName) override;
 	void OnHostDisconnected();
 	void HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type Arg, const FString& String);
 	FName GetSessionName() const;
