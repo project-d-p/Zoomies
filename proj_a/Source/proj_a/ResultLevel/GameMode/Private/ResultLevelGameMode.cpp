@@ -12,7 +12,7 @@ AResultLevelGameMode::AResultLevelGameMode()
 
 	PrimaryActorTick.bCanEverTick = true;
 	
-	DefaultPawnClass = ADPCharacter::StaticClass();
+	DefaultPawnClass = nullptr;
 	PlayerControllerClass = ADPPlayerController::StaticClass();
 	PlayerStateClass = ADPPlayerState::StaticClass();
 	GameStateClass = AResultLevelGameState::StaticClass();
