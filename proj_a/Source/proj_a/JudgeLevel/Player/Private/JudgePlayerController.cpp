@@ -299,7 +299,7 @@ void AJudgePlayerController::findMyCamera()
 
 	for (AActor* Actor : FoundActors)
 	{
-		FString ActorName = Actor->GetActorLabel();
+		FString ActorName = Actor->GetName();
 		if (ActorName == FString::Printf(TEXT("CameraActor_%d"), CameraIndex))
 		{
 			CameraActor = Actor;
