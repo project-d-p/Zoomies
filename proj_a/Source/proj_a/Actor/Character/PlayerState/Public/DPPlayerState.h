@@ -10,6 +10,8 @@
 #include "PlayerScoreData.h"
 #include "DPPlayerState.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnJobChanged);
+
 UCLASS()
 class PROJ_A_API ADPPlayerState : public APlayerState
 {
@@ -73,6 +75,7 @@ private:
 	UPROPERTY()
 	UPlayerScoreData* PlayerScoreData = nullptr;
 	FDelegateHandle OnHostMigrationDelegate;
+	FOnJobChanged OnJobChanged;
 	FTimerHandle PlayerNameTimerHandle;
 
 	/* For Seamless Travel */

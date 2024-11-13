@@ -160,6 +160,8 @@ void ADPPlayerState::AddInGameWidgetFunctionToDelegate()
 			else
 			{
 				PlayerScoreData->OnDataChanged.AddDynamic(InGameWidget, &UDPIngameWidget::OnScoreChanged);
+				this->OnJobChanged.AddDynamic(InGameWidget, &UDPIngameWidget::CheckAndUpdatePlayerJob);
+				OnJobChanged.Broadcast();
 				PlayerScoreData->TestBroadcast();
 			}
 		}
@@ -177,11 +179,6 @@ void ADPPlayerState::AddInGameWidgetFunctionToDelegate()
 
 void ADPPlayerState::InitializePlayerState()
 {
-	if (GetWorld()->GetMapName().Contains(TEXT("mainLevel")))
-	{
-		AddInGameWidgetFunctionToDelegate();
-	}
-	
 	PlayerScoreData->SetPlayerName(this->GetPlayerName());
 	// PlayerScoreData->SetPlayerId(this->GetPlayerId());
 	// GetWorld()->GetTimerManager().SetTimer(PlayerNameTimerHandle, this, &ADPPlayerState::SetPlayerNameDelayed, 0.5f, false);
@@ -216,7 +213,11 @@ void ADPPlayerState::InitializePlayerState()
 			}
 		}
 	}
-	PlayerScoreData->TestBroadcast();
+	
+	if (GetWorld()->GetMapName().Contains(TEXT("mainLevel")))
+	{
+		AddInGameWidgetFunctionToDelegate();
+	}
 }
 
 void ADPPlayerState::SetPlayerNameDelayed()

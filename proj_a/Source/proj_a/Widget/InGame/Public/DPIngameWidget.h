@@ -23,6 +23,8 @@ public:
 
 	UFUNCTION()
 	void OnScoreChanged(UBaseData* Data);
+	UFUNCTION()
+	void CheckAndUpdatePlayerJob();
 	
 protected:
 	UPROPERTY()
@@ -45,7 +47,6 @@ protected:
 
 	void UpdateTextBlock(UTextBlock* TextBlock);
 	void FindAndUpdateTextBlocks(UWidget* ParentWidget);
-	void CheckAndUpdatePlayerJob();
 
 	int32 reCallCnt = 0;
 };
