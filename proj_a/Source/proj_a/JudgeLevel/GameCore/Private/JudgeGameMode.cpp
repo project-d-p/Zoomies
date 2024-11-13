@@ -125,7 +125,8 @@ EPlayerJob AJudgeGameMode::CollectVotingResults()
 
     for (const EPlayerJob& Vote : PlayerVotes)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, OccupationToString(Vote));
+        // GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, OccupationToString(Vote));
+        FNetLogger::EditerLog(FColor::Cyan, TEXT("%s"), *OccupationToString(Vote));
         VoteCounts.FindOrAdd(Vote)++;
     }
     PlayerVotes.Empty();
