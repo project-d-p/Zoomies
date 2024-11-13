@@ -32,16 +32,12 @@ void USteamSocket::RecieveData(const TFunction<void(const Message&)>& Callback)
 		const uint8* msg = static_cast<const uint8*>(pp_message[i]->GetData());
 		int32 size = pp_message[i]->m_cbSize;
 
-		if (data.Num() < size)
-		{
-			data.SetNum(size);
-		}
-		
+		data.SetNum(size);
 		FMemory::Memcpy(data.GetData(), msg, size);
 		
 		Message ret_msg = Marshaller::DeserializeMessage(data);
-		pp_message[i]->Release();
 		Callback(ret_msg);
+		pp_message[i]->Release();
 	}
 }
 
