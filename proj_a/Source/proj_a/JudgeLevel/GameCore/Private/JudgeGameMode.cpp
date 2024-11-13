@@ -104,8 +104,6 @@ FUIInitData AJudgeGameMode::GetUiData()
         if (!JudgedInformation->IsJudgedPlayer(PName))
         {
             UIData.VoterName = Cast<AJudgePlayerState>(GetWorld()->GetGameState<AJudgeGameState>()->PlayerArray[CurrentPlayerIndex])->GetPlayerName();
-            AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
-            check(GS)
             GS->CurrentVotedPlayerName = PName;
             break ;
         }
