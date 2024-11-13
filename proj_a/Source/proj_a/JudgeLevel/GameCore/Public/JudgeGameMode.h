@@ -20,11 +20,15 @@ struct FPlayerInitData
     int32 Score;
     UPROPERTY()
     FString Occupation;
+    UPROPERTY()
+    int32 PlayerId;
+    UPROPERTY()
+    int32 CameraIndex;
 
     FPlayerInitData() : Score(0), Occupation(TEXT("None")) {}
 
     FPlayerInitData(const FString& InName, int32 InScore, const FString& InOccupation = TEXT("None"))
-        : PlayerName(InName), Score(InScore), Occupation(InOccupation) {}
+        : PlayerName(InName), Score(InScore), Occupation(InOccupation) , PlayerId(-1), CameraIndex(-1) {}
 };
 
 USTRUCT()
@@ -47,6 +51,7 @@ class PROJ_A_API AJudgeGameMode : public AGameModeBase, public IChatGameMode
 
 public:
     AJudgeGameMode();
+    virtual void PostLogin(APlayerController* NewPlayer) override;
 
     void AddVote(EPlayerJob Occupation) { PlayerVotes.Add(Occupation); }
     virtual UServerChatManager* GetChatManager() const override { return ChatManager; }

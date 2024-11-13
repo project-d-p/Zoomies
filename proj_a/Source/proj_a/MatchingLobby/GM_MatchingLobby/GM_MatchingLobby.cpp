@@ -60,8 +60,15 @@ void AGM_MatchingLobby::CheckReadyToStart()
 		AGS_MatchingLobby* GS = GetGameState<AGS_MatchingLobby>();
 		if (GS && GS->AreAllPlayersReady() && GetNumPlayers() >= MAX_USERS)
 		{
-			GS->MulticastShowLoadingWidget();
-			StartGame_t();
+			GS->MulticastShowCountDown();
+			FTimerHandle DelayHandle;
+			GetWorld()->GetTimerManager().SetTimer(DelayHandle, [GS, this]() {
+				if (GS)
+				{
+					GS->MulticastShowLoadingWidget();
+					StartGame_t();
+				}
+			}, 4.0f, false);
 		}
 	}
 }

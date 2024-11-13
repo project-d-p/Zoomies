@@ -4,6 +4,7 @@
 #include "EngineUtils.h"
 #include "IChatGameMode.h"
 #include "JudgeGameMode.h"
+#include "JudgeGameState.h"
 #include "JudgeLevelUI.h"
 #include "JudgePlayerState.h"
 #include "NetworkMessage.h"
@@ -64,16 +65,9 @@ void AJudgePlayerController::SetVoterName_Implementation(const FString& Name)
 	if (JudgeLevelUI)
 	{
 		JudgeLevelUI->SetVoterName(Name);
-		if (TurnStartSound)  // 사운드가 유효한지 확인
+		if (TurnStartSound) 
 		{
-			// 2D 사운드를 재생 (UI에서 사용)
 			UGameplayStatics::PlaySound2D(this, TurnStartSound);
-			//log on screen
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("TurnStartSound"));
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("TurnStartSound is not valid"));
 		}
 	}
 }
@@ -136,6 +130,7 @@ void AJudgePlayerController::RequestCharacter_Implementation()
 void AJudgePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	bAutoManageActiveCameraTarget = false;
 
 	if (IsLocalController())
 	{
@@ -147,10 +142,12 @@ void AJudgePlayerController::BeginPlay()
 		bShowMouseCursor = true;
 		
 		GetWorldTimerManager().SetTimer(TH, this, &AJudgePlayerController::RequestUIData, 1.f, true);
+		findMyCamera();
 		RequestCharacter();
 		GetWorldTimerManager().SetTimer(CTH, this, &AJudgePlayerController::RequestCharacter, 1.f, true);
 	}
 	SetInputMode(FInputModeGameAndUI());
+	ActivateCurrentComponent(this);
 }
 
 void AJudgePlayerController::SeamlessTravelFrom(APlayerController* OldPC)
@@ -248,6 +245,66 @@ void AJudgePlayerController::ActivateCurrentComponent(AJudgePlayerController* Lo
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("PC_MatchingLobby::InputComponent is nullptr"));
+		}
+	}
+}
+
+void AJudgePlayerController::findMyCamera()
+{
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor::StaticClass(), FoundActors);
+
+	AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
+	if (!GS)
+	{
+		return;
+	}
+	if (GS->GS_PlayerData.Num() == 0)
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+		{
+			findMyCamera();
+		}), 0.1f, false);
+		return;
+	}
+	
+	AJudgePlayerState* PS = Cast<AJudgePlayerState>(PlayerState);
+	if (!PS)
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+		{
+			findMyCamera();
+		}), 0.1f, false);
+		return;
+	}
+
+	int32 PlayerId = PS->GetPlayerId();
+	int32 CameraIndex = -1;
+
+	for (const FPlayerInitData& Data : GS->GS_PlayerData)
+	{
+		if (Data.PlayerId == PlayerId)
+		{
+			CameraIndex = Data.CameraIndex;
+			break;
+		}
+	}
+	
+	if (CameraIndex == -1)
+	{
+		return;
+	}
+
+	for (AActor* Actor : FoundActors)
+	{
+		FString ActorName = Actor->GetActorLabel();
+		if (ActorName == FString::Printf(TEXT("CameraActor_%d"), CameraIndex))
+		{
+			CameraActor = Actor;
+			SetViewTarget(Actor);
+			break;
 		}
 	}
 }

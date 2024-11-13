@@ -16,6 +16,7 @@ void UJudgeLevelComponent::Activate(bool bReset)
 void UJudgeLevelComponent::Deactivate()
 {
 	Super::Deactivate();
+	InputComponent->Deactivate();
 }
 
 void UJudgeLevelComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -26,6 +27,11 @@ void UJudgeLevelComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 void UJudgeLevelComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+	if (EndPlayReason == EEndPlayReason::LevelTransition)
+	{
+		Deactivate();
+		DestroyComponent();
+	}
 }
 
 void UJudgeLevelComponent::Set_PC(AJudgePlayerController* AdpPlayerController)

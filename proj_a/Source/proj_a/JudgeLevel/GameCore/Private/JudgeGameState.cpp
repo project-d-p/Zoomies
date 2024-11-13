@@ -44,11 +44,9 @@ void AJudgeGameState::SetVoterName_Implementation(const FString& Name)
 	// UJudgeLevelComponent* JLC = Cast<UJudgeLevelComponent>(PC->GetLevelComponent());
 	// check(JLC)
 	PC->GetJudgeLevelUI()->SetVoterName(Name);
-	if (TurnStartSound)  // 사운드가 유효한지 확인
+	if (TurnStartSound)
 	{
-		// 2D 사운드를 재생 (UI에서 사용)
 		UGameplayStatics::PlaySound2D(this, TurnStartSound);
-		//log on screen
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("TurnStartSound"));
 	}
 	else
@@ -67,4 +65,5 @@ void AJudgeGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AJudgeGameState, TimerManager);
+	DOREPLIFETIME(AJudgeGameState, GS_PlayerData);
 }

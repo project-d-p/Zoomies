@@ -1,7 +1,12 @@
 ﻿#include "NetworkedDynamicTextureComponent.h"
 
 #include "FNetLogger.h"
+#include "JudgeGameMode.h"
+#include "JudgeGameState.h"
+#include "JudgePlayerController.h"
 #include "TextureTransferManager.h"
+#include "Animation/SkeletalMeshActor.h"
+#include "Kismet/GameplayStatics.h"
 
 bool UNetworkedDynamicTextureComponent::InitializeTexture(FNetworkedDynamicTextureComponentInitializer& Initializer)
 {
@@ -176,6 +181,65 @@ UTexture2D* UNetworkedDynamicTextureComponent::DeserializeTexture(FSerializedTex
 
 void UNetworkedDynamicTextureComponent::UpdateTexture(UTexture2D* NewTexture)
 {
+	FString LevelName = GetWorld()->GetMapName();
+	if (LevelName.Contains("judge"))
+	{
+		AJudgeGameState* GS = Cast<AJudgeGameState>(GetWorld()->GetGameState());
+		if (!GS)
+		{
+			FNetLogger::LogError(TEXT("Failed to get JudgeGameState in 'UNetworkedDynamicTextureComponent'."));
+			return;
+		}
+
+		TArray<AActor*> FoundActors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASkeletalMeshActor::StaticClass(), FoundActors);
+
+		for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+		{
+			AJudgePlayerController* JPC = Cast<AJudgePlayerController>(*It);
+			if (!JPC)
+				continue;
+
+			if (GS->GS_PlayerData.Num() > 0)
+			{
+				int32 PlayerIndex = 0;
+				
+				for (FPlayerInitData& PlayerData : GS->GS_PlayerData)
+				{
+					if (PlayerData.PlayerId == PlayerState->GetPlayerId())
+					{
+						PlayerIndex = PlayerData.CameraIndex;
+						GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("PlayerIndex: %d is Loaded!"), PlayerIndex));
+						break;
+					}
+				}
+				if (PlayerIndex >= GS->GS_PlayerData.Num())
+				{
+					FNetLogger::LogError(TEXT("Failed to find player data in 'UNetworkedDynamicTextureComponent'."));
+					return;
+				}
+
+				for (AActor* Actor : FoundActors)
+				{
+					FString ActorName = Actor->GetActorLabel();
+					if (ActorName == FString::Printf(TEXT("Character_%d"), PlayerIndex))
+					{
+						ASkeletalMeshActor* SkeletalMeshActor = Cast<ASkeletalMeshActor>(Actor);
+						if (SkeletalMeshActor)
+						{
+							SkeletalMeshComponent = SkeletalMeshActor->GetSkeletalMeshComponent();
+							if (DynamicMaterialInstance && NewTexture)
+							{
+								DynamicMaterialInstance->SetTextureParameterValue(TEXT("renderTarget"), NewTexture);
+								SkeletalMeshComponent->SetMaterial(0, DynamicMaterialInstance);
+							}
+						}
+						break;
+					}
+				}
+			}
+		}
+	}
 	if (NewTexture && DynamicMaterialInstance && SkeletalMeshComponent)
 	{
 		DynamicMaterialInstance->SetTextureParameterValue(TEXT("renderTarget"), NewTexture);

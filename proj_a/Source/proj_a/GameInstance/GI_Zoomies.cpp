@@ -171,11 +171,11 @@ void UGI_Zoomies::CreateSession()
 	   FOnCreateSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onCreateComplete));
 	// set SessionName to Unique
 	SessionName = FName(*FString::Printf(TEXT("Zoomies_%s"), *FGuid::NewGuid().ToString()));
-	session_settings_->Set(FName("SessionName"), SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
+	session_settings_->Set(FName("SESSION_NAME"), SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
 	
 	// Create session
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
-	session_interface_->CreateSession(*local_player->GetPreferredUniqueNetId(), SessionName, *session_settings_);
+	session_interface_->CreateSession(*local_player->GetPreferredUniqueNetId(), NAME_GameSession, *session_settings_);
 }
 
 void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
@@ -228,7 +228,7 @@ bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& se
 	dh_on_join_complete = session_interface_->AddOnJoinSessionCompleteDelegate_Handle(
 		FOnJoinSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onJoinComplete));
 	FString RetrievedSessionName;
-	if (search_result.Session.SessionSettings.Get(FName("SessionName"), RetrievedSessionName))
+	if (search_result.Session.SessionSettings.Get(FName("SESSION_NAME"), RetrievedSessionName))
 	{
 		SessionName = FName(*RetrievedSessionName);
 	}
@@ -259,7 +259,15 @@ void UGI_Zoomies::OnInviteAccepted(const bool bWasSuccessful, const int32 LocalP
 		dh_on_join_complete = session_interface_->AddOnJoinSessionCompleteDelegate_Handle(
 			FOnJoinSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onJoinComplete));
 		
-		SessionName = FName(*InviteResult.Session.GetSessionIdStr());
+		FString RetrievedSessionName;
+		if (InviteResult.Session.SessionSettings.Get(FName("SESSION_NAME"), RetrievedSessionName))
+		{
+			SessionName = FName(*RetrievedSessionName);
+		}
+		else
+		{
+			SessionName = FName(*InviteResult.Session.GetSessionIdStr());
+		}
 
 		const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
 		session_interface_->JoinSession(*local_player->GetPreferredUniqueNetId(), SessionName, InviteResult);
