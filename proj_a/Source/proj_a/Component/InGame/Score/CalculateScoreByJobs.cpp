@@ -13,7 +13,7 @@ FScoreData UCalculateScoreByJobs::CalculateScoreByJobs(EPlayerJob Job, const TAr
 		case EPlayerJob::JOB_ARCHAEOLOGIST:
 				score = CalScoreByJobs(
 					animals,
-					EAnimal::ANIMAL_WHALE,
+					EAnimal::ANIMAL_MAMMOTH,
 					{TArray<EAnimal>{
 						EAnimal::ANIMAL_MAMMOTH,
 						EAnimal::ANIMAL_ELEPHANT,
