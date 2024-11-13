@@ -3,6 +3,7 @@
 #include "ClientTimerManager.h"
 #include "IChatGameState.h"
 #include "ChatManager.h"
+#include "JudgeGameMode.h"
 #include "GameFramework/GameStateBase.h"
 #include "JudgeGameState.generated.h"
 
@@ -21,6 +22,9 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void SetVoterName(const FString& Name);
+
+	UPROPERTY(Replicated)
+	TArray<FPlayerInitData> GS_PlayerData;
 	
 protected:
 	virtual void BeginPlay() override;

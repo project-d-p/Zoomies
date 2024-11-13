@@ -280,7 +280,6 @@ void ADPGameModeBase::Logout(AController* Exiting)
 	{
 		return ;
 	}
-	// ���� ���ľ� ��! �̸����� �Ǿ� ����!! SteamID�� �ٲ��� ��
 #if LAN_MODE || EDITOR_MODE
 	std::string key(TCHAR_TO_UTF8(*controller->PlayerState->GetPlayerName()));
 #else

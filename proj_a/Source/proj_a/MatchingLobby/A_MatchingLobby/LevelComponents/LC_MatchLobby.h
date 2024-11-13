@@ -13,7 +13,7 @@ class ULC_MatchLobby : public UActorComponent
 {
 	GENERATED_BODY()
 	
-	public:
+public:
 	ULC_MatchLobby();
 
 	UFUNCTION(BlueprintCallable)
@@ -25,25 +25,24 @@ class ULC_MatchLobby : public UActorComponent
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 	
-	protected:
-		UPROPERTY()
-		UIC_MatchLobby* InputComponent;
-		UPROPERTY()
-		UChatManager* ChatManager;
-		UPROPERTY()
-		USoundComponent* SoundComponent;
+protected:
+	UPROPERTY()
+	UIC_MatchLobby* InputComponent;
+	UPROPERTY()
+	UChatManager* ChatManager;
+	UPROPERTY()
+	USoundComponent* SoundComponent;
 	
-		APC_MatchingLobby* PC_MatchLobby;
-		APawn* CHAR_MatchLobby;
+	APC_MatchingLobby* PC_MatchLobby;
+	APawn* CHAR_MatchLobby;
 	
-		APC_MatchingLobby* GetPlayerController() const;
-		APawn* GetPlayerCharacter();
+	APC_MatchingLobby* GetPlayerController() const;
+	APawn* GetPlayerCharacter();
 		
-	public:
+public:
+	void Set_PC(APC_MatchingLobby* AdpPlayerController);
+	void Set_CHAR(APawn* InCharacter);
 		
-		void Set_PC(APC_MatchingLobby* AdpPlayerController);
-		void Set_CHAR(APawn* InCharacter);
-		
-		UIC_MatchLobby* GetInputComponent() const;
-		USoundComponent* GetSoundComponent() const;
+	UIC_MatchLobby* GetInputComponent() const;
+	USoundComponent* GetSoundComponent() const;
 };

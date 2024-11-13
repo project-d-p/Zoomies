@@ -40,6 +40,12 @@ void UVoteWidget::InitializEPlayerJobs()
                     OccupationButton->SetLambda([this](EPlayerJob EOcc)
                     {
                         this->CurrentVoterOcc = EOcc;
+                        FString CurrentVoterOccStr = OccupationToString(EOcc);
+
+                        if (GEngine)
+                        {
+                            GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Blue, CurrentVoterOccStr);
+                        }
                         UTexture2D* Texture = LoadObject<UTexture2D>(nullptr, PathManager::GetOccupationImagePath(EOcc));
                         this->VoterImg->SetBrushFromTexture(Texture);
                     });

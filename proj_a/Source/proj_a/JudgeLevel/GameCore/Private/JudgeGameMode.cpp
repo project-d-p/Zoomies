@@ -16,7 +16,7 @@ AJudgeGameMode::AJudgeGameMode()
     PlayerStateClass = AJudgePlayerState::StaticClass();
     PlayerControllerClass = AJudgePlayerController::StaticClass();
     // PlayerControllerClass = ADPPlayerController::StaticClass();
-    // DefaultPawnClass = ADynamicTexturedCharacter::StaticClass();
+    DefaultPawnClass = ADynamicTexturedCharacter::StaticClass();
     GameStateClass = AJudgeGameState::StaticClass();
     
     TimerManager = CreateDefaultSubobject<UServerTimerManager>(TEXT("TimerManager"));
@@ -24,35 +24,94 @@ AJudgeGameMode::AJudgeGameMode()
     bUseSeamlessTravel = true;
 }
 
+void AJudgeGameMode::PostLogin(APlayerController* NewPlayer)
+{
+    Super::PostLogin(NewPlayer);
+
+    AJudgePlayerController* PC = Cast<AJudgePlayerController>(NewPlayer);
+    check(PC)
+    PC->RequestUIData();
+}
+
 FUIInitData AJudgeGameMode::GetUiData()
 {
     FUIInitData UIData;
+    int32 i = 0;
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         AJudgePlayerController* PC = Cast<AJudgePlayerController>(*It);
-        // ADPPlayerController* PC = Cast<ADPPlayerController>(*It);
         if (!PC)
             return UIData;
+
         AJudgePlayerState* PS = Cast<AJudgePlayerState>(PC->PlayerState);
         if (!PS)
+        {
+            FTimerHandle TimerHandle;
+            GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+            {
+                GetUiData();
+            }), 0.1f, false);
             return UIData;
+        }
+
+        AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
+        if (!GS)
+            return UIData;
+
         FPlayerInitData PlayerData;
         PlayerData.PlayerName = PS->GetPlayerName();
         PlayerData.Score = PS->GetScore();
-        UIData.PlayerData.Add(PlayerData);
+        PlayerData.PlayerId = PS->GetPlayerId();
+
+        bool bIsDuplicated = false;
+        for (const FPlayerInitData& Data : GS->GS_PlayerData)
+        {
+            if (Data.PlayerId == PlayerData.PlayerId)
+            {
+                bIsDuplicated = true;
+                break;
+            }
+        }
+
+        if (!bIsDuplicated)
+        {
+            GS->GS_PlayerData.Add(PlayerData);
+            UIData.PlayerData.Add(PlayerData);
+        }
+        i++;
     }
-    // for now, following code is temporary. (Current player index)
+
+    AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
+    if (!GS)
+        return UIData;
+
+    GS->GS_PlayerData.Sort([](const FPlayerInitData& A, const FPlayerInitData& B) {
+        return A.PlayerId < B.PlayerId;
+    });
+
+    for (int32 Index = 0; Index < GS->GS_PlayerData.Num(); ++Index)
+    {
+        GS->GS_PlayerData[Index].CameraIndex = Index;
+    }
+
     UIData.VoterName = Cast<AJudgePlayerState>(GetWorld()->GetGameState<AJudgeGameState>()->PlayerArray[CurrentPlayerIndex])->GetPlayerName();
     UIData.bInitSuccessful = true;
+
     return UIData;
 }
 
 EPlayerJob AJudgeGameMode::CollateVotingResults()
 {
+    if (PlayerVotes.IsEmpty())
+    {
+        return EPlayerJob::JOB_NONE;
+    }
+
     TMap<EPlayerJob, int32> VoteCounts;
 
     for (const EPlayerJob& Vote : PlayerVotes)
     {
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, OccupationToString(Vote));
         VoteCounts.FindOrAdd(Vote)++;
     }
     PlayerVotes.Empty();
@@ -65,6 +124,7 @@ EPlayerJob AJudgeGameMode::CollateVotingResults()
 void AJudgeGameMode::ProcessVotingResults()
 {
     EPlayerJob MostVotedOccupation = CollateVotingResults();
+    GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::White, OccupationToString(MostVotedOccupation));
 
     AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
     check(GS)
