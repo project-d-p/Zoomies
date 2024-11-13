@@ -69,7 +69,7 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
 
 	this->MonsterId = -1;
 
-	GetCharacterMovement()->SetWalkableFloorAngle(85.f);
+	GetCharacterMovement()->SetWalkableFloorAngle(60.f);
 	GetCharacterMovement()->MaxStepHeight = 200.f;
 }
 
