@@ -52,7 +52,7 @@ void UNetworkFailureManager::Init()
 		// FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
 		
 		// Below Functions Is Not Called During Seamless Travel
-		// FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
+		FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
 		// FCoreUObjectDelegates::PreLoadMapWithContext.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
 	}
 }
@@ -416,23 +416,9 @@ void UNetworkFailureManager::ResetInstance()
 	}
 }
 
-void UNetworkFailureManager::TryReset(FString LevelName)
+void UNetworkFailureManager::TryReset()
 {
-	const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
-	FString DefaultLevel = GameMapsSettings->GetGameDefaultMap();
-	// FString CurrentLevel = World->GetMapName();
-	if (bMigrating)
-	{
-		if (DefaultLevel.Contains(LevelName))
-		{
-			return ;
-		}
-		if (LevelName.Contains(DesiredMapName.ToString()))
-		{
-			bMigrating = false;
-		}
-	}
-	else
+	if (!bMigrating)
 	{
 		ResetInstance();
 	}

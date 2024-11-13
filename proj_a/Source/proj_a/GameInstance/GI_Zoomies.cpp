@@ -14,13 +14,6 @@
 #include "Interfaces/OnlinePresenceInterface.h"
 #include "proj_a/MatchingLobby/TYPE_MatchingLobby/TYPE_MatchingLobby.h"
 
-void UGI_Zoomies::LoadComplete(const float LoadTime, const FString& MapName)
-{
-	Super::LoadComplete(LoadTime, MapName);
-
-	network_failure_manager_->TryReset(MapName);
-}
-
 FName UGI_Zoomies::GetSessionName() const
 {
 	return network_failure_manager_->SessionNameGI;

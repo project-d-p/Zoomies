@@ -22,7 +22,7 @@ public:
 	UDataManager* GetDataManager() { return DataManager; }
 	int GetDesiredMaxPlayers() { return DesiredMaxPlayers; }
 	void ResetInstance();
-	void TryReset(FString LevelName);
+	void TryReset();
 	void Init();
 	void SetSessionName(FName Name) { SessionNameGI = Name; }
 
