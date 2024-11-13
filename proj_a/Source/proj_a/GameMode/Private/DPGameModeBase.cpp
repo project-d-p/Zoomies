@@ -67,7 +67,7 @@ void ADPGameModeBase::GetSeamlessTravelActorList(bool bToTransition, TArray<AAct
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
 	if (!GameInstance)
 		return ;
-	
+	GameInstance->network_failure_manager_->TryReset();
 	for (FConstPlayerControllerIterator IT = GetWorld()->GetPlayerControllerIterator(); IT; ++IT)
 	{
 		ADPPlayerController* PlayerController = Cast<ADPPlayerController>(*IT);

@@ -74,6 +74,7 @@ protected:
     virtual void StartPlay() override;
     virtual void Logout(AController* Exiting) override;
     virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
+    virtual void GetSeamlessTravelActorList(bool bToTransition, TArray<AActor*>& ActorList) override;
     
     UPROPERTY()
     UServerTimerManager* TimerManager;

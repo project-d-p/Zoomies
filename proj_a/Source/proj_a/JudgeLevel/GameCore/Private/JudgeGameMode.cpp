@@ -257,3 +257,12 @@ void AJudgeGameMode::HandleStartingNewPlayer_Implementation(APlayerController* N
     //
     // NewPlayer->SetViewTarget(CamAct);
 }
+
+void AJudgeGameMode::GetSeamlessTravelActorList(bool bToTransition, TArray<AActor*>& ActorList)
+{
+    Super::GetSeamlessTravelActorList(bToTransition, ActorList);
+
+    UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+    check(GameInstance)
+    GameInstance->network_failure_manager_->TryReset();
+}
