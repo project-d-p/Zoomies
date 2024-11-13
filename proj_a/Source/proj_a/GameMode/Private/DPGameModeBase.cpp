@@ -231,7 +231,10 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 	SpawnNewCharacter(newPlayer);
 	
 	// Set Player Random Job
-	player_state->SetPlayerRandomJob();
+	if (bRestarted == false)
+	{
+		player_state->SetPlayerRandomJob();
+	}
 	
 	if (!newPlayer->IsLocalController())
 	{
