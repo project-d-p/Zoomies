@@ -183,7 +183,6 @@ void UGI_Zoomies::CreateSession()
 	SessionName = FName(*FString::Printf(TEXT("Zoomies_%s"), *FGuid::NewGuid().ToString()));
 	network_failure_manager_->SessionNameGI = SessionName;
 	session_settings_->Set(FName("SessionName"), SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("SessionName: %s"), *SessionName.ToString());
 	// Create session
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
 	session_interface_->CreateSession(*local_player->GetPreferredUniqueNetId(), SessionName, *session_settings_);
@@ -226,7 +225,6 @@ bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& se
 	FString BanList;
 	if (search_result.Session.SessionSettings.Get(FName("BanList"), BanList))
 	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("BanList: %s"), *BanList);
 		CSteamID SteamIDRaw = SteamUser()->GetSteamID();
 		FString PlayerID = FString::Printf(TEXT("%llu"), SteamIDRaw.ConvertToUint64());
 		FUniqueNetIdRepl LocalID = GetWorld()->GetFirstLocalPlayerFromController()->GetUniqueNetIdFromCachedControllerId();
@@ -436,7 +434,6 @@ void UGI_Zoomies::AddBanPlayer(const FString& String)
 		///
 		FString MapName;
 		UpdatedSessionSettings.Get(SETTING_MAPNAME, MapName);
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("MapName: %s"), *MapName);
 		///
 		
 		FString BanList;

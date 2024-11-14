@@ -51,10 +51,8 @@ void ADPPlayerState::SeamlessTravelTo(APlayerState* NewPlayerState)
 	AJudgePlayerState* JPS = Cast<AJudgePlayerState>(NewPlayerState);
 	if (JPS)
 	{
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("SeamlessTravel To in PlayerState"));
 		JPS->SetPlayerJob(PlayerJob);
 		JPS->SetPlayerScoreData(PlayerScoreData);
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("Seamless: %s"), *(JPS->GetPlayerScoreData()->GetPlayerName()));
 	}
 }
 
@@ -150,7 +148,6 @@ void ADPPlayerState::AddInGameWidgetFunctionToDelegate()
 			UDPIngameWidget* InGameWidget = Cast<UDPIngameWidget>(MainLevelComponent->GetInGameWidget());
 			if (InGameWidget == nullptr)
 			{
-				FNetLogger::EditerLog(FColor::Red, TEXT("InGameWidget is nullptr"));
 				FTimerHandle TimerHandle;
 				GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
 				{
@@ -167,7 +164,6 @@ void ADPPlayerState::AddInGameWidgetFunctionToDelegate()
 		}
 		else
 		{
-			FNetLogger::EditerLog(FColor::Red, TEXT("MainLevelComponent is nullptr"));
 			FTimerHandle TimerHandle;
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
 			{

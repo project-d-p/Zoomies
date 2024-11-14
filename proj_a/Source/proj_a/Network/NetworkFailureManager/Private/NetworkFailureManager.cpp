@@ -46,7 +46,6 @@ void UNetworkFailureManager::Init()
 
 	if (GEngine)
 	{
-		FNetLogger::EditerLog(FColor::Green, TEXT("NetworkFailureManager::Init"));
 		GEngine->OnNetworkFailure().AddUObject(this, &UNetworkFailureManager::HandleNetworkFailure);
 		// FWorldDelegates::LevelAddedToWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
 		// FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
@@ -112,8 +111,6 @@ void UNetworkFailureManager::ShowCapturedTextureToPlayer(UTextureRenderTarget2D*
 			// 캡처된 텍스처 설정
 			CapturedImageWidget->SetCapturedTexture(CapturedTexture2D);
 
-			FNetLogger::EditerLog(FColor::Blue, TEXT("ShowCapturedTextureToPlayer"));
-
 			// 위젯을 화면에 추가
 			CapturedImageWidget->AddToViewport();
 		}
@@ -145,13 +142,11 @@ void UNetworkFailureManager::DestroyPreviousSession(FOnSessionDestroyedCallback 
 						UWorld* World = StrongThis->GetWorld();
 						if (World)
 						{
-							FNetLogger::EditerLog(FColor::Cyan, TEXT("Destroy Session Complete CallBack"));
 							// (StrongThis->*OnSessionDestroyedCallback)(World);
 							StrongThis->OnSessionDestroyedDelegate.Broadcast(World);
 						}
 						else
 						{
-							FNetLogger::EditerLog(FColor::Cyan, TEXT("Cannot Get World"));
 							FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(StrongThis, &UNetworkFailureManager::OnLevelLoaded, OnSessionDestroyedCallback);
 							UGameplayStatics::OpenLevel(StrongThis, NewLevelName, true);
 						}
@@ -170,9 +165,6 @@ void UNetworkFailureManager::DestroyPreviousSession(FOnSessionDestroyedCallback 
 
 void UNetworkFailureManager::OnLevelLoaded(UWorld* LoadedWorld, FOnSessionDestroyedCallback OnSessionDestroyedCallback)
 {
-	// 레벨이 완전히 로드된 후 호출
-	FNetLogger::EditerLog(FColor::Green, TEXT("Level Loaded Successfully"));
-	
 	// 델리게이트 해제
 	FCoreUObjectDelegates::PostLoadMapWithWorld.RemoveAll(this);
 
@@ -215,7 +207,6 @@ void UNetworkFailureManager::CreateSessionComplete(FName SessionName, bool bWasS
 {
 	if (bWasSuccessful)
 	{
-		FNetLogger::EditerLog(FColor::Green, TEXT("Session Created Successfully"));
 		SessionInterface->OnCreateSessionCompleteDelegates.Remove(OnCreateCompleteDelegateHandle);
 
 		FString MapName = DesiredMapName.ToString();
@@ -232,7 +223,6 @@ void UNetworkFailureManager::CreateSessionComplete(FName SessionName, bool bWasS
 void UNetworkFailureManager::JoinNewSession(UWorld* World)
 {
 	this->OnSessionDestroyedDelegate.Clear();
-	FNetLogger::EditerLog(FColor::Green, TEXT("Finding Session...!!!!!!!!!!!!!"));
 	SessionSearch = MakeShareable(new FOnlineSessionSearch());
 	// Online Mode : False
 	SessionSearch->bIsLanQuery = false;
@@ -487,13 +477,11 @@ void UNetworkFailureManager::HandleNetworkFailure(UWorld* World, UNetDriver* Net
 		OnHostMigrationDelegate.Broadcast(World, DataManager);
 		if (bNextHost)
 		{
-			FNetLogger::EditerLog(FColor::Green, TEXT("Next Host"));
 			OnSessionDestroyedDelegate.AddUObject(this, &UNetworkFailureManager::CreateNewSession);
 			DestroyPreviousSession(&UNetworkFailureManager::CreateNewSession);
 		}
 		else
 		{
-			FNetLogger::EditerLog(FColor::Green, TEXT("Not Host"));
 			OnSessionDestroyedDelegate.AddUObject(this, &UNetworkFailureManager::JoinNewSession);
 			DestroyPreviousSession(&UNetworkFailureManager::JoinNewSession);
 		}
@@ -514,11 +502,9 @@ void UNetworkFailureManager::CreateNewSessionMetaData(UWorld* World, FNamedOnlin
 
 	// Create a new session name based on the player's name
 	DesiredSessionName = FName(*FString::Printf(TEXT("Session_%s"), *PlayerName));
-	FNetLogger::EditerLog(FColor::Red, TEXT("New Session Name: %s"), *DesiredSessionName.ToString());
 	FNetLogger::LogError(TEXT("New Session Name: %s"), *DesiredSessionName.ToString());
 
 	DesiredMapName = FName(*FString::Printf(TEXT("%s"), *World->GetMapName()));
-	FNetLogger::EditerLog(FColor::Red, TEXT("New Map Name: %s"), *DesiredMapName.ToString());
 
 	SavedBanList = "";
 	CurrentSession->SessionSettings.Get(FName("BanList"), SavedBanList);
@@ -556,7 +542,6 @@ void UNetworkFailureManager::CaptureViewport()
 
 void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 {
-	FNetLogger::EditerLog(FColor::Green, TEXT("Name of Session: %s"), *SessionNameGI.ToString());
 	FNetLogger::LogError(TEXT("Name of Session: %s"), *SessionNameGI.ToString());
 	FNamedOnlineSession* CurrentSession = SessionInterface->GetNamedSession(SessionNameGI);
 	if (CurrentSession)
@@ -584,7 +569,6 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 			// 중복된 닉네임이 있는지 확인
 			if (UniqueNicknames.Contains(PlayerID->ToString()))
 			{
-				FNetLogger::EditerLog(FColor::Yellow, TEXT("Duplicate nickname, skipping."));
 				continue;  // 중복된 닉네임은 추가하지 않음
 			}
 			// Not Include the First Player(Original Host)
@@ -613,7 +597,6 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 		{
 			FUniqueNetIdRef PlayerID = RegisteredPlayers[i];
 			FString PlayerNickname = PlayerID->ToString();
-			FNetLogger::EditerLog(FColor::Green, TEXT("Player %d: %s"), i, *PlayerNickname);
 		}
 		
 		const FUniqueNetIdRepl LocalPlayerID = World->GetFirstLocalPlayerFromController()->GetUniqueNetIdFromCachedControllerId();
@@ -621,10 +604,8 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 		const FUniqueNetIdRef NextHostID = RegisteredPlayers[0];
 		const FString NextHostNickname = NextHostID->ToString();
 		
-		FNetLogger::EditerLog(FColor::Green, TEXT("Local Player: %s & Next Host Player: %s"), *LocalPlayerNickname, *NextHostNickname);
 		if (NextHostID->IsValid() && NextHostNickname.Contains(LocalPlayerNickname))
 		{
-			FNetLogger::EditerLog(FColor::Green, TEXT("Being a Next Host"));
 			bNextHost = true;
 		}
 		else
@@ -636,7 +617,6 @@ void UNetworkFailureManager::SaveSessionMetaData(UWorld* World)
 	}
 	else
 	{
-		FNetLogger::EditerLog(FColor::Green, TEXT("CurrentSession is null"));
 		FNetLogger::LogError(TEXT("CurrentSession is null"));
 	}
 }

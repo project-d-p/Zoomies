@@ -35,37 +35,16 @@ void ADPInGameState::MulticastPlayerJob_Implementation() const
 	ADPPlayerController* PlayerController = Cast<ADPPlayerController>(GetWorld()->GetFirstPlayerController());
 	if (PlayerController)
 	{
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("MulticastPlayerJob_Implementation"));
 		ADPPlayerState* PlayerState = Cast<ADPPlayerState>(PlayerController->PlayerState);
 		if (PlayerState)
 		{
-			switch (PlayerState->GetPlayerJob())
+			if (JobWidgetInstance)
 			{
-			case EPlayerJob::JOB_ARCHAEOLOGIST:
-				FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Job : JOB_ARCHAEOLOGIST"));
-				break;
-			case EPlayerJob::JOB_POACHER:
-				FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Job : JOB_POACHER"));
-				break;
-			case EPlayerJob::JOB_RINGMASTER:
-				FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Job : JOB_RINGMASTER"));
-				break;
-			case EPlayerJob::JOB_TERRORIST:
-				FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Job : JOB_TERRORIST"));
-				break;
-			case EPlayerJob::JOB_ENVIRONMENTALIST:
-				FNetLogger::EditerLog(FColor::Cyan, TEXT("Player Job : JOB_ENVIRONMENTALIST"));
-				break;
-			default:
-				break;
+				UDPJobAssign* JobWidget = Cast<UDPJobAssign>(JobWidgetInstance);
+				check(JobWidget)
+				JobWidget->AddToViewport();
+				JobWidget->OnJobAssigned(PlayerState->GetPlayerJob());
 			}
-		}
-		if (JobWidgetInstance)
-		{
-			UDPJobAssign* JobWidget = Cast<UDPJobAssign>(JobWidgetInstance);
-			check(JobWidget)
-			JobWidget->AddToViewport();
-			JobWidget->OnJobAssigned(PlayerState->GetPlayerJob());
 		}
 	}
 }

@@ -42,7 +42,6 @@ void AChasePlayerMonsterAIController::SetRandomPlayerIndex()
 	int32 NumPlayers = UGameplayStatics::GetNumPlayerControllers(GetWorld());
 	int32 NewIndex = FMath::RandRange(0, NumPlayers - 1);
 
-	// FNetLogger::EditerLog(FColor::Green, TEXT("New Player Index: %d"), NewIndex);
 	/* Set index to 0 if no controllers exist in the world, preventing engine errors */
 	if (NumPlayers <= 1)
 	{

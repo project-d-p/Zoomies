@@ -52,7 +52,7 @@ FName UPlayerScoreData::GetDataType() const
 void UPlayerScoreData::IncreaseScore(const EPlayerJob& PlayerJob_, const TArray<EAnimal>& Animals)
 {
 	int BaseAnimalScore = 100;
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Animals Num is %d and Job is %d"), Animals.Num(), static_cast<int>(PlayerJob_));
+	// FNetLogger::EditerLog(FColor::Cyan, TEXT("Animals Num is %d and Job is %d"), Animals.Num(), static_cast<int>(PlayerJob_));
 	FScoreData scoreData = UCalculateScoreByJobs::CalculateScoreByJobs(PlayerJob_, Animals);
 	Score.ScoreDatas.Add(scoreData);
 	Score.CapturedAnimals.Add(Animals);
