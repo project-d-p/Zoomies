@@ -84,7 +84,7 @@ private:
 	void InitOnlineSubsystemSteam();
 	bool CheckValidation() const;
 	void OnInviteAccepted(const bool bWasSuccessful, const int32 LocalPlayerNum, TSharedPtr<const FUniqueNetId> UserId, const FOnlineSessionSearchResult& InviteResult);
-	bool IsPlayerAllowedToJoin(const FString& PlayerId);
+	bool UGI_Zoomies::IsPlayerAllowedToJoin(const FString& PlayerId, const FName& SessionNameToCheck) const;
 	void RestrictNewClientAccessAndAllowExistingPlayers();
 
 	UPROPERTY()

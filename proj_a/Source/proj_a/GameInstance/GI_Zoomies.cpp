@@ -234,11 +234,11 @@ void UGI_Zoomies::RestrictNewClientAccessAndAllowExistingPlayers()
 	}
 }
 
-bool UGI_Zoomies::IsPlayerAllowedToJoin(const FString& PlayerId)
+bool UGI_Zoomies::IsPlayerAllowedToJoin(const FString& PlayerId, const FName& SessionNameToCheck) const
 {
 	IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
 	IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
-	FNamedOnlineSession* ExistingSession = SessionInterface->GetNamedSession(SessionName);
+	FNamedOnlineSession* ExistingSession = SessionInterface->GetNamedSession(SessionNameToCheck);
 
 	if (ExistingSession != nullptr)
 	{
@@ -275,24 +275,29 @@ bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& se
 		UE_LOG( LogTemp, Error, TEXT("JoinSessionBySearchResult: Validation failed") );
 		return false;
 	}
+
+	FString RetrievedSessionName;
+	FName SessionNameToCheck;
+	if (search_result.Session.SessionSettings.Get(FName("SESSION_NAME"), RetrievedSessionName))
+	{
+		SessionNameToCheck = FName(*RetrievedSessionName);
+	}
+	else
+	{
+		SessionNameToCheck = FName(*search_result.Session.GetSessionIdStr());
+	}
+	
 	FString PlayerID = GetWorld()->GetFirstLocalPlayerFromController()->GetPreferredUniqueNetId()->ToString();
-	if (!IsPlayerAllowedToJoin(PlayerID))
+	if (!IsPlayerAllowedToJoin(PlayerID, SessionNameToCheck))
 	{
 		FNetLogger::EditerLog(FColor::Red, TEXT("JoinSessionBySearchResult: Player is not allowed to join the session."));
 		return false;
 	}
 	
+	SessionName = SessionNameToCheck;
+	
 	dh_on_join_complete = session_interface_->AddOnJoinSessionCompleteDelegate_Handle(
 		FOnJoinSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onJoinComplete));
-	FString RetrievedSessionName;
-	if (search_result.Session.SessionSettings.Get(FName("SESSION_NAME"), RetrievedSessionName))
-	{
-		SessionName = FName(*RetrievedSessionName);
-	}
-	else
-	{
-		SessionName = FName(*search_result.Session.GetSessionIdStr());
-	}
 	
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
 	session_interface_->JoinSession(*local_player->GetPreferredUniqueNetId(), SessionName, search_result);
