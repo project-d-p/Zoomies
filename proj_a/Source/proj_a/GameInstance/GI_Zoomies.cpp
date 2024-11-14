@@ -214,9 +214,11 @@ void UGI_Zoomies::RestrictNewClientAccessAndAllowExistingPlayers()
 	{
 		FOnlineSessionSettings UpdatedSessionSettings = ExistingSession->SessionSettings;
         
+		// Restrict new clients from joining and stop advertising the session
 		UpdatedSessionSettings.bAllowJoinInProgress = false;
 		UpdatedSessionSettings.bShouldAdvertise = false;
 
+		// Store the list of existing players in the session settings
 		FString ExistingPlayers;
 		for (auto& Player : ExistingSession->RegisteredPlayers)
 		{
@@ -224,13 +226,14 @@ void UGI_Zoomies::RestrictNewClientAccessAndAllowExistingPlayers()
 		}
 		UpdatedSessionSettings.Set(FName("ExistingPlayersList"), ExistingPlayers, EOnlineDataAdvertisementType::ViaOnlineService);
         
+		// Update the session with the new settings
 		SessionInterface->UpdateSession(SessionName, UpdatedSessionSettings);
 
-		UE_LOG(LogTemp, Log, TEXT("RestrictNewClientAccessAndAllowExistingPlayers: 기존 플레이어만 접근할 수 있도록 설정되었습니다."));
+		UE_LOG(LogTemp, Log, TEXT("RestrictNewClientAccessAndAllowExistingPlayers: The session has been updated to allow only existing players."));
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("RestrictNewClientAccessAndAllowExistingPlayers: 세션이 존재하지 않습니다."));
+		UE_LOG(LogTemp, Warning, TEXT("RestrictNewClientAccessAndAllowExistingPlayers: No existing session found."));
 	}
 }
 

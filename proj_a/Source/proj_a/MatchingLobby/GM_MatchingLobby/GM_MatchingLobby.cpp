@@ -58,6 +58,10 @@ void AGM_MatchingLobby::CheckReadyToStart()
 	if (HasAuthority())
 	{
 		AGS_MatchingLobby* GS = GetGameState<AGS_MatchingLobby>();
+		if (UGI_Zoomies* GI = Cast<UGI_Zoomies>(GetGameInstance()))
+		{
+			GI->RestrictNewClientAccessAndAllowExistingPlayers();
+		}
 		if (GS && GS->AreAllPlayersReady() && GetNumPlayers() >= MAX_USERS)
 		{
 			GS->MulticastShowCountDown();

@@ -48,6 +48,8 @@ public:
 	int player_count = 0;
 	UPROPERTY()
 	UNetworkFailureManager* network_failure_manager_;
+	void RestrictNewClientAccessAndAllowExistingPlayers();
+	
 private:
 	// Online subsystem & session interface pointers
 	IOnlineSubsystem* online_subsystem_;
@@ -85,7 +87,6 @@ private:
 	bool CheckValidation() const;
 	void OnInviteAccepted(const bool bWasSuccessful, const int32 LocalPlayerNum, TSharedPtr<const FUniqueNetId> UserId, const FOnlineSessionSearchResult& InviteResult);
 	bool UGI_Zoomies::IsPlayerAllowedToJoin(const FString& PlayerId, const FName& SessionNameToCheck) const;
-	void RestrictNewClientAccessAndAllowExistingPlayers();
 
 	UPROPERTY()
 	UUserWidget* LoadingWidget;
