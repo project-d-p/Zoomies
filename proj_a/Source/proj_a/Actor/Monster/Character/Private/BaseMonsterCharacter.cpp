@@ -183,22 +183,27 @@ void ABaseMonsterCharacter::SyncPosition()
 {
 	int32 id = MonsterId;
 	FString MonsterID = FString::FromInt(id);
-	
-	MonsterPosition* MonsterData = FDataHub::monsterData.Find(MonsterID);
-	if (!MonsterData)
+
+	TOptional<MonsterPosition> MonsterData = FDataHub::GetMonsterData(MonsterID);
+	if (!MonsterData.IsSet())
 	{
-		return ;
+		return;
 	}
+
+	MonsterPosition MonsterDataValue = MonsterData.GetValue();
 	
 	FVector CurrentPosition = this->GetActorLocation();
 	FVector CurrentVelocity = this->GetCharacterMovement()->Velocity;
 	
-	FVector Position = FVector(MonsterData->position().x(), MonsterData->position().y(), MonsterData->position().z());
-	FVector Velocity = FVector(MonsterData->velocity().x(), MonsterData->velocity().y(), 0);
-	FRotator Rotation = FRotator(MonsterData->rotation().x(), MonsterData->rotation().y(), 0);
-	
-	FVector InterpolatedPosition = FMath::VInterpTo(CurrentPosition, Position, 0.1f, 1.0f);
-	FVector InterpolatedVelocity = FMath::VInterpTo(CurrentVelocity, Velocity, 0.1f, 1.0f);
+	FVector Position = FVector(MonsterDataValue.position().x(), MonsterDataValue.position().y(), MonsterDataValue.position().z());
+	FVector Velocity = FVector(MonsterDataValue.velocity().x(), MonsterDataValue.velocity().y(), 0);
+	FRotator Rotation = FRotator(MonsterDataValue.rotation().x(), MonsterDataValue.rotation().y(), 0);
+
+	float DeltaTime = GetWorld()->GetDeltaSeconds(); // 현재 프레임의 델타 시간
+	constexpr float InterpolationSpeed = 1.0f; // 보간 속도
+	FVector InterpolatedPosition = FMath::VInterpTo(CurrentPosition, Position, DeltaTime, InterpolationSpeed);
+	FVector InterpolatedVelocity = FMath::VInterpTo(CurrentVelocity, Velocity, DeltaTime, InterpolationSpeed);
+
 	FRotator FinalRotation = FRotator(0, Rotation.Yaw, 0);
 
 	this->SetActorLocation(InterpolatedPosition);
