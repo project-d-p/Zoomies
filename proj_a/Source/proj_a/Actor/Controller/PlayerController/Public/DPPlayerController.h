@@ -90,7 +90,7 @@ private:
 	TMap<FString, uint32> LevelEnumMap;
 
 	UPROPERTY()
-	UBaseLevelComponent* ActiveComponent;
+	UBaseLevelComponent* ActiveComponent = nullptr;
 
 	UPROPERTY()
 	UTextureTransferManager* TextureTransferManager = nullptr;

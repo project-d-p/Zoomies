@@ -17,6 +17,7 @@ public:
 
 	virtual ~AResultLevelGameMode() override;
 
+	virtual void PostLogin(APlayerController* NewPlayer) override;
 	/* Seamless Travel : Reuse PlayerControllers */
 	virtual void HandleSeamlessTravelPlayer(AController*& C) override;
 	virtual void PostSeamlessTravel() override;

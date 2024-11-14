@@ -13,6 +13,7 @@
 AGM_Lobby::AGM_Lobby()
 {
 	PlayerControllerClass = ADPPlayerController::StaticClass();
+	PlayerStateClass = ADPPlayerState::StaticClass();
 	DefaultPawnClass = ADPCharacter::StaticClass(); 
 }
 

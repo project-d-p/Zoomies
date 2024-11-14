@@ -12,7 +12,7 @@ AResultLevelGameMode::AResultLevelGameMode()
 
 	PrimaryActorTick.bCanEverTick = true;
 	
-	DefaultPawnClass = ADPCharacter::StaticClass();
+	DefaultPawnClass = nullptr;
 	PlayerControllerClass = ADPPlayerController::StaticClass();
 	PlayerStateClass = ADPPlayerState::StaticClass();
 	GameStateClass = AResultLevelGameState::StaticClass();
@@ -24,6 +24,16 @@ AResultLevelGameMode::~AResultLevelGameMode()
 {
 }
 
+// Only Called On Server durign Host Migration
+void AResultLevelGameMode::PostLogin(APlayerController* NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+
+	SpawnNewPlayerPawn(NewPlayer);
+	this->CurrentPlayerCount += 1;
+	CheckPlayersAllTraveled();
+}
+
 void AResultLevelGameMode::PostSeamlessTravel()
 {
 	Super::PostSeamlessTravel();
@@ -33,6 +43,12 @@ void AResultLevelGameMode::Logout(AController* Exiting)
 {
 	// Clear the session when the player leaves the game
 	Super::Logout(Exiting);
+
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (GameInstance)
+	{
+		GameInstance->AddBanPlayer(Exiting->PlayerState->GetUniqueId()->ToString());
+	}
 }
 
 void AResultLevelGameMode::SpawnNewPlayerPawn(AController* PC)
@@ -53,6 +69,7 @@ void AResultLevelGameMode::SpawnNewPlayerPawn(AController* PC)
 	ADPCharacter* NewCharacter = GetWorld()->SpawnActor<ADPCharacter>(DefaultPawnClass, SpawnLocation, FRotator::ZeroRotator);
 	if (NewCharacter)
 	{
+		NewCharacter->SetReplicatingMovement(true);
 		PC->Possess(NewCharacter);
 	}
 
@@ -61,24 +78,6 @@ void AResultLevelGameMode::SpawnNewPlayerPawn(AController* PC)
 	{
 		PlayerController->SwitchLevelComponent(ELevelComponentType::RESULT);
 	}
-	///
-	ADPPlayerState* PS = PlayerController->GetPlayerState<ADPPlayerState>();
-	check(PS)
-	FFinalScoreData fd = PS->GetFinalScoreData();
-	UE_LOG(LogTemp, Warning, TEXT("Player Name : %s"), *PS->GetPlayerName());
-	for (int k = 0; k < fd.CapturedAnimals.Num(); k++)
-	{
-		for (int j = 0; j < fd.CapturedAnimals[k].Num(); j++)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Captured Animals : %d"), fd.CapturedAnimals[k][j]);
-		}
-	}
-	for (int k = 0; k < fd.ScoreDatas.Num(); k++)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Score Data : %d"), fd.ScoreDatas[k].baseScore);
-	}
-	UE_LOG(LogTemp, Warning, TEXT("Is Detected : %d"), fd.bIsDetected);
-	///
 }
 
 /* Seamless Travel : Reuse PlayerControllers */
@@ -101,10 +100,12 @@ void AResultLevelGameMode::CheckPlayersAllTraveled()
 	UGI_Zoomies* GI = Cast<UGI_Zoomies>(GetGameInstance());
 	check(GI)
 
+	int MaxPlayers = GI->network_failure_manager_->GetDesiredMaxPlayers() ? GI->network_failure_manager_->GetDesiredMaxPlayers() : GI->player_count;
+	
 	AResultLevelGameState* GS = Cast<AResultLevelGameState>(GetWorld()->GetGameState());
 	check(GS)
 
-	if (CurrentPlayerCount >= GI->player_count)
+	if (CurrentPlayerCount >= MaxPlayers)
 	{
 		FTimerHandle StartTimerHandle;
 		FTimerDelegate StartTimerDelegate;
@@ -136,8 +137,4 @@ void AResultLevelGameMode::CheckPlayersAllTraveled()
 void AResultLevelGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-
-	AResultLevelGameState* GS = Cast<AResultLevelGameState>(GetWorld()->GetGameState());
-	check(GS)
-	// GS->MulticastPlayersAllTraveled();
 }

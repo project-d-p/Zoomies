@@ -105,7 +105,7 @@ CSteamID USteamSocketP2P::GetHostSteamID()
 	IOnlineSessionPtr SessionPtr = OnlineSub->GetSessionInterface();
 	check(SessionPtr);
 	
-	FNamedOnlineSession* Session = SessionPtr->GetNamedSession(GameInstance->SessionName);
+	FNamedOnlineSession* Session = SessionPtr->GetNamedSession(GameInstance->GetSessionName());
 	check(Session);
 
 	TSharedPtr<const FUniqueNetId> hostNetID = Session->OwningUserId;

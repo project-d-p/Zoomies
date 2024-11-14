@@ -221,7 +221,8 @@ void UNetworkedDynamicTextureComponent::UpdateTexture(UTexture2D* NewTexture)
 
 				for (AActor* Actor : FoundActors)
 				{
-					FString ActorName = Actor->GetActorLabel();
+					// FString ActorName = Actor->GetActorLabel();
+					FString ActorName = Actor->GetActorNameOrLabel();
 					if (ActorName == FString::Printf(TEXT("Character_%d"), PlayerIndex))
 					{
 						ASkeletalMeshActor* SkeletalMeshActor = Cast<ASkeletalMeshActor>(Actor);

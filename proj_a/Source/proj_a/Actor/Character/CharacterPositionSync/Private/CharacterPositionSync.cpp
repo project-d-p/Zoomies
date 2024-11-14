@@ -33,13 +33,14 @@ void UCharacterPositionSync::PlayAimAnimation(ADPCharacter* character)
 #else
 	const FString PlayerId = Player_State->GetUniqueId()->ToString();
 #endif
-	AimState* aim_state = FDataHub::aimStateData.Find(PlayerId);
-	if (aim_state == nullptr)
+	TOptional<AimState> AimStateOpt = FDataHub::GetAimStateData(PlayerId);
+	if (!AimStateOpt.IsSet())
 	{
 		return;
 	}
-	FDataHub::aimStateData.Remove(PlayerId);
-	switch (aim_state->aim_state())
+	AimState AimStateData = AimStateOpt.GetValue();
+	
+	switch (AimStateData.aim_state())
 	{
 	case AimState::AIM_STATE_ACTIVE:
 		character->PlayAimAnimation();
@@ -66,13 +67,19 @@ void UCharacterPositionSync::SyncWithServer(ADPCharacter* character)
 	const FString PlayerId = Player_State->GetUniqueId()->ToString();
 #endif
 
-	ActorPosition* actor_position = FDataHub::actorPosition.Find(PlayerId);
-	if (actor_position == nullptr)
+	// ActorPosition* actor_position = FDataHub::actorPosition.Find(PlayerId);
+	// if (actor_position == nullptr)
+	// {
+	// 	return;
+	// }
+
+	TOptional<ActorPosition> ActorPositionOpt = FDataHub::GetActorPositionData(PlayerId);
+	if (!ActorPositionOpt.IsSet())
 	{
 		return;
 	}
 	
-	actor_position_ = *actor_position;
+	actor_position_ = ActorPositionOpt.GetValue();
 
 	this->SetState(character);
 
@@ -94,13 +101,14 @@ void UCharacterPositionSync::SyncGunFire(ADPCharacter* character)
 #else
 	const FString PlayerId = Player_State->GetUniqueId()->ToString();
 #endif
-	Gunfire* gunfire = FDataHub::gunfireData.Find(PlayerId);
-	if (gunfire == nullptr)
+
+	TOptional<Gunfire> GunfireOpt = FDataHub::GetGunfireData(PlayerId);
+	if (!GunfireOpt.IsSet())
 	{
 		return;
 	}
-	gunfire_ = *gunfire;
-	FDataHub::gunfireData.Remove(PlayerId);
+	gunfire_ = GunfireOpt.GetValue();
+
 	FHitResult hit_result;
 	
 	if (character->weaponComponent->SimulateAttack(character, hit_result, gunfire_))
@@ -123,14 +131,15 @@ void UCharacterPositionSync::SyncCatch(ADPCharacter* character)
 #else
 	const FString PlayerId = Player_State->GetUniqueId()->ToString();
 #endif
-	Catch* catch_ = FDataHub::catchData.Find(PlayerId);
-	if (catch_ == nullptr)
+
+	TOptional<Catch> CatchOpt = FDataHub::GetCatchData(PlayerId);
+	if (!CatchOpt.IsSet())
 	{
 		return;
 	}
-	Catch catch_data = *catch_;
-	FDataHub::catchData.Remove(PlayerId);
-	FString monster_id = UTF8_TO_TCHAR(catch_data.target().c_str());
+	Catch CatchData = CatchOpt.GetValue();
+	
+	FString monster_id = UTF8_TO_TCHAR(CatchData.target().c_str());
 	character->CatchMonster(monster_id);
 }
 
@@ -146,12 +155,12 @@ void UCharacterPositionSync::SyncReturnAnimal(ADPCharacter* character)
 #else
 	const FString PlayerId = Player_State->GetUniqueId()->ToString();
 #endif
-	bool* isReturn = FDataHub::returnAnimalData.Find(PlayerId);
-	if (isReturn == nullptr)
+	TOptional<bool> ReturnAnimalOpt = FDataHub::GetReturnAnimalData(PlayerId);
+	if (!ReturnAnimalOpt.IsSet())
 	{
 		return;
 	}
-	if (*isReturn)
+	if (ReturnAnimalOpt.GetValue())
 	{
 		TArray<EAnimal> animals = character->ReturnMonsters();
 		Player_State->IncreaseScore(animals);

@@ -18,6 +18,8 @@ AJudgeGameMode::AJudgeGameMode()
     // PlayerControllerClass = ADPPlayerController::StaticClass();
     DefaultPawnClass = ADynamicTexturedCharacter::StaticClass();
     GameStateClass = AJudgeGameState::StaticClass();
+    JudgedInformation = NewObject<UJudgeData>(this, TEXT("JudgedInformation"));
+    JudgedInformation->InitializeData();
     
     TimerManager = CreateDefaultSubobject<UServerTimerManager>(TEXT("TimerManager"));
     ChatManager = CreateDefaultSubobject<UServerChatManager>(TEXT("ChatManager"));
@@ -95,12 +97,24 @@ FUIInitData AJudgeGameMode::GetUiData()
     }
 
     UIData.VoterName = Cast<AJudgePlayerState>(GetWorld()->GetGameState<AJudgeGameState>()->PlayerArray[CurrentPlayerIndex])->GetPlayerName();
+    // for now, following code is temporary. (Current player index)
+    while (true)
+    {
+        FString PName = Cast<AJudgePlayerState>(GetWorld()->GetGameState<AJudgeGameState>()->PlayerArray[CurrentPlayerIndex])->GetPlayerName();
+        if (!JudgedInformation->IsJudgedPlayer(PName))
+        {
+            UIData.VoterName = Cast<AJudgePlayerState>(GetWorld()->GetGameState<AJudgeGameState>()->PlayerArray[CurrentPlayerIndex])->GetPlayerName();
+            GS->CurrentVotedPlayerName = PName;
+            break ;
+        }
+        CurrentPlayerIndex++;
+    }
     UIData.bInitSuccessful = true;
 
     return UIData;
 }
 
-EPlayerJob AJudgeGameMode::CollateVotingResults()
+EPlayerJob AJudgeGameMode::CollectVotingResults()
 {
     if (PlayerVotes.IsEmpty())
     {
@@ -111,7 +125,8 @@ EPlayerJob AJudgeGameMode::CollateVotingResults()
 
     for (const EPlayerJob& Vote : PlayerVotes)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, OccupationToString(Vote));
+        // GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, OccupationToString(Vote));
+        FNetLogger::EditerLog(FColor::Cyan, TEXT("%s"), *OccupationToString(Vote));
         VoteCounts.FindOrAdd(Vote)++;
     }
     PlayerVotes.Empty();
@@ -121,80 +136,170 @@ EPlayerJob AJudgeGameMode::CollateVotingResults()
     return MostVotedPair->Key;
 }
 
+AJudgePlayerState* AJudgeGameMode::GetCurrentVotedPlayerState()
+{
+    AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
+    check(GS)
+    for (APlayerState* PS : GS->PlayerArray)
+    {
+        AJudgePlayerState* JPS = Cast<AJudgePlayerState>(PS);
+        if (JPS->GetPlayerName().Contains(GS->CurrentVotedPlayerName))
+        {
+            return JPS;
+        }
+    }
+    return nullptr;
+}
+
+void AJudgeGameMode::HandlePlayerStateNull()
+{
+    AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
+    if (!GS->PlayerArray.IsValidIndex(CurrentPlayerIndex - 1))
+    {
+        // 중간에 나간 클라이언트가 마지막 순번이었을 경우
+        if (CurrentPlayerIndex < TOTAL_PLAYER)
+        {
+            TOTAL_PLAYER--;
+        }
+        FTimerHandle VoteCollectionTimerHandle;
+        GetWorld()->GetTimerManager().SetTimer(VoteCollectionTimerHandle, this, &AJudgeGameMode::EndTimer, 1.0f, false);
+    }
+    else
+    {
+        // 중간에 나간 클라이언트가 중간의 순번이었을 경우
+        CurrentPlayerIndex--;
+        TOTAL_PLAYER--;
+        FTimerHandle VoteCollectionTimerHandle;
+        GetWorld()->GetTimerManager().SetTimer(VoteCollectionTimerHandle, this, &AJudgeGameMode::EndTimer, 1.0f, false);
+    }
+}
+
 void AJudgeGameMode::ProcessVotingResults()
 {
-    EPlayerJob MostVotedOccupation = CollateVotingResults();
+    EPlayerJob MostVotedOccupation = CollectVotingResults();
     GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::White, OccupationToString(MostVotedOccupation));
 
     AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
     check(GS)
-    if (!GS->PlayerArray.IsValidIndex(CurrentPlayerIndex - 1))
+    AJudgePlayerState* PS = GetCurrentVotedPlayerState();
+    if (!PS)
     {
-        FNetLogger::LogError(TEXT("Failed to get %d player state."), CurrentPlayerIndex - 1);
+        HandlePlayerStateNull();
         return ;
     }
-    AJudgePlayerState* PS = Cast<AJudgePlayerState>(GetWorld()->GetGameState<AJudgeGameState>()->PlayerArray[CurrentPlayerIndex - 1]);
-    check(PS)
+
+    // Environmentalist를 했는데 왜 Poacher가 나오지?
+    // 설마 이전의 투표했던 거가 나오는건가?
     if (PS->GetPlayerJob() == MostVotedOccupation)
     {
         PS->SetIsDetected(true);
     }
 
-    constexpr int TOTAL_PLAYER = Zoomies::MAX_PLAYERS;
-    if (CurrentPlayerIndex == TOTAL_PLAYER)
+    if (CurrentPlayerIndex >= TOTAL_PLAYER)
     {
-        EndTimer();
+        FTimerHandle VoteCollectionTimerHandle;
+        GetWorld()->GetTimerManager().SetTimer(VoteCollectionTimerHandle, this, &AJudgeGameMode::EndTimer, 1.0f, false);
         return;
     }
 
     if (!GS->PlayerArray.IsValidIndex(CurrentPlayerIndex))
     {
-        FNetLogger::LogError(TEXT("Failed to get %d player state."), CurrentPlayerIndex);
+        FTimerHandle VoteCollectionTimerHandle;
+        GetWorld()->GetTimerManager().SetTimer(VoteCollectionTimerHandle, this, &AJudgeGameMode::EndTimer, 1.0f, false);
         return ;
     }
-    PS = Cast<AJudgePlayerState>(GetWorld()->GetGameState<AJudgeGameState>()->PlayerArray[CurrentPlayerIndex]);
-    FString PName = PS->GetPlayerName();
-    GS->SetVoterName(PName);
+
+    while (true)
+    {
+        PS = Cast<AJudgePlayerState>(GetWorld()->GetGameState<AJudgeGameState>()->PlayerArray[CurrentPlayerIndex]);
+        FString PName = PS->GetPlayerName();
+        if (!JudgedInformation->IsJudgedPlayer(PName))
+        {
+            GS->SetVoterName(PName);
+            break;
+        }
+        CurrentPlayerIndex++;
+    }
 
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         AJudgePlayerController* PC = Cast<AJudgePlayerController>(*It);
-        // ADPPlayerController* PC = Cast<ADPPlayerController>(*It);
         check(PC)
-        // UJudgeLevelComponent* JLC = Cast<UJudgeLevelComponent>(PC->GetLevelComponent());
-        // check(JLC)
-        // JLC->SetOccupationeName(CurrentPlayerIndex - 1, OccupationToString(MostVotedOccupation));
         PC->SetOccupationeName(CurrentPlayerIndex - 1, OccupationToString(MostVotedOccupation));
     }
-    TimerManager->StartTimer<AJudgeGameState>(WAIT_TIME, &AJudgeGameMode::EndTimer, this);
+    if (CurrentPlayerIndex < TOTAL_PLAYER && GS->PlayerArray.IsValidIndex(CurrentPlayerIndex))
+    {
+        TimerManager->StartTimer<AJudgeGameState>(WAIT_TIME, &AJudgeGameMode::EndTimer, this);
+    }
+    else
+    {
+        FTimerHandle VoteCollectionTimerHandle;
+        GetWorld()->GetTimerManager().SetTimer(VoteCollectionTimerHandle, this, &AJudgeGameMode::EndTimer, 1.0f, false);
+    }
 }
 
 void AJudgeGameMode::EndTimer()
 {
-    constexpr int TOTAL_PLAYER = Zoomies::MAX_PLAYERS;
+    UGI_Zoomies* GI = Cast<UGI_Zoomies>(GetGameInstance());
+    check(GI)
+    
     if (CurrentPlayerIndex++ < TOTAL_PLAYER)
     {
         AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
         check(GS)
         GS->NotifyTimerEnd();
 
-        FTimerHandle VoteCollationTimerHandle;
-        GetWorldTimerManager().SetTimer(VoteCollationTimerHandle, this, &AJudgeGameMode::ProcessVotingResults, 1.0f, false);
+        // FTimerHandle VoteCollationTimerHandle;
+        // GetWorldTimerManager().SetTimer(VoteCollationTimerHandle, this, &AJudgeGameMode::ProcessVotingResults, 1.0f, false);
+        ProcessVotingResults();
     }
     else
     {
-        UGI_Zoomies* GI = Cast<UGI_Zoomies>(GetGameInstance());
-        check(GI)
         GI->player_count = GetWorld()->GetNumControllers();
         GetWorld()->ServerTravel("calculateLevel?listen");   
+    }
+}
+
+void AJudgeGameMode::InitializeGameMode()
+{
+    UGI_Zoomies* GI = Cast<UGI_Zoomies>(GetGameInstance());
+    check(GI)
+
+    if (GI->network_failure_manager_->GetDesiredMaxPlayers() != 0)
+    {
+        TOTAL_PLAYER = GI->network_failure_manager_->GetDesiredMaxPlayers();
+        UDataManager* DataManager = GI->network_failure_manager_->GetDataManager();
+        check(DataManager)
+        UJudgeData* SavedData = DataManager->GetSingleDataAs<UJudgeData>("JudgeData");
+        if (SavedData)
+        {
+            JudgedInformation->SetJudgedPlayerNames(SavedData->GetJudgedPlayerNames());
+        }
+    }
+    else
+    {
+        TOTAL_PLAYER = GI->player_count;
     }
 }
 
 void AJudgeGameMode::StartPlay()
 {
     Super::StartPlay();
-    
+
+    InitializeGameMode();
     TimerManager->StartTimer<AJudgeGameState>(WAIT_TIME, &AJudgeGameMode::EndTimer, this);
+}
+
+void AJudgeGameMode::Logout(AController* Exiting)
+{
+    Super::Logout(Exiting);
+
+    UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+    if (GameInstance)
+    {
+        GameInstance->AddBanPlayer(Exiting->PlayerState->GetUniqueId()->ToString());
+    }
+    JudgedInformation->AddJudgedPlayerName(Exiting->PlayerState->GetPlayerName());
 }
 
 void AJudgeGameMode::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
@@ -213,4 +318,13 @@ void AJudgeGameMode::HandleStartingNewPlayer_Implementation(APlayerController* N
     // check(CamAct)
     //
     // NewPlayer->SetViewTarget(CamAct);
+}
+
+void AJudgeGameMode::GetSeamlessTravelActorList(bool bToTransition, TArray<AActor*>& ActorList)
+{
+    Super::GetSeamlessTravelActorList(bToTransition, ActorList);
+
+    UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+    check(GameInstance)
+    GameInstance->network_failure_manager_->TryReset();
 }
