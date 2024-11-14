@@ -218,7 +218,6 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 #else
 	// Online Mode : Steam ID
 	std::string key(TCHAR_TO_UTF8(*player_state->GetUniqueId()->ToString()));
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Player ID : %s"), *FString(key.c_str()));
 #endif
 	
 	player_controllers_[key] = Cast<ADPPlayerController>(newPlayer);

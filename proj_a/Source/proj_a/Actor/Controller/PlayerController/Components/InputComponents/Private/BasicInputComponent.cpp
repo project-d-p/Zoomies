@@ -68,7 +68,6 @@ void UBasicInputComponent::BindBasicLevelActions()
 		// 달리기 ( shift )
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Triggered, this, &UBasicInputComponent::Run);
 		PlayerController->SetInputMode(FInputModeGameOnly());
-		FNetLogger::LogError(TEXT("BindBasicLevelActions"));
 	}
 }
 
@@ -93,7 +92,6 @@ void UBasicInputComponent::UnbindBasicLevelActions()
 
 void UBasicInputComponent::Move(const FInputActionValue& value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Move Action Triggered"));
 	ADPPlayerController* PlayerController = GetPlayerController();
 	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
 	if (!Character) return ;

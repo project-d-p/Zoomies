@@ -184,10 +184,8 @@ void ADPPlayerController::OnPossess(APawn* InPawn)
 void ADPPlayerController::SetLevelComponent()
 {
 	UWorld* World = GetWorld();
-	FNetLogger::EditerLog(FColor::Red, TEXT("SetLevelComponent"));
 	if (World)
 	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("SetLevelComponent: %s"), *World->GetMapName());
 		ELevelComponentType LevelType = LevelEnumMap.Find(World->GetMapName()) ? static_cast<ELevelComponentType>(*(LevelEnumMap.Find(World->GetMapName()))) : ELevelComponentType::NONE;
 		SwitchLevelComponent(LevelType);
 	}

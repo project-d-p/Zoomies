@@ -51,10 +51,8 @@ void ADPPlayerState::SeamlessTravelTo(APlayerState* NewPlayerState)
 	AJudgePlayerState* JPS = Cast<AJudgePlayerState>(NewPlayerState);
 	if (JPS)
 	{
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("SeamlessTravel To in PlayerState"));
 		JPS->SetPlayerJob(PlayerJob);
 		JPS->SetPlayerScoreData(PlayerScoreData);
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("Seamless: %s"), *(JPS->GetPlayerScoreData()->GetPlayerName()));
 	}
 }
 
@@ -150,7 +148,6 @@ void ADPPlayerState::AddInGameWidgetFunctionToDelegate()
 			UDPIngameWidget* InGameWidget = Cast<UDPIngameWidget>(MainLevelComponent->GetInGameWidget());
 			if (InGameWidget == nullptr)
 			{
-				FNetLogger::EditerLog(FColor::Red, TEXT("InGameWidget is nullptr"));
 				FTimerHandle TimerHandle;
 				GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
 				{
@@ -167,7 +164,6 @@ void ADPPlayerState::AddInGameWidgetFunctionToDelegate()
 		}
 		else
 		{
-			FNetLogger::EditerLog(FColor::Red, TEXT("MainLevelComponent is nullptr"));
 			FTimerHandle TimerHandle;
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
 			{
@@ -271,7 +267,7 @@ void ADPPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 void ADPPlayerState::SetPlayerRandomJob()
 {
-	PlayerJob = static_cast<EPlayerJob>(FMath::RandRange(0, static_cast<int>(EPlayerJob::JOB_MAX) - 1));
+	PlayerJob = static_cast<EPlayerJob>(FMath::RandRange(0, static_cast<int>(EPlayerJob::JOB_NONE) - 1));
 	PlayerScoreData->SetPlayerJob(PlayerJob);
 }
 

@@ -460,8 +460,6 @@ void ADPCharacter::Tick(float DeltaTime)
 		currentVelocity = GetCharacterMovement()->Velocity;
 		speed = currentVelocity.Size();
 	}
-	else
-		UE_LOG(LogTemp, Warning, TEXT("null GetCharacterMovement"));
 	
 	if (!IsLocallyControlled())
 	{
@@ -548,7 +546,6 @@ void ADPCharacter::OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerSta
 	{
 		monsterSlotComponent->AddMonsterToSlot(this, Animal);
 	}
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("%s"), *PlayerName);
 }
 
 // Called to bind functionality to input
@@ -640,7 +637,6 @@ bool ADPCharacter::IsStunned() const
 
 void ADPCharacter::ClientNotifyAnimalReturn_Implementation(const FString& player_name)
 {
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("ClientNotifyAnimalReturn_Implementation"));
 	FDataHub::PushReturnAnimalDA(player_name, true);
 }
 

@@ -19,19 +19,16 @@ void USteamSocket::RecieveData(const TFunction<void(const Message&)>& Callback)
 		return ;
 	}
 
-	TArray<uint8> data;
-	data.SetNum(1512);
 	
 	for (int i = 0; i < n_messages; ++i)
 	{
 		if (pp_message[i] == nullptr)
 			continue;
-		
-		data.Reset();
 
 		const uint8* msg = static_cast<const uint8*>(pp_message[i]->GetData());
 		int32 size = pp_message[i]->m_cbSize;
 
+		TArray<uint8> data;
 		data.SetNum(size);
 		FMemory::Memcpy(data.GetData(), msg, size);
 		

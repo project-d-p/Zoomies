@@ -196,7 +196,6 @@ void ADPWeaponGun::SpawnHitEffect(const FHitResult& HitResult)
 
 	UNiagaraSystem* particleEffect = nullptr;
 
-	FNetLogger::LogError(TEXT("%s"), *HitResult.GetActor()->GetName());
 	if (HitResult.GetActor()->IsA<ADPCharacter>() || HitResult.GetActor()->GetName().Contains("21"))
 	{
 		particleEffect = particleEffectChar;
