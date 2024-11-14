@@ -165,6 +165,8 @@ void UGI_Zoomies::CreateSession()
 	// }
 
 	session_settings_->Set(SETTING_MAPNAME, FString("matchLobby"), EOnlineDataAdvertisementType::ViaOnlineService);
+	session_settings_->Set(FName("IsStarted"), FString("No"), EOnlineDataAdvertisementType::ViaOnlineService);
+	
     
 	// Add delegate
 	dh_on_create_complete = session_interface_->AddOnCreateSessionCompleteDelegate_Handle(
@@ -225,6 +227,7 @@ void UGI_Zoomies::RestrictNewClientAccessAndAllowExistingPlayers()
 			ExistingPlayers += Player->ToString() + TEXT(",");
 		}
 		UpdatedSessionSettings.Set(FName("ExistingPlayersList"), ExistingPlayers, EOnlineDataAdvertisementType::ViaOnlineService);
+		UpdatedSessionSettings.Set(FName("IsStarted"), FString("Yes"), EOnlineDataAdvertisementType::ViaOnlineService);
         
 		// Update the session with the new settings
 		SessionInterface->UpdateSession(SessionName, UpdatedSessionSettings);
@@ -245,6 +248,14 @@ bool UGI_Zoomies::IsPlayerAllowedToJoin(const FString& PlayerId, const FName& Se
 
 	if (ExistingSession != nullptr)
 	{
+		FString IsStarted;
+		if (ExistingSession->SessionSettings.Get(FName("IsStarted"), IsStarted))
+		{
+			if (IsStarted.Contains("No"))
+			{
+				return true;
+			}
+		}
 		FString BanList;
 		if (ExistingSession->SessionSettings.Get(FName("BanList"), BanList))
 		{
