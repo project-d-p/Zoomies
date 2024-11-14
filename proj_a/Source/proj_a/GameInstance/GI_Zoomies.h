@@ -84,6 +84,8 @@ private:
 	void InitOnlineSubsystemSteam();
 	bool CheckValidation() const;
 	void OnInviteAccepted(const bool bWasSuccessful, const int32 LocalPlayerNum, TSharedPtr<const FUniqueNetId> UserId, const FOnlineSessionSearchResult& InviteResult);
+	bool IsPlayerAllowedToJoin(const FString& PlayerId);
+	void RestrictNewClientAccessAndAllowExistingPlayers();
 
 	UPROPERTY()
 	UUserWidget* LoadingWidget;

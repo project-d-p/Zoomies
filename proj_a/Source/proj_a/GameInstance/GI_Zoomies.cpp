@@ -204,6 +204,70 @@ void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
 	}
 }
 
+void UGI_Zoomies::RestrictNewClientAccessAndAllowExistingPlayers()
+{
+	IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
+	IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
+	FNamedOnlineSession* ExistingSession = SessionInterface->GetNamedSession(SessionName);
+
+	if (ExistingSession != nullptr)
+	{
+		FOnlineSessionSettings UpdatedSessionSettings = ExistingSession->SessionSettings;
+        
+		UpdatedSessionSettings.bAllowJoinInProgress = false;
+		UpdatedSessionSettings.bShouldAdvertise = false;
+
+		FString ExistingPlayers;
+		for (auto& Player : ExistingSession->RegisteredPlayers)
+		{
+			ExistingPlayers += Player->ToString() + TEXT(",");
+		}
+		UpdatedSessionSettings.Set(FName("ExistingPlayersList"), ExistingPlayers, EOnlineDataAdvertisementType::ViaOnlineService);
+        
+		SessionInterface->UpdateSession(SessionName, UpdatedSessionSettings);
+
+		UE_LOG(LogTemp, Log, TEXT("RestrictNewClientAccessAndAllowExistingPlayers: 기존 플레이어만 접근할 수 있도록 설정되었습니다."));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("RestrictNewClientAccessAndAllowExistingPlayers: 세션이 존재하지 않습니다."));
+	}
+}
+
+bool UGI_Zoomies::IsPlayerAllowedToJoin(const FString& PlayerId)
+{
+	IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
+	IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
+	FNamedOnlineSession* ExistingSession = SessionInterface->GetNamedSession(SessionName);
+
+	if (ExistingSession != nullptr)
+	{
+		FString BanList;
+		if (ExistingSession->SessionSettings.Get(FName("BanList"), BanList))
+		{
+			FNetLogger::EditerLog(FColor::Red, TEXT("BanList: %s"), *BanList);
+			if (BanList.Contains(PlayerId))
+			{
+				FNetLogger::EditerLog(FColor::Red, TEXT("IsPlayerAllowedToJoin: Player %s is banned from this session."), *PlayerId);
+				return false;
+			}
+		}
+
+		FString ExistingPlayers;
+		if (ExistingSession->SessionSettings.Get(FName("ExistingPlayersList"), ExistingPlayers))
+		{
+			if (ExistingPlayers.Contains(PlayerId))
+			{
+				UE_LOG(LogTemp, Log, TEXT("IsPlayerAllowedToJoin: Player %s is allowed to join."), *PlayerId);
+				return true;
+			}
+		}
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("IsPlayerAllowedToJoin: Player %s is not allowed to join."), *PlayerId);
+	return false;
+}
+
 bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& search_result)
 {
 	if(!CheckValidation())
@@ -211,18 +275,11 @@ bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& se
 		UE_LOG( LogTemp, Error, TEXT("JoinSessionBySearchResult: Validation failed") );
 		return false;
 	}
-	
-	FString BanList;
-	if (search_result.Session.SessionSettings.Get(FName("BanList"), BanList))
+	FString PlayerID = GetWorld()->GetFirstLocalPlayerFromController()->GetPreferredUniqueNetId()->ToString();
+	if (!IsPlayerAllowedToJoin(PlayerID))
 	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("BanList: %s"), *BanList);
-		CSteamID SteamIDRaw = SteamUser()->GetSteamID();
-		FString PlayerID = FString::Printf(TEXT("%llu"), SteamIDRaw.ConvertToUint64());
-		if (BanList.Contains(PlayerID))
-		{
-			FNetLogger::EditerLog(FColor::Red, TEXT("You are banned from this session"));
-			return false;
-		}
+		FNetLogger::EditerLog(FColor::Red, TEXT("JoinSessionBySearchResult: Player is not allowed to join the session."));
+		return false;
 	}
 	
 	dh_on_join_complete = session_interface_->AddOnJoinSessionCompleteDelegate_Handle(
@@ -396,7 +453,7 @@ void UGI_Zoomies::ChangeJoinInProgress(bool bCond)
 	}
 }
 
-void UGI_Zoomies::AddBanPlayer(const FString& String)
+void UGI_Zoomies::AddBanPlayer(const FString& PlayerId)
 {
 	IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
 	IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
@@ -414,7 +471,7 @@ void UGI_Zoomies::AddBanPlayer(const FString& String)
 		
 		FString BanList;
 		UpdatedSessionSettings.Get(FName("BanList"), BanList);
-		BanList += String + TEXT(",");
+		BanList += PlayerId + TEXT(",");
 		UpdatedSessionSettings.Set(FName("BanList"), BanList, EOnlineDataAdvertisementType::ViaOnlineService);
 
 		SessionInterface->UpdateSession(SessionName, UpdatedSessionSettings);
