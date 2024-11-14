@@ -241,6 +241,13 @@ void ABaseMonsterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	FVector CurrentPosition = this->GetActorLocation();
+	if (CurrentPosition.Z < -1000.f)
+	{
+		FNetLogger::LogError(TEXT("Monsters Bad Position: %f %f %f"), CurrentPosition.X, CurrentPosition.Y, CurrentPosition.Z);
+		// this->Destroy();
+	}
+	
 	if (!HasAuthority())
 	{
 		this->SyncPosition();
