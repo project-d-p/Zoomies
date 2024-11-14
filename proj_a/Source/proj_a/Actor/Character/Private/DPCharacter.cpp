@@ -460,8 +460,6 @@ void ADPCharacter::Tick(float DeltaTime)
 		currentVelocity = GetCharacterMovement()->Velocity;
 		speed = currentVelocity.Size();
 	}
-	else
-		UE_LOG(LogTemp, Warning, TEXT("null GetCharacterMovement"));
 	
 	if (!IsLocallyControlled())
 	{

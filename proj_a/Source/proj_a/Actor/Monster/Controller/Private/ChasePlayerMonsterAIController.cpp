@@ -60,7 +60,6 @@ void AChasePlayerMonsterAIController::SetRandomPlayerIndex()
 void AChasePlayerMonsterAIController::SimulateMovement(float delta_time)
 {
 	Super::SimulateMovement(delta_time);
-	FNetLogger::LogWarning(TEXT("%s started movement!"), *GetPawn()->GetName());
 	if (!GetMovementAllowed())
 	{
 		return;
