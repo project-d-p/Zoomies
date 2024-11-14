@@ -240,46 +240,33 @@ void UGI_Zoomies::RestrictNewClientAccessAndAllowExistingPlayers()
 	}
 }
 
-bool UGI_Zoomies::IsPlayerAllowedToJoin(const FString& PlayerId, const FName& SessionNameToCheck) const
+bool UGI_Zoomies::IsPlayerAllowedToJoin(const FString& PlayerId, const FOnlineSessionSearchResult& SearchResult) const
 {
-	IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
-	IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
-	FNamedOnlineSession* ExistingSession = SessionInterface->GetNamedSession(SessionNameToCheck);
-
-	if (ExistingSession != nullptr)
+	if (!SearchResult.IsValid())
 	{
-		FString IsStarted;
-		if (ExistingSession->SessionSettings.Get(FName("IsStarted"), IsStarted))
-		{
-			if (IsStarted.Contains("No"))
-			{
-				return true;
-			}
-		}
-		FString BanList;
-		if (ExistingSession->SessionSettings.Get(FName("BanList"), BanList))
-		{
-			FNetLogger::EditerLog(FColor::Red, TEXT("BanList: %s"), *BanList);
-			if (BanList.Contains(PlayerId))
-			{
-				FNetLogger::EditerLog(FColor::Red, TEXT("IsPlayerAllowedToJoin: Player %s is banned from this session."), *PlayerId);
-				return false;
-			}
-		}
-
-		FString ExistingPlayers;
-		if (ExistingSession->SessionSettings.Get(FName("ExistingPlayersList"), ExistingPlayers))
-		{
-			if (ExistingPlayers.Contains(PlayerId))
-			{
-				UE_LOG(LogTemp, Log, TEXT("IsPlayerAllowedToJoin: Player %s is allowed to join."), *PlayerId);
-				return true;
-			}
-		}
+		return false;
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("IsPlayerAllowedToJoin: Player %s is not allowed to join."), *PlayerId);
-	return false;
+	
+	FString IsStarted = "";
+	FString BanList = "";
+	FString ExistingPlayers = "";
+	SearchResult.Session.SessionSettings.Get(FName("IsStarted"), IsStarted);
+	SearchResult.Session.SessionSettings.Get(FName("BanList"), BanList);
+	SearchResult.Session.SessionSettings.Get(FName("ExistingPlayers"), ExistingPlayers);
+	
+	if (IsStarted.Contains("No"))
+	{
+		return true;
+	}
+	if (BanList.Contains(PlayerId))
+	{
+		return false;
+	}
+	if (ExistingPlayers.Contains(PlayerId))
+	{
+		return true;
+	}
+    return false;
 }
 
 bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& search_result)
@@ -289,26 +276,22 @@ bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& se
 		UE_LOG( LogTemp, Error, TEXT("JoinSessionBySearchResult: Validation failed") );
 		return false;
 	}
+	
+	FString PlayerID = GetWorld()->GetFirstLocalPlayerFromController()->GetPreferredUniqueNetId()->ToString();
+	if (!IsPlayerAllowedToJoin(PlayerID, search_result))
+	{
+		return false;
+	}
 
 	FString RetrievedSessionName;
-	FName SessionNameToCheck;
 	if (search_result.Session.SessionSettings.Get(FName("SESSION_NAME"), RetrievedSessionName))
 	{
-		SessionNameToCheck = FName(*RetrievedSessionName);
+		SessionName = FName(*RetrievedSessionName);
 	}
 	else
 	{
-		SessionNameToCheck = FName(*search_result.Session.GetSessionIdStr());
+		SessionName = FName(*search_result.Session.GetSessionIdStr());
 	}
-	
-	FString PlayerID = GetWorld()->GetFirstLocalPlayerFromController()->GetPreferredUniqueNetId()->ToString();
-	if (!IsPlayerAllowedToJoin(PlayerID, SessionNameToCheck))
-	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("JoinSessionBySearchResult: Player is not allowed to join the session."));
-		return false;
-	}
-	
-	SessionName = SessionNameToCheck;
 	
 	dh_on_join_complete = session_interface_->AddOnJoinSessionCompleteDelegate_Handle(
 		FOnJoinSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onJoinComplete));
