@@ -25,7 +25,7 @@ void UDPIngameWidget::NativeConstruct()
 		TimerUiInitializer.InWorld = GetWorld();
 		TimerUI->initTimerUI<ADPInGameState>(TimerUiInitializer);
 	}
-	
+
 	FindAndUpdateTextBlocks(this);
 
 	ScoreUI_Private = NewObject<UScoreUiPrivate>(this);
@@ -171,7 +171,7 @@ void UDPIngameWidget::OnScoreChanged(UBaseData* Data)
 {
 	//BaseData to PlayerScoreData
 	UPlayerScoreData* PlayerScoreData = Cast<UPlayerScoreData>(Data);
-	
+
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	if (PlayerController)
 	{
@@ -202,7 +202,7 @@ void UDPIngameWidget::OnScoreChanged(UBaseData* Data)
 					//FNetLogger::EditerLog(FColor::Red, TEXT("OnScoreChanged: scoreFront or scoreBack or scoreTotal is nullptr"));
 					return;
 				}
-					
+
 				FFinalScoreData ScoreData = PlayerScoreData->GetScore();
 				scoreFront->SetText(FText::FromString(FString::FromInt(ScoreData.PrivateTotalBaseScore)));
 				scoreBack->SetText(FText::FromString(FString::FromInt(ScoreData.PrivateTotalScale)));
