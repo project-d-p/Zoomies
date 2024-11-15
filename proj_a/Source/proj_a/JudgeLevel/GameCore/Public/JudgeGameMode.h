@@ -61,6 +61,7 @@ public:
 
 private:
     void CollectVotingResults(const FString& CurrentVotedPlayer);
+    AJudgePlayerState* GetPlayerStateFromPlayerName(const FString& PlayerName);
     AJudgePlayerState* GetCurrentVotedPlayerState();
     void HandlePlayerStateNull();
     void ProcessVotingResults();

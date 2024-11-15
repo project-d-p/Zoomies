@@ -151,7 +151,7 @@ void AJudgeGameMode::CollectVotingResults(const FString& CurrentVotedPlayer)
     }
     auto MostVotedPair = Algo::MaxElementBy(VoteCounts, [](const auto& Pair) { return Pair.Value; });
 
-    AJudgePlayerState* PS = GetCurrentVotedPlayerState();
+    AJudgePlayerState* PS = GetPlayerStateFromPlayerName(CurrentVotedPlayer);
     if (PS)
     {
         if (PS->GetPlayerJob() == MostVotedPair->Key)
@@ -171,6 +171,21 @@ void AJudgeGameMode::CollectVotingResults(const FString& CurrentVotedPlayer)
     {
         HandlePlayerStateNull();
     }
+}
+
+AJudgePlayerState* AJudgeGameMode::GetPlayerStateFromPlayerName(const FString& PlayerName)
+{
+    AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
+    check(GS)
+    for (APlayerState* PS : GS->PlayerArray)
+    {
+        AJudgePlayerState* JPS = Cast<AJudgePlayerState>(PS);
+        if (JPS->GetPlayerName().Contains(PlayerName))
+        {
+            return JPS;
+        }
+    }
+    return nullptr;
 }
 
 AJudgePlayerState* AJudgeGameMode::GetCurrentVotedPlayerState()
