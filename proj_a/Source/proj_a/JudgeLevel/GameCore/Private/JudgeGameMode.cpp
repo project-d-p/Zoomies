@@ -206,13 +206,10 @@ AJudgePlayerState* AJudgeGameMode::GetCurrentVotedPlayerState()
 void AJudgeGameMode::HandlePlayerStateNull()
 {
     AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
+    TOTAL_PLAYER--;
     if (!GS->PlayerArray.IsValidIndex(CurrentPlayerIndex - 1))
     {
         // 중간에 나간 클라이언트가 마지막 순번이었을 경우
-        if (CurrentPlayerIndex < TOTAL_PLAYER)
-        {
-            TOTAL_PLAYER--;
-        }
         FTimerHandle VoteCollectionTimerHandle;
         GetWorld()->GetTimerManager().SetTimer(VoteCollectionTimerHandle, this, &AJudgeGameMode::EndTimer, 1.0f, false);
     }
@@ -220,7 +217,6 @@ void AJudgeGameMode::HandlePlayerStateNull()
     {
         // 중간에 나간 클라이언트가 중간의 순번이었을 경우
         CurrentPlayerIndex--;
-        TOTAL_PLAYER--;
         FTimerHandle VoteCollectionTimerHandle;
         GetWorld()->GetTimerManager().SetTimer(VoteCollectionTimerHandle, this, &AJudgeGameMode::EndTimer, 1.0f, false);
     }
