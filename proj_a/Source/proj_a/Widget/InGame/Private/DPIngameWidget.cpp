@@ -45,7 +45,7 @@ void UDPIngameWidget::NativeConstruct()
 void UDPIngameWidget::ChangeListByScore()
 {
 	PlayerNameListByScore.Empty();
-	TArray<UPlayerScoreData> PlayerScoreDataArray;
+	TArray<FFinalScoreData> PlayerScoreDataArray;
 	ADPInGameState* GameState = Cast<ADPInGameState>(GetWorld()->GetGameState());
 	if (GameState)
 	{
@@ -57,18 +57,18 @@ void UDPIngameWidget::ChangeListByScore()
 				UPlayerScoreData* PlayerScoreData = DPPlayerState->GetPlayerScoreData();
 				if (PlayerScoreData)
 				{
-					PlayerScoreDataArray.Add(*PlayerScoreData);
+					PlayerScoreDataArray.Add(PlayerScoreData->GetScore());
 				}
 			}
 		}
 	}
-	PlayerScoreDataArray.Sort([](const UPlayerScoreData& A, const UPlayerScoreData& B)
+	PlayerScoreDataArray.Sort([](const FFinalScoreData& A, const FFinalScoreData& B)
 	{
-		return A.GetScore().PrivateTotalScore > B.GetScore().PrivateTotalScore;
+		return A.PrivateTotalScore > B.PrivateTotalScore;
 	});
 	for (int32 i = 0; i < PlayerScoreDataArray.Num(); ++i)
 	{
-		PlayerNameListByScore.Add(PlayerScoreDataArray[i].GetPlayerId());
+		PlayerNameListByScore.Add(PlayerScoreDataArray[i].PlayerName);
 	}
 	OnRankingChanged(PlayerNameListByScore);
 }
