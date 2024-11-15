@@ -25,7 +25,7 @@ public:
 	void OnScoreChanged(UBaseData* Data);
 	UFUNCTION()
 	void CheckAndUpdatePlayerJob();
-	
+
 protected:
 	UPROPERTY()
 	UTimerUI* TimerUI = nullptr;
