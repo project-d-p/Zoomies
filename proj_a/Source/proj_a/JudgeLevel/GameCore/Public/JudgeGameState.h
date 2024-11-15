@@ -24,6 +24,9 @@ public:
 	void NotifyTimerEnd();
 
 	UFUNCTION(NetMulticast, Reliable)
+	void NotifyCurrentPlayerVoted(const FString& VotedPlayerName);
+	
+	UFUNCTION(NetMulticast, Reliable)
 	void SetVoterName(const FString& Name);
 
 	UPROPERTY(Replicated)

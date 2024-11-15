@@ -21,4 +21,5 @@ public:
 	
 private:
 	TArray<FString> JudgedPlayerNames;
+	TArray<FString> VotedPlayerNamesToEndGame;
 };
