@@ -125,7 +125,7 @@ EPlayerJob AJudgeGameMode::CollectVotingResults()
 
     for (const EPlayerJob& Vote : PlayerVotes)
     {
-        // GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, OccupationToString(Vote));
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, OccupationToString(Vote));
         FNetLogger::EditerLog(FColor::Cyan, TEXT("%s"), *OccupationToString(Vote));
         VoteCounts.FindOrAdd(Vote)++;
     }
@@ -156,7 +156,6 @@ void AJudgeGameMode::HandlePlayerStateNull()
     AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
     if (!GS->PlayerArray.IsValidIndex(CurrentPlayerIndex - 1))
     {
-        // 중간에 나간 클라이언트가 마지막 순번이었을 경우
         if (CurrentPlayerIndex < TOTAL_PLAYER)
         {
             TOTAL_PLAYER--;
@@ -166,7 +165,6 @@ void AJudgeGameMode::HandlePlayerStateNull()
     }
     else
     {
-        // 중간에 나간 클라이언트가 중간의 순번이었을 경우
         CurrentPlayerIndex--;
         TOTAL_PLAYER--;
         FTimerHandle VoteCollectionTimerHandle;
@@ -188,8 +186,6 @@ void AJudgeGameMode::ProcessVotingResults()
         return ;
     }
 
-    // Environmentalist를 했는데 왜 Poacher가 나오지?
-    // 설마 이전의 투표했던 거가 나오는건가?
     if (PS->GetPlayerJob() == MostVotedOccupation)
     {
         PS->SetIsDetected(true);
