@@ -27,7 +27,7 @@ public:
 	void CheckAndUpdatePlayerJob();
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnRankingChanged(const TArray<FString>& PlayerNameListByScore);
+	void OnRankingChanged(const TArray<FString>& PlayerNameList);
 	
 protected:
 	UPROPERTY()
