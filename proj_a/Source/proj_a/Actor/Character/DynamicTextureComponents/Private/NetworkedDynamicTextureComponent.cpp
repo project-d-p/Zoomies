@@ -202,7 +202,7 @@ void UNetworkedDynamicTextureComponent::UpdateTexture(UTexture2D* NewTexture)
 
 			if (GS->GS_PlayerData.Num() > 0)
 			{
-				int32 PlayerIndex = 0;
+				int32 PlayerIndex = -1;
 				
 				for (FPlayerInitData& PlayerData : GS->GS_PlayerData)
 				{
@@ -213,17 +213,25 @@ void UNetworkedDynamicTextureComponent::UpdateTexture(UTexture2D* NewTexture)
 						break;
 					}
 				}
+				if (PlayerIndex == -1)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 1500.f, FColor::Red, FString::Printf(TEXT("PlayerIndex can't Found!"), PlayerIndex));
+				}
+				else
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("PlayerIndex: %d is Loaded!"), PlayerIndex));
+				}
 				if (PlayerIndex >= GS->GS_PlayerData.Num())
 				{
 					FNetLogger::LogError(TEXT("Failed to find player data in 'UNetworkedDynamicTextureComponent'."));
 					return;
 				}
+				
 
 				for (AActor* Actor : FoundActors)
 				{
 					FString ActorName = Actor->GetName();
-					
-					if (ActorName == FString::Printf(TEXT("SkeletalMeshActor_%d"), PlayerIndex + 4))
+					if (ActorName == FString::Printf(TEXT("SkeletalMeshActor_%d"), PlayerIndex + 5))
 					{
 						GEngine->AddOnScreenDebugMessage(-1, 15000.f, FColor::Red, FString::Printf(TEXT("ActorName: %s"), *ActorName));
 						ASkeletalMeshActor* SkeletalMeshActor = Cast<ASkeletalMeshActor>(Actor);
