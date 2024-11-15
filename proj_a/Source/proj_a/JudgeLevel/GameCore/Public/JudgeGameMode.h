@@ -55,24 +55,27 @@ public:
     AJudgeGameMode();
     virtual void PostLogin(APlayerController* NewPlayer) override;
 
-    void AddVote(EPlayerJob Occupation) { PlayerVotes.Add(Occupation); }
+    void AddVote(const FString& VotedName, EPlayerJob Occupation);
     virtual UServerChatManager* GetChatManager() const override { return ChatManager; }
     FUIInitData GetUiData();
 
 private:
-    EPlayerJob CollectVotingResults();
+    void CollectVotingResults(const FString& CurrentVotedPlayer);
+    AJudgePlayerState* GetPlayerStateFromPlayerName(const FString& PlayerName);
     AJudgePlayerState* GetCurrentVotedPlayerState();
     void HandlePlayerStateNull();
     void ProcessVotingResults();
+    bool IsJudgedAllPlayers();
     void EndTimer();
 
     int CurrentPlayerIndex = 0;
     float WAIT_TIME = Zoomies::JUDGE_TIME;
-    TArray<EPlayerJob> PlayerVotes;
+    TMap<FString, TArray<EPlayerJob>> PlayerVotes;
     int TOTAL_PLAYER;
 
     UPROPERTY()
     UJudgeData* JudgedInformation;
+    bool bVotingEnd;
 
 protected:
     void InitializeGameMode();
