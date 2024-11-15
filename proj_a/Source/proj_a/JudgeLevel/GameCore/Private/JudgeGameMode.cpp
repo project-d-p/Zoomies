@@ -127,6 +127,7 @@ EPlayerJob AJudgeGameMode::CollectVotingResults()
     {
         // GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, OccupationToString(Vote));
         FNetLogger::EditerLog(FColor::Cyan, TEXT("%s"), *OccupationToString(Vote));
+        FNetLogger::LogError(TEXT("VoteArray : %s"), *OccupationToString(Vote));
         VoteCounts.FindOrAdd(Vote)++;
     }
     PlayerVotes.Empty();
@@ -177,7 +178,8 @@ void AJudgeGameMode::HandlePlayerStateNull()
 void AJudgeGameMode::ProcessVotingResults()
 {
     EPlayerJob MostVotedOccupation = CollectVotingResults();
-    GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::White, OccupationToString(MostVotedOccupation));
+    FNetLogger::EditerLog(FColor::White, TEXT("MostVotedOccupation : %s"), *OccupationToString(MostVotedOccupation));
+    FNetLogger::LogError(TEXT("MostVotedOccupation : %s"), *OccupationToString(MostVotedOccupation));
 
     AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
     check(GS)

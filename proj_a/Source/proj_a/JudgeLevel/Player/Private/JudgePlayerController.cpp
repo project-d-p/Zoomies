@@ -88,7 +88,8 @@ void AJudgePlayerController::ReturnVote_Implementation(EPlayerJob Type)
 	AJudgeGameMode* GM = Cast<AJudgeGameMode>(GetWorld()->GetAuthGameMode());
 	if (GM)
 	{
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("%s"), *OccupationToString(Type));
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Clients Return Their Votes: %s"), *OccupationToString(Type));
+		FNetLogger::LogError(TEXT("Clients Return Their Votes: %s"), *OccupationToString(Type));
 		GM->AddVote(Type);
 	}
 }
