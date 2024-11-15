@@ -25,6 +25,9 @@ public:
 	void OnScoreChanged(UBaseData* Data);
 	UFUNCTION()
 	void CheckAndUpdatePlayerJob();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnRankingChanged(const TArray<FString>& PlayerNameListByScore);
 	
 protected:
 	UPROPERTY()
@@ -49,4 +52,9 @@ protected:
 	void FindAndUpdateTextBlocks(UWidget* ParentWidget);
 
 	int32 reCallCnt = 0;
+
+private:
+	void ChangeListByScore();
+	
+	TArray<FString> PlayerNameListByScore;
 };

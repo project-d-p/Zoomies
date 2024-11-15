@@ -6,6 +6,7 @@
 #include "DPInGameState.h"
 #include "DPPlayerState.h"
 #include "FNetLogger.h"
+#include "PlayerName.h"
 #include "PlayerScoreComp.h"
 #include "Components/TextBlock.h"
 #include "../../../Component/InGame/Score/ScoreUiPrivate.h"
@@ -40,6 +41,38 @@ void UDPIngameWidget::NativeConstruct()
 		ScoreUI_Private->InitScoreUiPrivate(PrivateScoreUiInitializer);
 	}
 }
+
+void UDPIngameWidget::ChangeListByScore()
+{
+	PlayerNameListByScore.Empty();
+	TArray<UPlayerScoreData> PlayerScoreDataArray;
+	ADPInGameState* GameState = Cast<ADPInGameState>(GetWorld()->GetGameState());
+	if (GameState)
+	{
+		for (auto PlayerState : GameState->PlayerArray)
+		{
+			ADPPlayerState* DPPlayerState = Cast<ADPPlayerState>(PlayerState);
+			if (DPPlayerState)
+			{
+				UPlayerScoreData* PlayerScoreData = DPPlayerState->GetPlayerScoreData();
+				if (PlayerScoreData)
+				{
+					PlayerScoreDataArray.Add(*PlayerScoreData);
+				}
+			}
+		}
+	}
+	PlayerScoreDataArray.Sort([](const UPlayerScoreData& A, const UPlayerScoreData& B)
+	{
+		return A.GetScore().PrivateTotalScore > B.GetScore().PrivateTotalScore;
+	});
+	for (int32 i = 0; i < PlayerScoreDataArray.Num(); ++i)
+	{
+		PlayerNameListByScore.Add(PlayerScoreDataArray[i].GetPlayerId());
+	}
+	OnRankingChanged(PlayerNameListByScore);
+}
+
 void UDPIngameWidget::FindAndUpdateTextBlocks(UWidget* ParentWidget)
 {
 	if (!ParentWidget)
@@ -177,4 +210,5 @@ void UDPIngameWidget::OnScoreChanged(UBaseData* Data)
 			}
 		}
 	}
+	ChangeListByScore();
 }
