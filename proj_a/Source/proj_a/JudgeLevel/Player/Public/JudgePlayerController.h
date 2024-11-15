@@ -59,6 +59,8 @@ public:
 	UFUNCTION(Server, Reliable)
 	void RequestUIData();
 
+	virtual void GetSeamlessTravelActorList(bool bToTransitionMap, TArray<AActor*>& ActorList) override;
+	
 	void ShowUI_ESC();
 
 	void ActivateCurrentComponent(AJudgePlayerController* LocalPlayerController);
@@ -70,6 +72,9 @@ public:
 	UJudgeLevelUI* GetJudgeLevelUI() const { return JudgeLevelUI; }
 	AActor* CameraActor = nullptr;
 protected:
+	// 
+	UFUNCTION()
+	void OnPossessEvent(APawn* OldPawn, APawn* NewPawn);
 	virtual void BeginPlay() override;
 	virtual void SeamlessTravelFrom(APlayerController* OldPC) override;
 	virtual void SeamlessTravelTo(APlayerController* NewPC) override;

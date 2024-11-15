@@ -2,6 +2,7 @@
 
 #include "DPCharacter.h"
 #include "DPGameModeBase.h"
+#include "DPInGameState.h"
 #include "DPPlayerController.h"
 #include "DPWeaponActorComponent.h"
 #include "EnhancedInputComponent.h"
@@ -79,6 +80,7 @@ UMainInputComponent::UMainInputComponent()
 void UMainInputComponent::Activate(bool bReset)
 {
 	Super::Activate(bReset);
+
 	BindMainLevelActions();
 }
 
@@ -88,8 +90,31 @@ void UMainInputComponent::Deactivate()
 	UnbindMainLevelActions();
 }
 
+bool UMainInputComponent::IsValidateToRunThisFunction()
+{
+	FTimerHandle RetryHandle;
+	ADPInGameState* InGameState = GetWorld()->GetGameState<ADPInGameState>();
+
+	auto RetryAction = [this]() {
+		BindMainLevelActions();
+	};
+
+	if (!InGameState || !InGameState->bAllReady)
+	{
+		GetWorld()->GetTimerManager().SetTimer(RetryHandle, FTimerDelegate::CreateLambda(RetryAction), 0.5f, false);
+		UE_LOG(LogTemp, Warning, TEXT("Game Is Not Ready Yet"));
+		return false;
+	}
+	return true;
+}
+
 void UMainInputComponent::BindMainLevelActions()
 {
+	if (!IsValidateToRunThisFunction())
+	{
+		return ;
+	}
+	
 	ADPPlayerController* PlayerController = GetPlayerController();
 	if (!PlayerController) return ;
 	if (!PlayerController->IsLocalController()) return ;

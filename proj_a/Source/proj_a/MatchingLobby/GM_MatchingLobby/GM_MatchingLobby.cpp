@@ -5,6 +5,7 @@
 #include "isteamfriends.h"
 #include "isteamuser.h"
 #include "isteamutils.h"
+#include "OnlineSubsystemUtils.h"
 #include "steamclientpublic.h"
 #include "Components/BackgroundBlur.h"
 #include "GameFramework/PlayerState.h"
@@ -12,6 +13,7 @@
 #include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
 #include "proj_a/MatchingLobby/PS_MatchingLobby/PS_MatchingLobby.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/OnlineEngineInterface.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 AGM_MatchingLobby::AGM_MatchingLobby() {

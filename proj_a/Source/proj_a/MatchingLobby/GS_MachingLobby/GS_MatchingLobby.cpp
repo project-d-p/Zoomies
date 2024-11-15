@@ -91,13 +91,14 @@ void AGS_MatchingLobby::BeginPlay()
 
 	// Delegate for handling network failure On This Level
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	check(GameInstance)
 	if (!HasAuthority())
 	{
-		if (GameInstance)
-		{
-			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &AGS_MatchingLobby::OnHostMigration);
-		}
+		OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &AGS_MatchingLobby::OnHostMigration);
 	}
+	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
+	check(DataManager)
+	DataManager->ClearSeamlessDataArray();
 }
 
 void AGS_MatchingLobby::OnHostMigration(UWorld* World, UDataManager* DataManager)

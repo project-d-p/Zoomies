@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "BaseData.h"
+#include "PlayerScoreData.h"
 #include "DataManager.generated.h"
 
 // Client 호출되는 작업
@@ -75,6 +76,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "DataManager")
 	UDataArray* GetDataArray(const FString& Key);
 
+	UFUNCTION(BlueprintCallable, Category = "DataManager")
+	UDataArray* GetSeamlessDataArray(const FString& Key);
+
 	template <typename T>
 	T* GetSingleDataAs(const FString& Key)
 	{
@@ -103,10 +107,15 @@ public:
 	{
 		DataArrayMap.Remove(Key);
 	}
-	
+
+	void ClearSeamlessDataArray();
+	void AddSeamlessDataToArray(const FString& Str, UBaseData* NewData);
+
 private:
 	UPROPERTY()
 	TMap<FString, UDataArray*> DataArrayMap;
 	UPROPERTY()
 	TMap<FString, UBaseData*> DataSingleMap;
+	UPROPERTY()
+	TMap<FString, UDataArray*> SeamlessDataArrayMap;
 };

@@ -8,6 +8,7 @@
 #include "ScoreUI.h"
 #include "../../../Component/InGame/Score/ScoreUiPrivate.h"
 #include "Components/PanelWidget.h"
+#include "BaseData.h"
 #include "DPIngameWidget.generated.h"
 
 /**
@@ -22,6 +23,8 @@ public:
 
 	UFUNCTION()
 	void OnScoreChanged(UBaseData* Data);
+	UFUNCTION()
+	void CheckAndUpdatePlayerJob();
 	
 protected:
 	UPROPERTY()
@@ -44,7 +47,6 @@ protected:
 
 	void UpdateTextBlock(UTextBlock* TextBlock);
 	void FindAndUpdateTextBlocks(UWidget* ParentWidget);
-	void CheckAndUpdatePlayerJob();
 
 	int32 reCallCnt = 0;
 };

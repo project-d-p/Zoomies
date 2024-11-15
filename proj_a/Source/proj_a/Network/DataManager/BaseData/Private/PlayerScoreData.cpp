@@ -1,6 +1,7 @@
 #include "PlayerScoreData.h"
 
 #include "FNetLogger.h"
+#include "EnumTypes.h"
 #include "proj_a/Component/InGame/Score/CalculateScoreByJobs.h"
 
 void UPlayerScoreData::InitializeData_Implementation()
@@ -38,6 +39,7 @@ UBaseData* UPlayerScoreData::Clone_Implementation(UObject* Outer)
 	{
 		ClonedObject->Score = Score;
 		ClonedObject->PlayerName = PlayerName;
+		ClonedObject->PlayerJob = PlayerJob;
 	}
 	return ClonedObject;
 }
@@ -47,11 +49,11 @@ FName UPlayerScoreData::GetDataType() const
 	return Super::GetDataType();
 }
 
-void UPlayerScoreData::IncreaseScore(const EPlayerJob& PlayerJob, const TArray<EAnimal>& Animals)
+void UPlayerScoreData::IncreaseScore(const EPlayerJob& PlayerJob_, const TArray<EAnimal>& Animals)
 {
 	int BaseAnimalScore = 100;
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Animals Num is %d and Job is %d"), Animals.Num(), static_cast<int>(PlayerJob));
-	FScoreData scoreData = UCalculateScoreByJobs::CalculateScoreByJobs(PlayerJob, Animals);
+	// FNetLogger::EditerLog(FColor::Cyan, TEXT("Animals Num is %d and Job is %d"), Animals.Num(), static_cast<int>(PlayerJob_));
+	FScoreData scoreData = UCalculateScoreByJobs::CalculateScoreByJobs(PlayerJob_, Animals);
 	Score.ScoreDatas.Add(scoreData);
 	Score.CapturedAnimals.Add(Animals);
 	Score.PublicTotalScore += Animals.Num() * BaseAnimalScore;

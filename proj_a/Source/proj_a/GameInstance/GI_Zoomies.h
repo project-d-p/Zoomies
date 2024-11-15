@@ -9,6 +9,7 @@
 #include "Interfaces/OnlineSessionInterface.h"
 #include "ScoreTypes.h"
 #include "proj_a/MatchingLobby/TYPE_MatchingLobby/TYPE_MatchingLobby.h"
+#include "CompileMode.h"
 #include "GI_Zoomies.generated.h"
 
 UCLASS()
@@ -18,6 +19,7 @@ class PROJ_A_API UGI_Zoomies : public UGameInstance
 public:
 	void OnHostDisconnected();
 	void HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type Arg, const FString& String);
+	FName GetSessionName() const;
 	virtual void Init() override;
 
 	// Matching starting function
@@ -78,7 +80,11 @@ private:
 	int max_count = 5;
 	bool is_steamAPI_init = false;
 	bool is_online_session_steam_init=false;
+#if not (EDITOR_MODE || LAN_MODE)
+	bool bIsOnline = true;
+#else
 	bool bIsOnline = false;
+#endif
 
 	FTimerHandle UnusedHandle;
 	void CheckSteamInit();

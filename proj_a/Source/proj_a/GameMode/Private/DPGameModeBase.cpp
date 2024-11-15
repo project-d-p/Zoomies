@@ -50,8 +50,13 @@ void ADPGameModeBase::OnGameStart()
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
 	check(GameInstance);
 
-	GameInstance->ChangeJoinInProgress(false);
-	this->bStart = true;
+	AsyncTask(ENamedThreads::GameThread, [this]()
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]() {
+			this->bStart = true;
+		}), 10.0f, false);
+	});
 }
 
 // Only Called in Server : PlayerController && PlayerState Automatically Travel
@@ -62,7 +67,7 @@ void ADPGameModeBase::GetSeamlessTravelActorList(bool bToTransition, TArray<AAct
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
 	if (!GameInstance)
 		return ;
-	
+	GameInstance->network_failure_manager_->TryReset();
 	for (FConstPlayerControllerIterator IT = GetWorld()->GetPlayerControllerIterator(); IT; ++IT)
 	{
 		ADPPlayerController* PlayerController = Cast<ADPPlayerController>(*IT);
@@ -213,7 +218,6 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 #else
 	// Online Mode : Steam ID
 	std::string key(TCHAR_TO_UTF8(*player_state->GetUniqueId()->ToString()));
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("Player ID : %s"), *FString(key.c_str()));
 #endif
 	
 	player_controllers_[key] = Cast<ADPPlayerController>(newPlayer);
@@ -226,7 +230,10 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 	SpawnNewCharacter(newPlayer);
 	
 	// Set Player Random Job
-	player_state->SetPlayerRandomJob();
+	if (bRestarted == false)
+	{
+		player_state->SetPlayerRandomJob();
+	}
 	
 	if (!newPlayer->IsLocalController())
 	{
@@ -385,16 +392,13 @@ void ADPGameModeBase::Tick(float delta_time)
 #endif
 		if (bTimeSet == false)
 		{
+			bTimeSet = true;
+			ADPInGameState* GS = GetGameState<ADPInGameState>();
+			check(GS)
+			GS->LevelAllReady();
 			if (bRestarted == false)
 			{
-				ADPInGameState* GS = GetGameState<ADPInGameState>();
-				if (GS)
-				{
-					FTimerHandle TimerHandle;
-					GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([GS]() {
-						GS->MulticastPlayerJob();
-					}), 10.0f, false); 
-				}
+				GS->MulticastPlayerJob();
 			}
 			if (BlockingVolume)
 			{
@@ -404,7 +408,6 @@ void ADPGameModeBase::Tick(float delta_time)
 			{
 				bWallDisappear = true;
 			}
-			bTimeSet = true;
 			for (auto& pair: player_controllers_)
 			{
 				ADPPlayerController* Controller = pair.second;

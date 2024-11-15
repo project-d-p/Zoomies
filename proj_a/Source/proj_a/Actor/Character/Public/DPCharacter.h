@@ -36,7 +36,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// virtual void NotifyControllerChanged() override;
+	// called when the player state changes (e.g. from NULL to a valid player state) both on the server and the client
 	virtual void OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerState* OldPlayerState) override;
 	
 	// Called to bind functionality to input

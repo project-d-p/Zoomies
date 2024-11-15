@@ -139,7 +139,7 @@ void UDPIngameWidget::OnScoreChanged(UBaseData* Data)
 	//BaseData to PlayerScoreData
 	UPlayerScoreData* PlayerScoreData = Cast<UPlayerScoreData>(Data);
 	
-	APlayerController* PlayerController = GetOwningPlayer<APlayerController>();
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	if (PlayerController)
 	{
 		ADPPlayerState* PlayerState = Cast<ADPPlayerState>(PlayerController->PlayerState);
@@ -157,7 +157,7 @@ void UDPIngameWidget::OnScoreChanged(UBaseData* Data)
 		else
 		{
 			reCallCnt = 0;
-			if (PlayerState->GetPlayerId() == PlayerScoreData->GetPlayerId())
+			if (PlayerState->GetUniqueId()->ToString().Contains(PlayerScoreData->GetPlayerId()))
 			{
 				if (!PlayerScoreData)
 				{
