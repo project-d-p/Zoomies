@@ -191,65 +191,72 @@ void UNetworkedDynamicTextureComponent::UpdateTexture(UTexture2D* NewTexture)
 			return;
 		}
 
+		int32 ExpectedPlayerCount = GetWorld()->GetGameState()->PlayerArray.Num();
+		//Log ExpectedPlayerCount
+		FString ExpectedPlayerCountString = FString::FromInt(ExpectedPlayerCount);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, ExpectedPlayerCountString);
+		if (GS->GS_PlayerData.Num() != ExpectedPlayerCount)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Player data count mismatch."));
+			//Log GS_PlayerData Num
+			FString PlayerDataCount = FString::FromInt(GS->GS_PlayerData.Num());
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, PlayerDataCount);
+			FTimerHandle RetryTimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(RetryTimerHandle, FTimerDelegate::CreateLambda([this, NewTexture]()
+			{
+				UpdateTexture(NewTexture);
+			}), 0.1f, false);
+			return;
+		}
+
 		TArray<AActor*> FoundActors;
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASkeletalMeshActor::StaticClass(), FoundActors);
 
 		for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 		{
 			AJudgePlayerController* JPC = Cast<AJudgePlayerController>(*It);
-			if (!JPC)
-				continue;
-
-			if (GS->GS_PlayerData.Num() > 0)
+			if (!JPC) continue;
+			AJudgePlayerState* PS = Cast<AJudgePlayerState>(JPC->PlayerState);
+			if (!PS) continue;
+			
+			int32 PlayerIndex = -1;
+			
+			for (FPlayerInitData& PlayerData : GS->GS_PlayerData)
 			{
-				int32 PlayerIndex = -1;
-				
-				for (FPlayerInitData& PlayerData : GS->GS_PlayerData)
+				if (PlayerData.PlayerId == PlayerState->GetPlayerId())
 				{
-					if (PlayerData.PlayerId == PlayerState->GetPlayerId())
-					{
-						PlayerIndex = PlayerData.CameraIndex;
-						GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("PlayerIndex: %d is Loaded!"), PlayerIndex));
-						break;
-					}
+					PlayerIndex = PlayerData.CameraIndex;
+					break;
 				}
-				if (PlayerIndex == -1)
-				{
-					GEngine->AddOnScreenDebugMessage(-1, 1500.f, FColor::Red, FString::Printf(TEXT("PlayerIndex can't Found!"), PlayerIndex));
-				}
-				else
-				{
-					GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("PlayerIndex: %d is Loaded!"), PlayerIndex));
-				}
-				if (PlayerIndex >= GS->GS_PlayerData.Num())
-				{
-					FNetLogger::LogError(TEXT("Failed to find player data in 'UNetworkedDynamicTextureComponent'."));
-					return;
-				}
-				
+			}
+			if (PlayerIndex == -1 || PlayerIndex >= GS->GS_PlayerData.Num())
+			{
+				FNetLogger::LogError(TEXT("Failed to find player data in 'UNetworkedDynamicTextureComponent'."));
+				return;
+			}
+			
 
-				for (AActor* Actor : FoundActors)
+			for (AActor* Actor : FoundActors)
+			{
+				FString ActorName = Actor->GetName();
+				if (ActorName == FString::Printf(TEXT("SkeletalMeshActor_%d"), PlayerIndex + 4))
 				{
-					FString ActorName = Actor->GetName();
-					if (ActorName == FString::Printf(TEXT("SkeletalMeshActor_%d"), PlayerIndex + 5))
+					ASkeletalMeshActor* SkeletalMeshActor = Cast<ASkeletalMeshActor>(Actor);
+					if (SkeletalMeshActor)
 					{
-						GEngine->AddOnScreenDebugMessage(-1, 15000.f, FColor::Red, FString::Printf(TEXT("ActorName: %s"), *ActorName));
-						ASkeletalMeshActor* SkeletalMeshActor = Cast<ASkeletalMeshActor>(Actor);
-						if (SkeletalMeshActor)
+						SkeletalMeshComponent = SkeletalMeshActor->GetSkeletalMeshComponent();
+						if (DynamicMaterialInstance && NewTexture)
 						{
-							SkeletalMeshComponent = SkeletalMeshActor->GetSkeletalMeshComponent();
-							if (DynamicMaterialInstance && NewTexture)
-							{
-								DynamicMaterialInstance->SetTextureParameterValue(TEXT("renderTarget"), NewTexture);
-								SkeletalMeshComponent->SetMaterial(0, DynamicMaterialInstance);
-							}
+							DynamicMaterialInstance->SetTextureParameterValue(TEXT("renderTarget"), NewTexture);
+							SkeletalMeshComponent->SetMaterial(0, DynamicMaterialInstance);
 						}
-						break;
 					}
+					break;
 				}
 			}
 		}
 	}
+	
 	if (NewTexture && DynamicMaterialInstance && SkeletalMeshComponent)
 	{
 		DynamicMaterialInstance->SetTextureParameterValue(TEXT("renderTarget"), NewTexture);

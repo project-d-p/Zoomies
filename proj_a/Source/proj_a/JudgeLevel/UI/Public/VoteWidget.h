@@ -63,10 +63,6 @@ public:
     {
         FString CurrentVoterOccStr = OccupationToString(CurrentVoterOcc);
 
-        if (GEngine)
-        {
-            GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Yellow, CurrentVoterOccStr);
-        }
         return CurrentVoterOcc;
     }
     void SetVoterName(const FString& Name)

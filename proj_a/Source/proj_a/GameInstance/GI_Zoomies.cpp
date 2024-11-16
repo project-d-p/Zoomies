@@ -261,11 +261,8 @@ bool UGI_Zoomies::IsPlayerAllowedToJoin(const FString& PlayerId, const FOnlineSe
 	FString BanList = "";
 	FString ExistingPlayers = "";
 	SearchResult.Session.SessionSettings.Get(FName("IsStarted"), IsStarted);
-	GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Red, FString::Printf(TEXT("IsStarted: %s"), *IsStarted));
 	SearchResult.Session.SessionSettings.Get(FName("BanList"), BanList);
-	GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Red, FString::Printf(TEXT("BanList: %s"), *BanList));
 	SearchResult.Session.SessionSettings.Get(FName("ExistingPlayersList"), ExistingPlayers);
-	GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Red, FString::Printf(TEXT("ExistingPlayers: %s"), *ExistingPlayers));
 	
 	if (IsStarted.Contains("No"))
 	{
