@@ -206,9 +206,7 @@ void UNetworkedDynamicTextureComponent::UpdateTexture(UTexture2D* NewTexture)
 		// Check playerData Ready
 		int32 ExpectedPlayerCount = GetWorld()->GetGameState()->PlayerArray.Num();
 		FString ExpectedPlayerCountString = FString::FromInt(ExpectedPlayerCount);
-		GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Red, ExpectedPlayerCountString);
 		FString PlayerDataCount = FString::FromInt(GS->GS_PlayerData.Num());
-		GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Red, PlayerDataCount);
 		
 		if (GS->GS_PlayerData.Num() != ExpectedPlayerCount)
 		{
