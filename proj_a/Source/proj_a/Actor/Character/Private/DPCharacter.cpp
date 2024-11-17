@@ -625,6 +625,11 @@ void ADPCharacter::RemoveSpringArm()
 	camera->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 }
 
+void ADPCharacter::OnRep_SyncRunning()
+{
+	GetCharacterMovement()->MaxWalkSpeed = bIsRunning ? 1000.0f : 600.0f;
+}
+
 void ADPCharacter::SetStunned(bool bCond)
 {
 	this->bIsStunned = bCond;
@@ -727,6 +732,18 @@ void ADPCharacter::CheckCollisionWithMonster()
 TArray<EAnimal> ADPCharacter::ReturnMonsters()
 {
 	return monsterSlotComponent->RemoveMonstersFromSlot();
+}
+
+void ADPCharacter::CharacterRun_Implementation()
+{
+	bIsRunning = true;
+	OnRep_SyncRunning();
+}
+
+void ADPCharacter::CharacterRunReleased_Implementation()
+{
+	bIsRunning = false;
+	OnRep_SyncRunning();
 }
 
 void ADPCharacter::ApplyStunEffect()
@@ -888,6 +905,7 @@ void ADPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ADPCharacter, bIsStunned);
+	DOREPLIFETIME(ADPCharacter, bIsRunning);
 }
 
 void ADPCharacter::SetCrownMesh_Implementation()

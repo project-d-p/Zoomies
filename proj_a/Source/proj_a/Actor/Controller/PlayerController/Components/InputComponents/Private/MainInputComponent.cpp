@@ -148,7 +148,7 @@ void UMainInputComponent::BindMainLevelActions()
 		// (q) : Return
 		EnhancedInputComponent->BindAction(ReturnAction, ETriggerEvent::Started, this, &UMainInputComponent::ReturningAnimals);
 		// (shift) : Run
-		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Triggered, this, &UMainInputComponent::Run); // key down
+		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Started, this, &UMainInputComponent::Run); // key down
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &UMainInputComponent::RunReleased); // key up
 	}
 }

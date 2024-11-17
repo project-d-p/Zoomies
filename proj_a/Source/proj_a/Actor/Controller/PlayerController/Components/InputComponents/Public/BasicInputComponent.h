@@ -25,6 +25,7 @@ private:
 	void Jump(const FInputActionValue& value);
 	void Rotate(const FInputActionValue& value);
 	void Run(const FInputActionValue& value);
+	void RunReleased(const FInputActionValue& value);
 
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputMappingContext* BasicLevelContext;
