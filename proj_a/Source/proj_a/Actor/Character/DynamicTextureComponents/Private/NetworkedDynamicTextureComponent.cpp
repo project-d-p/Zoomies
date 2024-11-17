@@ -184,24 +184,18 @@ void UNetworkedDynamicTextureComponent::UpdateTexture(UTexture2D* NewTexture)
 	FString LevelName = GetWorld()->GetMapName();
 	if (LevelName.Contains("judge"))
 	{
+		FTimerHandle RetryTimerHandle;
 		AJudgeGameState* GS = Cast<AJudgeGameState>(GetWorld()->GetGameState());
 		if (!GS)
 		{
-			FNetLogger::LogError(TEXT("Failed to get JudgeGameState in 'UNetworkedDynamicTextureComponent'."));
+			GetWorld()->GetTimerManager().SetTimer(RetryTimerHandle, FTimerDelegate::CreateLambda([this, NewTexture]()
+			{
+				UpdateTexture(NewTexture);
+			}), 0.1f, false);
 			return;
 		}
-
-		int32 ExpectedPlayerCount = GetWorld()->GetGameState()->PlayerArray.Num();
-		//Log ExpectedPlayerCount
-		FString ExpectedPlayerCountString = FString::FromInt(ExpectedPlayerCount);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, ExpectedPlayerCountString);
-		if (GS->GS_PlayerData.Num() != ExpectedPlayerCount)
+		if (!PlayerState)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Player data count mismatch."));
-			//Log GS_PlayerData Num
-			FString PlayerDataCount = FString::FromInt(GS->GS_PlayerData.Num());
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, PlayerDataCount);
-			FTimerHandle RetryTimerHandle;
 			GetWorld()->GetTimerManager().SetTimer(RetryTimerHandle, FTimerDelegate::CreateLambda([this, NewTexture]()
 			{
 				UpdateTexture(NewTexture);
@@ -209,50 +203,61 @@ void UNetworkedDynamicTextureComponent::UpdateTexture(UTexture2D* NewTexture)
 			return;
 		}
 
+		// Check playerData Ready
+		int32 ExpectedPlayerCount = GetWorld()->GetGameState()->PlayerArray.Num();
+		FString ExpectedPlayerCountString = FString::FromInt(ExpectedPlayerCount);
+		GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Red, ExpectedPlayerCountString);
+		FString PlayerDataCount = FString::FromInt(GS->GS_PlayerData.Num());
+		GEngine->AddOnScreenDebugMessage(-1, 50.f, FColor::Red, PlayerDataCount);
+		
+		if (GS->GS_PlayerData.Num() != ExpectedPlayerCount)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, TEXT("Player data count mismatch."));
+			
+			GetWorld()->GetTimerManager().SetTimer(RetryTimerHandle, FTimerDelegate::CreateLambda([this, NewTexture]()
+			{
+				UpdateTexture(NewTexture);
+			}), 0.1f, false);
+			return;
+		}
+
+		// Find PlayerIndex
+		int32 PlayerIndex = -1;
+		
+		for (FPlayerInitData& PlayerData : GS->GS_PlayerData)
+		{
+			if (PlayerData.PlayerId == PlayerState->GetPlayerId())
+			{
+				PlayerIndex = PlayerData.CameraIndex;
+				break;
+			}
+		}
+		if (PlayerIndex == -1 || PlayerIndex >= GS->GS_PlayerData.Num())
+		{
+			FNetLogger::LogError(TEXT("Failed to find player data in 'UNetworkedDynamicTextureComponent'."));
+			return;
+		}
+
+		// Find SkeletalMeshComponent & Update Texture
 		TArray<AActor*> FoundActors;
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASkeletalMeshActor::StaticClass(), FoundActors);
 
-		for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+		for (AActor* Actor : FoundActors)
 		{
-			AJudgePlayerController* JPC = Cast<AJudgePlayerController>(*It);
-			if (!JPC) continue;
-			AJudgePlayerState* PS = Cast<AJudgePlayerState>(JPC->PlayerState);
-			if (!PS) continue;
-			
-			int32 PlayerIndex = -1;
-			
-			for (FPlayerInitData& PlayerData : GS->GS_PlayerData)
+			FString ActorName = Actor->GetName();
+			if (ActorName == FString::Printf(TEXT("SkeletalMeshActor_%d"), PlayerIndex + 4))
 			{
-				if (PlayerData.PlayerId == PlayerState->GetPlayerId())
+				ASkeletalMeshActor* SkeletalMeshActor = Cast<ASkeletalMeshActor>(Actor);
+				if (SkeletalMeshActor)
 				{
-					PlayerIndex = PlayerData.CameraIndex;
-					break;
-				}
-			}
-			if (PlayerIndex == -1 || PlayerIndex >= GS->GS_PlayerData.Num())
-			{
-				FNetLogger::LogError(TEXT("Failed to find player data in 'UNetworkedDynamicTextureComponent'."));
-				return;
-			}
-			
-
-			for (AActor* Actor : FoundActors)
-			{
-				FString ActorName = Actor->GetName();
-				if (ActorName == FString::Printf(TEXT("SkeletalMeshActor_%d"), PlayerIndex + 4))
-				{
-					ASkeletalMeshActor* SkeletalMeshActor = Cast<ASkeletalMeshActor>(Actor);
-					if (SkeletalMeshActor)
+					SkeletalMeshComponent = SkeletalMeshActor->GetSkeletalMeshComponent();
+					if (DynamicMaterialInstance && NewTexture)
 					{
-						SkeletalMeshComponent = SkeletalMeshActor->GetSkeletalMeshComponent();
-						if (DynamicMaterialInstance && NewTexture)
-						{
-							DynamicMaterialInstance->SetTextureParameterValue(TEXT("renderTarget"), NewTexture);
-							SkeletalMeshComponent->SetMaterial(0, DynamicMaterialInstance);
-						}
+						DynamicMaterialInstance->SetTextureParameterValue(TEXT("renderTarget"), NewTexture);
+						SkeletalMeshComponent->SetMaterial(0, DynamicMaterialInstance);
 					}
-					break;
 				}
+				break;
 			}
 		}
 	}
