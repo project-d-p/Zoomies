@@ -49,6 +49,9 @@ struct FFinalScoreData
 	UPROPERTY(BlueprintReadWrite, Category = "Score Data")
 	bool bIsDetected = false;
 
+	UPROPERTY(BlueprintReadWrite, Category = "Score Data")
+	bool bIsLeft = false;
+
 	FFinalScoreData& operator=(const FFinalScoreData& InFinalScoreData)
 	{
 		if (this != &InFinalScoreData)
@@ -61,6 +64,7 @@ struct FFinalScoreData
 				ScoreDatas.Add(ScoreData);
 			PlayerName = InFinalScoreData.PlayerName;
 			bIsDetected = InFinalScoreData.bIsDetected;
+			bIsLeft = InFinalScoreData.bIsLeft;
 			PrivateTotalScore = InFinalScoreData.PrivateTotalScore;
 			PrivateTotalBaseScore = InFinalScoreData.PrivateTotalBaseScore;
 			PrivateTotalScale = InFinalScoreData.PrivateTotalScale;

@@ -1,5 +1,7 @@
 #include "ResultLevelGameState.h"
 
+#include <algorithm>
+
 #include "DPCharacter.h"
 #include "DPPlayerController.h"
 #include "EngineUtils.h"
@@ -32,10 +34,66 @@ AResultLevelGameState::AResultLevelGameState()
 	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
 }
 
+bool AResultLevelGameState::IsAlreadySet(const FFinalScoreData& FinalScoreData)
+{
+	return std::any_of(FinalScoreDataArray.begin(), FinalScoreDataArray.end(),
+		[&FinalScoreData](const FFinalScoreData& ExistingData)
+		{
+			return ExistingData.PlayerName == FinalScoreData.PlayerName; // 조건
+		});
+}
+
+void AResultLevelGameState::AddLeftPlayers()
+{
+	TArray<FFinalScoreData> LeftPlayers;
+	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	if (GameInstance)
+	{
+		UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
+		if (DataManager)
+		{
+			UDataArray* PlayerDataArray = DataManager->GetSeamlessDataArray(TEXT("PlayerScoreSeamless"));
+			if (PlayerDataArray)
+			{
+				for (UBaseData* Data : PlayerDataArray->DataArray)
+				{
+					UPlayerScoreData* PlayerScoreData = Cast<UPlayerScoreData>(Data);
+					FFinalScoreData FinalScoreData;
+					FinalScoreData = PlayerScoreData->GetScore();
+					if (PlayerScoreData && !IsAlreadySet(FinalScoreData))
+					{
+						FinalScoreData.bIsLeft = true;
+						LeftPlayers.Add(FinalScoreData);
+					}
+				}
+			}
+		}
+	}
+
+	LeftPlayers.Sort([](const FFinalScoreData& A, const FFinalScoreData& B) {
+		float ScoreA = A.bIsDetected ? A.PublicTotalScore : A.PrivateTotalScore;
+		float ScoreB = B.bIsDetected ? B.PublicTotalScore : B.PrivateTotalScore;
+		return ScoreA > ScoreB;
+	});
+
+	FinalScoreDataArray.Append(LeftPlayers);
+
+	if (FinalScoreDataArray.Num() < 4)
+	{
+		for (int i = FinalScoreDataArray.Num(); i < 4; i++)
+		{
+			FFinalScoreData FinalScoreData;
+			FinalScoreData.PlayerName = TEXT("NONE");
+			FinalScoreDataArray.Add(FinalScoreData);
+		}
+	}
+}
+
 void AResultLevelGameState::NotifyPlayersAllTraveled()
 {
 	this->SetPlayerScores();
 	this->SetMyRank();
+	this->AddLeftPlayers();
 
 	NotifyAllScoresCalculated(FinalScoreDataArray);
 }
@@ -83,16 +141,6 @@ void AResultLevelGameState::SetPlayerScores()
 		FFinalScoreData FinalScoreData;
 		FinalScoreData = PlayerState->GetPlayerScoreData()->GetScore();
 		FinalScoreDataArray.Add(FinalScoreData);
-	}
-
-	if (FinalScoreDataArray.Num() < 4)
-	{
-		for (int i = FinalScoreDataArray.Num(); i < 4; i++)
-		{
-			FFinalScoreData FinalScoreData;
-			FinalScoreData.PlayerName = TEXT("NONE");
-			FinalScoreDataArray.Add(FinalScoreData);
-		}
 	}
 }
 
