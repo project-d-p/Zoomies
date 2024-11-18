@@ -20,4 +20,7 @@ public:
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
+	
+	ADPPlayerController* PC = nullptr;
+	void Set_PC(ADPPlayerController* PlayerController);
 };

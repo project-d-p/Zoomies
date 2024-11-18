@@ -10,14 +10,29 @@ public:
 	{
 		switch (OType)
 		{
-		case EPlayerJob::JOB_ARCHAEOLOGIST: return TEXT("/Game/image/character/pickaxe");
-		case EPlayerJob::JOB_POACHER: return TEXT("/Game/image/character/gun");
-		case EPlayerJob::JOB_ENVIRONMENTALIST: return TEXT("/Game/image/character/earth");
-		case EPlayerJob::JOB_RINGMASTER: return TEXT("/Game/image/character/circus");
-		case EPlayerJob::JOB_TERRORIST: return TEXT("/Game/image/character/bomb");
+		case EPlayerJob::JOB_ARCHAEOLOGIST: return TEXT("/Game/image/character/JobText/archa_red");
+		case EPlayerJob::JOB_POACHER: return TEXT("/Game/image/character/JobText/poacher_red");
+		case EPlayerJob::JOB_ENVIRONMENTALIST: return TEXT("/Game/image/character/JobText/environmentalist_red");
+		case EPlayerJob::JOB_RINGMASTER: return TEXT("/Game/image/character/JobText/ringMaster_red");
+		case EPlayerJob::JOB_TERRORIST: return TEXT("/Game/image/character/JobText/terrorist_red");
 		case EPlayerJob::JOB_CHECK: return TEXT("/Game/image/ui/check");
 		case EPlayerJob::JOB_CROSS: return TEXT("/Game/image/ui/cross");
 			default: check(false) return nullptr;;
+		}
+	}
+
+	static constexpr const TCHAR* GetOccupationImagePath_White(EPlayerJob OType)
+	{
+		switch (OType)
+		{
+		case EPlayerJob::JOB_ARCHAEOLOGIST: return TEXT("/Game/image/character/JobText/archa_white");
+		case EPlayerJob::JOB_POACHER: return TEXT("/Game/image/character/JobText/poacher_white");
+		case EPlayerJob::JOB_ENVIRONMENTALIST: return TEXT("/Game/image/character/JobText/environmentalist_white");
+		case EPlayerJob::JOB_RINGMASTER: return TEXT("/Game/image/character/JobText/ringMaster_white");
+		case EPlayerJob::JOB_TERRORIST: return TEXT("/Game/image/character/JobText/terrorist_white");
+		case EPlayerJob::JOB_CHECK: return TEXT("/Game/image/ui/check");
+		case EPlayerJob::JOB_CROSS: return TEXT("/Game/image/ui/cross");
+		default: check(false) return nullptr;;
 		}
 	}
 	
@@ -25,12 +40,12 @@ public:
 	{
 		switch(WType)
 		{
-		case EWidget::JUDGE_LEVEL: return TEXT("/Game/widget/widget_judge.widget_judge_C");
-		case EWidget::CALCULATE_WIDGET: return TEXT("/Game/widget/widget_calculate.widget_calculate_C");
-		case EWidget::RESULT_WIDGET: return TEXT("/Game/widget/widget_result.widget_result_C");
-		case EWidget::BOARD_ACTOR: return TEXT("/Game/widget/resultWidgetActor.resultWidgetActor_C");
-		default: 
-			checkf(false, TEXT("Invalid widget type: %d"), static_cast<int>(WType)) return nullptr;;
+			case EWidget::JUDGE_LEVEL: return TEXT("/Game/widget/WBP_JudgeLevel/widget_judge.widget_judge_C");
+			case EWidget::CALCULATE_WIDGET: return TEXT("/Game/widget/widget_calculate.widget_calculate_C");
+			case EWidget::RESULT_WIDGET: return TEXT("/Game/widget/widget_result.widget_result_C");
+			case EWidget::BOARD_ACTOR: return TEXT("/Game/widget/resultWidgetActor.resultWidgetActor_C");
+			default: 
+				checkf(false, TEXT("Invalid widget type: %d"), static_cast<int>(WType)) return nullptr;;
 		}
 	}
 	

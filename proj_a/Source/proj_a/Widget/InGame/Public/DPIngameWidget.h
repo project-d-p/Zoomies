@@ -7,6 +7,8 @@
 #include "TimerUI.h"
 #include "ScoreUI.h"
 #include "../../../Component/InGame/Score/ScoreUiPrivate.h"
+#include "Components/PanelWidget.h"
+#include "BaseData.h"
 #include "DPIngameWidget.generated.h"
 
 /**
@@ -21,25 +23,30 @@ public:
 
 	UFUNCTION()
 	void OnScoreChanged(UBaseData* Data);
+	UFUNCTION()
+	void CheckAndUpdatePlayerJob();
+	
 protected:
 	UPROPERTY()
 	UTimerUI* TimerUI = nullptr;
-	UPROPERTY()
-	UScoreUI* ScoreUI = nullptr;
-	UPROPERTY()
-	UScoreUiPrivate* ScoreUI_Private = nullptr;
 	
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* Time_Text;
+	
+	UPROPERTY()
+	UScoreUiPrivate* ScoreUI_Private = nullptr;
+	//ScoreBox
+	UPROPERTY()
+	UTextBlock* scoreFront = nullptr;
+	UPROPERTY()
+	UTextBlock* scoreBack = nullptr;
+	UPROPERTY()
+	UTextBlock* scoreJob = nullptr;
+	UPROPERTY()
+	UTextBlock* scoreTotal = nullptr;
 
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* score_Text;
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* score_Text_Private;
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* player1Score_Text;
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* player2Score_Text;
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* player3Score_Text;
+	void UpdateTextBlock(UTextBlock* TextBlock);
+	void FindAndUpdateTextBlocks(UWidget* ParentWidget);
+
+	int32 reCallCnt = 0;
 };

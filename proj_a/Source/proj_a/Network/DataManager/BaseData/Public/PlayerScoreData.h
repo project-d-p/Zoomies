@@ -23,9 +23,15 @@ public:
 	FString GetPlayerName() const { return PlayerName; }
 	FFinalScoreData GetScore() const { return Score; }
 	void SetScore(const FFinalScoreData& InScore) { Score = InScore; }
+	void SetPlayerId(FString InPlayerId) { PlayerId = InPlayerId; }
+	FString GetPlayerId() const { return PlayerId; }
+	void SetPlayerJob(EPlayerJob InPlayerJob) { PlayerJob = InPlayerJob; }
+	EPlayerJob GetPlayerJob() const { return PlayerJob; }
 	void SetIsDetected(bool bIsDetected) { Score.bIsDetected = bIsDetected; }
 
 private:
+	EPlayerJob PlayerJob;
 	FString PlayerName;
+	FString PlayerId;
 	FFinalScoreData Score;
 };

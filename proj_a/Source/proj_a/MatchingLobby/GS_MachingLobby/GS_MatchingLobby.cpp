@@ -11,10 +11,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 #include "proj_a/MatchingLobby/GM_MatchingLobby/GM_MatchingLobby.h"
+#include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
 
 AGS_MatchingLobby::AGS_MatchingLobby() {
 	// Set Players Num. need to be Set
-	ReadyPlayers.SetNum(MAX_USERS, false);
 	LobbyInfos.SetNum(MAX_USERS, false);
 	BestHostPlayer = nullptr;
 	LowestAveragePing = 202406071806.0f;
@@ -30,36 +30,39 @@ void AGS_MatchingLobby::UpdateLobbyInfo() const
 {
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADPCharacter::StaticClass(), FoundActors);
+	
 	for (int32 j = 0; j < FoundActors.Num(); j++)
 	{
 		ADPCharacter* Character = Cast<ADPCharacter>(FoundActors[j]);
-		if (Character && Character->LobbyInfoWidgetComponent)
+		if (Character)
 		{
-			UUserWidget* Widget = Character->LobbyInfoWidgetComponent->GetUserWidgetObject();
-			if (Widget)
-			{
-				// for (int32 i = 0; i < LobbyInfos.Num(); i++)
-				// {
-				// 	if (LobbyInfos[i].Name == Character->GetPlayerState()->GetPlayerName())
-				// 	{
-						FString Command = FString::Printf(TEXT("Update %d"), j);
-						Widget->CallFunctionByNameWithArguments(*Command, *GLog, nullptr, true);
-				// 	}
-				// }
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("&*Widget is null for Character at index %d"), j);
-			}
+			Character->UpdateLobbyInfo();
 		}
 	}
 }
 
+int32 AGS_MatchingLobby::FindIndexByPlayerId(const int32 &PlayerId) const
+{
+	int32 returnIndex = -1;
+	for (int32 i = 0; i < LobbyInfos.Num(); i++)
+	{
+		if (LobbyInfos[i].PlayerId == PlayerId)
+		{
+			returnIndex = i;
+			break;
+		}
+	}
+	if (returnIndex == -1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PlayerId not found in LobbyInfos"));
+	}
+	return returnIndex;
+}
+
 void AGS_MatchingLobby::SetPlayerReady(int32 PlayerIndex, bool bIsReady)
 {
-	if (PlayerIndex >= 0 && PlayerIndex < ReadyPlayers.Num())
+	if (PlayerIndex >= 0 && PlayerIndex < LobbyInfos.Num())
 	{
-		ReadyPlayers[PlayerIndex] = bIsReady;
 		LobbyInfos[PlayerIndex].bIsReady = bIsReady;
 		UpdateLobbyInfo();
 	}
@@ -77,7 +80,6 @@ void AGS_MatchingLobby::SetPlayerReady(int32 PlayerIndex, bool bIsReady)
 void AGS_MatchingLobby::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(AGS_MatchingLobby, ReadyPlayers);
 	DOREPLIFETIME(AGS_MatchingLobby, LobbyInfos);
 	DOREPLIFETIME(AGS_MatchingLobby, LowestAveragePing);
 	DOREPLIFETIME(AGS_MatchingLobby, BestHostPlayer);
@@ -89,13 +91,14 @@ void AGS_MatchingLobby::BeginPlay()
 
 	// Delegate for handling network failure On This Level
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+	check(GameInstance)
 	if (!HasAuthority())
 	{
-		if (GameInstance)
-		{
-			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &AGS_MatchingLobby::OnHostMigration);
-		}
+		OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &AGS_MatchingLobby::OnHostMigration);
 	}
+	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
+	check(DataManager)
+	DataManager->ClearSeamlessDataArray();
 }
 
 void AGS_MatchingLobby::OnHostMigration(UWorld* World, UDataManager* DataManager)
@@ -112,7 +115,6 @@ void AGS_MatchingLobby::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
 		if (GameInstance)
 		{
-			FNetLogger::EditerLog(FColor::Red, TEXT("GameInstance is not null"));
 			GameInstance->network_failure_manager_->OnHostMigration().Remove(OnHostMigrationDelegate);
 		}
 	}
@@ -120,14 +122,15 @@ void AGS_MatchingLobby::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 bool AGS_MatchingLobby::AreAllPlayersReady()
 {
-	for (int32 i = 0; i < ReadyPlayers.Num(); ++i)
+	for (int32 i = 0; i < LobbyInfos.Num(); ++i)
 	{
-		if (!ReadyPlayers[i])
+		if (!LobbyInfos[i].bIsReady)
 		{
 			return false;
 		}
 	}
 	FindFastestPlayer();
+	RemovePlayerInputComponent();
 	return true;
 }
 
@@ -147,15 +150,6 @@ void AGS_MatchingLobby::FindFastestPlayer()
 		}
 		average_ping /= GameState->PlayerArray.Num();
 		
-		//logging
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(
-				-1,
-				30.f,
-				FColor::Green,
-				FString::Printf(TEXT("Average Ping: %f"), average_ping));
-		}
 		ReportPing(CurrentPlayerState, average_ping);
 	}
 }
@@ -166,6 +160,18 @@ void AGS_MatchingLobby::ReportPing_Implementation(APlayerState* ReportingPlayer,
 	{
 		LowestAveragePing = AveragePing;
 		BestHostPlayer = ReportingPlayer;
+	}
+}
+
+void AGS_MatchingLobby::RemovePlayerInputComponent()
+{
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		APC_MatchingLobby* PC = Cast<APC_MatchingLobby>(*Iterator);
+		if (PC)
+		{
+			PC->DeactiveCurrentComponent();
+		}
 	}
 }
 
@@ -184,36 +190,34 @@ void AGS_MatchingLobby::MulticastShowLoadingWidget_Implementation()
 		{
 			LoadingWidget->AddToViewport();
 		}
-		else
-		{
-			//logging on screen about failed to create widget
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(
-					-1,
-					30.f,
-					FColor::Red,
-					FString::Printf(TEXT("Failed to create widget")));
-			}
-		}
 	}
 }
 
+void AGS_MatchingLobby::MulticastShowCountDown_Implementation()
+{
+	UClass* WidgetClass = nullptr;
+	FString WidgetPath = TEXT("/Game/widget/WBP_Common/CountDown/WBP_CountDown.WBP_CountDown_C");
 
-// ���� ����
-// 1. ��Ʈ��ũ ���� ����
-// 2. �ش� ������ �ִ� �����͵��� ����
-// 2-1. �� �������� ������ �����Ͱ� �ٸ�
-// 3. �ش� ������ �ٸ� Ŭ���̾�Ʈ�� �ٽ� ȣ������
-// 4. �ٽ� ȣ���õ� Ŭ���̾�Ʈ�� ������ �����͸� �ҷ���
-// 5. �ҷ��� �����͸� ������� �ٽ� ������ ������
+	WidgetClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *WidgetPath));
 
-// 1. 현재의 객체가 파괴되도 다음에 접근이 가능해야 함 - 전역적으로 들고 있어야 함.
+	if (WidgetClass != nullptr)
+	{
+		UUserWidget* CountWidget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), WidgetClass);
 
-// ABSTRACT
-// 1. GameInstance
-// 2. 각 클래스마다 자신의 정보를 저장하는 세부적으로 다른 구체화된 클래스를 GameInstance에 선언된
-// 추상 클래스 내부를 계속해서 바꿔줘야 함.
-
-// EVENT
-// 해당 이벤트에 바인딩만 해주면 된다.
+		if (CountWidget != nullptr)
+		{
+			CountWidget->AddToViewport();
+			APC_MatchingLobby* PC = Cast<APC_MatchingLobby>(GetWorld()->GetFirstPlayerController());
+			PC->DisableMouseInput();
+			UE_LOG(LogTemp, Log, TEXT("StartCountDown::CountDownStarted"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("StartCountDown::Failed to create widget"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("StartCountDown::Failed to load widget class"));
+	}
+}

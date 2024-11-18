@@ -55,8 +55,10 @@ public class proj_a : ModuleRules
 			"proj_a/Actor/Controller/PlayerController/Public",
 			"proj_a/Actor/Controller/PlayerController/Components/InputComponents/Public",
 			"proj_a/Actor/Controller/PlayerController/Components/LevelComponents/Public",
+			"proj_a/Actor/Controller/PlayerController/Components/TransferComponents/Public",
 			"proj_a/Actor/Character/Public",
 			"proj_a/Actor/Character/CharacterPositionSync/Public",
+			"proj_a/Actor/Character/DynamicTextureComponents/Public",
 			"proj_a/Actor/Character/PlayerState/Public",
 			"proj_a/Actor/Monster/Character/Public",
 			"proj_a/Actor/Monster/Controller/Public",
@@ -115,8 +117,11 @@ public class proj_a : ModuleRules
 			"Niagara",
             "GameplayCameras",
             "EngineSettings",
+            "RHI",
+            "RenderCore",
+            "ImageWrapper",
         });
-		PrivateDependencyModuleNames.AddRange(new string[] { "CinematicCamera" });
+		PrivateDependencyModuleNames.AddRange(new string[] { "CinematicCamera", "Core", "CoreUObject", "Engine", "OnlineSubsystem", "OnlineSubsystemUtils" });
 
 		string SteamSDKPath = Path.Combine(ModuleDirectory, "Steam");
 		if (Directory.Exists(SteamSDKPath))

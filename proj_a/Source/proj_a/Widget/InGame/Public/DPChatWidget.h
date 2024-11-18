@@ -17,7 +17,6 @@ class PROJ_A_API UDPChatWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 	
-public:
 	UPROPERTY(BlueprintReadOnly)
 	UChatUI* ChatUI = nullptr;
 

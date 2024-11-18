@@ -44,7 +44,7 @@ void UClientNetworkManager::Shutdown()
 
 UClientNetworkManager::~UClientNetworkManager()
 {
-	UClientNetworkManager::Shutdown();
+	// UClientNetworkManager::Shutdown();
 	if (WorkerThread)
 	{
 		WorkerThread = nullptr;

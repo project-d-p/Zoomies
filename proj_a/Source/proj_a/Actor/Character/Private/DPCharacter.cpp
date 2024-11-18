@@ -13,6 +13,7 @@
 #include "DPWeaponActorComponent.h"
 #include "DPStateActorComponent.h"
 #include "DPWeaponGun.h"
+#include "DynamicTextureComponent.h"
 #include "FDataHub.h"
 #include "FNetLogger.h"
 #include "MonsterSlotComponent.h"
@@ -29,9 +30,14 @@
 #include "Materials/MaterialInstanceConstant.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/GameSession.h"
 #include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
+#include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
+#include "proj_a/MatchingLobby/GS_MachingLobby/GS_MatchingLobby.h"
+#include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
+#include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
 #include "Serialization/BulkDataRegistry.h"
 
 // Sets default values
@@ -64,9 +70,11 @@ ADPCharacter::ADPCharacter()
 	//sceneCaptureSpringArm->SetupAttachment(RootComponent);
 	//sceneCapture->SetupAttachment(sceneCaptureSpringArm);
 
+	/* If initialize before the parent constructor, it may be ignored by Unreal Engine. please check USkeletalMeshComponent::SetSkeletalMesh */
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CHARACTER
 	(TEXT("/Game/model/steve/StickManForMixamo.StickManForMixamo"));
-	if (SK_CHARACTER.Succeeded()) {
+	if (SK_CHARACTER.Succeeded())
+	{
 		GetMesh()->SetSkeletalMesh(SK_CHARACTER.Object);
 	}
 
@@ -194,6 +202,7 @@ ADPCharacter::ADPCharacter()
 		
 		if (CurrentLevelName == "matchLobby")
 		{
+			RemoveSpringArm();
 			if (LobbyInfoWidgetComponent && LobbyInfoWidgetComponent->IsValidLowLevel())
 			{
 				LobbyInfoWidgetComponent->DestroyComponent();
@@ -201,7 +210,7 @@ ADPCharacter::ADPCharacter()
 			}
 	
 			LobbyInfoWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("LobbyInfoWidgetComponent"));
-			static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClass(TEXT("/Game/widget/widget_LobbyInfo.widget_LobbyInfo_C"));
+			static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClass(TEXT("/Game/widget/WBP_MatchLobby/widget_LobbyInfo.widget_LobbyInfo_C"));
 			if (WidgetClass.Succeeded())
 			{
 				LobbyInfoWidgetComponent->SetWidgetClass(WidgetClass.Class);
@@ -213,6 +222,20 @@ ADPCharacter::ADPCharacter()
 			LobbyInfoWidgetComponent->SetRelativeScale3D(FVector(1.4f, 1.4f, 1.4f));
 			LobbyInfoWidgetComponent->SetDrawSize(FVector2D(260,100));
 			LobbyInfoWidgetComponent->SetRelativeRotation(FRotator(-180, -90, 180));
+			// Adjust for back view
+			LobbyInfoWidgetComponentBack = CreateDefaultSubobject<UWidgetComponent>(TEXT("LobbyInfoWidgetComponentBack"));
+			if (WidgetClass.Succeeded())
+			{
+				LobbyInfoWidgetComponentBack->SetWidgetClass(WidgetClass.Class);
+			}
+			LobbyInfoWidgetComponentBack->SetVisibility(true);
+			LobbyInfoWidgetComponentBack->SetWidgetSpace(EWidgetSpace::World);
+			LobbyInfoWidgetComponentBack->SetupAttachment(GetMesh());
+			LobbyInfoWidgetComponentBack->SetRelativeLocation(FVector(0, 0, 650));
+			LobbyInfoWidgetComponentBack->SetRelativeScale3D(FVector(1.4f, 1.4f, 1.4f));
+			LobbyInfoWidgetComponentBack->SetDrawSize(FVector2D(260, 100));
+			LobbyInfoWidgetComponentBack->SetRelativeRotation(FRotator(0, -90, 0));
+
 		}
 	}
 
@@ -285,6 +308,82 @@ void ADPCharacter::SetNameTag_Implementation()
 	}
 }
 
+void ADPCharacter::UpdateLobbyInfo() 
+{
+	APlayerState* PS = GetPlayerState();
+	UWorld* World = GetWorld();
+	if (World == nullptr)
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+		{
+			UpdateLobbyInfo();
+		}), 0.1f, false);
+		return;
+	}
+	
+	AGS_MatchingLobby* GS = Cast<AGS_MatchingLobby>(GetWorld()->GetGameState());
+	if (!PS || !GS)
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+		{
+			UpdateLobbyInfo();
+		}), 0.1f, false);
+		return ;
+	}
+	
+	FString Name = PS->GetPlayerName();
+
+	if (LobbyInfoWidgetComponent == nullptr || LobbyInfoWidgetComponentBack == nullptr)
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+		{
+			UpdateLobbyInfo();
+		}), 0.1f, false);
+		return ;
+	}
+	
+	UUserWidget* Widget = LobbyInfoWidgetComponent->GetUserWidgetObject();
+	UUserWidget* WidgetBack = LobbyInfoWidgetComponentBack->GetUserWidgetObject();
+	if (Widget && WidgetBack)
+	{
+		int32 PlayerIndex = GS->FindIndexByPlayerId(PS->GetPlayerId());
+		FString Command = FString::Printf(TEXT("Update %d"), PlayerIndex);
+		Widget->CallFunctionByNameWithArguments(*Command, *GLog, nullptr, true);
+		WidgetBack->CallFunctionByNameWithArguments(*Command, *GLog, nullptr, true);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("&*Widget is null for Character"));
+	}
+}
+
+// void ADPCharacter::SetNameTag()
+// {
+// 	APlayerState* PS = GetPlayerState();
+// 	if (!PS)
+// 	{
+// 		FTimerHandle TimerHandle;
+// 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+// 		{
+// 			SetNameTag();
+// 		}), 0.1f, false);
+// 		return ;
+// 	}
+//
+// 	FString Name = PS->GetPlayerName();
+// 	if (NameTag_Instance)
+// 	{
+// 		NameTag_Instance->SetName(Name);
+// 	}
+// 	if (NameTag_WidgetComponent && !IsLocallyControlled())
+// 	{
+// 		NameTag_WidgetComponent->SetVisibility(true);
+// 	}
+// }
+
 // Called when the game starts or when spawned
 void ADPCharacter::BeginPlay()
 {
@@ -308,6 +407,8 @@ void ADPCharacter::BeginPlay()
 		NameTag_WidgetComponent->SetWidget(NameTag_Instance);
 		NameTag_WidgetComponent->SetVisibility(false);
 	}
+	
+	// GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ADPCharacter::TryInItializeDynamicTexture);
 	
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AReturnTriggerVolume::StaticClass(), FoundActors);
@@ -335,6 +436,21 @@ void ADPCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	}
 }
 
+// void ADPCharacter::TryInItializeDynamicTexture()
+// {
+// 	FNetworkedDynamicTextureComponentInitializer Initializer;
+// 	Initializer.DynamicMaterialInstance = dynamicMaterialInstance;
+// 	Initializer.SkeletalMeshComponent = GetMesh();
+// 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+// 	if (PC)
+// 	{
+// 		Initializer.PlayerState = GetPlayerState<APlayerState>();
+// 		Initializer.TextureTransferManager = PC->FindComponentByClass<UTextureTransferManager>();
+// 	}
+// 	if (DynamicTextureComponent->InitializeTexture(Initializer))
+// 		DynamicTextureComponent->LoadTexture();
+// }
+
 // Called every frame
 void ADPCharacter::Tick(float DeltaTime)
 {
@@ -344,8 +460,6 @@ void ADPCharacter::Tick(float DeltaTime)
 		currentVelocity = GetCharacterMovement()->Velocity;
 		speed = currentVelocity.Size();
 	}
-	else
-		UE_LOG(LogTemp, Warning, TEXT("null GetCharacterMovement"));
 	
 	if (!IsLocallyControlled())
 	{
@@ -389,7 +503,7 @@ void ADPCharacter::Tick(float DeltaTime)
 void ADPCharacter::OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerState* OldPlayerState)
 {
 	Super::OnPlayerStateChanged(NewPlayerState, OldPlayerState);
-	FNetLogger::EditerLog(FColor::Red, TEXT("OnPlayerStateChanged"));
+	//FNetLogger::EditerLog(FColor::Red, TEXT("OnPlayerStateChanged"));
 	if (NewPlayerState == nullptr)
 	{
 		return ;
@@ -417,17 +531,21 @@ void ADPCharacter::OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerSta
 			break;
 		}
 	}
+	if (!MyCharacterData)
+	{
+		return ;
+	}
 	if (IsLocallyControlled())
 	{
 		this->SetActorLocation(MyCharacterData->GetActorLocation());
 		this->SetActorRotation(MyCharacterData->GetActorRotation());
 	}
+	// @fixme: There is a nullptr error here
 	TArray<EAnimal> CapturedAnimals = MyCharacterData->GetCapturedAnimals();
 	for (EAnimal Animal : CapturedAnimals)
 	{
 		monsterSlotComponent->AddMonsterToSlot(this, Animal);
 	}
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("%s"), *PlayerName);
 }
 
 // Called to bind functionality to input
@@ -519,9 +637,22 @@ bool ADPCharacter::IsStunned() const
 
 void ADPCharacter::ClientNotifyAnimalReturn_Implementation(const FString& player_name)
 {
-	FNetLogger::EditerLog(FColor::Cyan, TEXT("ClientNotifyAnimalReturn_Implementation"));
 	FDataHub::PushReturnAnimalDA(player_name, true);
 }
+
+// void ADPCharacter::OnRep_PlayerState()
+// {
+// 	Super::OnRep_PlayerState();
+//
+// 	TryInItializeDynamicTexture();
+// }
+//
+// void ADPCharacter::OnRep_Controller()
+// {
+// 	Super::OnRep_Controller();
+//
+// 	TryInItializeDynamicTexture();
+// }
 
 void ADPCharacter::UpdateNameTagRotation()
 {

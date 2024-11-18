@@ -17,6 +17,7 @@ enum class EPlayerJob : uint8
 	JOB_RINGMASTER UMETA(DisplayName = "Ringmaster"),
 	JOB_TERRORIST UMETA(DisplayName = "Terrorist"),
 	JOB_ENVIRONMENTALIST UMETA(DisplayName = "Environmentalist"),
+	JOB_NONE UMETA(DisplayName = "None"),
 	JOB_MAX UMETA(DisplayName = "Max"),
 	JOB_CHECK UMETA(DisplayName = "Check"),
 	JOB_CROSS UMETA(DisplayName = "Cross"),

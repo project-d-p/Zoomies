@@ -4,6 +4,7 @@
 #include "isteamnetworkingutils.h"
 #include "OnlineSessionSettings.h"
 #include "SteamSocketIP.h"
+#include "Engine/World.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 UISocketInterface* USteamSocketP2P::Clone() const
@@ -39,7 +40,7 @@ void USteamSocketP2P::ActivateClient()
 	identityRemote.SetSteamID(this->GetHostSteamID());
 
 
-	int nRemoteVirtualPort = 0; // 상대방의 가상 포트 번호와 일치해야 함
+	int nRemoteVirtualPort = 0;
 	m_Connection = SteamNetworkingSockets()->ConnectP2P(identityRemote, nRemoteVirtualPort, 0, nullptr);
 
 	if (m_Connection == k_HSteamNetConnection_Invalid)
@@ -75,13 +76,36 @@ void USteamSocketP2P::BeginDestroy()
 
 CSteamID USteamSocketP2P::GetHostSteamID()
 {
-	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
+	UGI_Zoomies* GameInstance = nullptr;
+
+	if (GEngine)
+	{
+		for (const FWorldContext& Context : GEngine->GetWorldContexts())
+		{
+			if (Context.World())
+			{
+				GameInstance = Cast<UGI_Zoomies>(Context.World()->GetGameInstance());
+				if (GameInstance)
+				{
+					break;
+				}
+			}
+		}
+	}
+
+	if (!GameInstance)
+	{
+		UE_LOG(LogTemp, Error, TEXT("GameInstance is null"));
+		return k_steamIDNil; // Return an invalid SteamID or handle the error appropriately
+	}
+
+	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
 	check(OnlineSub);
 
 	IOnlineSessionPtr SessionPtr = OnlineSub->GetSessionInterface();
 	check(SessionPtr);
-
-	FNamedOnlineSession* Session = SessionPtr->GetNamedSession(NAME_GameSession);
+	
+	FNamedOnlineSession* Session = SessionPtr->GetNamedSession(GameInstance->GetSessionName());
 	check(Session);
 
 	TSharedPtr<const FUniqueNetId> hostNetID = Session->OwningUserId;
@@ -89,6 +113,7 @@ CSteamID USteamSocketP2P::GetHostSteamID()
 
 	// Change UniqueNetId to FString
 	FString HostSteamIDString = hostNetID->ToString();
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, HostSteamIDString);
                     
 	// Change FString to uint64
 	uint64 HostSteamID64 = FCString::Atoi64(*HostSteamIDString);

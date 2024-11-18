@@ -17,6 +17,7 @@ public:
 	virtual void Deactivate() override;
 
 private:
+	bool IsValidateToRunThisFunction();
 	void BindMainLevelActions();
 	void UnbindMainLevelActions();
 	
@@ -32,6 +33,7 @@ private:
 	void ReturningAnimals(const FInputActionValue& value);
 	void Run(const FInputActionValue& value);
 	void RunReleased(const FInputActionValue& value);
+	void Esc(const FInputActionValue& value);
 
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputMappingContext* MainLevelContext;
@@ -50,6 +52,8 @@ private:
 	class UInputAction* AimAction;
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* CancelAction;
+	UPROPERTY(VisibleAnywhere, Category = Input)
+	class UInputAction* EscAction;
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* CatchAction;
 	UPROPERTY(VisibleAnywhere, Category = Input)

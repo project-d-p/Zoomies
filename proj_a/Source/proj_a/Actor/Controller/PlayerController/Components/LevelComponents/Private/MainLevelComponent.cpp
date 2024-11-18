@@ -22,7 +22,7 @@ UMainLevelComponent::UMainLevelComponent()
 	SoundComponent = CreateDefaultSubobject<USoundComponent>(TEXT("MainSoundComponent"));
 	CatchRay = CreateDefaultSubobject<UHitScan>(TEXT("CatchRay"));
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetBPClass(TEXT("/Game/widget/widget_ingame.widget_ingame_C"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetBPClass(TEXT("/Game/widget/widget_ingame1.widget_ingame1_C"));
 	if (WidgetBPClass.Succeeded())
 	{
 		WidgetClass = WidgetBPClass.Class;
@@ -82,6 +82,11 @@ void UMainLevelComponent::SetStateComponent()
 	if (const ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter()))
 	{
 		StateComponent = Cast<UDPStateActorComponent>(Character->GetComponentByClass(UDPStateActorComponent::StaticClass()));
+	}
+	else
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UMainLevelComponent::SetStateComponent, 1.0f, false);
 	}
 }
 

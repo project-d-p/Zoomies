@@ -67,6 +67,7 @@ void UBasicInputComponent::BindBasicLevelActions()
 		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &UBasicInputComponent::Rotate);
 		// 달리기 ( shift )
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Triggered, this, &UBasicInputComponent::Run);
+		PlayerController->SetInputMode(FInputModeGameOnly());
 	}
 }
 
@@ -140,4 +141,13 @@ void UBasicInputComponent::Run(const FInputActionValue& value)
 	if (!Character) return ;
 
 	Character->GetCharacterMovement()->MaxWalkSpeed = 1000.0f;
+}
+
+void UBasicInputComponent::Set_PC(ADPPlayerController* PlayerController)
+{
+	if (PlayerController == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("IC_MatchLobby::PlayerController is nullptr."));
+	}
+	PC = PlayerController;
 }

@@ -9,6 +9,7 @@
 #include "BaseLevelComponent.h"
 #include "ELevelComponentType.h"
 #include "MainLevelComponent.h"
+#include "TextureTransferManager.h"
 #include "DPPlayerController.generated.h"
 
 class UPlayerScoreComp;
@@ -47,29 +48,34 @@ public:
 
 	UPlayerScoreComp* GetScoreManagerComponent() const;
 	UPrivateScoreManager* GetPrivateScoreManagerComponent() const;
+	UTextureTransferManager* GetTextureTransferManager() const { return TextureTransferManager; }
 
 	UANetworkManager* GetNetworkManager() const;
-
+	
 	void ReleaseMemory();
 
 	UFUNCTION(Client, Reliable)
 	void ClientDestroySession();
 
-	/// TEST
 	UFUNCTION(Client, Reliable)
 	void ConnectToServer(ELevelComponentType Type);
-	///
+	
+	UPROPERTY(BlueprintReadOnly, Category= "UI")
+	UUserWidget* UIWidget = nullptr;
+	void getUIWidget();
+	void RemoveUIWidget();
+	void ShowUI_ESC();
 	
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void OnPossess(APawn* InPawn) override;
-	
 private:
 	void SetLevelComponent();
 	void DeactiveCurrentComponent();
 	void ActivateComponent(ELevelComponentType Type);
+	
 
 	// Move To PlayerState
 	UPROPERTY(VisibleAnywhere)
@@ -84,5 +90,8 @@ private:
 	TMap<FString, uint32> LevelEnumMap;
 
 	UPROPERTY()
-	UBaseLevelComponent* ActiveComponent;
+	UBaseLevelComponent* ActiveComponent = nullptr;
+
+	UPROPERTY()
+	UTextureTransferManager* TextureTransferManager = nullptr;
 };

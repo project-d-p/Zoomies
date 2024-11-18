@@ -24,6 +24,10 @@ public:
 	void ResetInstance();
 	void TryReset();
 	void Init();
+	void SetSessionName(FName Name) { SessionNameGI = Name; }
+
+	bool bMigrating;
+	FName SessionNameGI;
 
 private:
 	void ShowCapturedTextureToPlayer(UTextureRenderTarget2D* CapturedTexture, const TArray<FColor>& Bitmap);
@@ -33,11 +37,13 @@ private:
 	void CreateSessionComplete(FName SessionName, bool bWasSuccessful, UWorld* World);
 	void JoinNewSession(UWorld* World);
 	void FindSessionComplete(bool bWasSuccessful, UWorld* World);
+	void OnNewLevelLoaded(const FWorldContext& WorldContext, const FString& LevelName);
+	void OnNewLevelLoaded(UWorld* World);
 	void OnNewLevelLoaded(const FString& LevelName);
 	void JoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result, UWorld* World);
 	void JoinSession(const FOnlineSessionSearchResult& SearchResult, UWorld* World);
 	void HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type Arg, const FString& String);
-	void CreateNewSessionMetaData(::UWorld* World, const FUniqueNetIdRef& NewHostPlayerID);
+	void CreateNewSessionMetaData(::UWorld* World, ::FNamedOnlineSession* CurrentSession, const FUniqueNetIdRef& NewHostPlayerID);
 	void CaptureViewport();
 	void SaveSessionMetaData(UWorld* World);
 	bool ValidateAddr(FString& Addr);
@@ -62,5 +68,5 @@ private:
 	UPROPERTY()
 	UTexture2D* CapturedTexture2D;
 	TSubclassOf<UCapturedImageWidget> CapturedImageWidgetClass;
-	bool bMigrating;
+	FString SavedBanList;
 };

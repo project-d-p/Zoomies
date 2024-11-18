@@ -16,9 +16,6 @@ class PROJ_A_API AGS_MatchingLobby : public AGameStateBase
 public:
 	AGS_MatchingLobby();
 
-	UPROPERTY(Replicated)
-	TArray<bool> ReadyPlayers;
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_LobbyInfo)
 	TArray<FLobbyInfo> LobbyInfos;
 	int32 HostPlayerIndex;
@@ -35,6 +32,8 @@ public:
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastShowLoadingWidget();
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastShowCountDown();
 
 	UFUNCTION(Server, Reliable)
 	void ReportPing(APlayerState* ReportingPlayer, float AveragePing);
@@ -45,6 +44,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "MatchLobby")
 	bool AreAllPlayersReady();
+	
+	int32 FindIndexByPlayerId(const int32 &PlayerId) const;
 
 
 protected:
@@ -55,4 +56,6 @@ protected:
 	
 private:
 	FDelegateHandle OnHostMigrationDelegate;
+private:
+	void RemovePlayerInputComponent();
 };

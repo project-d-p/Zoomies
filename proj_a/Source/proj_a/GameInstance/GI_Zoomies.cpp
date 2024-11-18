@@ -8,6 +8,16 @@
 #include "CompileMode.h"
 #include "NavigationSystemTypes.h"
 #include "Online/OnlineSessionNames.h"
+#include "Interfaces/OnlineFriendsInterface.h"
+#include "Online.h"
+#include "EntitySystem/MovieSceneComponentDebug.h"
+#include "Interfaces/OnlinePresenceInterface.h"
+#include "proj_a/MatchingLobby/TYPE_MatchingLobby/TYPE_MatchingLobby.h"
+
+FName UGI_Zoomies::GetSessionName() const
+{
+	return network_failure_manager_->SessionNameGI;
+}
 
 void UGI_Zoomies::Init()
 {
@@ -34,11 +44,26 @@ void UGI_Zoomies::StartMatchMaking()
 
 IOnlineSessionPtr UGI_Zoomies::GetOnlineSessionInterface() const
 {
-	return session_interface_;
+	if (session_interface_.IsValid())
+	{
+		return session_interface_;
+	}
+	UE_LOG(LogTemp, Error, TEXT("Session interface is not valid"));
+	return nullptr;
+}
+
+IOnlineSubsystem* UGI_Zoomies::GetOnlineSubsystemInterface() const
+{
+	return online_subsystem_;
 }
 
 void UGI_Zoomies::FindSession()
 {
+	if(!CheckValidation())
+	{
+		UE_LOG( LogTemp, Error, TEXT("FindSession: Validation failed") );
+		return ;
+	}
 	FNetLogger::LogError(TEXT("FindSession_t"));
     
 	// Session search settings 
@@ -46,7 +71,6 @@ void UGI_Zoomies::FindSession()
     
 	// Align with CreateSession settings
 	session_search_->bIsLanQuery = !bIsOnline;
-    
 	session_search_->MaxSearchResults = 20;
     
 	// Set query settings based on the online/LAN mode
@@ -69,6 +93,11 @@ void UGI_Zoomies::FindSession()
 
 void UGI_Zoomies::OnFindComplete(bool bWasSuccessful)
 {
+	if(!CheckValidation())
+	{
+		UE_LOG( LogTemp, Error, TEXT("OnFindComplete: Validation failed") );
+		return ;
+	}
 	FNetLogger::LogError(TEXT("OnFindComplete"));
 	// unregister the delegate
 	session_interface_->ClearOnFindSessionsCompleteDelegate_Handle(
@@ -95,10 +124,19 @@ void UGI_Zoomies::OnFindComplete(bool bWasSuccessful)
 			FNetLogger::LogError(TEXT("FindSession_t[Create]"));
 		}
 	}
+	else
+	{
+		FindSession();
+	}
 }
 
 void UGI_Zoomies::CreateSession()
 {
+	if(!CheckValidation())
+	{
+		UE_LOG( LogTemp, Error, TEXT("CreateSession: Validation failed") );
+		return ;
+	}
 	FNetLogger::LogError(TEXT("CreateSession_t"));
 	session_settings_ = MakeShareable(new FOnlineSessionSettings());
 
@@ -137,18 +175,28 @@ void UGI_Zoomies::CreateSession()
 	// }
 
 	session_settings_->Set(SETTING_MAPNAME, FString("matchLobby"), EOnlineDataAdvertisementType::ViaOnlineService);
+	session_settings_->Set(FName("IsStarted"), FString("No"), EOnlineDataAdvertisementType::ViaOnlineService);
+	
     
 	// Add delegate
 	dh_on_create_complete = session_interface_->AddOnCreateSessionCompleteDelegate_Handle(
 	   FOnCreateSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onCreateComplete));
-    
+	// set SessionName to Unique
+	SessionName = FName(*FString::Printf(TEXT("Zoomies_%s"), *FGuid::NewGuid().ToString()));
+	network_failure_manager_->SessionNameGI = SessionName;
+	session_settings_->Set(FName("SessionName"), SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
 	// Create session
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
-	session_interface_->CreateSession(*local_player->GetPreferredUniqueNetId(), NAME_GameSession, *session_settings_);
+	session_interface_->CreateSession(*local_player->GetPreferredUniqueNetId(), SessionName, *session_settings_);
 }
 
 void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
 {
+	if(!CheckValidation())
+	{
+		UE_LOG( LogTemp, Error, TEXT("onCreateComplete: Validation failed") );
+		return ;
+	}
 	// unregister the delegate
 	session_interface_->ClearOnCreateSessionCompleteDelegate_Handle(
 		dh_on_create_complete
@@ -168,31 +216,150 @@ void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
 	}
 }
 
+void UGI_Zoomies::RestrictNewClientAccessAndAllowExistingPlayers()
+{
+	IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
+	IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
+	FNamedOnlineSession* ExistingSession = SessionInterface->GetNamedSession(SessionName);
+
+	if (ExistingSession != nullptr)
+	{
+		FOnlineSessionSettings UpdatedSessionSettings = ExistingSession->SessionSettings;
+        
+		// Restrict new clients from joining and stop advertising the session
+		UpdatedSessionSettings.bAllowJoinInProgress = false;
+		UpdatedSessionSettings.bShouldAdvertise = false;
+
+		// Store the list of existing players in the session settings
+		FString ExistingPlayers;
+		for (auto& Player : ExistingSession->RegisteredPlayers)
+		{
+			ExistingPlayers += Player->ToString() + TEXT(",");
+		}
+		UpdatedSessionSettings.Set(FName("ExistingPlayersList"), ExistingPlayers, EOnlineDataAdvertisementType::ViaOnlineService);
+		UpdatedSessionSettings.Set(FName("IsStarted"), FString("Yes"), EOnlineDataAdvertisementType::ViaOnlineService);
+        
+		// Update the session with the new settings
+		SessionInterface->UpdateSession(SessionName, UpdatedSessionSettings);
+
+		UE_LOG(LogTemp, Log, TEXT("RestrictNewClientAccessAndAllowExistingPlayers: The session has been updated to allow only existing players."));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("RestrictNewClientAccessAndAllowExistingPlayers: No existing session found."));
+	}
+}
+
+bool UGI_Zoomies::IsPlayerAllowedToJoin(const FString& PlayerId, const FOnlineSessionSearchResult& SearchResult) const
+{
+	if (!SearchResult.IsValid())
+	{
+		return false;
+	}
+	
+	FString IsStarted = "";
+	FString BanList = "";
+	FString ExistingPlayers = "";
+	SearchResult.Session.SessionSettings.Get(FName("IsStarted"), IsStarted);
+	SearchResult.Session.SessionSettings.Get(FName("BanList"), BanList);
+	SearchResult.Session.SessionSettings.Get(FName("ExistingPlayersList"), ExistingPlayers);
+	
+	if (IsStarted.Contains("No"))
+	{
+		return true;
+	}
+	if (BanList.Contains(PlayerId))
+	{
+		return false;
+	}
+	if (ExistingPlayers.Contains(PlayerId))
+	{
+		return true;
+	}
+    return false;
+}
+
 bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& search_result)
 {
-	FString BanList;
-	if (search_result.Session.SessionSettings.Get(FName("BanList"), BanList))
+	if(!CheckValidation())
 	{
-		FNetLogger::EditerLog(FColor::Red, TEXT("BanList: %s"), *BanList);
-		CSteamID SteamIDRaw = SteamUser()->GetSteamID();
-		FString PlayerID = FString::Printf(TEXT("%llu"), SteamIDRaw.ConvertToUint64());
-		if (BanList.Contains(PlayerID))
-		{
-			FNetLogger::EditerLog(FColor::Red, TEXT("You are banned from this session"));
-			return false;
-		}
+		UE_LOG( LogTemp, Error, TEXT("JoinSessionBySearchResult: Validation failed") );
+		return false;
+	}
+	
+	FString PlayerID = GetWorld()->GetFirstLocalPlayerFromController()->GetPreferredUniqueNetId()->ToString();
+	if (!IsPlayerAllowedToJoin(PlayerID, search_result))
+	{
+		return false;
+	}
+
+	FString RetrievedSessionName;
+	if (search_result.Session.SessionSettings.Get(FName("SESSION_NAME"), RetrievedSessionName))
+	{
+		SessionName = FName(*RetrievedSessionName);
+		network_failure_manager_->SetSessionName(SessionName);
+	}
+	else
+	{
+		SessionName = FName(*search_result.Session.GetSessionIdStr());
+		network_failure_manager_->SetSessionName(SessionName);
 	}
 	
 	dh_on_join_complete = session_interface_->AddOnJoinSessionCompleteDelegate_Handle(
 		FOnJoinSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onJoinComplete));
-    
+	
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
-	session_interface_->JoinSession(*local_player->GetPreferredUniqueNetId(), NAME_GameSession, search_result);
+	session_interface_->JoinSession(*local_player->GetPreferredUniqueNetId(), SessionName, search_result);
 	return true;
 }
 
+void UGI_Zoomies::OnInviteAccepted(const bool bWasSuccessful, const int32 LocalPlayerNum, TSharedPtr<const FUniqueNetId> UserId, const FOnlineSessionSearchResult& InviteResult)
+{
+	if (!CheckValidation())
+	{
+		UE_LOG(LogTemp, Error, TEXT("OnInviteAccepted: Validation failed"));
+		return;
+	}
+	UE_LOG(LogTemp, Error, TEXT("OnInviteAccepted: OnInviteAccepted is called"));
+
+	if (bWasSuccessful && InviteResult.IsValid())
+	{
+		UE_LOG(LogTemp, Log, TEXT("OnInviteAccepted: Invite successfully accepted"));
+		ShowLoadingScreen();
+
+		dh_on_join_complete = session_interface_->AddOnJoinSessionCompleteDelegate_Handle(
+			FOnJoinSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onJoinComplete));
+
+		FString RetrievedSessionName;
+		if (InviteResult.Session.SessionSettings.Get(FName("SessionName"), RetrievedSessionName))
+		{
+			SessionName = FName(*RetrievedSessionName);
+			network_failure_manager_->SetSessionName(SessionName);
+		
+		}
+		else
+		{
+			SessionName = FName(*InviteResult.Session.GetSessionIdStr());
+			network_failure_manager_->SetSessionName(SessionName);
+		}
+
+		const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
+		session_interface_->JoinSession(*local_player->GetPreferredUniqueNetId(), SessionName, InviteResult);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("OnInviteAccepted: Invite was not successful or InviteResult is invalid"));
+	}
+}
+
+
 void UGI_Zoomies::onJoinComplete(FName session_name, EOnJoinSessionCompleteResult::Type result)
 {
+	if(!CheckValidation())
+	{
+		UE_LOG( LogTemp, Error, TEXT("onJoinComplete: Validation failed") );
+		return;
+	}
 	if (result == EOnJoinSessionCompleteResult::Success)
 	{
 		APlayerController* player_controller = GetWorld()->GetFirstPlayerController();
@@ -238,74 +405,85 @@ void UGI_Zoomies::onJoinComplete(FName session_name, EOnJoinSessionCompleteResul
 
 void UGI_Zoomies::OnSessionFailure()
 {
-	UWorld* World = GetWorld();
-	if (World)
+	if(!CheckValidation())
 	{
-		if (World->GetNetMode() == NM_ListenServer)
-		{
-			IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
-			if (OnlineSubsystem)
-			{
-				IOnlineSessionPtr Sessions = OnlineSubsystem->GetSessionInterface();
-				if (Sessions.IsValid())
-				{
-					FNamedOnlineSession* Session = Sessions->GetNamedSession(NAME_GameSession);
-					if (Session)
-					{
-						Sessions->EndSession(NAME_GameSession);
-					}
-				}
-			}
-			for (FConstPlayerControllerIterator It = World->GetPlayerControllerIterator(); It; ++It)
-			{
-				APlayerController* PlayerController = It->Get();
-				if (PlayerController)
-				{
-					PlayerController->ClientTravel(TEXT("lobbyLevel?closed"), ETravelType::TRAVEL_Absolute);
-				}
-			}
-			World->ServerTravel(TEXT("lobbyLevel?closed"), true);
-			session_interface_->DestroySession(NAME_GameSession);
-		}
-		else
-		{
-			APlayerController* CurrentPlayerController = GetWorld()->GetFirstPlayerController();
-			if (CurrentPlayerController)
-			{
-				CurrentPlayerController->ClientTravel(TEXT("lobbyLevel?closed"), ETravelType::TRAVEL_Absolute);
-				session_interface_->DestroySession(NAME_GameSession);
-			}
-		}
+		UE_LOG( LogTemp, Error, TEXT("OnSessionFailure: Validation failed") );
+		return;
 	}
+
+	// session_interface_->DestroySession(network_failure_manager_->SessionNameGI);
+	APlayerController* CurrentPlayerController = GetWorld()->GetFirstPlayerController();
+	if (CurrentPlayerController)
+	{
+		CurrentPlayerController->ClientTravel(TEXT("lobbyLevel?closed"), ETravelType::TRAVEL_Absolute);
+	}
+	
+	// UWorld* World = GetWorld();
+	// if (World)
+	// {
+	// 	if (World->GetNetMode() == NM_ListenServer)
+	// 	{
+	// 		IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
+	// 		if (OnlineSubsystem)
+	// 		{
+	// 			IOnlineSessionPtr Sessions = OnlineSubsystem->GetSessionInterface();
+	// 			if (Sessions.IsValid())
+	// 			{
+	// 				FNamedOnlineSession* Session = Sessions->GetNamedSession(network_failure_manager_->SessionNameGI);
+	// 				if (Session)
+	// 				{
+	// 					Sessions->EndSession(network_failure_manager_->SessionNameGI);
+	// 				}
+	// 			}
+	// 		}
+	// 		for (FConstPlayerControllerIterator It = World->GetPlayerControllerIterator(); It; ++It)
+	// 		{
+	// 			APlayerController* PlayerController = It->Get();
+	// 			if (PlayerController)
+	// 			{
+	// 				PlayerController->ClientTravel(TEXT("lobbyLevel?closed"), ETravelType::TRAVEL_Absolute);
+	// 			}
+	// 		}
+	// 		World->ServerTravel(TEXT("lobbyLevel?closed"), true);
+	// 		session_interface_->DestroySession(network_failure_manager_->SessionNameGI);
+	// 		SessionName = "";
+	// 		network_failure_manager_->SessionNameGI = SessionName;
+	// 	}
+	// 	else
+	// 	{
+	// 		APlayerController* CurrentPlayerController = GetWorld()->GetFirstPlayerController();
+	// 		if (CurrentPlayerController)
+	// 		{
+	// 			CurrentPlayerController->ClientTravel(TEXT("lobbyLevel?closed"), ETravelType::TRAVEL_Absolute);
+	// 			session_interface_->DestroySession(network_failure_manager_->SessionNameGI);
+	// 		}
+	// 	}
+	// }
 }
 
 void UGI_Zoomies::ChangeJoinInProgress(bool bCond)
 {
 	IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
 	IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
-	FNamedOnlineSession* ExistingSession = SessionInterface->GetNamedSession(NAME_GameSession);
+	FNamedOnlineSession* ExistingSession = SessionInterface->GetNamedSession(SessionName);
 
 	if (ExistingSession != nullptr)
 	{
-		// 세션 설정 업데이트
 		FOnlineSessionSettings UpdatedSessionSettings = ExistingSession->SessionSettings;
         
-		// 세션을 비공개로 설정
 		UpdatedSessionSettings.bAllowJoinInProgress = false;
         
-		// 추가적으로 검색 결과에서 숨기기 위해
 		UpdatedSessionSettings.bShouldAdvertise = false;
 
-		// 세션 설정 업데이트
-		SessionInterface->UpdateSession(NAME_GameSession, UpdatedSessionSettings);
+		SessionInterface->UpdateSession(SessionName, UpdatedSessionSettings);
 	}
 }
 
-void UGI_Zoomies::AddBanPlayer(const FString& String)
+void UGI_Zoomies::AddBanPlayer(const FString& PlayerId)
 {
 	IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
 	IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
-	FNamedOnlineSession* ExistingSession = SessionInterface->GetNamedSession(NAME_GameSession);
+	FNamedOnlineSession* ExistingSession = SessionInterface->GetNamedSession(SessionName);
 
 	if (ExistingSession != nullptr)
 	{
@@ -314,15 +492,14 @@ void UGI_Zoomies::AddBanPlayer(const FString& String)
 		///
 		FString MapName;
 		UpdatedSessionSettings.Get(SETTING_MAPNAME, MapName);
-		FNetLogger::EditerLog(FColor::Cyan, TEXT("MapName: %s"), *MapName);
 		///
 		
 		FString BanList;
 		UpdatedSessionSettings.Get(FName("BanList"), BanList);
-		BanList += String + TEXT(",");
+		BanList += PlayerId + TEXT(",");
 		UpdatedSessionSettings.Set(FName("BanList"), BanList, EOnlineDataAdvertisementType::ViaOnlineService);
 
-		SessionInterface->UpdateSession(NAME_GameSession, UpdatedSessionSettings);
+		SessionInterface->UpdateSession(SessionName, UpdatedSessionSettings);
 	}
 }
 
@@ -342,20 +519,24 @@ void UGI_Zoomies::OnDestroyComplete(FName session_name, bool bWasSuccessful)
 
 bool UGI_Zoomies::ResetSession()
 {
-	// if (session_interface_.IsValid())
-	// {
-	// 	if (session_interface_->GetNamedSession(NAME_GameSession) != nullptr)
-	// 	{
-	// 		// Register OnDestroySessionComplete delegate
-	// 		dh_on_destroy_complete = session_interface_->AddOnDestroySessionCompleteDelegate_Handle(
-	// 			FOnDestroySessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::OnDestroyComplete)
-	// 		);
-	// 		// Destroy the current session
-	// 		session_interface_->DestroySession(NAME_GameSession);
-	// 		return true;
-	// 	}
-	// }
+	if (session_interface_.IsValid() && !network_failure_manager_->bMigrating)
+	{
+		if (session_interface_->GetNamedSession(network_failure_manager_->SessionNameGI) != nullptr)
+		{
+			dh_on_destroy_complete = session_interface_->AddOnDestroySessionCompleteDelegate_Handle(
+				FOnDestroySessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::OnDestroyComplete)
+			);
+			session_interface_->DestroySession(network_failure_manager_->SessionNameGI);
+			SessionName = "";
+			network_failure_manager_->SessionNameGI = SessionName;
+			
+			FriendsList.Empty();
+			FriendsArray.Empty();
+			return true;
+		}
+	}
 	// UE_LOG(LogTemp, Log, TEXT("no existing session to reset"));
+	FNetLogger::LogError(TEXT("No Existing Session to Reset"));
 	return false;
 }
 
@@ -399,15 +580,6 @@ void UGI_Zoomies::InitSteamAPI()
 	if (!is_steamAPI_init)
 	{
 		UE_LOG(LogTemp, Log, TEXT("SteamAPI init failed"));
-		//logging on Screen if GEngine is available
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(
-				-1,
-				30.f,
-				FColor::Red,
-				FString::Printf(TEXT("SteamAPI init failed")));
-		}
 	}
 	else
 	{
@@ -427,6 +599,7 @@ void UGI_Zoomies::InitOnlineSubsystemSteam()
 {
 	if (!is_online_session_steam_init)
 	{
+		online_subsystem_ = IOnlineSubsystem::Get(STEAM_SUBSYSTEM);
 #if EDITOR_MODE || LAN_MODE
 		online_subsystem_ = IOnlineSubsystem::Get(/*STEAM_SUBSYSTEM*/);
 #else
@@ -444,20 +617,158 @@ void UGI_Zoomies::InitOnlineSubsystemSteam()
 						Log,
 						TEXT("Online Subsystem steam SUCCESS || SubsystemName: %s"),
 						*online_subsystem_->GetSubsystemName().ToString());
+				session_interface_->AddOnSessionUserInviteAcceptedDelegate_Handle(
+					FOnSessionUserInviteAcceptedDelegate::CreateUObject(this, &UGI_Zoomies::OnInviteAccepted)
+				);
+				UE_LOG(LogTemp, Log, TEXT("Online Subsystem steam init success"));
 			}
 		}
 	}
 	if (!is_online_session_steam_init)
 	{
-		//logging on Screen if GEngine is available
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(
-				-1,
-				30.f,
-				FColor::Red,
-				FString::Printf(TEXT("Online Subsystem steam init failed")));
-		}
 		UE_LOG(LogTemp, Log, TEXT("Online Subsystem steam init failed"));
+	}
+	else
+	{
+		ReadFriendList();
+	}
+}
+
+void UGI_Zoomies::ReadFriendList()
+{
+	IOnlineFriendsPtr Friends = online_subsystem_->GetFriendsInterface();
+	if (Friends.IsValid())
+	{
+		Friends->ReadFriendsList(0, EFriendsLists::ToString(EFriendsLists::Default));
+	}
+}
+
+void UGI_Zoomies::LoadFriendsList()
+{
+    if (!online_subsystem_)
+    {
+		UE_LOG(LogTemp, Log, TEXT("online subsystem is not valid"));
+        return;
+    }
+
+	if (FriendsArray.Num() > 0)
+	{
+		FriendsArray.Empty();
+	}
+
+    IOnlineFriendsPtr Friends = online_subsystem_->GetFriendsInterface();
+    if (Friends.IsValid())
+    {
+        FString ListName = TEXT("Default");
+
+        if (Friends->GetFriendsList(0, ListName, FriendsList))
+        {
+            for (auto Friend : FriendsList)
+            {
+                FFriendInfo NewFriend;
+                FString FriendNickname = Friend->GetDisplayName();
+                FUniqueNetIdPtr FriendId = Friend->GetUserId();
+
+                if (!FriendId.IsValid())
+                {
+                	
+					UE_LOG(LogTemp, Log, TEXT("Invalid Friend ID"));
+                    continue;
+                }
+
+                NewFriend.FriendNickname = FText::FromString(FriendNickname);
+                NewFriend.FriendId = FriendId->ToString();
+                NewFriend.IsOnline = Friend->GetPresence().bIsOnline;
+                FriendsArray.Add(NewFriend);
+            }
+
+            FriendsArray.Sort([](const FFriendInfo& A, const FFriendInfo& B)
+            {
+                return A.IsOnline && !B.IsOnline;
+            });
+        }
+        else
+        {
+			UE_LOG(LogTemp, Log, TEXT("failed to get friends list"));
+        }
+    }
+    else
+    {
+    	UE_LOG(LogTemp, Log, TEXT("online friends interface is not valid"));
+    }
+}
+
+void UGI_Zoomies::InviteFriendToGame(FString FriendId)
+{
+	if (session_interface_.IsValid())
+	{
+		IOnlineIdentityPtr IdentityInterface = online_subsystem_->GetIdentityInterface();
+		FUniqueNetIdPtr uniqueNetId = IdentityInterface->CreateUniquePlayerId(FriendId);
+		bool bInviteSent = session_interface_->SendSessionInviteToFriend(0, SessionName, *uniqueNetId);
+		if (bInviteSent)
+		{
+			UE_LOG(LogTemp, Log, TEXT("success to send invite"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Fail to send invite"));
+		}
+	}
+}
+
+
+bool UGI_Zoomies::CheckValidation() const
+{
+	if (!session_interface_.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Session interface is not valid."));
+		return false;
+	}
+	if (online_subsystem_ == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Online subsystem is not valid."));
+		return false;
+	}
+	return true;
+}
+
+void UGI_Zoomies::ShowLoadingScreen()
+{
+	UClass* WidgetClass = nullptr;
+	FString WidgetPath = TEXT("/Game/widget/widget_loading.widget_loading_C");
+
+	WidgetClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *WidgetPath));
+
+	if (WidgetClass != nullptr)
+	{
+		LoadingWidget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), WidgetClass);
+
+		if (LoadingWidget != nullptr)
+		{
+			LoadingWidget->AddToViewport();
+			UE_LOG(LogTemp, Log, TEXT("ShowLoadingScreen::Loading screen displayed"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("ShowLoadingScreen::Failed to create widget"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("ShowLoadingScreen::Failed to load widget class"));
+	}
+}
+
+void UGI_Zoomies::HideLoadingScreen()
+{
+	if (LoadingWidget != nullptr)
+	{
+		LoadingWidget->RemoveFromParent();
+		LoadingWidget = nullptr;
+		UE_LOG(LogTemp, Log, TEXT("HideLoadingScreen::Loading screen hidden"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HideLoadingScreen::No loading screen to hide"));
 	}
 }

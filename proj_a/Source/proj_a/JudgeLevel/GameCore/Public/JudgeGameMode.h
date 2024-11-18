@@ -1,7 +1,10 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "CompileMode.h"
 #include "IChatGameMode.h"
+#include "JudgeData.h"
+#include "JudgePlayerState.h"
 #include "ServerTimerManager.h"
 #include "ServerChatManager.h"
 #include "ScoreTypes.h"
@@ -19,11 +22,15 @@ struct FPlayerInitData
     int32 Score;
     UPROPERTY()
     FString Occupation;
+    UPROPERTY()
+    int32 PlayerId;
+    UPROPERTY()
+    int32 CameraIndex;
 
     FPlayerInitData() : Score(0), Occupation(TEXT("None")) {}
 
     FPlayerInitData(const FString& InName, int32 InScore, const FString& InOccupation = TEXT("None"))
-        : PlayerName(InName), Score(InScore), Occupation(InOccupation) {}
+        : PlayerName(InName), Score(InScore), Occupation(InOccupation) , PlayerId(-1), CameraIndex(-1) {}
 };
 
 USTRUCT()
@@ -46,23 +53,33 @@ class PROJ_A_API AJudgeGameMode : public AGameModeBase, public IChatGameMode
 
 public:
     AJudgeGameMode();
+    virtual void PostLogin(APlayerController* NewPlayer) override;
 
     void AddVote(EPlayerJob Occupation) { PlayerVotes.Add(Occupation); }
     virtual UServerChatManager* GetChatManager() const override { return ChatManager; }
     FUIInitData GetUiData();
 
 private:
-    EPlayerJob CollateVotingResults();
+    EPlayerJob CollectVotingResults();
+    AJudgePlayerState* GetCurrentVotedPlayerState();
+    void HandlePlayerStateNull();
     void ProcessVotingResults();
     void EndTimer();
 
     int CurrentPlayerIndex = 0;
-    const float WAIT_TIME = 10.f;
+    float WAIT_TIME = Zoomies::JUDGE_TIME;
     TArray<EPlayerJob> PlayerVotes;
-    
+    int TOTAL_PLAYER;
+
+    UPROPERTY()
+    UJudgeData* JudgedInformation;
+
 protected:
+    void InitializeGameMode();
     virtual void StartPlay() override;
+    virtual void Logout(AController* Exiting) override;
     virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
+    virtual void GetSeamlessTravelActorList(bool bToTransition, TArray<AActor*>& ActorList) override;
     
     UPROPERTY()
     UServerTimerManager* TimerManager;

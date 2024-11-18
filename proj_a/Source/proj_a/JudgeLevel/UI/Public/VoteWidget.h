@@ -9,6 +9,7 @@
 #include "Components/UniformGridPanel.h"
 #include "ScoreTypes.h"
 #include "Components/TextBlock.h"
+#include "Components/VerticalBox.h"
 #include "VoteWidget.generated.h"
 
 // refer ScoreTypes.h
@@ -34,8 +35,46 @@ class PROJ_A_API UVoteWidget : public UUserWidget
     GENERATED_BODY()
 
 public:
-    EPlayerJob GetVote() const { return CurrentVoterOcc; }
-    void SetVoterName(const FString& Name) { VoterName->SetText(FText::FromString(Name)); }
+
+    FString OccupationToString(EPlayerJob Occupation)
+    {
+        switch(Occupation)
+        {
+        case EPlayerJob::JOB_ARCHAEOLOGIST:
+            return FString("ARCHAEOLOGIST");
+        case EPlayerJob::JOB_POACHER:
+            return FString("POACHER");
+        case EPlayerJob::JOB_ENVIRONMENTALIST:
+            return FString("ENVIRONMENTALIST");
+        case EPlayerJob::JOB_RINGMASTER:
+            return FString("RINGMASTER");
+        case EPlayerJob::JOB_TERRORIST:
+            return FString("TERRORIST");
+        case EPlayerJob::JOB_CHECK:
+            return FString("CHECK");
+        case EPlayerJob::JOB_CROSS:
+            return FString("CROSS");
+        default:
+            return FString("UNKNOWN");
+        }
+    }
+    
+    EPlayerJob GetVote() 
+    {
+        FString CurrentVoterOccStr = OccupationToString(CurrentVoterOcc);
+
+        return CurrentVoterOcc;
+    }
+    void SetVoterName(const FString& Name)
+    {
+        VoterName->SetText(FText::FromString(Name));
+        TargetUserName->SetText(FText::FromString(Name));
+    }
+
+    UPROPERTY(meta = (BindWidget))
+    UVerticalBox* VoteButtonsGrid;
+    TArray<EPlayerJob> OccupationTypes;
+    EPlayerJob CurrentVoterOcc;
     
 protected:
     UPROPERTY(meta = (BindWidget))
@@ -47,13 +86,12 @@ protected:
     UPROPERTY(meta = (BindWidget))
     UCanvasPanel* VotableListPannel;
     UPROPERTY(meta = (BindWidget))
-    UUniformGridPanel* VoteButtonsGrid;
+    UTextBlock* TargetUserName;
+    
     
     virtual void NativeConstruct() override;
 
 private:
-    TArray<EPlayerJob> OccupationTypes;
-    EPlayerJob CurrentVoterOcc;
 
     void InitializEPlayerJobs();
     UFUNCTION()

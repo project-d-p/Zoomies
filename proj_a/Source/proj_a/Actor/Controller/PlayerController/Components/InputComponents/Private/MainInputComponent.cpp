@@ -2,6 +2,7 @@
 
 #include "DPCharacter.h"
 #include "DPGameModeBase.h"
+#include "DPInGameState.h"
 #include "DPPlayerController.h"
 #include "DPWeaponActorComponent.h"
 #include "EnhancedInputComponent.h"
@@ -69,11 +70,17 @@ UMainInputComponent::UMainInputComponent()
 	(TEXT("/Game/input/ia_run.ia_run"));
 	if (IA_RUN.Succeeded())
 		RunAction = IA_RUN.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_ESC
+	(TEXT("/Game/input/ia_esc.ia_esc"));
+	if (IA_ESC.Succeeded())
+		EscAction = IA_ESC.Object;
 }
 
 void UMainInputComponent::Activate(bool bReset)
 {
 	Super::Activate(bReset);
+
 	BindMainLevelActions();
 }
 
@@ -83,8 +90,31 @@ void UMainInputComponent::Deactivate()
 	UnbindMainLevelActions();
 }
 
+bool UMainInputComponent::IsValidateToRunThisFunction()
+{
+	FTimerHandle RetryHandle;
+	ADPInGameState* InGameState = GetWorld()->GetGameState<ADPInGameState>();
+
+	auto RetryAction = [this]() {
+		BindMainLevelActions();
+	};
+
+	if (!InGameState || !InGameState->bAllReady)
+	{
+		GetWorld()->GetTimerManager().SetTimer(RetryHandle, FTimerDelegate::CreateLambda(RetryAction), 0.5f, false);
+		UE_LOG(LogTemp, Warning, TEXT("Game Is Not Ready Yet"));
+		return false;
+	}
+	return true;
+}
+
 void UMainInputComponent::BindMainLevelActions()
 {
+	if (!IsValidateToRunThisFunction())
+	{
+		return ;
+	}
+	
 	ADPPlayerController* PlayerController = GetPlayerController();
 	if (!PlayerController) return ;
 	if (!PlayerController->IsLocalController()) return ;
@@ -111,8 +141,8 @@ void UMainInputComponent::BindMainLevelActions()
 		// (right mouse button) : Aim
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &UMainInputComponent::Aim);	// 	key down
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &UMainInputComponent::AimReleased);
-		// (esc) : Cancel
-		EnhancedInputComponent->BindAction(CancelAction, ETriggerEvent::Triggered, this, &UMainInputComponent::ActionCancel);
+		// (esc) : EseMenu
+		EnhancedInputComponent->BindAction(EscAction, ETriggerEvent::Started, this, &UMainInputComponent::Esc);
 		// (f) : Catch
 		EnhancedInputComponent->BindAction(CatchAction, ETriggerEvent::Started, this, &UMainInputComponent::CatchAnimals);
 		// (q) : Return
@@ -444,4 +474,17 @@ void UMainInputComponent::RunReleased(const FInputActionValue& value)
 	if (!Character) return ;
 
 	Character->GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+}
+
+void UMainInputComponent::Esc(const FInputActionValue& value)
+{
+	ADPPlayerController* PlayerController = GetPlayerController();
+	if (PlayerController != nullptr)
+	{
+		PlayerController->ShowUI_ESC();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UMainInputComponent::Esc::PlayerController is nullptr."));
+	}
 }

@@ -12,5 +12,5 @@ class PROJ_A_API AGM_Lobby : public AGameModeBase
 	GENERATED_BODY()
 public:
 	AGM_Lobby();
-	virtual void BeginPlay() override;	
+	virtual void BeginPlay() override;
 };
