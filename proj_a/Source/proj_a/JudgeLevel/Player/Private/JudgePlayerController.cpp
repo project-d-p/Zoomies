@@ -114,10 +114,7 @@ void AJudgePlayerController::RequestUIData_Implementation()
 
 void AJudgePlayerController::RequestCharacter_Implementation()
 {
-	if (this->GetCharacter() != nullptr)
-	{
-		return;
-	}
+	if (this->GetCharacter() != nullptr) return;
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADynamicTexturedCharacter::StaticClass(), FoundActors);
 	for (AActor* Actor : FoundActors)
@@ -347,8 +344,7 @@ void AJudgePlayerController::findMyCamera()
 
 	for (AActor* Actor : FoundActors)
 	{
-		// FString ActorName = Actor->GetActorLabel();
-		FString ActorName = Actor->GetActorNameOrLabel();
+		FString ActorName = Actor->GetName();
 		if (ActorName == FString::Printf(TEXT("CameraActor_%d"), CameraIndex))
 		{
 			CameraActor = Actor;

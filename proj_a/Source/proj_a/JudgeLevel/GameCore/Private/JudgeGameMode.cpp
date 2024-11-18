@@ -48,15 +48,19 @@ FUIInitData AJudgeGameMode::GetUiData()
 {
     FUIInitData UIData;
     int32 i = 0;
+    AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
+    if (!GS) return UIData;
+
+    //InitializePlayerData
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         AJudgePlayerController* PC = Cast<AJudgePlayerController>(*It);
-        if (!PC)
-            return UIData;
+        if (!PC) continue;
 
         AJudgePlayerState* PS = Cast<AJudgePlayerState>(PC->PlayerState);
         if (!PS)
         {
+            //SetDelayedUiDataFetch
             FTimerHandle TimerHandle;
             GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
             {
@@ -64,16 +68,12 @@ FUIInitData AJudgeGameMode::GetUiData()
             }), 0.1f, false);
             return UIData;
         }
-
-        AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
-        if (!GS)
-            return UIData;
-
         FPlayerInitData PlayerData;
         PlayerData.PlayerName = PS->GetPlayerName();
         PlayerData.Score = PS->GetScore();
         PlayerData.PlayerId = PS->GetPlayerId();
 
+        //Check Duplicates
         bool bIsDuplicated = false;
         for (const FPlayerInitData& Data : GS->GS_PlayerData)
         {
@@ -83,19 +83,14 @@ FUIInitData AJudgeGameMode::GetUiData()
                 break;
             }
         }
-
         if (!bIsDuplicated)
         {
             GS->GS_PlayerData.Add(PlayerData);
             UIData.PlayerData.Add(PlayerData);
         }
-        i++;
     }
 
-    AJudgeGameState* GS = GetWorld()->GetGameState<AJudgeGameState>();
-    if (!GS)
-        return UIData;
-
+    //SetCameraIndex
     GS->GS_PlayerData.Sort([](const FPlayerInitData& A, const FPlayerInitData& B) {
         return A.PlayerId < B.PlayerId;
     });
@@ -215,7 +210,6 @@ void AJudgeGameMode::HandlePlayerStateNull()
     }
     else
     {
-        // 중간에 나간 클라이언트가 중간의 순번이었을 경우
         CurrentPlayerIndex--;
         FTimerHandle VoteCollectionTimerHandle;
         GetWorld()->GetTimerManager().SetTimer(VoteCollectionTimerHandle, this, &AJudgeGameMode::EndTimer, 1.0f, false);

@@ -150,15 +150,6 @@ void AGS_MatchingLobby::FindFastestPlayer()
 		}
 		average_ping /= GameState->PlayerArray.Num();
 		
-		//logging
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(
-				-1,
-				30.f,
-				FColor::Green,
-				FString::Printf(TEXT("Average Ping: %f"), average_ping));
-		}
 		ReportPing(CurrentPlayerState, average_ping);
 	}
 }
@@ -198,18 +189,6 @@ void AGS_MatchingLobby::MulticastShowLoadingWidget_Implementation()
 		if (LoadingWidget != nullptr)
 		{
 			LoadingWidget->AddToViewport();
-		}
-		else
-		{
-			//logging on screen about failed to create widget
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(
-					-1,
-					30.f,
-					FColor::Red,
-					FString::Printf(TEXT("Failed to create widget")));
-			}
 		}
 	}
 }

@@ -45,11 +45,6 @@ void AJudgeGameState::SetVoterName_Implementation(const FString& Name)
 	if (TurnStartSound)
 	{
 		UGameplayStatics::PlaySound2D(this, TurnStartSound);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("TurnStartSound"));
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("TurnStartSound is not valid"));
 	}
 }
 

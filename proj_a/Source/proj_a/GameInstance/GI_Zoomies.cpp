@@ -175,6 +175,8 @@ void UGI_Zoomies::CreateSession()
 	// }
 
 	session_settings_->Set(SETTING_MAPNAME, FString("matchLobby"), EOnlineDataAdvertisementType::ViaOnlineService);
+	session_settings_->Set(FName("IsStarted"), FString("No"), EOnlineDataAdvertisementType::ViaOnlineService);
+	
     
 	// Add delegate
 	dh_on_create_complete = session_interface_->AddOnCreateSessionCompleteDelegate_Handle(
@@ -214,6 +216,69 @@ void UGI_Zoomies::onCreateComplete(FName session_name, bool bWasSuccessful)
 	}
 }
 
+void UGI_Zoomies::RestrictNewClientAccessAndAllowExistingPlayers()
+{
+	IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
+	IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
+	FNamedOnlineSession* ExistingSession = SessionInterface->GetNamedSession(SessionName);
+
+	if (ExistingSession != nullptr)
+	{
+		FOnlineSessionSettings UpdatedSessionSettings = ExistingSession->SessionSettings;
+        
+		// Restrict new clients from joining and stop advertising the session
+		UpdatedSessionSettings.bAllowJoinInProgress = false;
+		UpdatedSessionSettings.bShouldAdvertise = false;
+
+		// Store the list of existing players in the session settings
+		FString ExistingPlayers;
+		for (auto& Player : ExistingSession->RegisteredPlayers)
+		{
+			ExistingPlayers += Player->ToString() + TEXT(",");
+		}
+		UpdatedSessionSettings.Set(FName("ExistingPlayersList"), ExistingPlayers, EOnlineDataAdvertisementType::ViaOnlineService);
+		UpdatedSessionSettings.Set(FName("IsStarted"), FString("Yes"), EOnlineDataAdvertisementType::ViaOnlineService);
+        
+		// Update the session with the new settings
+		SessionInterface->UpdateSession(SessionName, UpdatedSessionSettings);
+
+		UE_LOG(LogTemp, Log, TEXT("RestrictNewClientAccessAndAllowExistingPlayers: The session has been updated to allow only existing players."));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("RestrictNewClientAccessAndAllowExistingPlayers: No existing session found."));
+	}
+}
+
+bool UGI_Zoomies::IsPlayerAllowedToJoin(const FString& PlayerId, const FOnlineSessionSearchResult& SearchResult) const
+{
+	if (!SearchResult.IsValid())
+	{
+		return false;
+	}
+	
+	FString IsStarted = "";
+	FString BanList = "";
+	FString ExistingPlayers = "";
+	SearchResult.Session.SessionSettings.Get(FName("IsStarted"), IsStarted);
+	SearchResult.Session.SessionSettings.Get(FName("BanList"), BanList);
+	SearchResult.Session.SessionSettings.Get(FName("ExistingPlayersList"), ExistingPlayers);
+	
+	if (IsStarted.Contains("No"))
+	{
+		return true;
+	}
+	if (BanList.Contains(PlayerId))
+	{
+		return false;
+	}
+	if (ExistingPlayers.Contains(PlayerId))
+	{
+		return true;
+	}
+    return false;
+}
+
 bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& search_result)
 {
 	if(!CheckValidation())
@@ -222,23 +287,14 @@ bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& se
 		return false;
 	}
 	
-	FString BanList;
-	if (search_result.Session.SessionSettings.Get(FName("BanList"), BanList))
+	FString PlayerID = GetWorld()->GetFirstLocalPlayerFromController()->GetPreferredUniqueNetId()->ToString();
+	if (!IsPlayerAllowedToJoin(PlayerID, search_result))
 	{
-		CSteamID SteamIDRaw = SteamUser()->GetSteamID();
-		FString PlayerID = FString::Printf(TEXT("%llu"), SteamIDRaw.ConvertToUint64());
-		FUniqueNetIdRepl LocalID = GetWorld()->GetFirstLocalPlayerFromController()->GetUniqueNetIdFromCachedControllerId();
-		if (BanList.Contains(PlayerID) || BanList.Contains(LocalID->ToString()))
-		{
-			FNetLogger::EditerLog(FColor::Red, TEXT("You are banned from this session"));
-			return false;
-		}
+		return false;
 	}
-	
-	dh_on_join_complete = session_interface_->AddOnJoinSessionCompleteDelegate_Handle(
-		FOnJoinSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onJoinComplete));
+
 	FString RetrievedSessionName;
-	if (search_result.Session.SessionSettings.Get(FName("SessionName"), RetrievedSessionName))
+	if (search_result.Session.SessionSettings.Get(FName("SESSION_NAME"), RetrievedSessionName))
 	{
 		SessionName = FName(*RetrievedSessionName);
 		network_failure_manager_->SetSessionName(SessionName);
@@ -248,6 +304,9 @@ bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& se
 		SessionName = FName(*search_result.Session.GetSessionIdStr());
 		network_failure_manager_->SetSessionName(SessionName);
 	}
+	
+	dh_on_join_complete = session_interface_->AddOnJoinSessionCompleteDelegate_Handle(
+		FOnJoinSessionCompleteDelegate::CreateUObject(this, &UGI_Zoomies::onJoinComplete));
 	
 	const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
 	session_interface_->JoinSession(*local_player->GetPreferredUniqueNetId(), SessionName, search_result);
@@ -283,7 +342,6 @@ void UGI_Zoomies::OnInviteAccepted(const bool bWasSuccessful, const int32 LocalP
 			SessionName = FName(*InviteResult.Session.GetSessionIdStr());
 			network_failure_manager_->SetSessionName(SessionName);
 		}
-
 
 		const ULocalPlayer* local_player = GetWorld()->GetFirstLocalPlayerFromController();
 		session_interface_->JoinSession(*local_player->GetPreferredUniqueNetId(), SessionName, InviteResult);
@@ -421,7 +479,7 @@ void UGI_Zoomies::ChangeJoinInProgress(bool bCond)
 	}
 }
 
-void UGI_Zoomies::AddBanPlayer(const FString& String)
+void UGI_Zoomies::AddBanPlayer(const FString& PlayerId)
 {
 	IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
 	IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
@@ -438,7 +496,7 @@ void UGI_Zoomies::AddBanPlayer(const FString& String)
 		
 		FString BanList;
 		UpdatedSessionSettings.Get(FName("BanList"), BanList);
-		BanList += String + TEXT(",");
+		BanList += PlayerId + TEXT(",");
 		UpdatedSessionSettings.Set(FName("BanList"), BanList, EOnlineDataAdvertisementType::ViaOnlineService);
 
 		SessionInterface->UpdateSession(SessionName, UpdatedSessionSettings);
