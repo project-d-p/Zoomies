@@ -536,7 +536,6 @@ bool UGI_Zoomies::ResetSession()
 		}
 	}
 	// UE_LOG(LogTemp, Log, TEXT("no existing session to reset"));
-	FNetLogger::LogError(TEXT("No Existing Session to Reset"));
 	return false;
 }
 
