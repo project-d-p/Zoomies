@@ -192,6 +192,7 @@ void UNetworkFailureManager::CreateNewSession(UWorld* World)
 	}
 
 	SessionSettings.Set(FName("BanList"), SavedBanList, EOnlineDataAdvertisementType::ViaOnlineService);
+	SessionSettings.Set(FName("ExistingPlayersList"), ExistingPlayersList, EOnlineDataAdvertisementType::ViaOnlineService);
 	SessionSettings.Set(SETTING_MAPNAME, DesiredMapName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
 	SessionSettings.Set(FName("SessionName"), DesiredSessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService);
 	
@@ -510,6 +511,9 @@ void UNetworkFailureManager::CreateNewSessionMetaData(UWorld* World, FNamedOnlin
 	CurrentSession->SessionSettings.Get(FName("BanList"), SavedBanList);
 	FUniqueNetIdPtr HostID = CurrentSession->OwningUserId;
 	SavedBanList += TEXT(",") + HostID->ToString();
+
+	ExistingPlayersList = "";
+	CurrentSession->SessionSettings.Get(FName("ExistingPlayersList"), ExistingPlayersList);
 }
 
 void UNetworkFailureManager::CaptureViewport()

@@ -69,4 +69,5 @@ private:
 	UTexture2D* CapturedTexture2D;
 	TSubclassOf<UCapturedImageWidget> CapturedImageWidgetClass;
 	FString SavedBanList;
+	FString ExistingPlayersList;
 };

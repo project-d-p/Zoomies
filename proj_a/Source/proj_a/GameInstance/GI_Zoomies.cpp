@@ -256,23 +256,33 @@ bool UGI_Zoomies::IsPlayerAllowedToJoin(const FString& PlayerId, const FOnlineSe
 	{
 		return false;
 	}
+
+	CSteamID SteamIDRaw = SteamUser()->GetSteamID();
+	FString PlayerSteamID = FString::Printf(TEXT("%llu"), SteamIDRaw.ConvertToUint64());
+	FUniqueNetIdRepl LocalID = GetWorld()->GetFirstLocalPlayerFromController()->GetUniqueNetIdFromCachedControllerId();
 	
 	FString IsStarted = "";
 	FString BanList = "";
 	FString ExistingPlayers = "";
+	FString MapName = "";
 	SearchResult.Session.SessionSettings.Get(FName("IsStarted"), IsStarted);
 	SearchResult.Session.SessionSettings.Get(FName("BanList"), BanList);
 	SearchResult.Session.SessionSettings.Get(FName("ExistingPlayersList"), ExistingPlayers);
-	
-	if (IsStarted.Contains("No"))
+	SearchResult.Session.SessionSettings.Get(FName(SETTING_MAPNAME), MapName);
+
+	if (MapName.Contains("matchLobby"))
 	{
 		return true;
 	}
-	if (BanList.Contains(PlayerId))
+	if (BanList.Contains(PlayerId) || BanList.Contains(PlayerSteamID) || BanList.Contains(LocalID->ToString()))
 	{
 		return false;
 	}
 	if (ExistingPlayers.Contains(PlayerId))
+	{
+		return true;
+	}
+	if (IsStarted.Contains("No"))
 	{
 		return true;
 	}
@@ -294,7 +304,7 @@ bool UGI_Zoomies::JoinSessionBySearchResult(const FOnlineSessionSearchResult& se
 	}
 
 	FString RetrievedSessionName;
-	if (search_result.Session.SessionSettings.Get(FName("SESSION_NAME"), RetrievedSessionName))
+	if (search_result.Session.SessionSettings.Get(FName("SessionName"), RetrievedSessionName))
 	{
 		SessionName = FName(*RetrievedSessionName);
 		network_failure_manager_->SetSessionName(SessionName);
