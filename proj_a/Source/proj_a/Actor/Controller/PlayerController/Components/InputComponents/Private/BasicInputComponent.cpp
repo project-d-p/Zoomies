@@ -66,7 +66,8 @@ void UBasicInputComponent::BindBasicLevelActions()
 		// 시점 변환 ( 마우스 회전 )
 		EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &UBasicInputComponent::Rotate);
 		// 달리기 ( shift )
-		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Triggered, this, &UBasicInputComponent::Run);
+		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Started, this, &UBasicInputComponent::Run);
+		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &UBasicInputComponent::RunReleased); // key up
 		PlayerController->SetInputMode(FInputModeGameOnly());
 	}
 }
@@ -141,6 +142,20 @@ void UBasicInputComponent::Run(const FInputActionValue& value)
 	if (!Character) return ;
 
 	Character->GetCharacterMovement()->MaxWalkSpeed = 1000.0f;
+	Character->bIsRunning = true;
+	// RPC
+	Character->CharacterRun();
+}
+
+void UBasicInputComponent::RunReleased(const FInputActionValue& value)
+{
+	ADPCharacter* Character = Cast<ADPCharacter>(GetPlayerCharacter());
+	if (!Character) return ;
+
+	Character->GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+	Character->bIsRunning = false;
+	// RPC
+	Character->CharacterRunReleased();
 }
 
 void UBasicInputComponent::Set_PC(ADPPlayerController* PlayerController)

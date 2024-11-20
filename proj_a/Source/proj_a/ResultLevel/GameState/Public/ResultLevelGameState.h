@@ -31,6 +31,8 @@ public:
 	void NotifyAllScoresCalculated(const TArray<FFinalScoreData>& InFinalScoreDataArray);
 	
 protected:
+	bool IsAlreadySet(const FFinalScoreData& FinalScoreData);
+	void AddLeftPlayers();
 	virtual void AddPlayerState(APlayerState* PlayerState) override;
 	virtual void BeginPlay() override;
 	void OnHostMigration(UWorld* World, UDataManager* DataManager);

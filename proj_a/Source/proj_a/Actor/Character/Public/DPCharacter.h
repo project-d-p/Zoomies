@@ -26,13 +26,6 @@ public:
 	ADPCharacter();
 	virtual ~ADPCharacter() override;
 
-protected:
-	void OnHostMigration(UWorld* World, UDataManager* DataManager);
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -47,10 +40,61 @@ public:
 
 	TArray<EAnimal> ReturnMonsters();
 
+	UFUNCTION(Server, Reliable)
+	void CharacterRun();
+	UFUNCTION(Server, Reliable)
+	void CharacterRunReleased();
+
+
+	UPROPERTY(ReplicatedUsing=OnRep_SyncStunned)
+	bool bIsStunned;
+	UFUNCTION()
+	void OnRep_SyncStunned();
+
+	UPROPERTY(ReplicatedUsing=OnRep_SyncRunning)
+	bool bIsRunning = false;
+	UFUNCTION()
+	void OnRep_SyncRunning();
+	
+	void SetStunned(bool bCond);
+	bool IsStunned() const;
+	void ApplyStunEffect();
+	void RemoveStunEffect();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void ApplyKockback(const FHitResult& HitResult);
+	UFUNCTION(NetMulticast, Reliable)
+	void SetNameTag();
+	void UpdateLobbyInfo();
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void SetCrownMesh();
+
+	UPROPERTY(ReplicatedUsing=OnRep_SyncInvincible)
+	bool bIsInvincible = false;
+	UFUNCTION()
+	void OnRep_SyncInvincible();
+	bool IsInvincible();
+
+	FVector GetCameraLocation() const;
+
+	void PlayAimAnimation();
+	void StopAimAnimation();
+	void PlayFireAnimation();
+	void ChangeAnimation();
+	void PlaceConstructionAnimation();
+	void DestroyConstructionAnimation();
+	void DyingAnimation();
+
+	bool CatchMonster(const FString& monster_type);
+	
+	void SetAtReturnPlace(bool isReturnPlace);
+	bool IsAtReturnPlace() const;
+
+	void RemoveSpringArm();
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "References")
 	class AReturnTriggerVolume* ReturnTriggerVolume; 
 
-public:	// component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UDPHpActorComponent* hpComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -93,48 +137,14 @@ public:	// component
 	class UArrowComponent* StunArrow;
 	UPROPERTY(VisibleAnywhere)
 	class UNiagaraComponent* StunEffectComponent;
-
-	UPROPERTY(ReplicatedUsing=OnRep_SyncStunned)
-	bool bIsStunned;
-	UFUNCTION()
-	void OnRep_SyncStunned();
-	void SetStunned(bool bCond);
-	bool IsStunned() const;
-	void ApplyStunEffect();
-	void RemoveStunEffect();
-
-	UFUNCTION(NetMulticast, Reliable)
-	void ApplyKockback(const FHitResult& HitResult);
-	UFUNCTION(NetMulticast, Reliable)
-	void SetNameTag();
-	void UpdateLobbyInfo();
-	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void SetCrownMesh();
-
-	UPROPERTY(ReplicatedUsing=OnRep_SyncInvincible)
-	bool bIsInvincible = false;
-	UFUNCTION()
-	void OnRep_SyncInvincible();
-	bool IsInvincible();
-
-	FVector GetCameraLocation() const;
-
-	void PlayAimAnimation();
-	void StopAimAnimation();
-	void PlayFireAnimation();
-	void ChangeAnimation();
-	void PlaceConstructionAnimation();
-	void DestroyConstructionAnimation();
-	void DyingAnimation();
-
-	bool CatchMonster(const FString& monster_type);
-	
-	void SetAtReturnPlace(bool isReturnPlace);
-	bool IsAtReturnPlace() const;
-
-	void RemoveSpringArm();
 	
 protected:
+	void OnHostMigration(UWorld* World, UDataManager* DataManager);
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
 	void ClientNotifyAnimalReturn_Implementation(const FString& player_name);
 	void SetCrownMesh_Implementation();
 	

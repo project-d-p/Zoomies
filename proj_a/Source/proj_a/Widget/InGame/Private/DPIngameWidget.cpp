@@ -6,6 +6,7 @@
 #include "DPInGameState.h"
 #include "DPPlayerState.h"
 #include "FNetLogger.h"
+#include "PlayerName.h"
 #include "PlayerScoreComp.h"
 #include "Components/TextBlock.h"
 #include "../../../Component/InGame/Score/ScoreUiPrivate.h"
@@ -24,7 +25,7 @@ void UDPIngameWidget::NativeConstruct()
 		TimerUiInitializer.InWorld = GetWorld();
 		TimerUI->initTimerUI<ADPInGameState>(TimerUiInitializer);
 	}
-	
+
 	FindAndUpdateTextBlocks(this);
 
 	ScoreUI_Private = NewObject<UScoreUiPrivate>(this);
@@ -40,6 +41,38 @@ void UDPIngameWidget::NativeConstruct()
 		ScoreUI_Private->InitScoreUiPrivate(PrivateScoreUiInitializer);
 	}
 }
+
+void UDPIngameWidget::ChangeListByScore()
+{
+	PlayerNameListByScore.Empty();
+	TArray<FFinalScoreData> PlayerScoreDataArray;
+	ADPInGameState* GameState = Cast<ADPInGameState>(GetWorld()->GetGameState());
+	if (GameState)
+	{
+		for (auto PlayerState : GameState->PlayerArray)
+		{
+			ADPPlayerState* DPPlayerState = Cast<ADPPlayerState>(PlayerState);
+			if (DPPlayerState)
+			{
+				UPlayerScoreData* PlayerScoreData = DPPlayerState->GetPlayerScoreData();
+				if (PlayerScoreData)
+				{
+					PlayerScoreDataArray.Add(PlayerScoreData->GetScore());
+				}
+			}
+		}
+	}
+	PlayerScoreDataArray.Sort([](const FFinalScoreData& A, const FFinalScoreData& B)
+	{
+		return A.PrivateTotalScore > B.PrivateTotalScore;
+	});
+	for (int32 i = 0; i < PlayerScoreDataArray.Num(); ++i)
+	{
+		PlayerNameListByScore.Add(PlayerScoreDataArray[i].PlayerName);
+	}
+	OnRankingChanged(PlayerNameListByScore);
+}
+
 void UDPIngameWidget::FindAndUpdateTextBlocks(UWidget* ParentWidget)
 {
 	if (!ParentWidget)
@@ -138,7 +171,7 @@ void UDPIngameWidget::OnScoreChanged(UBaseData* Data)
 {
 	//BaseData to PlayerScoreData
 	UPlayerScoreData* PlayerScoreData = Cast<UPlayerScoreData>(Data);
-	
+
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	if (PlayerController)
 	{
@@ -169,7 +202,7 @@ void UDPIngameWidget::OnScoreChanged(UBaseData* Data)
 					//FNetLogger::EditerLog(FColor::Red, TEXT("OnScoreChanged: scoreFront or scoreBack or scoreTotal is nullptr"));
 					return;
 				}
-					
+
 				FFinalScoreData ScoreData = PlayerScoreData->GetScore();
 				scoreFront->SetText(FText::FromString(FString::FromInt(ScoreData.PrivateTotalBaseScore)));
 				scoreBack->SetText(FText::FromString(FString::FromInt(ScoreData.PrivateTotalScale)));
@@ -177,4 +210,5 @@ void UDPIngameWidget::OnScoreChanged(UBaseData* Data)
 			}
 		}
 	}
+	ChangeListByScore();
 }

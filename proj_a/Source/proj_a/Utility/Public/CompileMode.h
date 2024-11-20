@@ -12,7 +12,7 @@
 #endif
 
 #ifndef LAN_MODE
-	#define LAN_MODE 0
+	#define LAN_MODE 1
 #endif
 
 namespace Zoomies	

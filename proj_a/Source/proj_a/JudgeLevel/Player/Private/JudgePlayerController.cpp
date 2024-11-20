@@ -83,12 +83,14 @@ void AJudgePlayerController::ServerSendChatMessage_Implementation(const FString&
 	GM->GetChatManager()->BroadcastChatMessage(SenderName, Message);
 }
 
-void AJudgePlayerController::ReturnVote_Implementation(EPlayerJob Type)
+void AJudgePlayerController::ReturnVote_Implementation(const FString& VotedName, EPlayerJob Type)
 {
 	AJudgeGameMode* GM = Cast<AJudgeGameMode>(GetWorld()->GetAuthGameMode());
 	if (GM)
 	{
-		GM->AddVote(Type);
+		FNetLogger::EditerLog(FColor::Cyan, TEXT("Clients Return Their Votes: %s"), *OccupationToString(Type));
+		FNetLogger::LogError(TEXT("Clients Return Their Votes: %s"), *OccupationToString(Type));
+		GM->AddVote(VotedName, Type);
 	}
 }
 

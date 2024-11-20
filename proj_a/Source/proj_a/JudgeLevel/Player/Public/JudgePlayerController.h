@@ -54,7 +54,7 @@ public:
 	void InitializeUI(const FUIInitData UIData);
 	
 	UFUNCTION(Server, Reliable)
-	void ReturnVote(EPlayerJob Type);
+	void ReturnVote(const FString& VotedName, EPlayerJob Type);
 
 	UFUNCTION(Server, Reliable)
 	void RequestUIData();

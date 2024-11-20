@@ -23,13 +23,17 @@ AJudgeGameState::AJudgeGameState()
     }
 }
 
+void AJudgeGameState::NotifyCurrentPlayerVoted_Implementation(const FString& VotedPlayerName)
+{
+	JudgedInformation->AddJudgedPlayerName(VotedPlayerName);
+}
+
 void AJudgeGameState::NotifyTimerEnd_Implementation()
 {
 	AJudgePlayerController* PC = Cast<AJudgePlayerController>(GetWorld()->GetFirstPlayerController());
 	if (!PC || !PC->GetJudgeLevelUI())
 		return ;
-	PC->ReturnVote(PC->GetJudgeLevelUI()->GetVote());
-	JudgedInformation->AddJudgedPlayerName(CurrentVotedPlayerName);
+	PC->ReturnVote(CurrentVotedPlayerName, PC->GetJudgeLevelUI()->GetVote());
 }
 
 void AJudgeGameState::SetVoterName_Implementation(const FString& Name)
