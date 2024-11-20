@@ -72,6 +72,7 @@ public:
 
     UPROPERTY(meta = (BindWidget))
     UVerticalBox* VoteButtonsGrid;
+    UPROPERTY()
     TArray<EPlayerJob> OccupationTypes;
     EPlayerJob CurrentVoterOcc;
     

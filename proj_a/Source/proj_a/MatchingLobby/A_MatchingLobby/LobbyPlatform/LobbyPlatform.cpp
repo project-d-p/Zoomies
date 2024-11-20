@@ -5,6 +5,7 @@
 #include "DPCharacter.h"
 #include "Components/BackgroundBlur.h"
 #include "FNetLogger.h"
+#include "Components/ArrowComponent.h"
 #include "Engine/StaticMeshActor.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"

@@ -81,5 +81,6 @@ private:
     FVector initialLocation;
     void CheckReach();
 
+	UPROPERTY()
     TArray<FAnimalData> animalComponents;
 };

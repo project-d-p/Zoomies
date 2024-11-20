@@ -1,5 +1,7 @@
 #pragma once
 
+#include <map>
+
 #include "CoreMinimal.h"
 #include "Containers/Queue.h"
 #include "Message.pb.h"
@@ -11,14 +13,14 @@ class FDataHub
 {
 public:
 	// Player Data Map
-	static TMap<ID_TYPE, ActorPosition> actorPosition;
-	static TMap<ID_TYPE, Movement> EchoData;
-	static TMap<ID_TYPE, Jump> jumpData;
-	static TMap<ID_TYPE, Gunfire> gunfireData;
-	static TMap<ID_TYPE, AimState> aimStateData;
-	static TMap<ID_TYPE, MonsterPosition> monsterData;
-	static TMap<ID_TYPE, Catch> catchData;
-	static TMap<ID_TYPE, bool> returnAnimalData;
+	static std::map<ID_TYPE, ActorPosition> actorPosition;
+	static std::map<ID_TYPE, Movement> EchoData;
+	static std::map<ID_TYPE, Jump> jumpData;
+	static std::map<ID_TYPE, Gunfire> gunfireData;
+	static std::map<ID_TYPE, AimState> aimStateData;
+	static std::map<ID_TYPE, MonsterPosition> monsterData;
+	static std::map<ID_TYPE, Catch> catchData;
+	static std::map<ID_TYPE, bool> returnAnimalData;
 
 	static FCriticalSection actorPositionMutex;
 	static FCriticalSection echoDataMutex;

@@ -42,6 +42,8 @@ private:
 	FSocket* ListenSocket;
 	FSocket* ClientSocket;
 
+	// UPROPERTY()
+	// @fixme : UPROPERTY
 	TArray<FSocket*> Connections;
 	TFunction<void()> GameStartCallback;
 	int MaxClients;

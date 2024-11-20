@@ -7,6 +7,7 @@
 #include "JudgeLevelComponent.h"
 #include "JudgePlayerController.h"
 #include "JudgePlayerState.h"
+#include "ServerChatManager.h"
 #include "Algo/MaxElement.h"
 #include "Camera/CameraActor.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"

@@ -169,7 +169,6 @@ void UCharacterPositionSync::SyncReturnAnimal(ADPCharacter* character)
 			character->ReturnTriggerVolume->SpawnReturnEffect(animals);
 		}
 	}
-	FDataHub::returnAnimalData.Remove(PlayerId);
 }
 
 void UCharacterPositionSync::SetState(ADPCharacter* character)

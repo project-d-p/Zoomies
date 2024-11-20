@@ -14,5 +14,5 @@ public:
 	UISocketInterface* CreateSocketInterface(ENetworkTypeZoomies socketType);
 	virtual ~UISocketFactory() override;
 private:
-	TMap<ENetworkTypeZoomies, TFunction<UISocketInterface*(void)>> SocketTypeToSocketInterfaceMap;
+	std::map<ENetworkTypeZoomies, TFunction<UISocketInterface*(void)>> SocketTypeToSocketInterfaceMap;
 };

@@ -36,7 +36,9 @@ public:
 	void LoadFriendsList();
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void InviteFriendToGame(FString FriendId);
-	
+
+	// UPROPERTY()
+	// @fixme : UPROPERTY를 붙일 수 있게 바꿔줘야 함.
 	TArray<TSharedRef<FOnlineFriend>> FriendsList;
 	UPROPERTY(BlueprintReadOnly, Category = "Friends")
 	TArray<FFriendInfo> FriendsArray;

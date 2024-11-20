@@ -69,6 +69,8 @@ private:
 
     int CurrentPlayerIndex = 0;
     float WAIT_TIME = Zoomies::JUDGE_TIME;
+    // UPROPERTY()
+    // @fixme : UPROPERTY
     TMap<FString, TArray<EPlayerJob>> PlayerVotes;
     int TOTAL_PLAYER;
 

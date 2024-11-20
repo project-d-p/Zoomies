@@ -58,10 +58,10 @@ void AReturnTriggerVolume::EndPlay(const EEndPlayReason::Type EndPlayReason)
 			World->GetTimerManager().ClearTimer(AnimData.AnimationTimerHandle);
 			World->GetTimerManager().ClearTimer(AnimData.DestroyTimerHandle);
 		}
-		for (FTimerHandle* Handle : SpawnTimerHandles)
+		for (FTimerHandle& Handle : SpawnTimerHandles)
 		{
-			World->GetTimerManager().ClearTimer(*Handle);
-			delete Handle;
+			World->GetTimerManager().ClearTimer(Handle);
+			// delete Handle;
 		}
 	}
 	MeshAnimationMap.clear();
@@ -157,7 +157,8 @@ void AReturnTriggerVolume::SpawnReturnEffect(TArray<EAnimal> Array)
 	for (int32 Index = 1; Index < Array.Num(); ++Index)
 	{
 		EAnimal Animal = Array[Index];
-		FTimerHandle* SpawnTimerHandle = new FTimerHandle();
+		// FTimerHandle* SpawnTimerHandle = new FTimerHandle();
+		FTimerHandle SpawnTimerHandle;
 		FTimerDelegate SpawnTimerDelegate;
         
 		TWeakObjectPtr<AReturnTriggerVolume> WeakThis(this);
@@ -167,12 +168,12 @@ void AReturnTriggerVolume::SpawnReturnEffect(TArray<EAnimal> Array)
 			if (WeakThis.IsValid())
 			{
 				WeakThis->SpawnSingleMonster(Animal, Index);
-				delete SpawnTimerHandle;
+				// delete SpawnTimerHandle;
 				WeakThis->SpawnTimerHandles.Remove(SpawnTimerHandle);
 			}
 		});
 		float SpawnDelay = Index * 0.5f;
-		GetWorld()->GetTimerManager().SetTimer(*SpawnTimerHandle, SpawnTimerDelegate, SpawnDelay, false);
+		GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, SpawnTimerDelegate, SpawnDelay, false);
 		SpawnTimerHandles.Add(SpawnTimerHandle);
 	}
 }

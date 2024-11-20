@@ -13,6 +13,7 @@
 #include "CompileMode.h"
 #include "MessageMaker.h"
 #include "ReturnTriggerVolume.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "proj_a/Component/InGame/Score/PrivateScoreManager.h"
 
 UMainLevelComponent::UMainLevelComponent()

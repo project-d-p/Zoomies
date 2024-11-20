@@ -540,7 +540,6 @@ void ADPCharacter::OnPlayerStateChanged(APlayerState* NewPlayerState, APlayerSta
 		this->SetActorLocation(MyCharacterData->GetActorLocation());
 		this->SetActorRotation(MyCharacterData->GetActorRotation());
 	}
-	// @fixme: There is a nullptr error here
 	TArray<EAnimal> CapturedAnimals = MyCharacterData->GetCapturedAnimals();
 	for (EAnimal Animal : CapturedAnimals)
 	{

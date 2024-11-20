@@ -15,6 +15,7 @@
 #include "EngineUtils.h"
 #include "JudgeLevelComponent.h"
 #include "LobbyLevelComponent.h"
+#include "ServerChatManager.h"
 #include "Chaos/ChaosPerfTest.h"
 #include "Kismet/GameplayStatics.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"

@@ -3,6 +3,7 @@
 #include "DPPlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 UBasicInputComponent::UBasicInputComponent()
 {

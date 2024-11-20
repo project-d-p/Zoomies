@@ -53,6 +53,7 @@ protected:
 
 private:
 	void ChangeListByScore();
-	
+
+	UPROPERTY()
 	TArray<FString> PlayerNameListByScore;
 };

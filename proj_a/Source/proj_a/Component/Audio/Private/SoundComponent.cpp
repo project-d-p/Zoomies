@@ -1,5 +1,6 @@
 #include "SoundComponent.h"
 
+#include "Components/AudioComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 USoundComponent::USoundComponent()

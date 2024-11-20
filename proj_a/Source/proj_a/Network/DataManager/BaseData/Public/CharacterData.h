@@ -28,5 +28,6 @@ private:
 	FString ActorName;
 	FVector ActorLocation;
 	FRotator ActorRotation;
+	UPROPERTY()
 	TArray<EAnimal> CapturedAnimals;
 };

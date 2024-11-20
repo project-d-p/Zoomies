@@ -38,5 +38,7 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	UVoteWidget* widget_vote = nullptr;
 
+	// UPROPERTY()
+	// @fixme : UPROPERTY를 붙여야 함
 	TMap<ETextBlockType, TArray<UTextBlock*>> TextBlockMap;
 };

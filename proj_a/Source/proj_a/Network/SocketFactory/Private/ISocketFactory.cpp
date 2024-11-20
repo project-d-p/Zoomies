@@ -8,9 +8,9 @@
 
 UISocketFactory::UISocketFactory()
 {
-	SocketTypeToSocketInterfaceMap.Add(ENetworkTypeZoomies::SOCKET_STEAM_LAN, []()->UISocketInterface* { return NewObject<USteamSocketIP>(); });
-	SocketTypeToSocketInterfaceMap.Add(ENetworkTypeZoomies::SOCKET_STEAM_P2P, []()->UISocketInterface* { return NewObject<USteamSocketP2P>(); });
-	SocketTypeToSocketInterfaceMap.Add(ENetworkTypeZoomies::ENGINE_SOCKET, []()->UISocketInterface* { return NewObject<UEngineSocket>(); });
+	SocketTypeToSocketInterfaceMap[ENetworkTypeZoomies::SOCKET_STEAM_LAN] = []()->UISocketInterface* { return NewObject<USteamSocketIP>(); };
+	SocketTypeToSocketInterfaceMap[ENetworkTypeZoomies::SOCKET_STEAM_P2P] = []()->UISocketInterface* { return NewObject<USteamSocketP2P>(); };
+	SocketTypeToSocketInterfaceMap[ENetworkTypeZoomies::ENGINE_SOCKET] = []()->UISocketInterface* { return NewObject<UEngineSocket>(); };
 }
 
 UISocketInterface* UISocketFactory::CreateSocketInterface(ENetworkTypeZoomies socketType)

@@ -5,6 +5,10 @@
 #include "ISocketFactory.h"
 #include "MessageHandler.h"
 
+UClientNetworkManager::UClientNetworkManager()
+{
+}
+
 void UClientNetworkManager::Initialize(ENetworkTypeZoomies SocketType)
 {
 	UISocketInterface* SocketInterface = SocketFactory->CreateSocketInterface(SocketType);

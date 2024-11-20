@@ -13,6 +13,7 @@
 #include "FNetLogger.h"
 #include "NetworkMessage.h"
 #include "ReturnTriggerVolume.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 UMainInputComponent::UMainInputComponent()
 {

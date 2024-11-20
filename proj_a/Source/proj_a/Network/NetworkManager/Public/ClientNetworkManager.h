@@ -11,6 +11,7 @@ class UClientNetworkManager : public UANetworkManager
 {
 	GENERATED_BODY()
 public:
+	UClientNetworkManager();
 	virtual void Initialize(ENetworkTypeZoomies SocketType) override;
 	virtual void OnDataReceived(const Message& Data) override;
 	virtual void SendData(const Message& Data) override;
@@ -21,5 +22,5 @@ private:
 	UPROPERTY()
 	UNetworkWorker* Worker = nullptr;
 	FRunnableThread* WorkerThread = nullptr;
-	FMessageHandler MessageHandler;
+	UMessageHandler MessageHandler;
 };

@@ -3,14 +3,14 @@
 #include "FNetLogger.h"
 #include "WorldPartition/ContentBundle/ContentBundleLog.h"
 
-TMap<ID_TYPE, ActorPosition> FDataHub::actorPosition;
-TMap<ID_TYPE, Movement> FDataHub::EchoData;
-TMap<ID_TYPE, Jump> FDataHub::jumpData;
-TMap<ID_TYPE, Gunfire> FDataHub::gunfireData;
-TMap<ID_TYPE, AimState> FDataHub::aimStateData;
-TMap<ID_TYPE, MonsterPosition> FDataHub::monsterData;
-TMap<ID_TYPE, Catch> FDataHub::catchData;
-TMap<ID_TYPE, bool> FDataHub::returnAnimalData;
+std::map<ID_TYPE, ActorPosition> FDataHub::actorPosition;
+std::map<ID_TYPE, Movement> FDataHub::EchoData;
+std::map<ID_TYPE, Jump> FDataHub::jumpData;
+std::map<ID_TYPE, Gunfire> FDataHub::gunfireData;
+std::map<ID_TYPE, AimState> FDataHub::aimStateData;
+std::map<ID_TYPE, MonsterPosition> FDataHub::monsterData;
+std::map<ID_TYPE, Catch> FDataHub::catchData;
+std::map<ID_TYPE, bool> FDataHub::returnAnimalData;
 //XXX: Player, Enermy 등등 각자의 Map을 가질 예정.
 
 FCriticalSection FDataHub::actorPositionMutex;
@@ -26,50 +26,50 @@ void FDataHub::PushActorDA(const Message& NewData)
 {
     FScopeLock lock(&actorPositionMutex);
     const ID_TYPE key(NewData.player_id().c_str());
-    if (!actorPosition.Contains(key)) {
+    if (!actorPosition.contains(key)) {
         // 새로운 데이터 생성 알림
     }
-    actorPosition.Add(key, NewData.actor_position());
+    actorPosition[key] = NewData.actor_position();
 }
 
 void FDataHub::PushEchoDA(const Message& NewData)
 {
     FScopeLock lock(&echoDataMutex);
     const ID_TYPE key = NewData.player_id().c_str();
-    if (!EchoData.Contains(key)) {
+    if (!EchoData.contains(key)) {
         // 새로운 데이터 생성 알림
     }
-    EchoData.Add(key, NewData.movement());
+    EchoData[key] = NewData.movement();
 }
 
 void FDataHub::PushJumpDA(const Message& NewData)
 {
     FScopeLock lock(&jumpDataMutex);
     const ID_TYPE key(NewData.player_id().c_str());
-    if (!jumpData.Contains(key)) {
+    if (!jumpData.contains(key)) {
         // 새로운 데이터 생성 알림
     }
-    jumpData.Add(key, NewData.jump());
+    jumpData[key] = NewData.jump();
 }
 
 void FDataHub::PushGunfireDA(const Message& Msg)
 {
     FScopeLock lock(&gunfireDataMutex);
     const ID_TYPE key(Msg.player_id().c_str());
-    if (!gunfireData.Contains(key)) {
+    if (!gunfireData.contains(key)) {
         // 새로운 데이터 생성 알림
     }
-    gunfireData.Add(key, Msg.gunfire()); 
+    gunfireData[key] = Msg.gunfire();
 }
 
 void FDataHub::PushAimStateDA(const Message& Msg)
 {
     FScopeLock lock(&aimStateDataMutex);
     const ID_TYPE key(Msg.player_id().c_str());
-    if (!aimStateData.Contains(key)) {
+    if (!aimStateData.contains(key)) {
         // 새로운 데이터 생성 알림
     }
-    aimStateData.Add(key, Msg.aim_state()); 
+    aimStateData[key] = Msg.aim_state();
 }
 
 void FDataHub::PushMonsterDA(const Message& Msg)
@@ -80,10 +80,10 @@ void FDataHub::PushMonsterDA(const Message& Msg)
     {
         const MonsterPosition& monster_position = monster_positions.monster_positions(i);
         const ID_TYPE key = monster_position.monster_id().c_str();
-        if (!monsterData.Contains(key)) {
+        if (!monsterData.contains(key)) {
             // 새로운 데이터 생성 알림
         }
-        monsterData.Add(key, monster_position);
+        monsterData[key] = monster_position;
     }
 }
 
@@ -91,27 +91,27 @@ void FDataHub::PushCatachDA(const Message& Msg)
 {
     FScopeLock lock(&catchDataMutex);
     const ID_TYPE key(Msg.player_id().c_str());
-    if (!catchData.Contains(key)) {
+    if (!catchData.contains(key)) {
         // 새로운 데이터 생성 알림
     }
-    catchData.Add(key, Msg.catch_()); 
+    catchData[key] = Msg.catch_();
 }
 
 void FDataHub::PushReturnAnimalDA(const FString& Key, bool bCond)
 {
     FScopeLock lock(&returnAnimalDataMutex);
-    if (!returnAnimalData.Contains(Key)) {
+    if (!returnAnimalData.contains(Key)) {
         // 새로운 데이터 생성 알림
     }
-    returnAnimalData.Add(Key, bCond);
+    returnAnimalData[Key] = bCond;
 }
 
 TOptional<ActorPosition> FDataHub::GetActorPositionData(const FString& Key)
 {
     FScopeLock lock(&actorPositionMutex);
-    if (actorPosition.Contains(Key)) {
+    if (actorPosition.contains(Key)) {
         ActorPosition RetrievedPosition = actorPosition[Key];
-        actorPosition.Remove(Key);
+        actorPosition.erase(Key);
         return RetrievedPosition;
     }
     return TOptional<ActorPosition>();
@@ -120,9 +120,9 @@ TOptional<ActorPosition> FDataHub::GetActorPositionData(const FString& Key)
 TOptional<Movement> FDataHub::GetEchoData(const FString& Key)
 {
     FScopeLock lock(&echoDataMutex);
-    if (EchoData.Contains(Key)) {
+    if (EchoData.contains(Key)) {
         Movement RetrievedMovement = EchoData[Key];
-        EchoData.Remove(Key);
+        EchoData.erase(Key);
         return RetrievedMovement;
     }
     return TOptional<Movement>();
@@ -131,9 +131,9 @@ TOptional<Movement> FDataHub::GetEchoData(const FString& Key)
 TOptional<Jump> FDataHub::GetJumpData(const FString& Key)
 {
     FScopeLock lock(&jumpDataMutex);
-    if (jumpData.Contains(Key)) {
+    if (jumpData.contains(Key)) {
         Jump RetrievedJump = jumpData[Key];
-        jumpData.Remove(Key);
+        jumpData.erase(Key);
         return RetrievedJump;
     }
     return TOptional<Jump>();
@@ -142,9 +142,9 @@ TOptional<Jump> FDataHub::GetJumpData(const FString& Key)
 TOptional<Gunfire> FDataHub::GetGunfireData(const FString& Key)
 {
     FScopeLock lock(&gunfireDataMutex);
-    if (gunfireData.Contains(Key)) {
+    if (gunfireData.contains(Key)) {
         Gunfire RetrievedGunfire = gunfireData[Key];
-        gunfireData.Remove(Key);
+        gunfireData.erase(Key);
         return RetrievedGunfire;
     }
     return TOptional<Gunfire>();
@@ -153,9 +153,9 @@ TOptional<Gunfire> FDataHub::GetGunfireData(const FString& Key)
 TOptional<AimState> FDataHub::GetAimStateData(const FString& Key)
 {
     FScopeLock lock(&aimStateDataMutex);
-    if (aimStateData.Contains(Key)) {
+    if (aimStateData.contains(Key)) {
         AimState RetrievedAimState = aimStateData[Key];
-        aimStateData.Remove(Key);
+        aimStateData.erase(Key);
         return RetrievedAimState;
     }
     return TOptional<AimState>();
@@ -164,9 +164,9 @@ TOptional<AimState> FDataHub::GetAimStateData(const FString& Key)
 TOptional<MonsterPosition> FDataHub::GetMonsterData(const FString& Key)
 {
     FScopeLock lock(&monsterDataMutex);
-    if (monsterData.Contains(Key)) {
+    if (monsterData.contains(Key)) {
         MonsterPosition RetrievedMonsterPosition = monsterData[Key];
-        monsterData.Remove(Key);
+        monsterData.erase(Key);
         return RetrievedMonsterPosition;
     }
     return TOptional<MonsterPosition>();
@@ -175,9 +175,9 @@ TOptional<MonsterPosition> FDataHub::GetMonsterData(const FString& Key)
 TOptional<Catch> FDataHub::GetCatchData(const FString& Key)
 {
     FScopeLock lock(&catchDataMutex);
-    if (catchData.Contains(Key)) {
+    if (catchData.contains(Key)) {
         Catch RetrievedCatch = catchData[Key];
-        catchData.Remove(Key);
+        catchData.erase(Key);
         return RetrievedCatch;
     }
     return TOptional<Catch>();
@@ -186,9 +186,9 @@ TOptional<Catch> FDataHub::GetCatchData(const FString& Key)
 TOptional<bool> FDataHub::GetReturnAnimalData(const FString& Key)
 {
     FScopeLock lock(&returnAnimalDataMutex);
-    if (returnAnimalData.Contains(Key)) {
+    if (returnAnimalData.contains(Key)) {
         bool RetrievedReturnAnimal = returnAnimalData[Key];
-        returnAnimalData.Remove(Key);
+        returnAnimalData.erase(Key);
         return RetrievedReturnAnimal;
     }
     return TOptional<bool>();

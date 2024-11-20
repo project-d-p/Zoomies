@@ -32,6 +32,7 @@ struct FDataTransferInfo
 	GENERATED_BODY()
 
 	// Array to store received data chunks
+	UPROPERTY()
 	TArray<uint8> ReceivedDataChunks;
 	bool bDataTransferComplete = false;
 	int32 TransferID = 0;
@@ -42,6 +43,7 @@ struct FDataTransferParams
 {
 	GENERATED_BODY()
 
+	UPROPERTY()
 	TArray<uint8> Data;
 	int32 PlayerId;
 	int32 ChunkSize;
@@ -89,7 +91,8 @@ protected:
 	void HandleReceivedData(const FDataChunkInfo& DataChunkInfo);
 	void ResetData(int32 Key);
 	bool CanSendDataWithoutOverflow(const TArray<uint8>& Data, UFunction* Function, const FDataChunkInfo& ChunkInfo);
-	
+
+	UPROPERTY()
 	TMap<int32, FDataTransferInfo> DataTransferMap;
 	int32 DataTransferID = 0;
 };
