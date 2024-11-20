@@ -64,12 +64,13 @@ public:
 	void ShowUI_ESC();
 
 	void ActivateCurrentComponent(AJudgePlayerController* LocalPlayerController);
-	void DeactivateCurrentComponent();
+	// void DeactivateCurrentComponent();
 
 	UFUNCTION(Server, Reliable)
 	void RequestCharacter();
 
 	UJudgeLevelUI* GetJudgeLevelUI() const { return JudgeLevelUI; }
+	UPROPERTY()
 	AActor* CameraActor = nullptr;
 protected:
 	// 
@@ -89,7 +90,9 @@ private:
 	UPROPERTY()
 	UTextureTransferManager* TextureTransferManager;
 
+	UPROPERTY()
 	USoundBase *TurnStartSound;
+	UPROPERTY()
 	UJudgeLevelComponent* LevelComponent = nullptr;
 	void findMyCamera();
 

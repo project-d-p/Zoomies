@@ -9,10 +9,10 @@ class USteamSocketIP : public USteamSocket
 {
 	GENERATED_BODY()
 public:
-	virtual UISocketInterface* Clone() const;
+	virtual UISocketInterface* Clone() const override;
 	virtual void ActivateServer() override;
 	virtual void ActivateClient() override;
-	virtual ~USteamSocketIP();
+	virtual ~USteamSocketIP() override;
 
 protected:
 	virtual void BeginDestroy() override;

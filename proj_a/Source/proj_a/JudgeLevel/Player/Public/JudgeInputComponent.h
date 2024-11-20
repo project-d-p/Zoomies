@@ -39,6 +39,7 @@ private:
 	class UInputAction* RotateAction;
 	
 protected:
+	UPROPERTY()
 	AJudgePlayerController* PC_JudgeLevel = nullptr;
 	
 	UPROPERTY()

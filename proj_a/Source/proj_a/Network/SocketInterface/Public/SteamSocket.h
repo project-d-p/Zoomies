@@ -16,10 +16,10 @@ public:
 	USteamSocket();
 	virtual UISocketInterface* Clone() const override;
 	
-	virtual void ActivateServer();
-	virtual void ActivateClient();
+	virtual void ActivateServer() override;
+	virtual void ActivateClient() override;
 	
-	virtual void SetGameStartCallback(int NumOfPlayers, const TFunction<void()>& Function);
+	virtual void SetGameStartCallback(int NumOfPlayers, const TFunction<void()>& Function) override;
 	virtual void SetAsServer() override;
 	virtual void SetAsClient() override;
 	

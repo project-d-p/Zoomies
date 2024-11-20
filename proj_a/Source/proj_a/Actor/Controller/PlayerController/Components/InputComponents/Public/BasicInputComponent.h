@@ -41,5 +41,6 @@ private:
 
 
 protected:
+	UPROPERTY()
 	ADPPlayerController* PC = nullptr;
 };

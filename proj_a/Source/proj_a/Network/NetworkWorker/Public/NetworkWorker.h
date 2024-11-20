@@ -3,9 +3,6 @@
 #include "CoreMinimal.h"
 #include "DoubleBuffer.h"
 #include "message.pb.h"
-#include "isteamnetworkingsockets.h"
-#include "steamnetworkingtypes.h"
-#include "steam_api_common.h"
 #include "ISocketInterface.h"
 #include "NetworkWorker.generated.h"
 

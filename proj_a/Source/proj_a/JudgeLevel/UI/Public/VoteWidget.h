@@ -6,7 +6,6 @@
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
 #include "Components/Image.h"
-#include "Components/UniformGridPanel.h"
 #include "ScoreTypes.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"

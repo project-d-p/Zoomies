@@ -4,7 +4,6 @@
 #include "CineCameraActor.h"
 #include "TextureTransferManager.h"
 #include "GameFramework/PlayerController.h"
-#include "proj_a/MatchingLobby/TYPE_MatchingLobby/TYPE_MatchingLobby.h"
 #include "PC_MatchingLobby.generated.h"
 
 class ULC_MatchLobby;
@@ -58,5 +57,6 @@ protected:
 	virtual void OnPossess(APawn* InPawn) override;
 
 private:
+	UPROPERTY()
 	ULC_MatchLobby* LevelComponent = nullptr;
 };

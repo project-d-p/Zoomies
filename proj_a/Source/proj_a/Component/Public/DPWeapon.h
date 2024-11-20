@@ -3,10 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "DPPlayerController.h"
 #include "GameFramework/Actor.h"
 #include "HitScan.h"
-#include "message.pb.h"
 #include "SoundComponent.h"
 #include "DPWeapon.generated.h"
 

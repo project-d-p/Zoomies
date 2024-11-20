@@ -5,9 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "TimerUI.h"
-#include "ScoreUI.h"
 #include "../../../Component/InGame/Score/ScoreUiPrivate.h"
-#include "Components/PanelWidget.h"
 #include "BaseData.h"
 #include "DPIngameWidget.generated.h"
 

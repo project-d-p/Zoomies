@@ -10,17 +10,17 @@ class UEngineSocket : public UISocketInterface
 	GENERATED_BODY()
 public:
 	UEngineSocket();
-	virtual ~UEngineSocket();
-	virtual UISocketInterface* Clone() const;
+	virtual ~UEngineSocket() override;
+	virtual UISocketInterface* Clone() const override;
 
-	virtual void ActivateServer();
-	virtual void ActivateClient();
+	virtual void ActivateServer() override;
+	virtual void ActivateClient() override;
 
-	virtual void RecieveData(const TFunction<void(const Message&)>& Callback);
-	virtual void SendData(Message& Msg);
-	virtual void SetAsServer();
-	virtual void SetAsClient();
-	virtual void SetGameStartCallback(int NumOfPlayers, const TFunction<void()>& Function);
+	virtual void RecieveData(const TFunction<void(const Message&)>& Callback) override;
+	virtual void SendData(Message& Msg) override;
+	virtual void SetAsServer() override;
+	virtual void SetAsClient() override;
+	virtual void SetGameStartCallback(int NumOfPlayers, const TFunction<void()>& Function) override;
 
 protected:
 	virtual void BeginDestroy() override;

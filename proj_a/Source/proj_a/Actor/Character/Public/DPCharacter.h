@@ -7,9 +7,7 @@
 #include "CharacterPositionSync.h"
 #include "DynamicTexturedCharacter.h"
 #include "NameTag.h"
-#include "NetworkedDynamicTextureComponent.h"
 #include "Components/WidgetComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "proj_a/Component/InGame/Score/Types/ScoreTypes.h"
 #include "DPCharacter.generated.h"
 

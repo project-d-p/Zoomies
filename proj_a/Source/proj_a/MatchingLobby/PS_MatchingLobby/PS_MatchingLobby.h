@@ -4,8 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
-#include "OnlineSubsystem.h"
-#include "OnlineSubsystemTypes.h"
 #include "PS_MatchingLobby.generated.h"
 
 UCLASS()

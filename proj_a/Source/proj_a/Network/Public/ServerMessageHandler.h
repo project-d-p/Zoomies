@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "message.pb.h"
-#include "DoubleBuffer.h"
 #include <map>
 
 class ADPPlayerController;

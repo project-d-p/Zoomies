@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Interfaces/OnlineFriendsInterface.h"
 #include "TYPE_MatchingLobby.generated.h"
 
 #define MAX_USERS Zoomies::MAX_PLAYERS

@@ -59,6 +59,8 @@ proj_a/Plugins/AdvancedSessions/
 
 
 proj_a/Package/*
+proj_a/Packaging/*
+proj_a/Packaging/
 
 # protobuf compiled file
 proj_a/Protobuf/Pb_file/

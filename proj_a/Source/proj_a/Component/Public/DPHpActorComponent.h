@@ -31,7 +31,4 @@ public:
 	float Hp{};
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	bool IsDead{ false };
-
-	void IncreaseHp(float value);
-	void DecreaseHp(float value);
 };

@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "EnumTypes.h"
-#include "ScoreTypes.h"
 
 class PathManager 
 {

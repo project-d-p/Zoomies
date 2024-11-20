@@ -6,7 +6,6 @@
 #include "JudgeData.h"
 #include "JudgePlayerState.h"
 #include "ServerTimerManager.h"
-#include "ServerChatManager.h"
 #include "ScoreTypes.h"
 #include "GameFramework/GameModeBase.h"
 #include "JudgeGameMode.generated.h"
@@ -27,7 +26,7 @@ struct FPlayerInitData
     UPROPERTY()
     int32 CameraIndex;
 
-    FPlayerInitData() : Score(0), Occupation(TEXT("None")) {}
+    FPlayerInitData() : Score(0), Occupation(TEXT("None")), PlayerId(0), CameraIndex(0) {}
 
     FPlayerInitData(const FString& InName, int32 InScore, const FString& InOccupation = TEXT("None"))
         : PlayerName(InName), Score(InScore), Occupation(InOccupation) , PlayerId(-1), CameraIndex(-1) {}

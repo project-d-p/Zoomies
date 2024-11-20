@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "BaseData.h"
-#include "PlayerScoreData.h"
 #include "DataManager.generated.h"
 
 // Client 호출되는 작업

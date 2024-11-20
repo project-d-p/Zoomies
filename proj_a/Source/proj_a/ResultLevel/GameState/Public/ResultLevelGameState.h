@@ -8,7 +8,6 @@
 #include "DPCalculateWidget.h"
 #include "DPResultWidget.h"
 #include "IChatGameState.h"
-#include "NetworkFailureManager.h"
 #include "ResultLevelGameState.generated.h"
 
 UCLASS()

@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "ChatManager.h"
 #include "proj_a/Component/InGame/Score/PrivateScoreManager.h"
 #include "BaseLevelComponent.h"
 #include "ELevelComponentType.h"
@@ -20,7 +19,6 @@ class PROJ_A_API ADPPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
-	void InitializeLevelComponent();
 	ADPPlayerController();
 	virtual ~ADPPlayerController() override;
 	

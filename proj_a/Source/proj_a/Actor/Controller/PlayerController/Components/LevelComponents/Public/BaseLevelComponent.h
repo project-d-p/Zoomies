@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "BaseInputComponent.h"
-#include "ChatManager.h"
 #include "SoundComponent.h"
 #include "BaseLevelComponent.generated.h"
 
@@ -22,8 +21,10 @@ protected:
 	UChatManager* ChatManager;
 	UPROPERTY()
 	USoundComponent* SoundComponent;
-	
+
+	UPROPERTY()
 	ADPPlayerController* CachedPlayerController;
+	UPROPERTY()
 	APawn* CachedCharacter;
 	
 public:

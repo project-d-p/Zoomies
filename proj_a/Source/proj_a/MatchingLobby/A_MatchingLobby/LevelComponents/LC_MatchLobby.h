@@ -32,8 +32,10 @@ protected:
 	UChatManager* ChatManager;
 	UPROPERTY()
 	USoundComponent* SoundComponent;
-	
+
+	UPROPERTY()
 	APC_MatchingLobby* PC_MatchLobby;
+	UPROPERTY()
 	APawn* CHAR_MatchLobby;
 	
 	APC_MatchingLobby* GetPlayerController() const;

@@ -2,11 +2,8 @@
 
 #include "CoreMinimal.h"
 #include "DataManager.h"
-#include "NetworkFailureManager.h"
-#include "Components/WidgetComponent.h"
 #include "GameFramework/GameStateBase.h"
 #include "proj_a/MatchingLobby/TYPE_MatchingLobby/TYPE_MatchingLobby.h"
-#include "steam_api.h"
 #include "GS_MatchingLobby.generated.h"
 
 UCLASS()
@@ -27,7 +24,7 @@ public:
 	APlayerState* BestHostPlayer;
 
 	void FindFastestPlayer();
-	void SetHostPlayer(const APlayerState* NewHostPlayer);
+	// void SetHostPlayer(const APlayerState* NewHostPlayer);
 	void UpdateLobbyInfo() const;
 	
 	UFUNCTION(NetMulticast, Reliable)

@@ -5,7 +5,6 @@
 #include "TimerUI.h"
 #include "VoteWidget.h"
 #include "Blueprint/UserWidget.h"
-#include "Components/VerticalBox.h"
 #include "JudgeLevelUI.generated.h"
 
 UENUM()

@@ -6,7 +6,6 @@
 #include "DPCharacter.h"
 #include "GameFramework/Actor.h"
 #include "Components/StaticMeshComponent.h"
-#include "Components/ArrowComponent.h"
 #include "LobbyPlatform.generated.h"
 
 UCLASS()

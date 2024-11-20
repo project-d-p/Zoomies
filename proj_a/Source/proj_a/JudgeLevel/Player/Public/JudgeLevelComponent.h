@@ -29,5 +29,6 @@ protected:
 private:
 	bool IsBeginPlay = false;
 	FTimerHandle TH;
+	UPROPERTY()
 	AJudgePlayerController* PC_JudegeLevel = nullptr;
 };

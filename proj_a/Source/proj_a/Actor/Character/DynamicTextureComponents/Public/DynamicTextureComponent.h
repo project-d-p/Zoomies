@@ -17,7 +17,7 @@ private:
 
 public:
 	UDynamicTextureComponent() = default;
-	~UDynamicTextureComponent();
+	virtual ~UDynamicTextureComponent() override;
 
 	bool bCustomTextureUploaded = false;
 	UTexture2D* GetDynamicTexture() const { return DynamicTexture; }

@@ -1,13 +1,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "DPCharacter.h"
-#include "DPPlayerController.h"
 #include "NetworkFailureManager.h"
 #include "Engine/GameInstance.h"
 #include "OnlineSubsystem.h"
 #include "Interfaces/OnlineSessionInterface.h"
-#include "ScoreTypes.h"
 #include "proj_a/MatchingLobby/TYPE_MatchingLobby/TYPE_MatchingLobby.h"
 #include "CompileMode.h"
 #include "GI_Zoomies.generated.h"
@@ -17,8 +14,6 @@ class PROJ_A_API UGI_Zoomies : public UGameInstance
 {
 	GENERATED_BODY()
 public:
-	void OnHostDisconnected();
-	void HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type Arg, const FString& String);
 	FName GetSessionName() const;
 	virtual void Init() override;
 

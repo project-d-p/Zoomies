@@ -1,7 +1,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BaseInputComponent.h"
 #include "InputActionValue.h"
 #include "InputMappingContext.h"
 #include "proj_a/MatchingLobby/PC_MatchingLobby/PC_MatchingLobby.h"
@@ -50,8 +49,10 @@ private:
 protected:
 	APC_MatchingLobby* Get_PC() const;
 	APawn* Get_CHAR();
-	
+
+	UPROPERTY()
 	APC_MatchingLobby* PC_MatchLobby = nullptr;
+	UPROPERTY()
 	APawn* CHAR_MatchLobby = nullptr;
 	
 	UPROPERTY()

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "DPCharacter.h"
 #include "BaseInputComponent.generated.h"
 
 class UBaseLevelComponent;
@@ -23,8 +22,10 @@ public:
 protected:
 	ADPPlayerController* GetPlayerController() const;
 	APawn* GetPlayerCharacter();
-	
+
+	UPROPERTY()
 	ADPPlayerController* CachedPlayerController = nullptr;
+	UPROPERTY()
 	APawn* CachedCharacter = nullptr;
 
 	UPROPERTY()

@@ -13,7 +13,7 @@ class UISocketInterface : public UObject {
 	GENERATED_BODY()
 public:
 	UISocketInterface();
-	virtual ~UISocketInterface();
+	virtual ~UISocketInterface() override;
 	virtual UISocketInterface* Clone() const;
 
 	virtual void ActivateServer();

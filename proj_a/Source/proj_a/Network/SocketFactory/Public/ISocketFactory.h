@@ -12,7 +12,7 @@ class UISocketFactory : public UObject
 public:
 	UISocketFactory();
 	UISocketInterface* CreateSocketInterface(ENetworkTypeZoomies socketType);
-	~UISocketFactory();
+	virtual ~UISocketFactory() override;
 private:
 	TMap<ENetworkTypeZoomies, TFunction<UISocketInterface*(void)>> SocketTypeToSocketInterfaceMap;
 };

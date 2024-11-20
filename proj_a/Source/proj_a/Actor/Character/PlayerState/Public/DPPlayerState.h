@@ -2,8 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "DataManager.h"
-#include "FNetLogger.h"
-#include "NetworkFailureManager.h"
 #include "PlayerScoreComp.h"
 #include "GameFramework/PlayerState.h"
 #include "proj_a/Component/InGame/Score/Types/ScoreTypes.h"

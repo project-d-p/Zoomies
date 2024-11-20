@@ -10,10 +10,10 @@ class USteamSocketP2P : public USteamSocket
 {
 	GENERATED_BODY()
 public:
-	virtual UISocketInterface* Clone() const;
+	virtual UISocketInterface* Clone() const override;
 	virtual void ActivateServer() override;
 	virtual void ActivateClient() override;
-	virtual ~USteamSocketP2P();
+	virtual ~USteamSocketP2P() override;
 
 protected:
 	virtual void BeginDestroy() override;

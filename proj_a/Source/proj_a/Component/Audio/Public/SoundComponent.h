@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
-#include "Components/AudioComponent.h"
 #include "SoundComponent.generated.h"
 
 UCLASS()

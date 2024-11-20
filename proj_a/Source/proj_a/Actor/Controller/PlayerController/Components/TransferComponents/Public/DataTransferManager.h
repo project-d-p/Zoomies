@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "DataTransferManager.generated.h"
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnDataTransferComplete, const int32, Key);
