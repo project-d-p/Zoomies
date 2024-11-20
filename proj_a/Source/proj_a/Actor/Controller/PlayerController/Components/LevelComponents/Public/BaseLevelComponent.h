@@ -4,6 +4,7 @@
 #include "Components/ActorComponent.h"
 #include "BaseInputComponent.h"
 #include "SoundComponent.h"
+#include "ChatManager.h"
 #include "BaseLevelComponent.generated.h"
 
 UCLASS(Abstract)

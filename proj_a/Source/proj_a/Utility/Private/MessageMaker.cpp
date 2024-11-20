@@ -4,6 +4,7 @@
 #include "DPPlayerController.h"
 #include "CompileMode.h"
 #include "FNetLogger.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/PlayerState.h"
 
