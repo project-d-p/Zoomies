@@ -13,6 +13,11 @@
 #include "Net/UnrealNetwork.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
+/** Static storage for loaded meshes and animations */
+static std::map<EAnimal, USkeletalMesh*> SkeletalMeshMap;
+static std::map<EAnimal, USkeletalMesh*> SkeletalMeshTransparencyMap;
+static std::map<EAnimal, UClass*> AnimClassMap;
+
 ABaseMonsterCharacter::ABaseMonsterCharacter()
 {
     bReplicates = true;
@@ -125,10 +130,6 @@ void ABaseMonsterCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	}
 }
 
-/** Static storage for loaded meshes and animations */
-static std::map<EAnimal, USkeletalMesh*> SkeletalMeshMap;
-static std::map<EAnimal, USkeletalMesh*> SkeletalMeshTransparencyMap;
-static std::map<EAnimal, UClass*> AnimClassMap;
 
 void ABaseMonsterCharacter::InitMonsterMeshData(EAnimal AT)
 {

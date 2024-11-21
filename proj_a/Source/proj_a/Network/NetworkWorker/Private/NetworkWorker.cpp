@@ -2,6 +2,7 @@
 
 #include "ISocketInterface.h"
 #include "message.pb.h"
+#include "steam_api_common.h"
 
 UNetworkWorker::UNetworkWorker()
 {

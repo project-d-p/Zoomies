@@ -136,12 +136,12 @@ void ADPPlayerController::ConnectToServer_Implementation(ELevelComponentType Typ
 	{
 		
 #if EDITOR_MODE
-	NetworkManager->Initialize(ENetworkTypeZoomies::NONE);
+		NetworkManager->Initialize(ENetworkTypeZoomies::NONE);
 #elif LAN_MODE
-	// NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
-	NetworkManager->Initialize(ENetworkTypeZoomies::ENGINE_SOCKET);
+		// NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
+		NetworkManager->Initialize(ENetworkTypeZoomies::ENGINE_SOCKET);
 #else
-	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
+		NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
 #endif
 	}
 }
@@ -163,7 +163,7 @@ void ADPPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	NetworkManager->Shutdown();
+	// NetworkManager->Shutdown();
 }
 
 void ADPPlayerController::OnPossess(APawn* InPawn)

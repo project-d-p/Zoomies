@@ -25,7 +25,7 @@
 UNetworkFailureManager::UNetworkFailureManager()
 {
 	bNextHost = false;
-	DataManager = NewObject<UDataManager>();
+	DataManager = NewObject<UDataManager>(this, TEXT("DataManager"));
 
 	static ConstructorHelpers::FClassFinder<UCapturedImageWidget> CaptureImage
 	(TEXT("/Game/widget/CapturedImage.CapturedImage_C"));

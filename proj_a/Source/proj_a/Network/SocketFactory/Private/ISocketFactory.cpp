@@ -8,14 +8,14 @@
 
 UISocketFactory::UISocketFactory()
 {
-	SocketTypeToSocketInterfaceMap[ENetworkTypeZoomies::SOCKET_STEAM_LAN] = []()->UISocketInterface* { return NewObject<USteamSocketIP>(); };
-	SocketTypeToSocketInterfaceMap[ENetworkTypeZoomies::SOCKET_STEAM_P2P] = []()->UISocketInterface* { return NewObject<USteamSocketP2P>(); };
-	SocketTypeToSocketInterfaceMap[ENetworkTypeZoomies::ENGINE_SOCKET] = []()->UISocketInterface* { return NewObject<UEngineSocket>(); };
+	SocketTypeToSocketInterfaceMap[ENetworkTypeZoomies::SOCKET_STEAM_LAN] = [](UObject* Outer)->UISocketInterface* { return NewObject<USteamSocketIP>(Outer); };
+	SocketTypeToSocketInterfaceMap[ENetworkTypeZoomies::SOCKET_STEAM_P2P] = [](UObject* Outer)->UISocketInterface* { return NewObject<USteamSocketP2P>(Outer); };
+	SocketTypeToSocketInterfaceMap[ENetworkTypeZoomies::ENGINE_SOCKET] = [](UObject* Outer)->UISocketInterface* { return NewObject<UEngineSocket>(Outer); };
 }
 
-UISocketInterface* UISocketFactory::CreateSocketInterface(ENetworkTypeZoomies socketType)
+UISocketInterface* UISocketFactory::CreateSocketInterface(ENetworkTypeZoomies socketType, UObject* Outer)
 {
-	UISocketInterface* SocketInterface = SocketTypeToSocketInterfaceMap[socketType]();
+	UISocketInterface* SocketInterface = SocketTypeToSocketInterfaceMap[socketType](Outer);
 	return SocketInterface;
 }
 

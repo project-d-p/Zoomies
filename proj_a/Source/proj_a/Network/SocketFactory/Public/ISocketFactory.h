@@ -11,8 +11,8 @@ class UISocketFactory : public UObject
 	GENERATED_BODY()
 public:
 	UISocketFactory();
-	UISocketInterface* CreateSocketInterface(ENetworkTypeZoomies socketType);
+	UISocketInterface* CreateSocketInterface(ENetworkTypeZoomies socketType, UObject* Outer);
 	virtual ~UISocketFactory() override;
 private:
-	std::map<ENetworkTypeZoomies, TFunction<UISocketInterface*(void)>> SocketTypeToSocketInterfaceMap;
+	std::map<ENetworkTypeZoomies, TFunction<UISocketInterface*(UObject* Outer)>> SocketTypeToSocketInterfaceMap;
 };
