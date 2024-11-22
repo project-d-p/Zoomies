@@ -43,11 +43,8 @@ void ULC_MatchLobby::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 	
-	if (EndPlayReason == EEndPlayReason::LevelTransition)
-	{
-		Deactivate();
-		DestroyComponent();
-	}
+	Deactivate();
+	DestroyComponent();
 }
 
 APC_MatchingLobby* ULC_MatchLobby::GetPlayerController() const
