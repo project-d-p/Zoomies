@@ -41,12 +41,12 @@ void UMainLevelComponent::Activate(bool bReset)
 	{
 		if (!InGameWidget)
 		{
-			InGameWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+			//InGameWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
 		}
 	}
 	if (InGameWidget)
 	{
-		InGameWidget->AddToViewport();
+		//InGameWidget->AddToViewport();
 	}
 }
 
@@ -68,7 +68,7 @@ void UMainLevelComponent::BeginPlay()
 	{
 		if (!InGameWidget)
 		{
-			InGameWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+			//InGameWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
 		}
 	}
 }
