@@ -7,12 +7,13 @@
 
 void UServerNetworkManager::Initialize(ENetworkTypeZoomies SocketType)
 {
-	UISocketInterface* SocketInterface = SocketFactory->CreateSocketInterface(SocketType, this);
-	check(SocketInterface);
-	SocketInterface->ActivateServer();
-
 	Worker = NewObject<UNetworkWorker>(this);
 	check(Worker);
+	
+	UISocketInterface* SocketInterface = SocketFactory->CreateSocketInterface(SocketType, Worker);
+	check(SocketInterface);
+	SocketInterface->ActivateServer();
+	
 	Worker->Initialize(SocketInterface);
 	Worker->SetMessageReceivedCallback([this](const Message& Data)
 	{

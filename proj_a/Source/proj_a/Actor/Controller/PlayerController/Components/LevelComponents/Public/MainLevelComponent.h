@@ -91,6 +91,7 @@ private:
 	std::queue<Message> GunQueue;
 	std::queue<Message> CatchQueue;
 	std::queue<Message> AimQueue;
+	UPROPERTY()
 	TSubclassOf<UUserWidget> WidgetClass;
 	UPROPERTY()
 	UUserWidget* InGameWidget;

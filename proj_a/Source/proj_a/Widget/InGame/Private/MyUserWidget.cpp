@@ -24,7 +24,8 @@ void UMyUserWidget::NativeConstruct()
 
 void UMyUserWidget::OnScoreBT1Clicked()
 {
-	ADPGameModeBase* GM = UGameHelper::GetInGameMode(GetWorld());
+	// ADPGameModeBase* GM = UGameHelper::GetInGameMode(GetWorld());
+	ADPGameModeBase* GM = Cast<ADPGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (GM)
 	{
 		GM->ScoreManager->IncreasePlayerScore(GetWorld()->GetFirstPlayerController(), { EAnimal::ANIMAL_WHALE, EAnimal::ANIMAL_ELEPHANT, EAnimal::ANIMAL_MAMMOTH});
@@ -39,7 +40,7 @@ void UMyUserWidget::OnScoreBT1Clicked()
 
 void UMyUserWidget::OnScoreBT2Clicked()
 {
-	ADPGameModeBase* GM = UGameHelper::GetInGameMode(GetWorld());
+	ADPGameModeBase* GM = Cast<ADPGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (GM)
 	{
 		int32 ControllerIndex = 0;

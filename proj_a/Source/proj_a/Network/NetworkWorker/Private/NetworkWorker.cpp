@@ -47,13 +47,19 @@ void UNetworkWorker::Stop()
 	this->bIsRunning = false;
 }
 
-UNetworkWorker::~UNetworkWorker()
+void UNetworkWorker::BeginDestroy()
 {
+	Super::BeginDestroy();
+	
 	if (SocketInterface->IsValidLowLevel())
 	{
 		SocketInterface->ConditionalBeginDestroy();
 		SocketInterface = nullptr;
 	}
+}
+
+UNetworkWorker::~UNetworkWorker()
+{
 }
 
 void UNetworkWorker::FlushSendMessages()

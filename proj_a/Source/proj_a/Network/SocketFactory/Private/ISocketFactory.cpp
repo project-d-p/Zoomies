@@ -21,4 +21,5 @@ UISocketInterface* UISocketFactory::CreateSocketInterface(ENetworkTypeZoomies so
 
 UISocketFactory::~UISocketFactory()
 {
+	SocketTypeToSocketInterfaceMap.clear();
 }
