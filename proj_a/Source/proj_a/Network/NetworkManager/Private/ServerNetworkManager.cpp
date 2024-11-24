@@ -7,12 +7,13 @@
 
 void UServerNetworkManager::Initialize(ENetworkTypeZoomies SocketType)
 {
-	UISocketInterface* SocketInterface = SocketFactory->CreateSocketInterface(SocketType);
+	Worker = NewObject<UNetworkWorker>(this);
+	check(Worker);
+	
+	UISocketInterface* SocketInterface = SocketFactory->CreateSocketInterface(SocketType, Worker);
 	check(SocketInterface);
 	SocketInterface->ActivateServer();
-
-	Worker = NewObject<UNetworkWorker>();
-	check(Worker);
+	
 	Worker->Initialize(SocketInterface);
 	Worker->SetMessageReceivedCallback([this](const Message& Data)
 	{
@@ -37,7 +38,15 @@ void UServerNetworkManager::Shutdown()
 	if (Worker)
 	{
 		Worker->Stop();
-		Worker = nullptr;
+		// WorkerThread가 안전하게 종료될 때까지 대기
+		if (WorkerThread)
+		{
+			WorkerThread->WaitForCompletion();
+			delete WorkerThread; // 동적 메모리 할당 해제
+			WorkerThread = nullptr;
+		}
+
+		Worker = nullptr; // Worker 포인터 정리
 	}
 }
 

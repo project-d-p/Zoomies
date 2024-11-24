@@ -16,6 +16,7 @@
 #include "CompileMode.h"
 #include "MonsterData.h"
 #include "TimeData.h"
+#include "GameFramework/PawnMovementComponent.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 class UTimeData;
@@ -430,7 +431,7 @@ void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	NetworkManager->Shutdown();
+	// NetworkManager->Shutdown();
 }
 
 void ADPGameModeBase::ProcessData(float delta_time)

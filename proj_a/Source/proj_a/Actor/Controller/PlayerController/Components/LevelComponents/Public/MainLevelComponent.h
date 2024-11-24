@@ -59,6 +59,7 @@ public:
 	UUserWidget* GetInGameWidget() const;
 	
 protected:
+	virtual void BeginDestroy() override;
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -91,6 +92,7 @@ private:
 	std::queue<Message> GunQueue;
 	std::queue<Message> CatchQueue;
 	std::queue<Message> AimQueue;
+	UPROPERTY()
 	TSubclassOf<UUserWidget> WidgetClass;
 	UPROPERTY()
 	UUserWidget* InGameWidget;

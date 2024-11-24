@@ -53,6 +53,8 @@ ADPPlayerController::ADPPlayerController()
 	LevelEnumMap.Add(TEXT("mainLevel"), static_cast<uint32>(ELevelComponentType::MAIN));
 	LevelEnumMap.Add(TEXT("lobbyLevel"), static_cast<uint32>(ELevelComponentType::LOBBY));
 	LevelEnumMap.Add(TEXT("calculateLevel"), static_cast<uint32>(ELevelComponentType::RESULT));
+
+	OnPossessedPawnChanged.AddDynamic(this, &ADPPlayerController::OnPossessEvent);
 }
 
 ADPPlayerController::~ADPPlayerController()
@@ -136,12 +138,12 @@ void ADPPlayerController::ConnectToServer_Implementation(ELevelComponentType Typ
 	{
 		
 #if EDITOR_MODE
-	NetworkManager->Initialize(ENetworkTypeZoomies::NONE);
+		NetworkManager->Initialize(ENetworkTypeZoomies::NONE);
 #elif LAN_MODE
-	// NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
-	NetworkManager->Initialize(ENetworkTypeZoomies::ENGINE_SOCKET);
+		// NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_LAN);
+		NetworkManager->Initialize(ENetworkTypeZoomies::ENGINE_SOCKET);
 #else
-	NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
+		NetworkManager->Initialize(ENetworkTypeZoomies::SOCKET_STEAM_P2P);
 #endif
 	}
 }
@@ -150,7 +152,9 @@ void ADPPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Cast<UMainLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::MAIN)])->SetStateComponent();
+	// Cast<UMainLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::MAIN)])->SetStateComponent();
+	
+	// OnPossessedPawnChanged.AddDynamic(this, &ADPPlayerController::OnPossessEvent);
 	SetLevelComponent();
 }
 
@@ -163,7 +167,7 @@ void ADPPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	NetworkManager->Shutdown();
+	// NetworkManager->Shutdown();
 }
 
 void ADPPlayerController::OnPossess(APawn* InPawn)
@@ -171,12 +175,25 @@ void ADPPlayerController::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 
 	// Set StateComponet in MainLevel
+	// for (auto& Pair : LevelComponents)
+	// {
+	// 	if (Pair.Value)
+	// 	{
+	// 		Pair.Value->SetPlayerCharacter(NewPawn);
+	// 		Pair.Value->GetInputComponent()->SetPlayerCharacter(NewPawn);
+	// 	}
+	// }
+	// Cast<UMainLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::MAIN)])->SetStateComponent();
+}
+
+void ADPPlayerController::OnPossessEvent(APawn* OldPawn_, APawn* NewPawn)
+{
 	for (auto& Pair : LevelComponents)
 	{
 		if (Pair.Value)
 		{
-			Pair.Value->SetPlayerCharacter(InPawn);
-			Pair.Value->GetInputComponent()->SetPlayerCharacter(InPawn);
+			Pair.Value->SetPlayerCharacter(NewPawn);
+			Pair.Value->GetInputComponent()->SetPlayerCharacter(NewPawn);
 		}
 	}
 	Cast<UMainLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::MAIN)])->SetStateComponent();
@@ -312,7 +329,7 @@ void ADPPlayerController::GetSeamlessTravelActorList(bool bToTransitionMap, TArr
 	this->SwitchLevelComponent(ELevelComponentType::NONE);
 }
 
-void ADPPlayerController::getUIWidget()
+UUserWidget* ADPPlayerController::getUIWidget()
 {
 	if (UWorld* World = GetWorld())
 	{
@@ -320,34 +337,33 @@ void ADPPlayerController::getUIWidget()
 		if (CurrentLevelName.Contains("main"))
 		{
 			UMainLevelComponent* ML = Cast<UMainLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::MAIN)]);
-			UIWidget = ML->GetInGameWidget();
+			return ML->GetInGameWidget();
 		}
 	}
-	if (UIWidget == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("DPPlayerController::getUIWidget: Widget is nullptr"));
-	}
+	return nullptr;
 }
 
 void ADPPlayerController::RemoveUIWidget()
 {
-	if (UIWidget != nullptr)
-	{
-		UIWidget->RemoveFromParent();
-		UIWidget = nullptr;
-		UE_LOG(LogTemp, Log, TEXT("DPPlayerController::RemoveMatchLobbyUI: Widget successfully removed from viewport and cleared."));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("DPPlayerController::RemoveMatchLobbyUI: MatchLobbyWidget is nullptr, nothing to remove."));
-	}
+	// if (UIWidget != nullptr)
+	// {
+	// 	UIWidget->RemoveFromParent();
+	// 	UIWidget = nullptr;
+	// 	UE_LOG(LogTemp, Log, TEXT("DPPlayerController::RemoveMatchLobbyUI: Widget successfully removed from viewport and cleared."));
+	// }
+	// else
+	// {
+	// 	UE_LOG(LogTemp, Warning, TEXT("DPPlayerController::RemoveMatchLobbyUI: MatchLobbyWidget is nullptr, nothing to remove."));
+	// }
 }
 
 void ADPPlayerController::ShowUI_ESC()
 {
+	UUserWidget* UIWidget = getUIWidget();
 	if (UIWidget == nullptr)
 	{
-		getUIWidget();
+		// getUIWidget();
+		return ;
 	}
 	if (UIWidget)
 	{

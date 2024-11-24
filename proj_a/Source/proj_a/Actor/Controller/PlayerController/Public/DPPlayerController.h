@@ -58,17 +58,20 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ConnectToServer(ELevelComponentType Type);
 	
-	UPROPERTY(BlueprintReadOnly, Category= "UI")
-	UUserWidget* UIWidget = nullptr;
-	void getUIWidget();
+	// UPROPERTY(BlueprintReadOnly, Category= "UI")
+	// UUserWidget* UIWidget = nullptr;
+	UUserWidget* getUIWidget();
 	void RemoveUIWidget();
 	void ShowUI_ESC();
 	
+	UFUNCTION()
+	void OnPossessEvent(APawn* OldPawn_, APawn* NewPawn);
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void OnPossess(APawn* InPawn) override;
+	
 private:
 	void SetLevelComponent();
 	void DeactiveCurrentComponent();

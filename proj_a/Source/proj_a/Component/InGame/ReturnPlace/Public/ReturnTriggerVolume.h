@@ -55,6 +55,7 @@ private:
 	std::map<EAnimal, USkeletalMesh*> monsterMeshMap;
 
 	std::map<USkeletalMeshComponent*, FMeshAnimationData> MeshAnimationMap;
+	
 	UPROPERTY()
 	TArray<FTimerHandle> SpawnTimerHandles;
 };
