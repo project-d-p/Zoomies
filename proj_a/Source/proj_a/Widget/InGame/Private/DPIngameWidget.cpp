@@ -154,8 +154,7 @@ void UDPIngameWidget::CheckAndUpdatePlayerJob()
 	if (P)
 	{
 		EPlayerJob Job = P->GetPlayerJob();
-		FString JobString = UEnum::GetValueAsString<EPlayerJob>(Job);
-		JobString = JobString.Replace(TEXT("EPlayerJob::JOB_"), TEXT(""));
+		FString JobString = FPlayerName::GetJobName(Job);
 		scoreJob->SetText(FText::FromString(JobString));
 	}
 	else
@@ -163,7 +162,7 @@ void UDPIngameWidget::CheckAndUpdatePlayerJob()
 		GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
 		{
 			CheckAndUpdatePlayerJob();
-		});
+		}); 
 	}
 }
 
