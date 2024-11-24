@@ -18,7 +18,7 @@ void UDPIngameWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	TimerUI = NewObject<UTimerUI>(Time_Text);
-	if (TimerUI)
+	if (TimerUI->IsValidLowLevel())
 	{
 		FTimerUiInitializer TimerUiInitializer;
 		TimerUiInitializer.Time_Text = Time_Text;
@@ -27,11 +27,10 @@ void UDPIngameWidget::NativeConstruct()
 	}
 
 	FindAndUpdateTextBlocks(this);
-
+	
 	ScoreUI_Private = NewObject<UScoreUiPrivate>(this);
 	if (ScoreUI_Private)
 	{
-		FPrivateScoreUiInitializer PrivateScoreUiInitializer;
 		PrivateScoreUiInitializer.InWorld = GetWorld();
 		//PrivateScoreUiInitializer.ScoreTextPrivate = score_Text_Private;
 		PrivateScoreUiInitializer.ScoreTextPrivate_Front = scoreFront;
