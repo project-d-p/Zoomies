@@ -4,6 +4,7 @@
 #include "DPPlayerController.h"
 #include "IChatGameState.h"
 #include "ResultLevelGameState.h"
+#include "ServerChatManager.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
 
 AResultLevelGameMode::AResultLevelGameMode()
@@ -12,7 +13,7 @@ AResultLevelGameMode::AResultLevelGameMode()
 
 	PrimaryActorTick.bCanEverTick = true;
 	
-	DefaultPawnClass = ADPCharacter::StaticClass();
+	DefaultPawnClass = nullptr;
 	PlayerControllerClass = ADPPlayerController::StaticClass();
 	PlayerStateClass = ADPPlayerState::StaticClass();
 	GameStateClass = AResultLevelGameState::StaticClass();
@@ -80,6 +81,21 @@ void AResultLevelGameMode::SpawnNewPlayerPawn(AController* PC)
 	}
 }
 
+void AResultLevelGameMode::SetPlayerNameTag(ADPPlayerController* Controller)
+{
+	ADPCharacter* Character = Cast<ADPCharacter>(Controller->GetCharacter());
+	if (Character == nullptr)
+	{
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this, Controller]()
+		{
+			SetPlayerNameTag(Controller);
+		}), 1.0f, false);
+		return ;
+	}
+	Character->SetNameTag();
+}
+
 /* Seamless Travel : Reuse PlayerControllers */
 void AResultLevelGameMode::HandleSeamlessTravelPlayer(AController*& C)
 {
@@ -121,12 +137,7 @@ void AResultLevelGameMode::CheckPlayersAllTraveled()
 				{
 					continue;
 				}
-				ADPCharacter* Character = Cast<ADPCharacter>(Controller->GetCharacter());
-				if (Character == nullptr)
-				{
-					check(false)
-				}
-				Character->SetNameTag();
+				SetPlayerNameTag(Controller);
 			}
 			
 		});
