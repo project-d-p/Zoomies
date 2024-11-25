@@ -18,7 +18,7 @@ void UDPIngameWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	TimerUI = NewObject<UTimerUI>(Time_Text);
-	if (TimerUI)
+	if (TimerUI->IsValidLowLevel())
 	{
 		FTimerUiInitializer TimerUiInitializer;
 		TimerUiInitializer.Time_Text = Time_Text;
@@ -27,11 +27,10 @@ void UDPIngameWidget::NativeConstruct()
 	}
 
 	FindAndUpdateTextBlocks(this);
-
+	
 	ScoreUI_Private = NewObject<UScoreUiPrivate>(this);
 	if (ScoreUI_Private)
 	{
-		FPrivateScoreUiInitializer PrivateScoreUiInitializer;
 		PrivateScoreUiInitializer.InWorld = GetWorld();
 		//PrivateScoreUiInitializer.ScoreTextPrivate = score_Text_Private;
 		PrivateScoreUiInitializer.ScoreTextPrivate_Front = scoreFront;
@@ -154,8 +153,7 @@ void UDPIngameWidget::CheckAndUpdatePlayerJob()
 	if (P)
 	{
 		EPlayerJob Job = P->GetPlayerJob();
-		FString JobString = UEnum::GetValueAsString<EPlayerJob>(Job);
-		JobString = JobString.Replace(TEXT("EPlayerJob::JOB_"), TEXT(""));
+		FString JobString = FPlayerName::GetJobName(Job);
 		scoreJob->SetText(FText::FromString(JobString));
 	}
 	else
@@ -163,7 +161,7 @@ void UDPIngameWidget::CheckAndUpdatePlayerJob()
 		GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
 		{
 			CheckAndUpdatePlayerJob();
-		});
+		}); 
 	}
 }
 

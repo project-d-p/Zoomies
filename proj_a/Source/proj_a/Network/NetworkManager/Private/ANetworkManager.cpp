@@ -6,7 +6,7 @@
 
 UANetworkManager::UANetworkManager()
 {
-	SocketFactory = NewObject<UISocketFactory>();
+	SocketFactory = NewObject<UISocketFactory>(this, TEXT("SocketFactory"));
 }
 
 void UANetworkManager::Initialize(ENetworkTypeZoomies SocketType)

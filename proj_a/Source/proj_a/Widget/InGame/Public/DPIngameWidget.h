@@ -53,6 +53,8 @@ protected:
 
 private:
 	void ChangeListByScore();
+	UPROPERTY()
+	FPrivateScoreUiInitializer PrivateScoreUiInitializer;
 
 	UPROPERTY()
 	TArray<FString> PlayerNameListByScore;

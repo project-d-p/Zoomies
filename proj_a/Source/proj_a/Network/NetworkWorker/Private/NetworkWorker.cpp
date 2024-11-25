@@ -2,6 +2,7 @@
 
 #include "ISocketInterface.h"
 #include "message.pb.h"
+#include "steam_api_common.h"
 
 UNetworkWorker::UNetworkWorker()
 {
@@ -46,13 +47,19 @@ void UNetworkWorker::Stop()
 	this->bIsRunning = false;
 }
 
-UNetworkWorker::~UNetworkWorker()
+void UNetworkWorker::BeginDestroy()
 {
+	Super::BeginDestroy();
+	
 	if (SocketInterface->IsValidLowLevel())
 	{
 		SocketInterface->ConditionalBeginDestroy();
 		SocketInterface = nullptr;
 	}
+}
+
+UNetworkWorker::~UNetworkWorker()
+{
 }
 
 void UNetworkWorker::FlushSendMessages()

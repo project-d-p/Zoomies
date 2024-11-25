@@ -41,12 +41,12 @@ void UMainLevelComponent::Activate(bool bReset)
 	{
 		if (!InGameWidget)
 		{
-			//InGameWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+			InGameWidget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), WidgetClass);
 		}
 	}
 	if (InGameWidget)
 	{
-		//InGameWidget->AddToViewport();
+		InGameWidget->AddToViewport();
 	}
 }
 
@@ -57,7 +57,7 @@ void UMainLevelComponent::Deactivate()
 	if (InGameWidget)
 	{
 		InGameWidget->RemoveFromParent();
-		InGameWidget = nullptr;		
+		InGameWidget = nullptr;
 	}
 }
 
@@ -68,7 +68,7 @@ void UMainLevelComponent::BeginPlay()
 	{
 		if (!InGameWidget)
 		{
-			//InGameWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
+			InGameWidget = CreateWidget<UUserWidget>(GetWorld()->GetFirstPlayerController(), WidgetClass);
 		}
 	}
 }
@@ -422,4 +422,15 @@ void UMainLevelComponent::SimulateAim(UANetworkManager* NetworkManager)
 UUserWidget* UMainLevelComponent::GetInGameWidget() const
 {
 	return InGameWidget;
+}
+
+void UMainLevelComponent::BeginDestroy()
+{
+	Super::BeginDestroy();
+
+	if (InGameWidget)
+	{
+		InGameWidget->RemoveFromParent();
+		InGameWidget = nullptr;
+	}
 }

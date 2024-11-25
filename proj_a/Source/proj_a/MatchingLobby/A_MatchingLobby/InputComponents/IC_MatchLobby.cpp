@@ -76,6 +76,7 @@ void UIC_MatchLobby::Deactivate()
 {
 	Super::Deactivate();
 	UnbindMatchLobbyActions();
+	DestroyComponent();
 }
 
 void UIC_MatchLobby::BindMatchLobbyActions()
