@@ -45,15 +45,10 @@ ABaseMonsterAIController* UMonsterFactory::RandomMonsterSpawn(int32 idx)
 		return nullptr;
 	}
 
-	// XXX: For now, hardcoding the Location.
-	//float RandomY = FMath::FRandRange(-3000.f, 3000.f);
-	// FVector Location = FVector(-5000.f, RandomY, 300.f);
-	//FVector Location = FVector(14166.601644,-469.843764, 300.f);
-	
 	TArray<FVector> locations = {
-	FVector(6436.601644f, -8879.843764f, 300.0f),
-	FVector(-3383.398356f, 8230.156236f, 300.0f),
-	FVector(-16405.629350f, -5853.624698f, 300.0f)
+	FVector(FMath::RandRange(5796.601644f, 6936.601644f), -8879.843764f, 300.0f),
+	FVector(FMath::RandRange(-2563.398356f, -3743.398356f), 8230.156236f, 300.0f),
+	FVector(-16405.629350f, FMath::RandRange(-5313.624698f, -6423.624698f), 300.0f)
 	};
 
 	int32 randomIndex = FMath::RandRange(0, locations.Num() - 1);
