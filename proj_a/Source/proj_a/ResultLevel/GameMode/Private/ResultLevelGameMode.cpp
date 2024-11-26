@@ -67,7 +67,7 @@ void AResultLevelGameMode::SpawnNewPlayerPawn(AController* PC)
 
 	FVector SpawnLocation = Location[i++];
 
-	ADPCharacter* NewCharacter = GetWorld()->SpawnActor<ADPCharacter>(DefaultPawnClass, SpawnLocation, FRotator::ZeroRotator);
+	ADPCharacter* NewCharacter = GetWorld()->SpawnActor<ADPCharacter>(ADPCharacter::StaticClass(), SpawnLocation, FRotator::ZeroRotator);
 	if (NewCharacter)
 	{
 		NewCharacter->SetReplicatingMovement(true);
