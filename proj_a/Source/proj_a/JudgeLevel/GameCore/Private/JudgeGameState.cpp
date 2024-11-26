@@ -16,7 +16,7 @@ AJudgeGameState::AJudgeGameState()
 	ChatManager = CreateDefaultSubobject<UChatManager>(TEXT("ChatManager"));
 	JudgedInformation = NewObject<UJudgeData>(this, TEXT("JudgedInformation"));
 	JudgedInformation->InitializeData();
-    static ConstructorHelpers::FObjectFinder<USoundWave> SoundAsset(TEXT("/Game/sounds/strange_bell.strange_bell"));
+    static ConstructorHelpers::FObjectFinder<USoundWave> SoundAsset(TEXT("/Game/sounds/effect/Turn/Chin.Chin"));
     if (SoundAsset.Succeeded())
     {
         TurnStartSound = SoundAsset.Object;
