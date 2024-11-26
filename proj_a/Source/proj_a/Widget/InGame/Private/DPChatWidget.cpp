@@ -10,8 +10,6 @@ void UDPChatWidget::NativeConstruct()
 	ChatUI = NewObject<UChatUI>(this);
 	if (ChatUI)
 	{
-		FChatUiInitializer ChatUiInitializer;
-
 		ChatUiInitializer.ChatEditableTextBox = chatEditableTextBox;
 		ChatUiInitializer.ChatScrollBox = chatScrollBox;
 		ChatUiInitializer.ChatLogBox = ChatLogBox;

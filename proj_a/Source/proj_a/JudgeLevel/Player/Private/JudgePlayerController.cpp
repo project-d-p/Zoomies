@@ -2,6 +2,7 @@
 
 #include "DPPlayerController.h"
 #include "EngineUtils.h"
+#include "FNetLogger.h"
 #include "IChatGameMode.h"
 #include "JudgeGameMode.h"
 #include "JudgeGameState.h"
@@ -163,8 +164,8 @@ void AJudgePlayerController::BeginPlay()
 		*/
 		OnPossessedPawnChanged.AddDynamic(this, &AJudgePlayerController::OnPossessEvent);
 	}
-	SetInputMode(FInputModeGameAndUI());
 	ActivateCurrentComponent(this);
+	SetInputMode(FInputModeGameAndUI());
 }
 
 void AJudgePlayerController::SeamlessTravelFrom(APlayerController* OldPC)

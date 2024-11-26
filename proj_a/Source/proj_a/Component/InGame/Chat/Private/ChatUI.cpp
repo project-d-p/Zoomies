@@ -84,8 +84,11 @@ void UChatUI::OnChatBoxCommitted(const FText& Text, ETextCommit::Type CommitMeth
 				}
 			}
 		}
-		FInputModeGameOnly InputMode;
-		PC->SetInputMode(InputMode);
+		FTimerHandle TimerHandle;
+		World->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+		{
+			ChatBox->SetKeyboardFocus();
+		}), 0.1f, false);
 		// DPPlayerController->bShowMouseCursor = false;
 	}
 }

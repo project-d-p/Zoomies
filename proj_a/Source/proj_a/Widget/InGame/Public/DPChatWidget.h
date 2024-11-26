@@ -28,4 +28,7 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	UVerticalBox* ChatLogBox;
+
+	UPROPERTY()
+	FChatUiInitializer ChatUiInitializer;
 };
