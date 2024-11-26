@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DPPlayerController.h"
 #include "IChatGameMode.h"
 #include "GameFramework/GameMode.h"
 #include "ResultLevelGameMode.generated.h"
@@ -20,7 +21,7 @@ public:
 	virtual void HandleSeamlessTravelPlayer(AController*& C) override;
 	virtual void PostSeamlessTravel() override;
 	UServerChatManager* GetChatManager() const { return ChatManager; }
-	
+
 	// UFUNCTION(NetMulticast, Reliable)
 	// virtual void Broadcast(AActor* Sender, const FString& Msg, FName Type) override;
 	
@@ -32,6 +33,7 @@ protected:
 private:
 	void CheckPlayersAllTraveled();
 	void SpawnNewPlayerPawn(AController* PC);
+	void SetPlayerNameTag(ADPPlayerController* Controller);
 	
 	UPROPERTY()
 	UServerChatManager* ChatManager;
