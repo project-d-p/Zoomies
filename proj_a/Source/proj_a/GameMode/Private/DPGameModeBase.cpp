@@ -18,6 +18,7 @@
 #include "TimeData.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"
+#include "UObject/FastReferenceCollector.h"
 
 class UTimeData;
 
@@ -236,10 +237,10 @@ void ADPGameModeBase::PostLogin(APlayerController* newPlayer)
 		player_state->SetPlayerRandomJob();
 	}
 	
-	if (!newPlayer->IsLocalController())
-	{
-		player_controllers_[key]->ConnectToServer(ELevelComponentType::MAIN);
-	}
+	// if (!newPlayer->IsLocalController())
+	// {
+	// 	player_controllers_[key]->ConnectToServer(ELevelComponentType::MAIN);
+	// }
 
 	ADPInGameState* GS = GetGameState<ADPInGameState>();
 	check(GS)
@@ -427,11 +428,68 @@ void ADPGameModeBase::Tick(float delta_time)
 #endif
 }
 
+void ADPGameModeBase::HandleSeamlessTravelPlayer(AController*& newPlayer)
+{
+	Super::HandleSeamlessTravelPlayer(newPlayer);
+
+	ADPPlayerState* player_state = Cast<ADPPlayerState>(newPlayer->PlayerState);
+	check(player_state);
+
+#if LAN_MODE || EDITOR_MODE
+	// #if EDITOR_MODE
+	FString name = player_state->GetPlayerName();
+	std::string key(TCHAR_TO_UTF8(*name));
+	
+	if (player_controllers_.find(key) != player_controllers_.end())
+	{
+		player_state->SetPlayerName(name + "1");
+		key = std::string(TCHAR_TO_UTF8(*player_state->GetPlayerName()));
+	}
+#else
+	// Online Mode : Steam ID
+	std::string key(TCHAR_TO_UTF8(*player_state->GetUniqueId()->ToString()));
+#endif
+	
+	player_controllers_[key] = Cast<ADPPlayerController>(newPlayer);
+	if (!player_controllers_[key]->IsLocalController())
+	{
+		player_controllers_[key]->SwitchLevelComponent(ELevelComponentType::MAIN);
+	}
+
+	// Spawn Character in New Place
+	ADPPlayerController* newPlayerController = Cast<ADPPlayerController>(newPlayer);
+	SpawnNewCharacter(newPlayerController);
+	
+	// Set Player Random Job
+	if (bRestarted == false)
+	{
+		player_state->SetPlayerRandomJob();
+	}
+	
+	// if (!newPlayer->IsLocalController())
+	// {
+	// 	player_controllers_[key]->ConnectToServer(ELevelComponentType::MAIN);
+	// }
+
+	ADPInGameState* GS = GetGameState<ADPInGameState>();
+	check(GS)
+	if (GS)
+	{
+		GS->AddConnectedPlayer();
+		CheckAllPlayersConnected();
+	}
+	else
+	{
+		FNetLogger::LogError(TEXT("Fail to cast ADPInGameState."));
+	}
+}
+
 void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	NetworkManager->Shutdown();
+	if (BlockingVolume)
+		BlockingVolume->Clear();
 	Super::EndPlay(EndPlayReason);
-
-	// NetworkManager->Shutdown();
 }
 
 void ADPGameModeBase::ProcessData(float delta_time)

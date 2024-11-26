@@ -35,7 +35,6 @@ ABlockingBoxVolume::ABlockingBoxVolume()
 
 void ABlockingBoxVolume::DeactiveBlockingVolume(bool& bWallDisappear)
 {
-	FTimerHandle DeactiveTimer;
 	FTimerDelegate TimerDelegate;
 	TimerDelegate.BindLambda([this, &bWallDisappear]() {
 		if (HasAuthority())
@@ -45,6 +44,11 @@ void ABlockingBoxVolume::DeactiveBlockingVolume(bool& bWallDisappear)
 		}
 	});
 	GetWorld()->GetTimerManager().SetTimer(DeactiveTimer, TimerDelegate, 10.0f, false);
+}
+
+void ABlockingBoxVolume::Clear()
+{
+	GetWorld()->GetTimerManager().ClearTimer(DeactiveTimer);
 }
 
 void ABlockingBoxVolume::MulticastDestroyComponent_Implementation()

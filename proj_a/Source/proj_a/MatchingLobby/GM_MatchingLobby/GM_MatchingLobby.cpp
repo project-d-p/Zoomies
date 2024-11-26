@@ -21,6 +21,7 @@ AGM_MatchingLobby::AGM_MatchingLobby() {
 	PlayerControllerClass = APC_MatchingLobby::StaticClass();
 	PlayerStateClass = APS_MatchingLobby::StaticClass();
 	DefaultPawnClass = nullptr;
+	bUseSeamlessTravel = true;
 }
 
 void AGM_MatchingLobby::PostLogin(APlayerController* NewPlayer) {

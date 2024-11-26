@@ -1,5 +1,6 @@
 ﻿#include "JudgePlayerState.h"
 
+#include "DPPlayerState.h"
 #include "Net/OnlineEngineInterface.h"
 #include "Net/UnrealNetwork.h"
 #include "proj_a/GameInstance/GI_Zoomies.h"

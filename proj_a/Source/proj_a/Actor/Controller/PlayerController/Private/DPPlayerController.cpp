@@ -197,6 +197,18 @@ void ADPPlayerController::OnPossessEvent(APawn* OldPawn_, APawn* NewPawn)
 		}
 	}
 	Cast<UMainLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::MAIN)])->SetStateComponent();
+	// Connect to Server P2P Socket
+	if (NewPawn == nullptr)
+	{
+		return ;
+	}
+	if (GetWorld()->GetMapName().Contains("mainLevel"))
+	{
+		if (!HasAuthority())
+		{
+			ConnectToServer(ELevelComponentType::MAIN);
+		}
+	}
 }
 
 void ADPPlayerController::SetLevelComponent()
