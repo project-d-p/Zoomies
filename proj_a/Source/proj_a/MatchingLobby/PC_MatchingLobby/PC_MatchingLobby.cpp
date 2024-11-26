@@ -62,9 +62,9 @@ void APC_MatchingLobby::BeginPlay()
 
 void APC_MatchingLobby::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	Super::EndPlay(EndPlayReason);
 	RemoveMatchLobbyUI();
 	DeactiveCurrentComponent();
+	Super::EndPlay(EndPlayReason);
 	Destroy();
 }
 
@@ -139,11 +139,11 @@ void APC_MatchingLobby::DeactiveCurrentComponent()
 {
 	if (LevelComponent)
 	{
-		if (UIC_MatchLobby* IC_Local = LevelComponent->GetInputComponent())
-		{
-			IC_Local->Deactivate();
-		}
-		
+		// Already Destroyed in LevelComponent->Deactivate();
+		// if (UIC_MatchLobby* IC_Local = LevelComponent->GetInputComponent())
+		// {
+		// 	IC_Local->Deactivate();
+		// }
 		LevelComponent->Deactivate();
 		LevelComponent->SetComponentTickEnabled(false);
 		LevelComponent->PrimaryComponentTick.bCanEverTick = false;

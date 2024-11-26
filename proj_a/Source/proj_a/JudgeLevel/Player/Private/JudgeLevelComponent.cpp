@@ -16,7 +16,10 @@ void UJudgeLevelComponent::Activate(bool bReset)
 void UJudgeLevelComponent::Deactivate()
 {
 	Super::Deactivate();
-	InputComponent->Deactivate();
+	if (InputComponent)
+	{
+		InputComponent->Deactivate();
+	}
 }
 
 void UJudgeLevelComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

@@ -41,9 +41,8 @@ void ULC_MatchLobby::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 void ULC_MatchLobby::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	Super::EndPlay(EndPlayReason);
-	
 	Deactivate();
+	Super::EndPlay(EndPlayReason);
 	DestroyComponent();
 }
 
