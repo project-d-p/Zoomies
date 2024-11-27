@@ -30,6 +30,7 @@ public:
 
 	bool bMigrating;
 	FName SessionNameGI;
+	bool bLoadedJustNow;
 
 private:
 	void ShowCapturedTextureToPlayer(UTextureRenderTarget2D* CapturedTexture, const TArray<FColor>& Bitmap);

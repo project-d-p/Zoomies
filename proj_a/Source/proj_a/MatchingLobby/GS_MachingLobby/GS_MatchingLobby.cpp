@@ -96,6 +96,7 @@ void AGS_MatchingLobby::BeginPlay()
 	{
 		OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &AGS_MatchingLobby::OnHostMigration);
 	}
+	GameInstance->network_failure_manager_->ClearWidget();
 	UDataManager* DataManager = GameInstance->network_failure_manager_->GetDataManager();
 	check(DataManager)
 	DataManager->ClearSeamlessDataArray();

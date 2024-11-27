@@ -325,22 +325,30 @@ void UNetworkFailureManager::OnNewLevelLoaded(const FWorldContext& WorldContext,
 void UNetworkFailureManager::OnNewLevelLoaded(UWorld* World)
 {
 	// POST LOAD
-	if (HostMigrationWidgetInstance)
+	if (bMigrating || bLoadedJustNow)
 	{
-		HostMigrationWidgetInstance->RemoveFromParent();
-		HostMigrationWidgetInstance = nullptr;
+		HostMigrationWidgetInstance = CreateWidget<UUserWidget>(World, WidgetHostMigration);
+		HostMigrationWidgetInstance->AddToViewport(99);
+	}
+	else
+	{
+		if (World->GetMapName().Contains(TEXT("mainLevel")))
+		{
+			FNetLogger::EditerLog(FColor::Cyan, TEXT("LoadingWidget Ready!"));
+			LoadingWidgetInstance = CreateWidget<UDPLoadingWidget>(World, WidgetLoading);
+			LoadingWidgetInstance->AddToViewport(99);
+		}
 	}
 }
 
 void UNetworkFailureManager::OnNewLevelLoaded(const FString& LevelName)
 {
 	// PreLoad
+	bLoadedJustNow = false;
 	const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
 	FString DefaultLevel = GameMapsSettings->GetGameDefaultMap();
 	if (bMigrating)
 	{
-		HostMigrationWidgetInstance = CreateWidget<UUserWidget>(GetWorld(), WidgetHostMigration);
-		HostMigrationWidgetInstance->AddToViewport(99);
 		if (DefaultLevel.Contains(LevelName))
 		{
 			return ;
@@ -348,16 +356,11 @@ void UNetworkFailureManager::OnNewLevelLoaded(const FString& LevelName)
 		if (LevelName.Contains(DesiredMapName.ToString()))
 		{
 			bMigrating = false;
+			bLoadedJustNow = true;
 		}
 	}
 	else
 	{
-		if (LevelName.Contains(TEXT("mainLevel")))
-		{
-			FNetLogger::EditerLog(FColor::Cyan, TEXT("LoadingWidget Ready!"));
-			LoadingWidgetInstance = CreateWidget<UDPLoadingWidget>(GetWorld(), WidgetLoading);
-			LoadingWidgetInstance->AddToViewport(99);
-		}
 		ResetInstance();
 	}
 }
@@ -628,5 +631,11 @@ void UNetworkFailureManager::ClearWidget()
 	if (LoadingWidgetInstance)
 	{
 		LoadingWidgetInstance->RemoveFromParent();
+		LoadingWidgetInstance = nullptr;
+	}
+	if (HostMigrationWidgetInstance)
+	{
+		HostMigrationWidgetInstance->RemoveFromParent();
+		HostMigrationWidgetInstance = nullptr;
 	}
 }

@@ -54,12 +54,13 @@ void AJudgeGameState::BeginPlay()
 
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
 	check(GameInstance)
-	if (!HasAuthority())
+	if (GameInstance)
 	{
-		if (GameInstance)
+		if (!HasAuthority())
 		{
 			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &AJudgeGameState::OnHostMigration);
 		}
+		GameInstance->network_failure_manager_->ClearWidget();
 	}
 }
 

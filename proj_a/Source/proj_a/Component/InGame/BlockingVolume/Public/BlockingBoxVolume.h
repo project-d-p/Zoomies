@@ -12,6 +12,7 @@ public:
 	ABlockingBoxVolume();
 
 	void DeactiveBlockingVolume(bool& bWallDisappear);
+	void Clear();
 
 protected:
 	UFUNCTION(NetMulticast, Reliable)
@@ -20,4 +21,5 @@ protected:
 private:
 	UPROPERTY()
 	UStaticMeshComponent* BlockingBox;
+	FTimerHandle DeactiveTimer;
 };
