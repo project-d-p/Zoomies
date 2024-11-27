@@ -54,12 +54,13 @@ void ADPInGameState::BeginPlay()
 	Super::BeginPlay();
 
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
-	if (!HasAuthority())
+	if (GameInstance)
 	{
-		if (GameInstance)
+		if (!HasAuthority())
 		{
 			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &ADPInGameState::OnHostMigration);
 		}
+		GameInstance->network_failure_manager_->ClearWidget();
 	}
 	if (!JobWidgetInstance)
 	{
