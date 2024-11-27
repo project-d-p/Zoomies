@@ -36,6 +36,7 @@ AJudgePlayerController::AJudgePlayerController()
 	}
 	
 	LevelComponent = CreateDefaultSubobject<UJudgeLevelComponent>(TEXT("ULC_JudgeLevel"));
+	OnPossessedPawnChanged.AddDynamic(this, &AJudgePlayerController::OnPossessEvent);
 }
 
 void AJudgePlayerController::SetOccupationeName_Implementation(int index, const FString& Name)
@@ -133,9 +134,18 @@ void AJudgePlayerController::RequestCharacter_Implementation()
 	}
 }
 
-void AJudgePlayerController::OnPossessEvent(APawn* /*OldPawn*/, APawn* /*NewPawn*/)
+void AJudgePlayerController::OnPossessEvent(APawn* /*OldPawn*/, APawn* NewPawn)
 {
 	GetWorldTimerManager().ClearTimer(CTH);
+
+	if (NewPawn)
+	{
+		UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+		if (GameInstance)
+		{
+			GameInstance->network_failure_manager_->ClearWidget();
+		}
+	}
 }
 
 void AJudgePlayerController::BeginPlay()

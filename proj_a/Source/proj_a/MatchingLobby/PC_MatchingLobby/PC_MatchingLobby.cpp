@@ -19,6 +19,8 @@ APC_MatchingLobby::APC_MatchingLobby()
 	LevelComponent = CreateDefaultSubobject<ULC_MatchLobby>(TEXT("ULC_MatchLobby"));
 	TextureTransferManager = CreateDefaultSubobject<UTextureTransferManager>(TEXT("TextureTransferManager"));
 	TextureTransferManager->OnDataTransferComplete.BindDynamic(TextureTransferManager, &UTextureTransferManager::OnTextureTransferComplete);
+
+	OnPossessedPawnChanged.AddDynamic(this, &APC_MatchingLobby::OnPossessEvent);
 }
 
 void APC_MatchingLobby::ServerSetReady_Implementation(bool pIsReady)
@@ -325,4 +327,16 @@ void APC_MatchingLobby::DisableMouseInput()
 	FInputModeGameOnly InputMode;
 	SetInputMode(InputMode);
 	bShowMouseCursor = false;
+}
+
+void APC_MatchingLobby::OnPossessEvent(APawn* OldPawn_, APawn* NewPawn)
+{
+	if (NewPawn)
+	{
+		UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+		if (GameInstance)
+		{
+			GameInstance->network_failure_manager_->ClearWidget();
+		}
+	}
 }
