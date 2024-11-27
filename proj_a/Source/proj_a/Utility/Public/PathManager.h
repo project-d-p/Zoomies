@@ -9,13 +9,14 @@ public:
 	{
 		switch (OType)
 		{
-		case EPlayerJob::JOB_ARCHAEOLOGIST: return TEXT("/Game/image/character/JobText/archa_red");
-		case EPlayerJob::JOB_POACHER: return TEXT("/Game/image/character/JobText/poacher_red");
-		case EPlayerJob::JOB_ENVIRONMENTALIST: return TEXT("/Game/image/character/JobText/environmentalist_red");
-		case EPlayerJob::JOB_RINGMASTER: return TEXT("/Game/image/character/JobText/ringMaster_red");
-		case EPlayerJob::JOB_TERRORIST: return TEXT("/Game/image/character/JobText/terrorist_red");
-		case EPlayerJob::JOB_CHECK: return TEXT("/Game/image/ui/check");
-		case EPlayerJob::JOB_CROSS: return TEXT("/Game/image/ui/cross");
+			case EPlayerJob::JOB_ARCHAEOLOGIST: return TEXT("/Game/image/character/JobText/archa_red");
+			case EPlayerJob::JOB_POACHER: return TEXT("/Game/image/character/JobText/poacher_red");
+			case EPlayerJob::JOB_ENVIRONMENTALIST: return TEXT("/Game/image/character/JobText/environmentalist_red");
+			case EPlayerJob::JOB_RINGMASTER: return TEXT("/Game/image/character/JobText/ringMaster_red");
+			case EPlayerJob::JOB_TERRORIST: return TEXT("/Game/image/character/JobText/terrorist_red");
+			case EPlayerJob::JOB_CHECK: return TEXT("/Game/image/ui/check");
+			case EPlayerJob::JOB_CROSS: return TEXT("/Game/image/ui/cross");
+			case EPlayerJob::JOB_NONE: return TEXT("/Game/image/character/JobText/Guess");
 			default: check(false) return nullptr;;
 		}
 	}

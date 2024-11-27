@@ -58,12 +58,7 @@ public:
         }
     }
     
-    EPlayerJob GetVote() 
-    {
-        FString CurrentVoterOccStr = OccupationToString(CurrentVoterOcc);
-
-        return CurrentVoterOcc;
-    }
+    EPlayerJob GetVote();
     void SetVoterName(const FString& Name)
     {
         VoterName->SetText(FText::FromString(Name));

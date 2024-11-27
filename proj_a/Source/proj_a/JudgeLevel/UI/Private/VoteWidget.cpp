@@ -59,3 +59,13 @@ void UVoteWidget::OnOpenVoteListButtonClicked()
         : ESlateVisibility::Visible
     );
 }
+
+EPlayerJob UVoteWidget::GetVote()
+{
+    FString CurrentVoterOccStr = OccupationToString(CurrentVoterOcc);
+    CurrentVoterOcc = EPlayerJob::JOB_NONE;
+    UTexture2D* Texture = LoadObject<UTexture2D>(nullptr, PathManager::GetOccupationImagePath(CurrentVoterOcc));
+    this->VoterImg->SetBrushFromTexture(Texture);
+    
+    return CurrentVoterOcc;
+}
