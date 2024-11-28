@@ -429,6 +429,9 @@ void ADPGameModeBase::Tick(float delta_time)
 
 void ADPGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	NetworkManager->Shutdown();
+	if (BlockingVolume)
+		BlockingVolume->Clear();
 	Super::EndPlay(EndPlayReason);
 
 	// NetworkManager->Shutdown();

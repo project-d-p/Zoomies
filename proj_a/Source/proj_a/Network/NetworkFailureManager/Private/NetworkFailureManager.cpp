@@ -15,6 +15,7 @@
 #include "Algo/Sort.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "CompileMode.h"
+#include "DPLoadingWidget.h"
 #include "isteamuser.h"
 #include "steamclientpublic.h"
 #include "Chaos/AABB.h"
@@ -33,6 +34,20 @@ UNetworkFailureManager::UNetworkFailureManager()
 	{
 		CapturedImageWidgetClass = CaptureImage.Class;
 	}
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetLoadingClass
+	(TEXT("/Game/widget/widget_loading.widget_loading_C"));
+	if (WidgetLoadingClass.Succeeded())
+	{
+		WidgetLoading = WidgetLoadingClass.Class;
+	}
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetHostMigrationClass
+	(TEXT("/Game/widget/widget_hostmigration.widget_hostmigration_C"));
+	if (WidgetHostMigrationClass.Succeeded())
+	{
+		WidgetHostMigration = WidgetHostMigrationClass.Class;
+	}
 }
 
 void UNetworkFailureManager::Init()
@@ -48,7 +63,7 @@ void UNetworkFailureManager::Init()
 	{
 		GEngine->OnNetworkFailure().AddUObject(this, &UNetworkFailureManager::HandleNetworkFailure);
 		// FWorldDelegates::LevelAddedToWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
-		// FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
+		FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
 		
 		// Below Functions Is Not Called During Seamless Travel
 		FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UNetworkFailureManager::OnNewLevelLoaded);
@@ -309,33 +324,29 @@ void UNetworkFailureManager::OnNewLevelLoaded(const FWorldContext& WorldContext,
 
 void UNetworkFailureManager::OnNewLevelLoaded(UWorld* World)
 {
-	FString LevelName = World->GetMapName();
-	const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
-	FString DefaultLevel = GameMapsSettings->GetGameDefaultMap();
-	// FString CurrentLevel = World->GetMapName();
-	if (bMigrating)
+	// POST LOAD
+	if (bMigrating || bLoadedJustNow)
 	{
-		if (DefaultLevel.Contains(LevelName))
-		{
-			return ;
-		}
-		if (LevelName.Contains(DesiredMapName.ToString()))
-		{
-			bMigrating = false;
-		}
+		HostMigrationWidgetInstance = CreateWidget<UUserWidget>(World, WidgetHostMigration);
+		HostMigrationWidgetInstance->AddToViewport(99);
 	}
 	else
 	{
-		ResetInstance();
+		if (World->GetMapName().Contains(TEXT("mainLevel")))
+		{
+			FNetLogger::EditerLog(FColor::Cyan, TEXT("LoadingWidget Ready!"));
+			LoadingWidgetInstance = CreateWidget<UDPLoadingWidget>(World, WidgetLoading);
+			LoadingWidgetInstance->AddToViewport(99);
+		}
 	}
 }
 
 void UNetworkFailureManager::OnNewLevelLoaded(const FString& LevelName)
 {
-	FNetLogger::LogError(TEXT("OnNewLevelLoaded %s"), *LevelName);
+	// PreLoad
+	bLoadedJustNow = false;
 	const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
 	FString DefaultLevel = GameMapsSettings->GetGameDefaultMap();
-	// FString CurrentLevel = World->GetMapName();
 	if (bMigrating)
 	{
 		if (DefaultLevel.Contains(LevelName))
@@ -345,42 +356,13 @@ void UNetworkFailureManager::OnNewLevelLoaded(const FString& LevelName)
 		if (LevelName.Contains(DesiredMapName.ToString()))
 		{
 			bMigrating = false;
+			bLoadedJustNow = true;
 		}
 	}
 	else
 	{
 		ResetInstance();
 	}
-	// const UGameMapsSettings* GameMapsSettings = GetDefault<UGameMapsSettings>();
-	// if (!GameMapsSettings)
-	// {
-	// 	FNetLogger::EditerLog(FColor::Red, TEXT("GameMapsSettings is null"));
-	// 	return;
-	// }
-	// FString DefaultLevel = GameMapsSettings->GetGameDefaultMap();
-	// FNetLogger::EditerLog(FColor::Cyan, TEXT("Default Level: %s"), *DefaultLevel);
-	// FNetLogger::EditerLog(FColor::Cyan, TEXT("Current Level: %s"), *World->GetMapName());
-	// if (CapturedImageWidget && !DefaultLevel.Contains(World->GetMapName()))
-	// {
-	// 	FNetLogger::EditerLog(FColor::Red, TEXT("OnNewLevelLoaded"));
-	// 	FCoreUObjectDelegates::PostLoadMapWithWorld.RemoveAll(this);
-	// 	CapturedImageWidget->RemoveFromParent();
-	// }
-	// else if (DefaultLevel.Contains(World->GetMapName()))
-	// {
-	// 	// UMG 困连 积己
-	// 	CapturedImageWidget = CreateWidget<UCapturedImageWidget>(World, CapturedImageWidgetClass);
-	// 	if (CapturedImageWidget)
-	// 	{
-	// 		// 母贸等 咆胶贸 汲沥
-	// 		if (CapturedTexture2D)
-	// 		{
-	// 			CapturedImageWidget->SetCapturedTexture(CapturedTexture2D);
-	// 			FNetLogger::EditerLog(FColor::Red, TEXT("OnNewLevelLoaded Default Level"));
-	// 			CapturedImageWidget->AddToViewport(9);
-	// 		}
-	// 	}
-	// }
 }
 
 void UNetworkFailureManager::JoinSession(const FOnlineSessionSearchResult& SearchResult, UWorld* World)
@@ -642,4 +624,18 @@ bool UNetworkFailureManager::ValidateAddr(FString& Addr)
 		}
 	}
 	return true;
+}
+
+void UNetworkFailureManager::ClearWidget()
+{
+	if (LoadingWidgetInstance)
+	{
+		LoadingWidgetInstance->RemoveFromParent();
+		LoadingWidgetInstance = nullptr;
+	}
+	if (HostMigrationWidgetInstance)
+	{
+		HostMigrationWidgetInstance->RemoveFromParent();
+		HostMigrationWidgetInstance = nullptr;
+	}
 }

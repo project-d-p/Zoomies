@@ -24,6 +24,7 @@ void AGM_Lobby::BeginPlay()
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
 	if (GameInstance)
 	{
+		GameInstance->network_failure_manager_->ClearWidget();
 		if(GameInstance->ResetSession())
 		{
 			if (UWorld* World = GetWorld())

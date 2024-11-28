@@ -63,7 +63,7 @@ ABaseMonsterCharacter::ABaseMonsterCharacter()
 	widgetComponent->SetupAttachment(GetMesh());
 	widgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
 	widgetComponent->SetDrawSize(FVector2D(500.f, 500.f));
-	widgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 300.f));
+	widgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
 	widgetComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> WIDGET

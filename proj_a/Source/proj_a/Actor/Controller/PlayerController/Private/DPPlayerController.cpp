@@ -165,9 +165,9 @@ void ADPPlayerController::Tick(float DeltaSeconds)
 
 void ADPPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	NetworkManager->Shutdown();
+	
 	Super::EndPlay(EndPlayReason);
-
-	// NetworkManager->Shutdown();
 }
 
 void ADPPlayerController::OnPossess(APawn* InPawn)
@@ -197,6 +197,14 @@ void ADPPlayerController::OnPossessEvent(APawn* OldPawn_, APawn* NewPawn)
 		}
 	}
 	Cast<UMainLevelComponent>(LevelComponents[static_cast<uint32>(ELevelComponentType::MAIN)])->SetStateComponent();
+	if (NewPawn)
+	{
+		UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
+		if (GameInstance)
+		{
+			GameInstance->network_failure_manager_->ClearWidget();
+		}
+	}
 }
 
 void ADPPlayerController::SetLevelComponent()

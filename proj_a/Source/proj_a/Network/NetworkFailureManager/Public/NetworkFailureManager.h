@@ -5,6 +5,7 @@
 #include "DataManager.h"
 #include "OnlineSessionSettings.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include "DPLoadingWidget.h"
 #include "NetworkFailureManager.generated.h"
 
 DECLARE_EVENT_TwoParams(UNetworkFailureManager, FOnHostMigration, UWorld*, UDataManager*);
@@ -25,9 +26,11 @@ public:
 	void TryReset();
 	void Init();
 	void SetSessionName(FName Name) { SessionNameGI = Name; }
+	void ClearWidget();
 
 	bool bMigrating;
 	FName SessionNameGI;
+	bool bLoadedJustNow;
 
 private:
 	void ShowCapturedTextureToPlayer(UTextureRenderTarget2D* CapturedTexture, const TArray<FColor>& Bitmap);
@@ -47,7 +50,7 @@ private:
 	void CaptureViewport();
 	void SaveSessionMetaData(UWorld* World);
 	bool ValidateAddr(FString& Addr);
-	
+
 	IOnlineSessionPtr SessionInterface;
 	FOnHostMigration OnHostMigrationDelegate;
 	FOnSessionDestroyedDelegate OnSessionDestroyedDelegate;
@@ -58,16 +61,26 @@ private:
 	FDelegateHandle OnJoinCompleteDelegateHandle;
 	FDelegateHandle OnFindCompleteDelegateHandle;
 	bool bNextHost;
-	UPROPERTY()
-	UDataManager* DataManager;
+	
 	FName DesiredSessionName;
 	FName DesiredMapName;
 	int DesiredMaxPlayers = 0;
+	FString SavedBanList;
+	FString ExistingPlayersList;
+
+	
+	UPROPERTY()
+	UDataManager* DataManager;
 	UPROPERTY()
 	UCapturedImageWidget* CapturedImageWidget;
 	UPROPERTY()
 	UTexture2D* CapturedTexture2D;
+	
 	TSubclassOf<UCapturedImageWidget> CapturedImageWidgetClass;
-	FString SavedBanList;
-	FString ExistingPlayersList;
+	TSubclassOf<UUserWidget> WidgetLoading;
+	UPROPERTY()
+	UDPLoadingWidget* LoadingWidgetInstance;
+	TSubclassOf<UUserWidget> WidgetHostMigration;
+	UPROPERTY()
+	UUserWidget* HostMigrationWidgetInstance;
 };

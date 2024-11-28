@@ -256,7 +256,7 @@ bool UGI_Zoomies::IsPlayerAllowedToJoin(const FString& PlayerId, const FOnlineSe
 	{
 		return false;
 	}
-
+ 
 	CSteamID SteamIDRaw = SteamUser()->GetSteamID();
 	FString PlayerSteamID = FString::Printf(TEXT("%llu"), SteamIDRaw.ConvertToUint64());
 	FUniqueNetIdRepl LocalID = GetWorld()->GetFirstLocalPlayerFromController()->GetUniqueNetIdFromCachedControllerId();
@@ -269,7 +269,7 @@ bool UGI_Zoomies::IsPlayerAllowedToJoin(const FString& PlayerId, const FOnlineSe
 	SearchResult.Session.SessionSettings.Get(FName("BanList"), BanList);
 	SearchResult.Session.SessionSettings.Get(FName("ExistingPlayersList"), ExistingPlayers);
 	SearchResult.Session.SessionSettings.Get(FName(SETTING_MAPNAME), MapName);
-
+ 
 	if (MapName.Contains("matchLobby"))
 	{
 		return true;

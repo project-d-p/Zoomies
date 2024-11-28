@@ -154,12 +154,13 @@ void AResultLevelGameState::BeginPlay()
 		Character->SetReplicatingMovement(true);
 	}
 	UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
-	if (!HasAuthority())
+	if (GameInstance)
 	{
-		if (GameInstance)
+		if (!HasAuthority())
 		{
 			OnHostMigrationDelegate = GameInstance->network_failure_manager_->OnHostMigration().AddUObject(this, &AResultLevelGameState::OnHostMigration);
 		}
+		GameInstance->network_failure_manager_->ClearWidget();
 	}
 }
 

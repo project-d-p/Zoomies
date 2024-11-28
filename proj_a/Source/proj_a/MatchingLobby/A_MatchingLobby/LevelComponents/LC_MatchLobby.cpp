@@ -31,7 +31,8 @@ void ULC_MatchLobby::Activate(bool bReset)
 void ULC_MatchLobby::Deactivate()
 {
 	Super::Deactivate();
-	InputComponent->Deactivate();
+	if (InputComponent)
+		InputComponent->Deactivate();
 }
 
 void ULC_MatchLobby::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

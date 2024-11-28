@@ -46,7 +46,10 @@ public:
 	void FindCineCamera();
 	void DisableMouseInput();
 	
-	
+	UFUNCTION()
+	void OnPossessEvent(APawn* OldPawn_, APawn* NewPawn);
+
+
 	UTextureTransferManager* GetTextureTransferManager() const { return TextureTransferManager; }
 private:
 	UPROPERTY()

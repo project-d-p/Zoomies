@@ -33,7 +33,8 @@ uint32 UNetworkWorker::Run()
 	while (this->bIsRunning)
 	{
 		SteamAPI_RunCallbacks();
-		SocketInterface->RecieveData(DataRecieveCallback);
+		if (SocketInterface)
+			SocketInterface->RecieveData(DataRecieveCallback);
 		this->FlushSendMessages();
 		FPlatformProcess::Sleep(0.01);
 	}
