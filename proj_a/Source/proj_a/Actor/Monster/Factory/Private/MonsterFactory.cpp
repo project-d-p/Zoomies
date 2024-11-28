@@ -92,7 +92,7 @@ ABaseMonsterAIController* UMonsterFactory::SpawnMonster(UClass* MonsterClass, co
 
 	TArray<FAIControllerSizeMapping> AIControllerSizeMappings = {
 		{ATargetPointMonsterAIController::StaticClass(), 0.5f},
-		{AAvoidPlayerMonsterAIController::StaticClass(), 0.5f},
+		// {AAvoidPlayerMonsterAIController::StaticClass(), 0.5f},
 		{AChasePlayerMonsterAIController::StaticClass(), 2.0f}
 	};
 
