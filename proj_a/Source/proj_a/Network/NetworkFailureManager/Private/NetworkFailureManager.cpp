@@ -628,6 +628,7 @@ bool UNetworkFailureManager::ValidateAddr(FString& Addr)
 
 void UNetworkFailureManager::ClearWidget()
 {
+	bLoadedJustNow = false;
 	if (LoadingWidgetInstance)
 	{
 		LoadingWidgetInstance->RemoveFromParent();
