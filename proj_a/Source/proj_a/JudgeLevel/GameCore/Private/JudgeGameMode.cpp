@@ -101,7 +101,6 @@ FUIInitData AJudgeGameMode::GetUiData()
         GS->GS_PlayerData[Index].CameraIndex = Index;
     }
 
-    UIData.VoterName = Cast<AJudgePlayerState>(GetWorld()->GetGameState<AJudgeGameState>()->PlayerArray[CurrentPlayerIndex])->GetPlayerName();
     // for now, following code is temporary. (Current player index)
     while (true)
     {
