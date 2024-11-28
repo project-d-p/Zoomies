@@ -36,7 +36,7 @@ uint32 UNetworkWorker::Run()
 		if (SocketInterface)
 			SocketInterface->RecieveData(DataRecieveCallback);
 		this->FlushSendMessages();
-		FPlatformProcess::Sleep(0.01);
+		// FPlatformProcess::Sleep(0.01);
 	}
 	return 0;
 }
