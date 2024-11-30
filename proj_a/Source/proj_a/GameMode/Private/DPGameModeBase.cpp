@@ -84,10 +84,10 @@ void ADPGameModeBase::GetSeamlessTravelActorList(bool bToTransition, TArray<AAct
 void ADPGameModeBase::SpawnNewCharacter(APlayerController* NewPlayer)
 {
 	FVector Location[4] = {
-		FVector(13833.768291,-469.843764,82.428649),
-		FVector(13833.768291,79.326964,82.428649),
-		FVector(14166.601644,79.326964,82.428649),
-		FVector(14166.601644,-469.843764,82.428649),
+		FVector(6033.849199,-429.24333,82.428649),
+		FVector(6033.849199,17.432042,82.428649),
+		FVector(6468.20866,-429.24333,82.428649),
+		FVector(6468.20866,17.432042,82.428649),
 	};
 	static int idx = 0;
 	if (idx >= 4)
