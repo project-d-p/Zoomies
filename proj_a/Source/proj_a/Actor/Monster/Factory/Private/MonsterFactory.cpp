@@ -90,9 +90,9 @@ ABaseMonsterAIController* UMonsterFactory::SpawnMonster(UClass* MonsterClass, co
 	}
 
 	TArray<FAIControllerSizeMapping> AIControllerSizeMappings = {
-		{ATargetPointMonsterAIController::StaticClass(), 0.5f},
+		{ATargetPointMonsterAIController::StaticClass(), 2.0f},
 		// {AAvoidPlayerMonsterAIController::StaticClass(), 0.5f},
-		{AChasePlayerMonsterAIController::StaticClass(), 2.0f}
+		{AChasePlayerMonsterAIController::StaticClass(), 3.0f}
 	};
 
 	int32 RandomIndex = FMath::RandRange(0, AIControllerSizeMappings.Num() - 1);
