@@ -167,9 +167,10 @@ void AReturnTriggerVolume::SpawnReturnEffect(TArray<EAnimal> Array)
 		{
 			if (WeakThis.IsValid())
 			{
-				WeakThis->SpawnSingleMonster(Animal, Index);
+				AReturnTriggerVolume* StrongThis = WeakThis.Get();
+				StrongThis->SpawnSingleMonster(Animal, Index);
 				// delete SpawnTimerHandle;
-				WeakThis->SpawnTimerHandles.Remove(SpawnTimerHandle);
+				StrongThis->SpawnTimerHandles.Remove(SpawnTimerHandle);
 			}
 		});
 		float SpawnDelay = Index * 0.5f;
