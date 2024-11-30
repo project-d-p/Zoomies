@@ -311,7 +311,7 @@ void ADPGameModeBase::InitializeGame()
 	int NumMaxPlayers = GameInstance->network_failure_manager_->GetDesiredMaxPlayers();
 	if (NumMaxPlayers == 0)
 	{
-		BlockingVolume = GetWorld()->SpawnActor<ABlockingBoxVolume>(ABlockingBoxVolume::StaticClass(), FVector(13380.0f, -253.279822f, 70.0f), FRotator(0.0f, 0.0f, 0.0f));
+		BlockingVolume = GetWorld()->SpawnActor<ABlockingBoxVolume>(ABlockingBoxVolume::StaticClass(), FVector(5564.740661f, -253.279822f, 70.0f), FRotator(0.0f, 0.0f, 0.0f));
 	}
 	else
 	{

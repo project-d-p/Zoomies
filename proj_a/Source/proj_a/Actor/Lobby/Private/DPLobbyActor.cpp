@@ -30,7 +30,7 @@ ADPLobbyActor::ADPLobbyActor()
     if (FOXANIMATION.Succeeded()) {
         foxAnim = FOXANIMATION.Object;
         foxComponent->AnimationData.AnimToPlay = foxAnim;
-        foxComponent->AnimationData.SavedPlayRate = 3.5f;
+        foxComponent->AnimationData.SavedPlayRate = 4.5f;
     }
 
     arrowComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("arrowComponent"));
@@ -201,7 +201,7 @@ ADPLobbyActor::ADPLobbyActor()
     if (LIONANIMATION.Succeeded()) {
         lionAnim = LIONANIMATION.Object;
         lionComponent->AnimationData.AnimToPlay = lionAnim;
-        lionComponent->AnimationData.SavedPlayRate = 0.8f;
+        lionComponent->AnimationData.SavedPlayRate = 0.6f;
     }
 
     FAnimalData lionData;
