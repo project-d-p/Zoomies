@@ -16,7 +16,7 @@ FScoreData UCalculateScoreByJobs::CalculateScoreByJobs(EPlayerJob Job, const TAr
 					EAnimal::ANIMAL_MAMMOTH,
 					{TArray<EAnimal>{
 						EAnimal::ANIMAL_MAMMOTH,
-						EAnimal::ANIMAL_ELEPHANT,
+						EAnimal::ANIMAL_CHAMELEON,
 						EAnimal::ANIMAL_WHALE}},
 					{TArray<EAnimal>{
 						EAnimal::ANIMAL_MAMMOTH,
@@ -46,7 +46,7 @@ FScoreData UCalculateScoreByJobs::CalculateScoreByJobs(EPlayerJob Job, const TAr
 				animals,
 				EAnimal::ANIMAL_LION,
 				{TArray<EAnimal>{
-					EAnimal::ANIMAL_ELEPHANT,
+					EAnimal::ANIMAL_HORSE,
 					EAnimal::ANIMAL_SEAL,
 					EAnimal::ANIMAL_LION}},
 				{TArray<EAnimal>{
