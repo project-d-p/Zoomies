@@ -219,14 +219,7 @@ void UCharacterPositionSync::SyncOrientationWithController(ADPCharacter* charact
 
 void UCharacterPositionSync::SyncOrientation(ADPCharacter* character)
 {
-	if (character->isAim == true)
-	{
-		this->SyncOrientationWithController(character);
-	}
-	else
-	{
-		this->SyncOrientationWithRotation(character);
-	}
+	this->SyncOrientationWithRotation(character);
 }
 
 void UCharacterPositionSync::SyncJump(ADPCharacter* character)
