@@ -217,7 +217,8 @@ void AReturnTriggerVolume::SpawnSingleMonster(EAnimal Animal, int32 Index)
         	{
         		if (WeakThis.IsValid() && IsValid(Mesh))
         		{
-        			WeakThis->AnimateAnimalMesh(Mesh);
+        			AReturnTriggerVolume* StrongThis = WeakThis.Get();
+        			StrongThis->AnimateAnimalMesh(Mesh);
         		}
         	});
             GetWorld()->GetTimerManager().SetTimer(AnimData.AnimationTimerHandle, AnimationTimerDelegate, 0.016f, true);
@@ -228,8 +229,9 @@ void AReturnTriggerVolume::SpawnSingleMonster(EAnimal Animal, int32 Index)
 			{
 				if (WeakThis.IsValid() && IsValid(Mesh))
 				{
+					AReturnTriggerVolume* StrongThis = WeakThis.Get();
 					Mesh->DestroyComponent();
-					WeakThis->MeshAnimationMap.erase(Mesh);
+					StrongThis->MeshAnimationMap.erase(Mesh);
 				}
 			});
         	float DestroyDelay = 2.5f + (Index * 0.5f);
