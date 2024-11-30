@@ -628,15 +628,18 @@ bool UNetworkFailureManager::ValidateAddr(FString& Addr)
 
 void UNetworkFailureManager::ClearWidget()
 {
-	bLoadedJustNow = false;
-	if (LoadingWidgetInstance)
+	if (LoadingWidgetInstance || HostMigrationWidgetInstance)
 	{
-		LoadingWidgetInstance->RemoveFromParent();
-		LoadingWidgetInstance = nullptr;
-	}
-	if (HostMigrationWidgetInstance)
-	{
-		HostMigrationWidgetInstance->RemoveFromParent();
-		HostMigrationWidgetInstance = nullptr;
+		if (LoadingWidgetInstance)
+		{
+			LoadingWidgetInstance->RemoveFromParent();
+			LoadingWidgetInstance = nullptr;
+		}
+		if (HostMigrationWidgetInstance)
+		{
+			HostMigrationWidgetInstance->RemoveFromParent();
+			HostMigrationWidgetInstance = nullptr;
+			bLoadedJustNow = false;
+		}
 	}
 }
