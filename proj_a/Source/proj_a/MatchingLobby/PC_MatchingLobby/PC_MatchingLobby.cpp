@@ -336,7 +336,11 @@ void APC_MatchingLobby::OnPossessEvent(APawn* OldPawn_, APawn* NewPawn)
 		UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
 		if (GameInstance)
 		{
-			GameInstance->network_failure_manager_->ClearWidget();
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [GameInstance, this]()
+			{
+				GameInstance->network_failure_manager_->ClearWidget();
+			}, 1.0f, false);
 		}
 	}
 }

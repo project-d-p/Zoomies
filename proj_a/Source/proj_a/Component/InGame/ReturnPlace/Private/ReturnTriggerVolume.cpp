@@ -60,8 +60,10 @@ void AReturnTriggerVolume::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		}
 		for (FTimerHandle& Handle : SpawnTimerHandles)
 		{
-			World->GetTimerManager().ClearTimer(Handle);
-			// delete Handle;
+			if (GetWorld()->GetTimerManager().IsTimerActive(Handle))
+			{
+				GetWorld()->GetTimerManager().ClearTimer(Handle);
+			}
 		}
 	}
 	MeshAnimationMap.clear();
@@ -163,14 +165,14 @@ void AReturnTriggerVolume::SpawnReturnEffect(TArray<EAnimal> Array)
         
 		TWeakObjectPtr<AReturnTriggerVolume> WeakThis(this);
         
-		SpawnTimerDelegate.BindLambda([WeakThis, Animal, Index, SpawnTimerHandle]()
+		SpawnTimerDelegate.BindLambda([WeakThis, Animal, Index]()
 		{
 			if (WeakThis.IsValid())
 			{
 				AReturnTriggerVolume* StrongThis = WeakThis.Get();
 				StrongThis->SpawnSingleMonster(Animal, Index);
 				// delete SpawnTimerHandle;
-				StrongThis->SpawnTimerHandles.Remove(SpawnTimerHandle);
+				// StrongThis->SpawnTimerHandles.Remove(SpawnTimerHandle);
 			}
 		});
 		float SpawnDelay = Index * 0.5f;
@@ -181,13 +183,23 @@ void AReturnTriggerVolume::SpawnReturnEffect(TArray<EAnimal> Array)
 
 void AReturnTriggerVolume::SpawnSingleMonster(EAnimal Animal, int32 Index)
 {
-	auto It = monsterMeshMap.find(Animal);
-    if (It != monsterMeshMap.end())
+	    // MonsterMeshMap 조회 보호
+    USkeletalMesh* SkeletalMesh = nullptr;
+    {
+        std::lock_guard<std::mutex> Lock(MonsterMeshMapMutex); // Lock 시작
+        auto It = monsterMeshMap.find(Animal);
+        if (It != monsterMeshMap.end())
+        {
+            SkeletalMesh = It->second;
+        }
+    } // Lock 해제 (scope 종료)
+
+    if (SkeletalMesh)
     {
         USkeletalMeshComponent* Mesh = NewObject<USkeletalMeshComponent>(this);
         if (Mesh)
         {
-            Mesh->SetSkeletalMesh(It->second);
+            Mesh->SetSkeletalMesh(SkeletalMesh);
             Mesh->RegisterComponent();
             Mesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
 
@@ -209,35 +221,41 @@ void AReturnTriggerVolume::SpawnSingleMonster(EAnimal Animal, int32 Index)
             AnimData.TotalTime = 0.0f;
             AnimData.Index = Index; // Store the index for use in animation
 
-        	TWeakObjectPtr<AReturnTriggerVolume> WeakThis(this);
+            TWeakObjectPtr<AReturnTriggerVolume> WeakThis(this);
+        	TWeakObjectPtr<USkeletalMeshComponent> WeakMesh(Mesh);
             // Start the ascension animation
             FTimerDelegate AnimationTimerDelegate;
-			// AnimationTimerDelegate.BindUFunction(this, FName("AnimateAnimalMesh"), Mesh);
-        	AnimationTimerDelegate.BindLambda([WeakThis, Mesh]()
-        	{
-        		if (WeakThis.IsValid() && IsValid(Mesh))
-        		{
-        			AReturnTriggerVolume* StrongThis = WeakThis.Get();
-        			StrongThis->AnimateAnimalMesh(Mesh);
-        		}
-        	});
-            GetWorld()->GetTimerManager().SetTimer(AnimData.AnimationTimerHandle, AnimationTimerDelegate, 0.016f, true);
-
-        	// Schedule mesh destruction
-        	FTimerDelegate DestroyTimerDelegate;
-        	DestroyTimerDelegate.BindLambda([WeakThis, Mesh]()
-			{
-				if (WeakThis.IsValid() && IsValid(Mesh))
+            AnimationTimerDelegate.BindLambda([WeakThis, WeakMesh]()
+            {
+                if (WeakThis.IsValid() && WeakMesh.IsValid())
 				{
 					AReturnTriggerVolume* StrongThis = WeakThis.Get();
-					Mesh->DestroyComponent();
-					StrongThis->MeshAnimationMap.erase(Mesh);
+					USkeletalMeshComponent* StrongMesh = WeakMesh.Get();
+					StrongThis->AnimateAnimalMesh(StrongMesh);
 				}
-			});
-        	float DestroyDelay = 2.5f + (Index * 0.5f);
-        	GetWorld()->GetTimerManager().SetTimer(AnimData.DestroyTimerHandle, DestroyTimerDelegate, DestroyDelay, false);
+            });
+            GetWorld()->GetTimerManager().SetTimer(AnimData.AnimationTimerHandle, AnimationTimerDelegate, 0.016f, true);
+
+            // Schedule mesh destruction
+            FTimerDelegate DestroyTimerDelegate;
+            DestroyTimerDelegate.BindLambda([WeakThis, WeakMesh, this]()
+            {
+                if (WeakThis.IsValid() && WeakMesh.IsValid())
+                {
+                    AReturnTriggerVolume* StrongThis = WeakThis.Get();
+                	USkeletalMeshComponent* StrongMesh = WeakMesh.Get();
+                    StrongMesh->DestroyComponent();
+                    {
+                        std::lock_guard<std::mutex> Lock(MonsterMeshMapMutex); // Lock 시작
+                        StrongThis->MeshAnimationMap.erase(StrongMesh);
+                    } // Lock 해제
+                }
+            });
+            float DestroyDelay = 2.5f + (Index * 0.5f);
+            GetWorld()->GetTimerManager().SetTimer(AnimData.DestroyTimerHandle, DestroyTimerDelegate, DestroyDelay, false);
         }
     }
+
 }
 
 void AReturnTriggerVolume::AnimateAnimalMesh(USkeletalMeshComponent* Mesh)

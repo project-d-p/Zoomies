@@ -3,6 +3,8 @@
 
 #include "CoreMinimal.h"
 #include <map>
+#include <mutex>
+
 #include "GameFramework/Actor.h"
 #include "Components/SphereComponent.h"
 #include "proj_a/Component/InGame/Score/Types/ScoreTypes.h"
@@ -58,4 +60,5 @@ private:
 	
 	UPROPERTY()
 	TArray<FTimerHandle> SpawnTimerHandles;
+	std::mutex MonsterMeshMapMutex;
 };

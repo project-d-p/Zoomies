@@ -36,7 +36,14 @@ AJudgePlayerController::AJudgePlayerController()
 	}
 	
 	LevelComponent = CreateDefaultSubobject<UJudgeLevelComponent>(TEXT("ULC_JudgeLevel"));
+	/*
+		 * This Delegate will Called when the Controller Possess New Pawn or UnPossess Old Pawn on both Server and Client Side
+		 * Look at the Possess() function in APlayerController Class
+		 * Pawn is Set as Replicated so OnRep_Pawn() will be called on both Server and Client Side
+		 * OnRep_Pawn() will call OnPossessedPawnChanged Delegate to Broadcast the Possess Event
+		*/
 	OnPossessedPawnChanged.AddDynamic(this, &AJudgePlayerController::OnPossessEvent);
+	// OnPossessedPawnChanged.AddDynamic(this, &AJudgePlayerController::OnPossessEvent);
 }
 
 void AJudgePlayerController::SetOccupationeName_Implementation(int index, const FString& Name)
@@ -143,7 +150,11 @@ void AJudgePlayerController::OnPossessEvent(APawn* /*OldPawn*/, APawn* NewPawn)
 		UGI_Zoomies* GameInstance = Cast<UGI_Zoomies>(GetGameInstance());
 		if (GameInstance)
 		{
-			GameInstance->network_failure_manager_->ClearWidget();
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [GameInstance, this]()
+			{
+				GameInstance->network_failure_manager_->ClearWidget();
+			}, 1.0f, false);
 		}
 	}
 }
@@ -166,13 +177,6 @@ void AJudgePlayerController::BeginPlay()
 		findMyCamera();
 		RequestCharacter();
 		GetWorldTimerManager().SetTimer(CTH, this, &AJudgePlayerController::RequestCharacter, 1.f, true);
-		/*
-		 * This Delegate will Called when the Controller Possess New Pawn or UnPossess Old Pawn on both Server and Client Side
-		 * Look at the Possess() function in APlayerController Class
-		 * Pawn is Set as Replicated so OnRep_Pawn() will be called on both Server and Client Side
-		 * OnRep_Pawn() will call OnPossessedPawnChanged Delegate to Broadcast the Possess Event
-		*/
-		OnPossessedPawnChanged.AddDynamic(this, &AJudgePlayerController::OnPossessEvent);
 	}
 	ActivateCurrentComponent(this);
 	SetInputMode(FInputModeGameAndUI());
