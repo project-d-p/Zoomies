@@ -78,9 +78,9 @@ void AResultLevelGameState::AddLeftPlayers()
 
 	FinalScoreDataArray.Append(LeftPlayers);
 
-	if (FinalScoreDataArray.Num() < 4)
+	if (FinalScoreDataArray.Num() < 3)
 	{
-		for (int i = FinalScoreDataArray.Num(); i < 4; i++)
+		for (int i = FinalScoreDataArray.Num(); i < 3; i++)
 		{
 			FFinalScoreData FinalScoreData;
 			FinalScoreData.PlayerName = TEXT("NONE");

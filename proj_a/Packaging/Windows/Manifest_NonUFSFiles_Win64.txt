@@ -3,7 +3,7 @@ proj_a/Binaries/Win64/OpenImageDenoise.dll	2024-06-11T05:57:57.294Z
 proj_a/Binaries/Win64/libprotobuf-lite.dll	2024-08-01T11:07:48.149Z
 proj_a/Binaries/Win64/libprotobuf.dll	2024-08-01T11:07:47.933Z
 proj_a/Binaries/Win64/libprotoc.dll	2024-08-01T11:07:48.274Z
-proj_a/Binaries/Win64/proj_a-Win64-Shipping.exe	2024-11-20T07:11:04.242Z
+proj_a/Binaries/Win64/proj_a-Win64-Shipping.exe	2024-12-02T11:48:50.002Z
 proj_a/Binaries/Win64/steam_api64.dll	2024-06-10T11:56:21.378Z
 proj_a/Binaries/Win64/tbb.dll	2024-06-11T05:44:14.543Z
 proj_a/Binaries/Win64/tbb12.dll	2024-06-11T05:57:56.029Z
@@ -19,4 +19,4 @@ Engine/Binaries/ThirdParty/Vorbis/Win64/VS2015/libvorbis_64.dll	2024-06-11T05:44
 Engine/Binaries/ThirdParty/Vorbis/Win64/VS2015/libvorbisfile_64.dll	2024-06-11T05:44:27.577Z
 Engine/Binaries/ThirdParty/Windows/XAudio2_9/x64/xaudio2_9redist.dll	2024-06-11T05:44:27.717Z
 Engine/Content/Slate/Cursor/invisible.cur	2024-06-11T05:46:03.994Z
-proj_a.exe	2024-11-20T07:11:52.791Z
+proj_a.exe	2024-12-02T11:49:26.683Z
